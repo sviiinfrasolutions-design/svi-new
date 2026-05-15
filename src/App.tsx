@@ -8,6 +8,7 @@ import ThankYou from './pages/ThankYou';
 import Projects from './pages/Projects';
 import CompletedProjects from './pages/CompletedProjects';
 import FAQ from './pages/FAQ';
+import Careers from './pages/Careers';
 import ScrollToTop from './components/common/ScrollToTop';
 import { ThemeProvider } from './components/ThemeProvider';
 
@@ -20,6 +21,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/careers" element={<Careers />} />
             <Route path="/projects/current" element={<Projects />} />
             <Route path="/projects/completed" element={<CompletedProjects />} />
             <Route path="/faq" element={<FAQ />} />
