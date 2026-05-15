@@ -3,41 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Download, ArrowRight, MapPin, X, ChevronLeft, ChevronRight, Facebook, Twitter, Linkedin, Share2 } from 'lucide-react';
 import CompletedProjectsMap from '../components/CompletedProjectsMap';
-
-const HoverZoomImage = ({ src, alt }: { src: string; alt: string }) => {
-  const [backgroundPosition, setBackgroundPosition] = useState('50% 50%');
-  
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
-    setBackgroundPosition(`${x}% ${y}%`);
-  };
-
-  return (
-    <div 
-      className="w-full h-full relative cursor-zoom-in overflow-hidden group/zoom"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => setBackgroundPosition('50% 50%')}
-    >
-      <img
-        src={src + '&fm=webp'}
-        alt={alt}
-        loading="lazy"
-        decoding="async"
-        className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover/zoom:opacity-0 relative z-0"
-      />
-      <div 
-        className="absolute inset-0 bg-no-repeat pointer-events-none opacity-0 group-hover/zoom:opacity-100 z-10 transition-opacity duration-300 bg-gray-100"
-        style={{
-          backgroundImage: `url(${src})`,
-          backgroundPosition,
-          backgroundSize: '250%',
-        }}
-      />
-    </div>
-  );
-};
+import HoverZoomImage from '../components/common/HoverZoomImage';
 
 const completedProjectsData = [
   {
@@ -72,23 +38,6 @@ const completedProjectsData = [
     gallery: [
       'https://images.unsplash.com/photo-1600607687931-cecebd802404?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ],
-    pdf: true
-  },
-  {
-    id: 'shivani-vatika',
-    title: 'Shivani Vatika',
-    location: 'Nayla',
-    lat: 26.8500,
-    lng: 76.0000,
-    type: 'Modern Living',
-    description: 'A modern living space that redefines community living. A fully sold-out project that stands as a testament to our quality commitment.',
-    fullDescription: 'Located in the serene landscapes of Nayla, Shivani Vatika redefined modern community living. Offering uniquely crafted residential spaces equipped with essential urban facilities, this widely acclaimed project sold out in record time. It reflects SVI Infra Solutions’ commitment to quality, timely delivery, and producing environments that foster active and peaceful lifestyles.',
-    status: 'Sold Out',
-    img: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    gallery: [
-      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     ],
     pdf: true
   },
