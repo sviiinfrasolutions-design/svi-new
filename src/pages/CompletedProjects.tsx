@@ -22,7 +22,7 @@ const HoverZoomImage = ({ src, alt }: { src: string; alt: string }) => {
       <img
         src={src}
         alt={alt}
-        className="w-full h-full object-cover transition-all duration-500 group-hover/zoom:opacity-0 group-hover/zoom:scale-110 relative z-0"
+        className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover/zoom:opacity-0 relative z-0"
       />
       <div 
         className="absolute inset-0 bg-no-repeat pointer-events-none opacity-0 group-hover/zoom:opacity-100 z-10 transition-opacity duration-300 bg-gray-100"
