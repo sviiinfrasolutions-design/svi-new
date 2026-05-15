@@ -63,7 +63,8 @@ const completedProjectsData = [
     gallery: [
       'https://images.unsplash.com/photo-1600607687931-cecebd802404?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ]
+    ],
+    pdf: true
   },
   {
     title: 'Shyam Aangan',
@@ -76,7 +77,8 @@ const completedProjectsData = [
     gallery: [
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ]
+    ],
+    pdf: true
   },
   {
     title: 'Shivani Vatika',
@@ -89,7 +91,8 @@ const completedProjectsData = [
     gallery: [
       'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ]
+    ],
+    pdf: true
   },
   {
     title: 'Shivani Residency',
@@ -102,7 +105,8 @@ const completedProjectsData = [
     gallery: [
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    ]
+    ],
+    pdf: true
   }
 ];
 
@@ -203,6 +207,7 @@ export default function CompletedProjects() {
                         <span className="text-xs font-bold text-brand-gold uppercase tracking-widest mt-1">{project.status}</span>
                       </div>
                       <button className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-brand-gold pb-1 text-brand-navy hover:text-brand-gold transition-colors cursor-pointer">
+                        <Download size={14} />
                         Download PDF
                       </button>
                     </div>
