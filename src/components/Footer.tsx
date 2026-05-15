@@ -51,6 +51,7 @@ const Footer = memo(function Footer() {
             <ul className="flex flex-col gap-4">
               <li><Link to="/" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Home</Link></li>
               <li><Link to="/about" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">About Us</Link></li>
+              <li><Link to="/leadership" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Leadership</Link></li>
               <li><Link to="/#faq" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">FAQ</Link></li>
               <li><Link to="/projects/completed" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Completed Projects</Link></li>
               <li><Link to="/registration" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Register</Link></li>
@@ -60,14 +61,14 @@ const Footer = memo(function Footer() {
 
           <div>
             <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">
-              Services
+              Services & Support
             </h4>
             <ul className="flex flex-col gap-4">
+              <li><Link to="/payment" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-brand-gold transition-colors">Pay Online</Link></li>
+              <li><Link to="/grievance" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-brand-gold transition-colors">Raise a Grievance</Link></li>
               <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Residential Properties</li>
               <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Commercial Properties</li>
               <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Property Management</li>
-              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Real Estate Consultancy</li>
-              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Project Development</li>
             </ul>
           </div>
 

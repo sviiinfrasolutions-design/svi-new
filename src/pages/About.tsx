@@ -83,7 +83,7 @@ export default function About() {
            <div className="flex flex-col md:flex-row gap-16 items-center">
              <div className="md:w-1/2">
                 <img 
-                  src="https://images.unsplash.com/photo-1542621334-a254cf47733d?q=80&w=1000&auto=format&fit=crop&fm=webp" 
+                  src="/images/house1.png" 
                   alt="Our Services" 
                   loading="lazy"
                   decoding="async"

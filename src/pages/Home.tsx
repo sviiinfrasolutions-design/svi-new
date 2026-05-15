@@ -13,9 +13,9 @@ const COMPLETED_PROJECTS = [
 ];
 
 const HERO_IMAGES = [
-  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
-  "https://images.unsplash.com/photo-1600607687931-cecebd802404?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
-  "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+  "/images/hero1.png",
+  "/images/hero2.png",
+  "/images/hero3.png",
 ];
 
 const HOME_FEATURES = [
@@ -212,7 +212,7 @@ export default function Home() {
             <div className="lg:w-1/2 relative">
               <div className="absolute inset-0 bg-brand-navy/5 translate-x-6 translate-y-6"></div>
               <img
-                src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80&fm=webp"
+                src="/images/house1.png"
                 alt="Modern House exterior"
                 loading="lazy"
                 decoding="async"
@@ -285,7 +285,7 @@ export default function Home() {
                 <div className="relative h-72 overflow-hidden bg-brand-navy">
                   <div className="absolute inset-0 bg-brand-navy/10 group-hover:bg-transparent transition-colors z-10"></div>
                   <img
-                    src={`https://images.unsplash.com/photo-160060768${8969 + idx}-cc921dd82801?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&fm=webp`}
+                    src={idx === 0 ? "/images/project1.png" : idx === 1 ? "/images/project2.png" : "/images/house1.png"}
                     alt={project.title}
                     loading="lazy"
                     decoding="async"

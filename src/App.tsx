@@ -16,6 +16,11 @@ const ThankYou = lazy(() => import('./pages/ThankYou'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsConditions = lazy(() => import('./pages/TermsConditions'));
+const Leadership = lazy(() => import('./pages/Leadership'));
+const Blog = lazy(() => import('./pages/Blog'));
+const Payment = lazy(() => import('./pages/Payment'));
+const Grievance = lazy(() => import('./pages/Grievance'));
+const Login = lazy(() => import('./pages/Login'));
 
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-brand-bg dark:bg-gray-900">
@@ -61,6 +66,11 @@ function App() {
                 <Route path="/thank-you" element={<ThankYou />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-conditions" element={<TermsConditions />} />
+                <Route path="/leadership" element={<Leadership />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/payment" element={<Payment />} />
+                <Route path="/grievance" element={<Grievance />} />
+                <Route path="/login" element={<Login />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
