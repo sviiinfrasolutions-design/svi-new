@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { Download, ArrowRight, MapPin, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Download, ArrowRight, MapPin, X, ChevronLeft, ChevronRight, Facebook, Twitter, Linkedin, Share2 } from 'lucide-react';
 
 const HoverZoomImage = ({ src, alt }: { src: string; alt: string }) => {
   const [backgroundPosition, setBackgroundPosition] = useState('50% 50%');
@@ -113,10 +113,12 @@ const completedProjectsData = [
 export default function CompletedProjects() {
   const [selectedProject, setSelectedProject] = useState<typeof completedProjectsData[0] | null>(null);
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
 
   const openModal = (project: typeof completedProjectsData[0]) => {
     setSelectedProject(project);
     setCurrentGalleryIndex(0);
+    setDirection(0);
     document.body.style.overflow = 'hidden';
   };
 
@@ -125,16 +127,18 @@ export default function CompletedProjects() {
     document.body.style.overflow = 'auto';
   };
 
-  const nextImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const nextImage = (e?: React.MouseEvent | Event) => {
+    if (e && 'stopPropagation' in e) e.stopPropagation();
     if (selectedProject && selectedProject.gallery) {
+      setDirection(1);
       setCurrentGalleryIndex((prev) => (prev + 1) % selectedProject.gallery.length);
     }
   };
 
-  const prevImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const prevImage = (e?: React.MouseEvent | Event) => {
+    if (e && 'stopPropagation' in e) e.stopPropagation();
     if (selectedProject && selectedProject.gallery) {
+      setDirection(-1);
       setCurrentGalleryIndex((prev) => (prev - 1 + selectedProject.gallery.length) % selectedProject.gallery.length);
     }
   };
@@ -269,11 +273,29 @@ export default function CompletedProjects() {
               <div className="md:w-1/2 relative bg-gray-100 min-h-[300px] md:min-h-auto flex items-center justify-center group overflow-hidden">
                 {selectedProject.gallery && selectedProject.gallery.length > 0 ? (
                   <>
-                    <img 
-                      src={selectedProject.gallery[currentGalleryIndex]} 
-                      alt={`${selectedProject.title} gallery ${currentGalleryIndex + 1}`}
-                      className="w-full h-full object-cover absolute inset-0"
-                    />
+                    <AnimatePresence initial={false} custom={direction} mode="popLayout">
+                      <motion.img 
+                        key={currentGalleryIndex}
+                        src={selectedProject.gallery[currentGalleryIndex]} 
+                        alt={`${selectedProject.title} gallery ${currentGalleryIndex + 1}`}
+                        className="w-full h-full object-cover absolute inset-0 cursor-grab active:cursor-grabbing"
+                        custom={direction}
+                        initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: direction > 0 ? -100 : 100 }}
+                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={1}
+                        onDragEnd={(e, { offset, velocity }) => {
+                          if (offset.x < -50 || velocity.x < -500) {
+                            nextImage();
+                          } else if (offset.x > 50 || velocity.x > 500) {
+                            prevImage();
+                          }
+                        }}
+                      />
+                    </AnimatePresence>
                     
                     {selectedProject.gallery.length > 1 && (
                       <>
@@ -337,6 +359,25 @@ export default function CompletedProjects() {
                     Download Brochure (PDF)
                   </button>
                 )}
+
+                <div className="mt-8 pt-8 border-t border-gray-100 mt-auto">
+                  <div className="flex items-center gap-4">
+                    <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest flex items-center gap-2">
+                       <Share2 size={12} /> Share Project
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-[#1877F2] hover:text-white transition-colors" aria-label="Share on Facebook">
+                        <Facebook size={14} />
+                      </a>
+                      <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(`Check out ${selectedProject.title} by SVI Infra Solutions!`)}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-[#1DA1F2] hover:text-white transition-colors" aria-label="Share on Twitter">
+                        <Twitter size={14} />
+                      </a>
+                      <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(selectedProject.title)}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-[#0A66C2] hover:text-white transition-colors" aria-label="Share on LinkedIn">
+                        <Linkedin size={14} />
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
