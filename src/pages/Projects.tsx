@@ -5,14 +5,14 @@ import { Construction } from 'lucide-react';
 
 export default function Projects() {
   return (
-    <div className="pt-24 min-h-screen flex flex-col bg-brand-bg">
+    <div className="pt-24 min-h-screen flex flex-col bg-brand-bg dark:bg-gray-900">
       {/* Header */}
-      <section className="bg-brand-bg py-24 text-center border-b border-gray-200">
+      <section className="bg-brand-bg dark:bg-gray-800 py-24 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-serif text-brand-navy mb-6"
+            className="text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6"
           >
             Current Projects
           </motion.h1>
@@ -32,18 +32,18 @@ export default function Projects() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white p-16 max-w-2xl mx-auto shadow-sm border border-gray-200"
+            className="bg-white dark:bg-gray-800 p-16 max-w-2xl mx-auto shadow-sm border border-gray-200 dark:border-gray-700"
           >
-            <div className="w-20 h-20 border border-brand-gold text-brand-navy flex items-center justify-center mx-auto mb-8 relative">
+            <div className="w-20 h-20 border border-brand-gold text-brand-navy dark:text-brand-gold flex items-center justify-center mx-auto mb-8 relative">
               <Construction size={32} />
               <div className="absolute inset-0 bg-brand-navy scale-0 group-hover:scale-100 transition-transform -z-10 origin-bottom-right opacity-5"></div>
             </div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-4">Under Development</h4>
-            <h2 className="text-3xl font-serif text-brand-navy mb-6">Coming Soon</h2>
-            <p className="text-gray-600 text-lg mb-10 leading-relaxed">
+            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-4">Under Development</h4>
+            <h2 className="text-3xl font-serif text-brand-navy dark:text-gray-100 mb-6">Coming Soon</h2>
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-10 leading-relaxed">
               We are currently working on exciting new residential and commercial projects in prime locations. Check back soon for detailed layouts, pricing, and availability.
             </p>
-            <Link to="/registration" className="bg-brand-navy hover:bg-brand-gold text-brand-gold hover:text-brand-navy font-bold uppercase text-xs tracking-widest px-8 py-4 transition-colors flex items-center justify-center gap-2 border border-brand-navy inline-flex w-full sm:w-auto">
+            <Link to="/registration" className="bg-brand-navy dark:bg-gray-700 hover:bg-brand-gold text-brand-gold hover:text-brand-navy font-bold uppercase text-xs tracking-widest px-8 py-4 transition-colors flex items-center justify-center gap-2 border border-brand-navy dark:border-gray-600 inline-flex w-full sm:w-auto">
               Get Notified First
             </Link>
           </motion.div>

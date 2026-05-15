@@ -4,34 +4,34 @@ import { Facebook, Twitter, Youtube, Instagram, MapPin, Phone, Mail } from 'luci
 
 export default function Footer() {
   return (
-    <footer className="bg-white text-brand-navy border-t border-gray-200 pt-16 pb-8">
+    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 pt-16 pb-8">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand Info */}
           <div>
             <Link to="/" className="inline-block mb-6 flex items-center gap-2">
-              <div className="w-10 h-10 bg-brand-navy flex items-center justify-center rounded-sm">
-                <span className="text-brand-gold font-bold text-xl">SVI</span>
+              <div className="w-10 h-10 bg-brand-navy dark:bg-brand-gold flex items-center justify-center rounded-sm">
+                <span className="text-brand-gold dark:text-brand-navy font-bold text-xl">SVI</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-bold tracking-tight leading-none text-brand-navy">SVI INFRA SOLUTIONS</span>
-                <span className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">Pvt. Ltd.</span>
+                <span className="font-bold tracking-tight leading-none text-brand-navy dark:text-gray-100">SVI INFRA SOLUTIONS</span>
+                <span className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 font-medium">Pvt. Ltd.</span>
               </div>
             </Link>
-            <p className="text-gray-500 mb-6 leading-relaxed text-sm">
+            <p className="text-gray-500 dark:text-gray-400 mb-6 leading-relaxed text-sm">
               Where Dreams Take Address. Building trust and delivering excellence in real estate for over 15 years.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:border-brand-gold hover:text-brand-gold transition-colors text-brand-navy">
+              <a href="#" className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-brand-gold dark:hover:border-brand-gold hover:text-brand-gold transition-colors text-brand-navy dark:text-gray-200">
                 <Facebook size={18} />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:border-brand-gold hover:text-brand-gold transition-colors text-brand-navy">
+              <a href="#" className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-brand-gold dark:hover:border-brand-gold hover:text-brand-gold transition-colors text-brand-navy dark:text-gray-200">
                 <Twitter size={18} />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:border-brand-gold hover:text-brand-gold transition-colors text-brand-navy">
+              <a href="#" className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-brand-gold dark:hover:border-brand-gold hover:text-brand-gold transition-colors text-brand-navy dark:text-gray-200">
                 <Instagram size={18} />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:border-brand-gold hover:text-brand-gold transition-colors text-brand-navy">
+              <a href="#" className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-brand-gold dark:hover:border-brand-gold hover:text-brand-gold transition-colors text-brand-navy dark:text-gray-200">
                 <Youtube size={18} />
               </a>
             </div>
@@ -39,71 +39,71 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-6">
+            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">
               Quick Links
             </h4>
             <ul className="flex flex-col gap-4">
               <li>
-                <Link to="/" className="text-xs font-bold uppercase tracking-widest text-brand-navy hover:text-brand-gold transition-colors">Home</Link>
+                <Link to="/" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Home</Link>
               </li>
               <li>
-                <Link to="/about" className="text-xs font-bold uppercase tracking-widest text-brand-navy hover:text-brand-gold transition-colors">About Us</Link>
+                <Link to="/about" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">About Us</Link>
               </li>
               <li>
-                <Link to="/projects/completed" className="text-xs font-bold uppercase tracking-widest text-brand-navy hover:text-brand-gold transition-colors">Completed Projects</Link>
+                <Link to="/projects/completed" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Completed Projects</Link>
               </li>
               <li>
-                <Link to="/registration" className="text-xs font-bold uppercase tracking-widest text-brand-navy hover:text-brand-gold transition-colors">Register</Link>
+                <Link to="/registration" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Register</Link>
               </li>
               <li>
-                <Link to="/contact" className="text-xs font-bold uppercase tracking-widest text-brand-navy hover:text-brand-gold transition-colors">Contact Us</Link>
+                <Link to="/contact" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Contact Us</Link>
               </li>
             </ul>
           </div>
 
           {/* Services */}
           <div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-6">
+            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">
               Services
             </h4>
             <ul className="flex flex-col gap-4">
-              <li className="text-sm font-semibold text-gray-600">Residential Properties</li>
-              <li className="text-sm font-semibold text-gray-600">Commercial Properties</li>
-              <li className="text-sm font-semibold text-gray-600">Property Management</li>
-              <li className="text-sm font-semibold text-gray-600">Real Estate Consultancy</li>
-              <li className="text-sm font-semibold text-gray-600">Project Development</li>
+              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Residential Properties</li>
+              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Commercial Properties</li>
+              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Property Management</li>
+              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Real Estate Consultancy</li>
+              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Project Development</li>
             </ul>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-6">
+            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">
               Contact Info
             </h4>
             <ul className="flex flex-col gap-5">
               <li className="flex items-start gap-3">
                 <MapPin className="text-brand-gold shrink-0 mt-1" size={18} />
-                <span className="text-sm text-gray-600 font-medium">A-61 Sector 65, Noida,<br />Uttar Pradesh 201309</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">A-61 Sector 65, Noida,<br />Uttar Pradesh 201309</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="text-brand-gold shrink-0" size={18} />
-                <span className="text-sm text-gray-600 font-medium">+91 73000 07643</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">+91 73000 07643</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="text-brand-gold shrink-0" size={18} />
-                <span className="text-sm text-gray-600 font-medium">info@sviinfrasolutions.com</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">info@sviinfrasolutions.com</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest text-center md:text-left">
+        <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest text-center md:text-left">
             &copy; {new Date().getFullYear()} SVI Infra Solutions.
           </p>
-          <div className="flex gap-6 text-xs font-bold uppercase tracking-widest text-gray-400">
-            <Link to="#" className="hover:text-brand-navy transition-colors">Privacy</Link>
-            <Link to="#" className="hover:text-brand-navy transition-colors">Terms</Link>
+          <div className="flex gap-6 text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+            <Link to="#" className="hover:text-brand-navy dark:hover:text-gray-300 transition-colors">Privacy</Link>
+            <Link to="#" className="hover:text-brand-navy dark:hover:text-gray-300 transition-colors">Terms</Link>
           </div>
         </div>
       </div>
