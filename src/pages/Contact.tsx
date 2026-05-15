@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, PhoneIcon, Mail, Clock, AlertCircle } from 'lucide-react';
+
+const DIGIT_REGEX = /\d/g;
 
 export default function Contact() {
   const navigate = useNavigate();
@@ -15,9 +17,9 @@ export default function Contact() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.name.trim()) newErrors.name = 'Name is required';
     else if (formData.name.length < 2) newErrors.name = 'Name must be at least 2 characters';
     else if (!/^[a-zA-Z\s]+$/.test(formData.name)) newErrors.name = 'Name can only contain letters and spaces';
@@ -26,9 +28,8 @@ export default function Contact() {
     if (!formData.email) newErrors.email = 'Email is required';
     else if (!emailRegex.test(formData.email)) newErrors.email = 'Please enter a valid email address';
 
-    // Allow optional +, followed by 10-15 digits, ignoring spaces and dashes
     const phoneRegex = /^\+?[\d\s-]{10,15}$/;
-    const digitCount = (formData.phone.match(/\d/g) || []).length;
+    const digitCount = (formData.phone.match(DIGIT_REGEX) || []).length;
     if (!formData.phone) newErrors.phone = 'Phone number is required';
     else if (!phoneRegex.test(formData.phone) || digitCount < 10 || digitCount > 15) {
       newErrors.phone = 'Please enter a valid phone number (10-15 digits)';
@@ -39,44 +40,42 @@ export default function Contact() {
 
     if (!formData.message.trim()) newErrors.message = 'Message is required';
     else if (formData.message.length < 10) newErrors.message = 'Message must be at least 10 characters';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [formData]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    
+
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
       navigate('/thank-you');
     }, 1500);
-  };
+  }, [validateForm, navigate]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
-  };
+  }, [errors]);
 
   return (
     <div className="pt-24 pb-20 bg-brand-bg relative">
-      {/* Header */}
       <section className="bg-brand-bg py-20 text-center border-b border-gray-200">
         <div className="container mx-auto px-4">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-6xl font-serif text-brand-navy mb-6"
           >
             Contact Us
           </motion.h1>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -88,13 +87,12 @@ export default function Contact() {
       <section className="py-24">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
-            
-            {/* Contact Info */}
+
             <div className="lg:w-1/3">
               <div className="bg-white p-10 border border-gray-200 h-full shadow-sm hover:shadow-xl transition-shadow duration-500">
                 <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-4">Reach Out</h4>
                 <h3 className="text-3xl font-serif text-brand-navy mb-10">Get In Touch</h3>
-                
+
                 <div className="space-y-10">
                   <div className="flex items-start gap-5">
                     <div className="w-10 h-10 border border-brand-gold text-brand-gold flex flex-shrink-0 items-center justify-center pt-1 shadow-sm">
@@ -105,7 +103,7 @@ export default function Contact() {
                       <p className="text-gray-600 font-medium text-sm">A-61 Sector 65,<br />Noida, Uttar Pradesh 201309</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-5">
                     <div className="w-10 h-10 border border-brand-gold text-brand-gold flex flex-shrink-0 items-center justify-center rounded-sm">
                       <PhoneIcon size={20} />
@@ -116,7 +114,7 @@ export default function Contact() {
                       <p className="text-xs text-brand-gold mt-2 uppercase tracking-widest font-bold">Main Office / Sales</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-5">
                     <div className="w-10 h-10 border border-brand-gold text-brand-gold flex flex-shrink-0 items-center justify-center rounded-sm">
                       <Mail size={20} />
@@ -143,7 +141,6 @@ export default function Contact() {
               </div>
             </div>
 
-            {/* Form & Map */}
             <div className="lg:w-2/3 flex flex-col gap-8">
               <div className="bg-white p-10 border border-gray-200 shadow-sm">
                 <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-4">Inquiries</h4>
@@ -152,8 +149,8 @@ export default function Contact() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 mb-2">Your Name</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
@@ -165,8 +162,8 @@ export default function Contact() {
                     </div>
                     <div>
                       <label className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 mb-2">Email Address</label>
-                      <input 
-                        type="email" 
+                      <input
+                        type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
@@ -180,8 +177,8 @@ export default function Contact() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div>
                       <label className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 mb-2">Phone Number</label>
-                      <input 
-                        type="tel" 
+                      <input
+                        type="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
@@ -194,8 +191,8 @@ export default function Contact() {
                     </div>
                     <div>
                       <label className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 mb-2">Subject</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
@@ -212,7 +209,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <label className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 mb-2">Message</label>
-                    <textarea 
+                    <textarea
                       rows={5}
                       name="message"
                       value={formData.message}
@@ -227,8 +224,8 @@ export default function Contact() {
                       <span className="text-gray-400 text-[10px]">{formData.message.length}/1000</span>
                     </div>
                   </div>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={isSubmitting}
                     className="bg-brand-navy hover:bg-brand-gold text-brand-gold hover:text-brand-navy font-bold uppercase text-xs tracking-widest py-4 transition-colors flex items-center justify-center gap-2 border border-brand-navy disabled:opacity-70 disabled:cursor-not-allowed w-full"
                   >
@@ -241,14 +238,13 @@ export default function Contact() {
                 </form>
               </div>
 
-              {/* Map */}
               <div className="bg-white p-2 shadow-sm border border-gray-200 overflow-hidden h-[400px]">
-                <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3503.2847551460337!2d77.38202521508168!3d28.61123488242598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce5b2104bd709%3A0x6b6c2a4cb8c16053!2sSector%2065%2C%20Noida%2C%20Uttar%20Pradesh%20201301%2C%20India!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus" 
-                  width="100%" 
-                  height="100%" 
-                  style={{ border: 0 }} 
-                  allowFullScreen={true} 
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3503.2847551460337!2d77.38202521508168!3d28.61123488242598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce5b2104bd709%3A0x6b6c2a4cb8c16053!2sSector%2065%2C%20Noida%2C%20Uttar%20Pradesh%20201301%2C%20India!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen={true}
                   loading="lazy">
                 </iframe>
               </div>

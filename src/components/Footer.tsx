@@ -1,13 +1,14 @@
-import React from 'react';
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Youtube, Instagram, MapPin, Phone, Mail } from 'lucide-react';
 
-export default function Footer() {
+const CURRENT_YEAR = new Date().getFullYear();
+
+const Footer = memo(function Footer() {
   return (
     <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 pt-16 pb-8">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          {/* Brand Info */}
           <div>
             <Link to="/" className="inline-block mb-6 flex items-center gap-2">
               <div className="w-10 h-10 bg-brand-navy dark:bg-brand-gold flex items-center justify-center rounded-sm">
@@ -37,34 +38,20 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">
               Quick Links
             </h4>
             <ul className="flex flex-col gap-4">
-              <li>
-                <Link to="/" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Home</Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">About Us</Link>
-              </li>
-              <li>
-                <Link to="/faq" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">FAQ</Link>
-              </li>
-              <li>
-                <Link to="/projects/completed" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Completed Projects</Link>
-              </li>
-              <li>
-                <Link to="/registration" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Register</Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Contact Us</Link>
-              </li>
+              <li><Link to="/" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Home</Link></li>
+              <li><Link to="/about" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">About Us</Link></li>
+              <li><Link to="/faq" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">FAQ</Link></li>
+              <li><Link to="/projects/completed" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Completed Projects</Link></li>
+              <li><Link to="/registration" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Register</Link></li>
+              <li><Link to="/contact" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 
-          {/* Services */}
           <div>
             <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">
               Services
@@ -78,7 +65,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
           <div>
             <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">
               Contact Info
@@ -102,7 +88,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest text-center md:text-left">
-            &copy; {new Date().getFullYear()} SVI Infra Solutions.
+            &copy; {CURRENT_YEAR} SVI Infra Solutions.
           </p>
           <div className="flex gap-6 text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
             <Link to="#" className="hover:text-brand-navy dark:hover:text-gray-300 transition-colors">Privacy</Link>
@@ -112,4 +98,6 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
+});
+
+export default Footer;

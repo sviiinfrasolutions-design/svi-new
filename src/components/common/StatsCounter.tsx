@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 interface StatProps {
   end: number;
@@ -7,7 +7,7 @@ interface StatProps {
   duration?: number;
 }
 
-function StatItem({ end, label, suffix = '', duration = 2000 }: StatProps) {
+const StatItem = memo(function StatItem({ end, label, suffix = '', duration = 2000 }: StatProps) {
   const [count, setCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
@@ -17,17 +17,13 @@ function StatItem({ end, label, suffix = '', duration = 2000 }: StatProps) {
       (entries) => {
         if (entries[0].isIntersecting && !hasAnimated) {
           setHasAnimated(true);
-          
+
           let startTimestamp: number;
           const step = (timestamp: number) => {
             if (!startTimestamp) startTimestamp = timestamp;
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            
-            // easeOutQuart
             const easeProgress = 1 - Math.pow(1 - progress, 4);
-            
             setCount(Math.floor(easeProgress * end));
-            
             if (progress < 1) {
               window.requestAnimationFrame(step);
             }
@@ -39,7 +35,6 @@ function StatItem({ end, label, suffix = '', duration = 2000 }: StatProps) {
     );
 
     if (nodeRef.current) observer.observe(nodeRef.current);
-
     return () => {
       if (nodeRef.current) observer.unobserve(nodeRef.current);
     };
@@ -55,7 +50,7 @@ function StatItem({ end, label, suffix = '', duration = 2000 }: StatProps) {
       </div>
     </div>
   );
-}
+});
 
 export default function StatsCounter() {
   return (

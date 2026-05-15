@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -29,23 +29,22 @@ const faqs = [
 export default function FAQ() {
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
-  const toggleQuestion = (index: number) => {
-    setActiveIndex(activeIndex === index ? null : index);
-  };
+  const toggleQuestion = useCallback((index: number) => {
+    setActiveIndex((prev) => (prev === index ? null : index));
+  }, []);
 
   return (
     <div className="pt-24 min-h-screen flex flex-col bg-brand-bg dark:bg-gray-900">
-      {/* Header */}
       <section className="bg-brand-bg dark:bg-gray-800 py-24 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6"
           >
             Frequently Asked Questions
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -56,12 +55,11 @@ export default function FAQ() {
         </div>
       </section>
 
-      {/* FAQ Accordion */}
       <section className="py-20 flex-grow">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <motion.div 
+              <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -83,9 +81,9 @@ export default function FAQ() {
                     <ChevronDown size={20} />
                   </motion.div>
                 </button>
-                
+
                 <AnimatePresence>
-                  {activeIndex === index && (
+                  {activeIndex === index ? (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
@@ -96,13 +94,13 @@ export default function FAQ() {
                         {faq.answer}
                       </div>
                     </motion.div>
-                  )}
+                  ) : null}
                 </AnimatePresence>
               </motion.div>
             ))}
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}

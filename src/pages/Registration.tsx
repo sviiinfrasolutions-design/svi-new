@@ -64,13 +64,17 @@ export default function Registration() {
   };
 
   return (
-    <div className="pt-32 pb-24 bg-brand-bg min-h-screen">
+    <div className="pt-32 pb-24 bg-brand-bg dark:bg-gray-900 min-h-screen">
       <div className="container mx-auto px-4">
         
-        <div className="max-w-5xl mx-auto bg-white shadow-2xl flex flex-col md:flex-row border border-gray-200">
+        <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-2xl dark:shadow-none flex flex-col md:flex-row border border-gray-200 dark:border-gray-700 overflow-hidden">
           
           {/* Left panel */}
-          <div className="md:w-5/12 bg-brand-navy p-12 lg:p-16 text-white flex flex-col justify-between relative overflow-hidden">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="md:w-5/12 bg-brand-navy p-12 lg:p-16 text-white flex flex-col justify-between relative overflow-hidden"
+          >
              <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)', backgroundSize: '40px 40px' }}></div>
              
              <div className="relative z-10 block">
@@ -102,15 +106,19 @@ export default function Registration() {
                </p>
                <p className="text-[10px] uppercase tracking-widest font-bold mt-4 text-brand-gold">- Recent Buyer</p>
              </div>
-          </div>
+          </motion.div>
           
           {/* Right panel (Form) */}
-          <div className="md:w-7/12 p-12 lg:p-16">
-            <h3 className="text-2xl font-serif text-brand-navy mb-8">Your Details</h3>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="md:w-7/12 p-12 lg:p-16 bg-white dark:bg-gray-800"
+          >
+            <h3 className="text-2xl font-serif text-brand-navy dark:text-gray-100 mb-8">Your Details</h3>
             
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500">Full Name</label>
+                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-gray-400">Full Name</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-gold">
                     <User size={16} />
@@ -120,7 +128,7 @@ export default function Registration() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900/50 dark:text-gray-100 ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                     placeholder="John Doe"
                   />
                 </div>
@@ -131,7 +139,7 @@ export default function Registration() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500">Email Address</label>
+                  <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-gray-400">Email Address</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-gold">
                       <Mail size={16} />
@@ -141,7 +149,7 @@ export default function Registration() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                      className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900/50 dark:text-gray-100 ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                       placeholder="john@example.com"
                     />
                   </div>
@@ -150,7 +158,7 @@ export default function Registration() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500">Phone Number</label>
+                  <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-gray-400">Phone Number</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-gold">
                       <Phone size={16} />
@@ -160,7 +168,7 @@ export default function Registration() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                      className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900/50 dark:text-gray-100 ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                       placeholder="+91"
                     />
                   </div>
@@ -171,7 +179,7 @@ export default function Registration() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500">Property Interest</label>
+                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-gray-400">Property Interest</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-gold">
                     <Building2 size={16} />
@@ -180,7 +188,7 @@ export default function Registration() {
                     name="propertyInterest"
                     value={formData.propertyInterest}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 appearance-none rounded-none ${errors.propertyInterest ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900/50 dark:text-gray-100 appearance-none rounded-none ${errors.propertyInterest ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                   >
                     <option value="" disabled>Select an option</option>
                     <option value="residential_3bhk">Residential 3BHK</option>
@@ -196,7 +204,7 @@ export default function Registration() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500">Additional Message</label>
+                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-gray-400">Additional Message</label>
                 <div className="relative">
                   <div className="absolute top-4 left-4 pointer-events-none text-brand-gold">
                     <MessageSquare size={16} />
@@ -207,7 +215,7 @@ export default function Registration() {
                     value={formData.message}
                     onChange={handleChange}
                     maxLength={500}
-                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 resize-none ${errors.message ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900/50 dark:text-gray-100 resize-none ${errors.message ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                     placeholder="Tell us about your requirements... (optional)"
                   ></textarea>
                 </div>
@@ -215,7 +223,7 @@ export default function Registration() {
                   {errors.message ? (
                     <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle size={12} /> {errors.message}</p>
                   ) : <span></span>}
-                  <span className="text-gray-400 text-[10px]">{formData.message.length}/500</span>
+                  <span className="text-gray-400 dark:text-gray-500 text-[10px]">{formData.message.length}/500</span>
                 </div>
               </div>
 
@@ -223,7 +231,7 @@ export default function Registration() {
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="w-full bg-brand-navy hover:bg-brand-gold text-brand-gold hover:text-brand-navy font-bold uppercase text-xs tracking-widest py-4 transition-colors flex items-center justify-center gap-2 border border-brand-navy disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full bg-brand-navy dark:bg-brand-gold hover:bg-brand-gold dark:hover:bg-white text-brand-gold hover:text-brand-navy dark:text-brand-navy font-bold uppercase text-xs tracking-widest py-4 transition-colors flex items-center justify-center gap-2 border border-brand-navy dark:border-brand-gold disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin"></div>
@@ -232,11 +240,11 @@ export default function Registration() {
                   )}
                 </button>
               </div>
-              <p className="text-[10px] uppercase tracking-widest font-bold text-center text-gray-400 mt-6">
+              <p className="text-[10px] uppercase tracking-widest font-bold text-center text-gray-400 dark:text-gray-500 mt-6">
                 By submitting, you agree to our terms and privacy policy.
               </p>
             </form>
-          </div>
+          </motion.div>
           
         </div>
       </div>

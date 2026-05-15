@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTheme } from './ThemeProvider';
+
+const NAV_LINKS = [
+  { name: 'Home', path: '/' },
+  { name: 'About Us', path: '/about' },
+  { name: 'Careers', path: '/careers' },
+  { name: 'FAQ', path: '/faq' },
+];
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -10,27 +17,35 @@ export default function Header() {
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
   const location = useLocation();
   const { theme, setTheme } = useTheme();
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsScrolled(!entry.isIntersecting),
+      { threshold: [1], rootMargin: '-20px 0px 0px 0px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsProjectsOpen(false);
   }, [location]);
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'About Us', path: '/about' },
-    { name: 'Careers', path: '/careers' },
-    { name: 'FAQ', path: '/faq' },
-  ];
+  const toggleTheme = useCallback(() => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  }, [theme, setTheme]);
+
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen((prev) => !prev);
+  }, []);
+
+  const handleMouseEnter = useCallback(() => setIsProjectsOpen(true), []);
+  const handleMouseLeave = useCallback(() => setIsProjectsOpen(false), []);
 
   return (
     <header
@@ -38,6 +53,7 @@ export default function Header() {
         isScrolled ? 'bg-white dark:bg-gray-900 shadow-md py-4' : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm py-5'
       }`}
     >
+      <div ref={sentinelRef} className="absolute top-0 left-0 w-px h-px pointer-events-none" aria-hidden="true" />
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between">
 <Link to="/" className="flex items-center gap-2 z-50">
@@ -48,9 +64,8 @@ export default function Header() {
   </div>
 </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+            {NAV_LINKS.map((link) => (
               <Link
                 key={link.name}
                 to={link.path}
@@ -62,11 +77,10 @@ export default function Header() {
               </Link>
             ))}
 
-            {/* Projects Dropdown */}
             <div
               className="relative group cursor-pointer py-2"
-              onMouseEnter={() => setIsProjectsOpen(true)}
-              onMouseLeave={() => setIsProjectsOpen(false)}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
               <span
                 className={`flex items-center gap-1 text-xs font-bold uppercase tracking-widest transition-colors hover:text-brand-gold ${
@@ -75,7 +89,7 @@ export default function Header() {
               >
                 Projects <ChevronDown size={16} />
               </span>
-              
+
               <AnimatePresence>
                 {isProjectsOpen && (
                   <motion.div
@@ -117,9 +131,9 @@ export default function Header() {
             >
               Register Now
             </Link>
-            
+
             <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={toggleTheme}
               className="p-2 text-brand-navy dark:text-gray-200 hover:text-brand-gold transition-colors"
               aria-label="Toggle theme"
             >
@@ -127,10 +141,9 @@ export default function Header() {
             </button>
           </nav>
 
-          {/* Mobile Actions */}
           <div className="flex md:hidden items-center gap-4">
             <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={toggleTheme}
               className="p-2 z-50 text-brand-navy dark:text-gray-200"
               aria-label="Toggle theme"
             >
@@ -138,7 +151,7 @@ export default function Header() {
             </button>
             <button
               className="z-50 text-brand-navy dark:text-gray-200 p-2"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={toggleMobileMenu}
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -147,7 +160,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -157,7 +169,7 @@ export default function Header() {
             className="fixed inset-0 top-0 bg-white dark:bg-gray-900 z-40 md:hidden overflow-y-auto pt-24 pb-8 px-6"
           >
             <div className="flex flex-col gap-6">
-              {navLinks.map((link) => (
+              {NAV_LINKS.map((link) => (
                 <Link
                   key={link.name}
                   to={link.path}
@@ -166,7 +178,7 @@ export default function Header() {
                   {link.name}
                 </Link>
               ))}
-              
+
               <div className="flex flex-col gap-4">
                 <span className="text-2xl font-serif text-brand-navy dark:text-gray-100">Projects</span>
                 <div className="flex flex-col gap-3 pl-4 border-l-2 border-brand-gold/30">
@@ -191,7 +203,7 @@ export default function Header() {
               >
                 Contact Us
               </Link>
-              
+
               <div className="mt-8">
                 <Link
                   to="/registration"
