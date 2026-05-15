@@ -102,8 +102,10 @@ export default function Home() {
             <div className="lg:w-1/2 relative">
               <div className="absolute inset-0 bg-brand-navy/5 translate-x-6 translate-y-6"></div>
               <img 
-                src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80&fm=webp" 
                 alt="Modern House exterior" 
+                loading="lazy"
+                decoding="async"
                 className="relative z-10 shadow-2xl w-full h-[500px] object-cover"
               />
             </div>
@@ -180,8 +182,10 @@ export default function Home() {
                 <div className="relative h-72 overflow-hidden bg-brand-navy">
                   <div className="absolute inset-0 bg-brand-navy/10 group-hover:bg-transparent transition-colors z-10"></div>
                   <img 
-                    src={`https://images.unsplash.com/photo-160060768${8969 + idx}-cc921dd82801?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80`} 
+                    src={`https://images.unsplash.com/photo-160060768${8969 + idx}-cc921dd82801?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&fm=webp`} 
                     alt={project.title} 
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100"
                   />
                   <div className="absolute top-4 right-4 z-20 bg-white text-brand-navy text-[10px] font-bold uppercase tracking-widest px-3 py-1 shadow-sm">

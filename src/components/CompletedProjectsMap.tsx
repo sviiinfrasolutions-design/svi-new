@@ -48,7 +48,7 @@ const MarkerWithInfoWindow = ({ project, onProjectClick }: { project: Project, o
           <div className="p-2 max-w-xs font-sans">
              <div className="font-bold text-gray-900 mb-1">{project.title}</div>
              <div className="text-xs text-gray-500 mb-2">{project.location}</div>
-             <img src={project.img} alt={project.title} className="w-full h-24 object-cover rounded-sm mb-2" />
+             <img src={project.img + '&fm=webp'} alt={project.title} loading="lazy" decoding="async" className="w-full h-24 object-cover rounded-sm mb-2" />
              <div className="flex justify-between items-center mt-2">
                 <span className="text-[10px] uppercase font-bold text-gray-400">{project.type}</span>
                 <button 

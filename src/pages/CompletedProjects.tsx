@@ -21,8 +21,10 @@ const HoverZoomImage = ({ src, alt }: { src: string; alt: string }) => {
       onMouseLeave={() => setBackgroundPosition('50% 50%')}
     >
       <img
-        src={src}
+        src={src + '&fm=webp'}
         alt={alt}
+        loading="lazy"
+        decoding="async"
         className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover/zoom:opacity-0 relative z-0"
       />
       <div 
@@ -130,6 +132,7 @@ export default function CompletedProjects() {
   const [selectedProject, setSelectedProject] = useState<typeof completedProjectsData[0] | null>(null);
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [highlightedProject, setHighlightedProject] = useState<string | null>(null);
 
   const openModal = (project: typeof completedProjectsData[0]) => {
     setSelectedProject(project);
@@ -141,6 +144,15 @@ export default function CompletedProjects() {
   const closeModal = () => {
     setSelectedProject(null);
     document.body.style.overflow = 'auto';
+  };
+
+  const scrollToProject = (project: typeof completedProjectsData[0]) => {
+    const el = document.getElementById(`project-${project.id}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setHighlightedProject(project.id);
+      setTimeout(() => setHighlightedProject(null), 2000);
+    }
   };
 
   const nextImage = (e?: React.MouseEvent | Event) => {
@@ -195,7 +207,7 @@ export default function CompletedProjects() {
             <MapPin size={24} />
             <h2 className="text-2xl font-serif">Project Locations</h2>
           </div>
-          <CompletedProjectsMap projects={completedProjectsData as any} onProjectClick={openModal} />
+          <CompletedProjectsMap projects={completedProjectsData as any} onProjectClick={scrollToProject} />
         </motion.div>
       </section>
 
@@ -206,11 +218,12 @@ export default function CompletedProjects() {
             {completedProjectsData.map((project, idx) => (
               <motion.div 
                 key={idx}
+                id={`project-${project.id}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-white dark:bg-gray-800 group overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col h-full hover:shadow-2xl dark:hover:shadow-brand-gold/20 hover:border-brand-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300"
+                className={`bg-white dark:bg-gray-800 group overflow-hidden border ${highlightedProject === project.id ? 'border-brand-gold shadow-2xl scale-[1.02] dark:shadow-brand-gold/20' : 'border-gray-200 dark:border-gray-700 hover:shadow-2xl dark:hover:shadow-brand-gold/20 hover:border-brand-gold hover:-translate-y-2 hover:scale-[1.02]'} flex flex-col h-full transition-all duration-300`}
               >
                 <div className="relative h-64 overflow-hidden bg-gray-100 flex items-center justify-center cursor-pointer" onClick={() => openModal(project)}>
                   <div className="absolute inset-0 bg-brand-navy/10 z-10 pointer-events-none group-hover:opacity-0 transition-opacity duration-500"></div>
@@ -361,8 +374,10 @@ export default function CompletedProjects() {
                   </>
                 ) : (
                   <img 
-                    src={selectedProject.img} 
+                    src={selectedProject.img + '&fm=webp'} 
                     alt={selectedProject.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover absolute inset-0"
                   />
                 )}
