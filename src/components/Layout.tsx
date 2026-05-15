@@ -1,9 +1,9 @@
-import { memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 
 interface LayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const Layout = memo(function Layout({ children }: LayoutProps) {

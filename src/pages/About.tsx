@@ -32,7 +32,7 @@ export default function About() {
             <h2 className="text-3xl font-serif text-brand-navy dark:text-gray-100 mb-8">Building Legacies Since 2009</h2>
             <div className="text-gray-600 dark:text-gray-300 space-y-6 text-lg leading-relaxed">
               <p>
-                For over 15 years, SVI Infra Solutions Pvt. Ltd. has been synonymous with trust, quality, and integrity in the Indian real estate market. We have successfully completed 15+ projects, delivering joy to over 5000+ happy clients.
+                For over 17 years, SVI Infra Solutions Pvt. Ltd. has been synonymous with trust, quality, and integrity in the Indian real estate market. We have successfully completed 15+ projects, delivering joy to over 5000+ happy clients.
               </p>
               <p>
                 Our vision extends beyond just building structures; we create communities, shape lifestyles, and provide high-value investment avenues. Focused significantly on the Phulera Smart City, Jaipur region, and the DMIC/DFC corridors, our integrity-driven approach has made us a preferred partner for home buyers and investors alike.
@@ -98,7 +98,7 @@ export default function About() {
                    "Residential Properties",
                    "Commercial Properties",
                    "Property Management",
-                   "Real Estate Consultancy",
+                   "Real Estate Builders and Developers",
                    "Project Development"
                  ].map((service, idx) => (
                    <motion.div 

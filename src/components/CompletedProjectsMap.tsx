@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { memo, useState } from 'react';
 import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow, useAdvancedMarkerRef } from '@vis.gl/react-google-maps';
 
 const API_KEY =
@@ -7,6 +7,8 @@ const API_KEY =
   (globalThis as any).GOOGLE_MAPS_PLATFORM_KEY ||
   '';
 const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
+
+const MAP_CONTAINER_STYLE = { width: '100%', height: '100%' };
 
 interface Location {
   lat: number;
@@ -30,15 +32,15 @@ interface Props {
   onProjectClick: (project: Project) => void;
 }
 
-const MarkerWithInfoWindow = ({ project, onProjectClick }: { project: Project, onProjectClick: (project: Project) => void }) => {
+const MarkerWithInfoWindow = memo(function MarkerWithInfoWindow({ project, onProjectClick }: { project: Project, onProjectClick: (project: Project) => void }) {
   const [markerRef, marker] = useAdvancedMarkerRef();
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <AdvancedMarker 
-        ref={markerRef} 
-        position={{ lat: project.lat, lng: project.lng }} 
+      <AdvancedMarker
+        ref={markerRef}
+        position={{ lat: project.lat, lng: project.lng }}
         onClick={() => setOpen(true)}
       >
         <Pin background="#1a2744" borderColor="#c9a84c" glyphColor="#c9a84c" />
@@ -51,7 +53,7 @@ const MarkerWithInfoWindow = ({ project, onProjectClick }: { project: Project, o
              <img src={project.img + '&fm=webp'} alt={project.title} loading="lazy" decoding="async" className="w-full h-24 object-cover rounded-sm mb-2" />
              <div className="flex justify-between items-center mt-2">
                 <span className="text-[10px] uppercase font-bold text-gray-400">{project.type}</span>
-                <button 
+                <button
                   onClick={() => onProjectClick(project)}
                   className="text-xs bg-[#1a2744] hover:bg-[#c9a84c] text-[#c9a84c] hover:text-[#1a2744] px-3 py-1 transition-colors uppercase tracking-wider font-bold rounded-sm border border-[#1a2744]"
                 >
@@ -63,7 +65,7 @@ const MarkerWithInfoWindow = ({ project, onProjectClick }: { project: Project, o
       )}
     </>
   );
-};
+});
 
 export default function CompletedProjectsMap({ projects, onProjectClick }: Props) {
   if (!hasValidKey) {
@@ -93,14 +95,14 @@ export default function CompletedProjectsMap({ projects, onProjectClick }: Props
           defaultZoom={9}
           mapId="SVI_PROJECTS_MAP"
           internalUsageAttributionIds={['gmp_mcp_codeassist_v1_aistudio']}
-          style={{ width: '100%', height: '100%' }}
+          style={MAP_CONTAINER_STYLE}
           gestureHandling="greedy"
         >
           {projects.map((project) => (
-            <MarkerWithInfoWindow 
-              key={project.id} 
-              project={project} 
-              onProjectClick={onProjectClick} 
+            <MarkerWithInfoWindow
+              key={project.id}
+              project={project}
+              onProjectClick={onProjectClick}
             />
           ))}
         </Map>

@@ -1,9 +1,9 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useState, type MouseEvent } from 'react';
 
 const HoverZoomImage = memo(function HoverZoomImage({ src, alt }: { src: string; alt: string }) {
   const [backgroundPosition, setBackgroundPosition] = useState('50% 50%');
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = useCallback((e: MouseEvent<HTMLDivElement>) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - left) / width) * 100;
     const y = ((e.clientY - top) / height) * 100;
