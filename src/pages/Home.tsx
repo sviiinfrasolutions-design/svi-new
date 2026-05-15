@@ -1,0 +1,243 @@
+import React from 'react';
+import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
+import { Building2, Shield, TrendingUp, CheckCircle, ArrowRight } from 'lucide-react';
+import StatsCounter from '../components/common/StatsCounter';
+
+export default function Home() {
+  const completedProjects = [
+    { title: 'Shree Shyam Residency', loc: 'Jaipur', type: '3BHK/4BHK' },
+    { title: 'Shivani City', loc: 'Manpura Machedi', type: 'Premier Residential' },
+    { title: 'Shyam Aangan', loc: 'Basri Khurd, Jaipur', type: 'Integrated Township' },
+  ];
+
+  return (
+    <div className="flex flex-col w-full">
+      {/* Hero Section */}
+      <section className="relative min-h-[700px] flex items-center justify-center bg-brand-navy overflow-hidden py-20 lg:py-32">
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)', backgroundSize: '40px 40px' }}></div>
+        
+        <div className="z-10 container mx-auto px-4 text-center flex flex-col items-center">
+          <span className="inline-block px-3 py-1 bg-brand-gold/20 text-brand-gold text-[10px] font-bold uppercase tracking-[0.2em] mb-6 rounded-sm">Legacy of Excellence</span>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-white text-5xl md:text-7xl font-serif leading-[1.1] mb-8"
+          >
+            Where Dreams Take<br/>
+            <span className="italic text-brand-gold">Address</span>
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-gray-300 text-lg md:text-xl max-w-2xl text-center leading-relaxed mb-10"
+          >
+            Specializing in premium residential flats and strategic plot investments across Jaipur and Noida.
+          </motion.p>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-6"
+          >
+            <Link 
+              to="/projects/current" 
+              className="bg-brand-gold text-brand-navy px-8 py-4 font-bold uppercase text-xs tracking-widest shadow-xl transition-transform hover:scale-105"
+            >
+              View Our Projects
+            </Link>
+            <Link 
+              to="/registration" 
+              className="text-white flex items-center gap-3 group"
+            >
+              <div className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center group-hover:border-brand-gold transition-colors">
+                <span className="text-lg">→</span>
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-widest">Invest with us</span>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Welcome Section */}
+      <section className="py-24 md:py-32 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row gap-16 items-center">
+            <div className="lg:w-1/2">
+              <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-6">Welcome to SVI Infra</h4>
+              <h2 className="text-4xl md:text-5xl font-serif text-brand-navy mb-8 leading-tight">
+                Building Trust, Delivering Excellence
+              </h2>
+              <p className="text-gray-600 mb-8 text-lg leading-relaxed">
+                With over a decade of experience in the real estate sector, SVI Infra Solutions Pvt. Ltd. has established itself as a beacon of trust, quality, and innovation. Based in Noida, we specialize in delivering dream homes and lucrative investment opportunities across expanding regions.
+              </p>
+              <ul className="space-y-4 mb-10">
+                {[
+                  '15+ Years of Industry Experience',
+                  '15 Successfully Completed Projects',
+                  'Favorable Locations like Phulera Smart City & Jaipur',
+                ].map((item, i) => (
+                  <motion.li 
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    key={i} 
+                    className="flex items-center gap-4 text-brand-navy font-serif text-lg"
+                  >
+                    <div className="w-8 h-8 flex items-center justify-center border border-brand-gold rounded-full text-brand-gold shrink-0">
+                      <CheckCircle className="w-4 h-4" />
+                    </div>
+                    {item}
+                  </motion.li>
+                ))}
+              </ul>
+              <Link to="/about" className="inline-flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-brand-navy group">
+                <span className="border-b border-brand-navy pb-1 group-hover:text-brand-gold group-hover:border-brand-gold transition-colors">Read Our Full Story</span>
+                <ArrowRight size={16} className="text-brand-gold group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+            <div className="lg:w-1/2 relative">
+              <div className="absolute inset-0 bg-brand-navy/5 translate-x-6 translate-y-6"></div>
+              <img 
+                src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                alt="Modern House exterior" 
+                className="relative z-10 shadow-2xl w-full h-[500px] object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section with warm background */}
+      <section className="bg-brand-navy border-y border-brand-gold border-opacity-30">
+        <StatsCounter />
+      </section>
+
+      {/* Excellence / Features */}
+      <section className="py-24 bg-brand-bg">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-6">Why Invest With Us</h4>
+            <h2 className="text-3xl md:text-5xl font-serif text-brand-navy mb-8">Excellence in Every Step</h2>
+            <p className="text-gray-600 text-lg leading-relaxed">
+              We focus on prime locations with high appreciation potential, notably the Phulera Smart City, Jaipur, and DMIC/DFC corridors. Backed by government approvals and strong partnerships.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { icon: <Building2 size={32} />, title: "Expert Agents", desc: "Our experienced professionals guide you through every step of property selection and acquisition." },
+              { icon: <Shield size={32} />, title: "Trusted Service", desc: "20+ years of core management expertise ensuring complete transparency and peace of mind." },
+              { icon: <TrendingUp size={32} />, title: "Market Expertise", desc: "Deep insights into high-growth corridors like DMIC ensuring the best ROI for investors." }
+            ].map((feature, idx) => (
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.2 }}
+                className="bg-white p-12 border border-gray-200 hover:border-brand-gold transition-colors group"
+              >
+                <div className="w-16 h-16 border border-brand-gold text-brand-gold flex items-center justify-center mb-8 shrink-0 relative bg-brand-bg/50">
+                  {feature.icon}
+                  <div className="absolute inset-0 bg-brand-gold scale-0 group-hover:scale-100 transition-transform -z-10 origin-bottom-right opacity-10"></div>
+                </div>
+                <h3 className="text-2xl font-serif text-brand-navy mb-4">{feature.title}</h3>
+                <p className="text-gray-600 leading-relaxed text-sm">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Selected Completed Projects Portfolio */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-end mb-16 border-b border-gray-200 pb-8">
+            <div>
+              <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-6">Portfolio</h4>
+              <h2 className="text-3xl md:text-5xl font-serif text-brand-navy">Featured Projects</h2>
+            </div>
+            <Link to="/projects/completed" className="hidden md:inline-flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-brand-navy group">
+              <span className="border-b border-brand-navy pb-1 group-hover:text-brand-gold transition-colors">View Portfolio</span>
+              <ArrowRight size={16} className="text-brand-gold group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {completedProjects.map((project, idx) => (
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.15 }}
+                className="group border border-gray-200 block overflow-hidden"
+              >
+                <div className="relative h-72 overflow-hidden bg-brand-navy">
+                  <div className="absolute inset-0 bg-brand-navy/10 group-hover:bg-transparent transition-colors z-10"></div>
+                  <img 
+                    src={`https://images.unsplash.com/photo-160060768${8969 + idx}-cc921dd82801?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80`} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100"
+                  />
+                  <div className="absolute top-4 right-4 z-20 bg-white text-brand-navy text-[10px] font-bold uppercase tracking-widest px-3 py-1 shadow-sm">
+                    Completed
+                  </div>
+                </div>
+                <div className="p-8 bg-brand-bg transition-colors">
+                  <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-3">{project.loc} • <span className="text-brand-gold">{project.type}</span></p>
+                  <h3 className="text-2xl font-serif text-brand-navy mb-6 group-hover:text-brand-gold transition-colors">{project.title}</h3>
+                  <Link to="/projects/completed" className="text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 text-brand-navy group-hover:text-brand-gold transition-colors">
+                    Explore Details <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          
+          <div className="mt-16 text-center md:hidden border-t border-gray-200 pt-8">
+            <Link to="/projects/completed" className="inline-flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-brand-navy group">
+              <span className="border-b border-brand-navy pb-1">View All Projects</span>
+              <ArrowRight size={16} className="text-brand-gold" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 bg-brand-navy relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)', backgroundSize: '40px 40px' }}></div>
+        
+        <div className="container mx-auto px-4 text-center relative z-10 py-10 border border-white/20">
+          <h2 className="text-3xl md:text-5xl font-serif text-white mb-8">Ready to Find Your Dream Home?</h2>
+          <p className="text-gray-300 text-lg mb-12 max-w-2xl mx-auto leading-relaxed">
+            Join thousands of happy families and investors. Our experts are ready to assist you in finding the perfect property match.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
+            <Link 
+              to="/registration" 
+              className="bg-brand-gold text-brand-navy px-8 py-4 font-bold uppercase text-xs tracking-widest shadow-xl transition-colors hover:bg-white"
+            >
+              Register Now
+            </Link>
+            <Link 
+              to="/contact" 
+              className="text-white flex items-center gap-3 group"
+            >
+              <div className="w-12 h-12 border border-white/30 flex items-center justify-center group-hover:border-brand-gold transition-colors relative">
+                <span className="text-lg">→</span>
+                <div className="absolute top-0 left-0 w-2 h-2 box-border border-t border-l border-white/30 -translate-x-1 -translate-y-1"></div>
+                <div className="absolute bottom-0 right-0 w-2 h-2 box-border border-b border-r border-white/30 translate-x-1 translate-y-1"></div>
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-widest">Contact Us</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
