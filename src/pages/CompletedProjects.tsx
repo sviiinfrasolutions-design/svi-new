@@ -22,14 +22,14 @@ const HoverZoomImage = ({ src, alt }: { src: string; alt: string }) => {
       <img
         src={src}
         alt={alt}
-        className="w-full h-full object-cover transition-opacity duration-300 group-hover/zoom:opacity-0 relative z-0"
+        className="w-full h-full object-cover transition-all duration-500 group-hover/zoom:opacity-0 group-hover/zoom:scale-110 relative z-0"
       />
       <div 
         className="absolute inset-0 bg-no-repeat pointer-events-none opacity-0 group-hover/zoom:opacity-100 z-10 transition-opacity duration-300 bg-gray-100"
         style={{
           backgroundImage: `url(${src})`,
           backgroundPosition,
-          backgroundSize: '200%',
+          backgroundSize: '250%',
         }}
       />
     </div>
@@ -116,7 +116,7 @@ export default function CompletedProjects() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-white group overflow-hidden border border-gray-200 flex flex-col h-full hover:shadow-2xl transition-shadow duration-500"
+                className="bg-white group overflow-hidden border border-gray-200 flex flex-col h-full hover:shadow-2xl hover:border-brand-gold hover:-translate-y-2 transition-all duration-500"
               >
                 <div className="relative h-64 overflow-hidden bg-gray-100 flex items-center justify-center">
                   <div className="absolute inset-0 bg-brand-navy/10 z-10 pointer-events-none group-hover:opacity-0 transition-opacity duration-500"></div>
