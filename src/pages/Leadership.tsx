@@ -4,22 +4,14 @@ import { Link } from 'react-router-dom';
 
 const TEAM_MEMBERS = [
   {
-    name: "Rajendra Prasad",
-    role: "Founder & Managing Director",
-    bio: "With over 25 years of experience in real estate development, Rajendra has led SVI Infra to become a trusted name in the industry. His vision drives our commitment to quality and transparency.",
-    image: "/images/leadership1.png"
+    name: "Iliyas Ali",
+    role: "Director",
+    bio: "Key personnel behind SVI Infra Solutions Private Limited. Instrumental in guiding the company's strategic vision and operations."
   },
   {
-    name: "Vikram Sharma",
-    role: "Director of Operations",
-    bio: "Vikram oversees all on-ground project executions. His meticulous attention to detail ensures that every SVI Infra project is delivered on time and exceeds quality standards.",
-    image: "/images/leadership2.png"
-  },
-  {
-    name: "Priya Desai",
-    role: "Head of Customer Relations",
-    bio: "Priya believes that buying a home should be a joyful journey. She leads our support teams to ensure every client receives personalized, transparent, and prompt service.",
-    image: "/images/leadership3.png"
+    name: "Vinod Kumar",
+    role: "Director",
+    bio: "Key personnel behind SVI Infra Solutions Private Limited. Brings extensive expertise in building construction and civil engineering."
   }
 ];
 
@@ -43,13 +35,13 @@ export default function Leadership() {
             className="w-16 h-px bg-brand-gold mx-auto mb-6"
           ></motion.div>
           <p className="text-gray-300 max-w-2xl mx-auto text-lg leading-relaxed">
-            Meet the visionaries behind SVI Infra Solutions. Our team is dedicated to building not just structures, but lifelong relationships based on trust and excellence.
+            Incorporated in December 2022 in Delhi, SVI Infra Solutions Private Limited is a non-government private company involved in building construction and civil engineering, based in Dwarka, Delhi. Meet the visionaries behind our success.
           </p>
         </div>
       </section>
 
-      <section className="container mx-auto px-4 lg:px-8 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+      <section className="container mx-auto px-4 lg:px-8 py-20 max-w-5xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {TEAM_MEMBERS.map((member, idx) => (
             <motion.div
               key={idx}
@@ -57,30 +49,26 @@ export default function Leadership() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, delay: idx * 0.15, ease: "easeOut" }}
-              className="bg-white group overflow-hidden border border-gray-200 hover:-translate-y-2 hover:shadow-2xl transition-all duration-400 flex flex-col"
+              className="bg-white group overflow-hidden border border-gray-200 hover:-translate-y-2 hover:shadow-xl transition-all duration-400 flex flex-col p-10 text-center relative"
             >
-              <div className="relative h-96 overflow-hidden bg-gray-100">
-                <div className="absolute inset-0 bg-brand-navy/10 z-10 pointer-events-none group-hover:opacity-0 transition-opacity duration-500"></div>
-                <img 
-                  src={member.image} 
-                  alt={member.name} 
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-20 flex gap-4 justify-center">
-                  <a href="#" className="w-10 h-10 rounded-full bg-brand-gold text-brand-navy flex items-center justify-center hover:bg-white transition-colors" aria-label="LinkedIn">
+              <div className="absolute top-0 left-0 w-full h-1 bg-brand-gold"></div>
+              <div className="w-24 h-24 mx-auto bg-brand-bg rounded-full flex items-center justify-center mb-6 border border-gray-100 group-hover:border-brand-gold transition-colors">
+                <span className="text-3xl font-serif text-brand-navy">{member.name.charAt(0)}</span>
+              </div>
+              <div className="flex flex-col flex-grow">
+                <h3 className="text-3xl font-serif text-brand-navy mb-2">{member.name}</h3>
+                <span className="text-sm font-bold text-brand-gold uppercase tracking-widest mb-6 block">{member.role}</span>
+                <p className="text-gray-600 text-base leading-relaxed mb-8 flex-grow">
+                  {member.bio}
+                </p>
+                <div className="flex justify-center gap-4 mt-auto pt-6 border-t border-gray-100">
+                  <a href="#" className="w-10 h-10 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-brand-navy hover:text-white transition-colors" aria-label="LinkedIn">
                     <Linkedin size={18} />
                   </a>
-                  <a href="#" className="w-10 h-10 rounded-full bg-brand-gold text-brand-navy flex items-center justify-center hover:bg-white transition-colors" aria-label="Email">
+                  <a href="#" className="w-10 h-10 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-brand-navy hover:text-white transition-colors" aria-label="Email">
                     <Mail size={18} />
                   </a>
                 </div>
-              </div>
-              <div className="p-8 flex flex-col flex-grow text-center">
-                <h3 className="text-2xl font-serif text-brand-navy mb-2">{member.name}</h3>
-                <span className="text-xs font-bold text-brand-gold uppercase tracking-widest mb-6 block">{member.role}</span>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {member.bio}
-                </p>
               </div>
             </motion.div>
           ))}
