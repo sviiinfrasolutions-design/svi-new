@@ -1,34 +1,25 @@
 "use client";
 
-import { useEffect } from 'react';
-
-declare global {
-  interface Window {
-    dataLayer: unknown[];
-  }
-}
+import Script from 'next/script';
 
 export default function Analytics() {
-  useEffect(() => {
-    const trackingId = process.env.NEXT_PUBLIC_ANALYTICS_ID;
-    if (!trackingId) return;
+  const trackingId = process.env.NEXT_PUBLIC_ANALYTICS_ID;
+  if (!trackingId) return null;
 
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${trackingId}`;
-    document.head.appendChild(script);
-
-    window.dataLayer = window.dataLayer || [];
-    function gtag(...args: unknown[]) {
-      window.dataLayer.push(args);
-    }
-    gtag('js', new Date());
-    gtag('config', trackingId);
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
-
-  return null;
+  return (
+    <>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${trackingId}`}
+        strategy="lazyOnload"
+      />
+      <Script id="google-analytics" strategy="lazyOnload">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${trackingId}');
+        `}
+      </Script>
+    </>
+  );
 }

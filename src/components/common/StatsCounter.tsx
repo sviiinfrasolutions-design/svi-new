@@ -9,14 +9,14 @@ interface StatProps {
 
 const StatItem = memo(function StatItem({ end, label, suffix = '', duration = 2000 }: StatProps) {
   const [count, setCount] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const hasAnimatedRef = useRef(false);
   const nodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
+        if (entries[0].isIntersecting && !hasAnimatedRef.current) {
+          hasAnimatedRef.current = true;
 
           let startTimestamp: number;
           const step = (timestamp: number) => {
@@ -38,7 +38,7 @@ const StatItem = memo(function StatItem({ end, label, suffix = '', duration = 20
     return () => {
       if (nodeRef.current) observer.unobserve(nodeRef.current);
     };
-  }, [end, duration, hasAnimated]);
+  }, [end, duration]);
 
   return (
     <div ref={nodeRef} className="text-center p-6">

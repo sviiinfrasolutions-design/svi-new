@@ -40,8 +40,8 @@ export default function Header() {
   }, [pathname]);
 
   const toggleTheme = useCallback(() => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  }, [theme, setTheme]);
+    setTheme((prev: 'dark' | 'light') => prev === 'dark' ? 'light' : 'dark');
+  }, [setTheme]);
 
   const toggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen((prev) => !prev);

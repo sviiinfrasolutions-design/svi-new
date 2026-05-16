@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { ArrowUp } from 'lucide-react';
 
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const sentinel = document.createElement('div');
@@ -31,12 +32,11 @@ export default function BackToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  if (!isVisible) return null;
-
   return (
     <button
       onClick={scrollToTop}
       className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-brand-navy dark:bg-brand-gold text-brand-gold dark:text-brand-navy rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center hover:scale-110"
+      style={{ opacity: isVisible ? 1 : 0, pointerEvents: isVisible ? 'auto' : 'none', transform: isVisible ? 'none' : 'translateY(10px)', transition: 'opacity 0.3s ease, transform 0.3s ease' }}
       aria-label="Back to top"
     >
       <ArrowUp size={20} />

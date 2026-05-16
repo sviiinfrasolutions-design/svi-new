@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { X } from 'lucide-react';
 
@@ -8,13 +8,16 @@ const CONSENT_KEY = 'svi-cookie-consent-v1';
 
 export default function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     const hasConsent = localStorage.getItem(CONSENT_KEY);
     if (!hasConsent) {
-      const timer = setTimeout(() => setIsVisible(true), 1000);
-      return () => clearTimeout(timer);
+      timerRef.current = setTimeout(() => setIsVisible(true), 1000);
     }
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, []);
 
   const handleAccept = useCallback(() => {
@@ -27,10 +30,11 @@ export default function CookieConsent() {
     setIsVisible(false);
   }, []);
 
-  if (!isVisible) return null;
-
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-xl">
+    <div
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-xl"
+      style={{ transform: isVisible ? 'translateY(0)' : 'translateY(100%)', transition: 'transform 0.3s ease' }}
+    >
       <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-start gap-3 flex-1">
           <button

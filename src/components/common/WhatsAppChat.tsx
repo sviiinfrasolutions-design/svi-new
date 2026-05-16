@@ -1,18 +1,22 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 
 const WHATSAPP_NUMBER = '917300007643';
 const WHATSAPP_MESSAGE = encodeURIComponent('Hi! I am interested in SVI Infra Solutions properties. Can you help me?');
 
 export default function WhatsAppChat() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [hasAppeared, setHasAppeared] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const isVisible = hasAppeared;
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 2000);
-    return () => clearTimeout(timer);
+    timerRef.current = setTimeout(() => setHasAppeared(true), 2000);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, []);
 
   const handleClick = useCallback(() => {
@@ -20,10 +24,11 @@ export default function WhatsAppChat() {
     setIsOpen(false);
   }, []);
 
-  if (!isVisible) return null;
-
   return (
-    <div className="fixed bottom-6 left-6 z-50 flex flex-col items-start gap-3">
+    <div
+      className="fixed bottom-6 left-6 z-50 flex flex-col items-start gap-3"
+      style={{ opacity: isVisible ? 1 : 0, pointerEvents: isVisible ? 'auto' : 'none', transition: 'opacity 0.3s ease' }}
+    >
       {isOpen && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-4 max-w-xs animate-in">
           <div className="flex items-start justify-between mb-3">
@@ -46,7 +51,7 @@ export default function WhatsAppChat() {
           </div>
           <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 mb-3">
             <p className="text-sm text-gray-700 dark:text-gray-300">
-              👋 Hi! How can we help you? Chat with us on WhatsApp for instant support.
+              Hi! How can we help you? Chat with us on WhatsApp for instant support.
             </p>
           </div>
           <button

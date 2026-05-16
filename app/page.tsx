@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform, AnimatePresence, useSpring } from 'motion/react';
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, useTransition } from 'react';
 import Link from 'next/link';
 import { Building2, Shield, TrendingUp, CheckCircle, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import StatsCounter from '@/src/components/common/StatsCounter';
@@ -29,37 +29,35 @@ const HOME_CHECKLIST = [
   'Favorable Locations like Phulera Smart City & Jaipur',
 ];
 
-// Magnetic button hook
 function useMagnetic(strength = 0.4) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useSpring(0, { stiffness: 200, damping: 20 });
   const y = useSpring(0, { stiffness: 200, damping: 20 });
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    x.set((e.clientX - cx) * strength);
-    y.set((e.clientY - cy) * strength);
-  }, [x, y, strength]);
-
-  const handleMouseLeave = useCallback(() => {
-    x.set(0);
-    y.set(0);
-  }, [x, y]);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    el.addEventListener('mousemove', handleMouseMove);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      x.set((e.clientX - cx) * strength);
+      y.set((e.clientY - cy) * strength);
+    };
+
+    const handleMouseLeave = () => {
+      x.set(0);
+      y.set(0);
+    };
+
+    el.addEventListener('mousemove', handleMouseMove, { passive: true });
     el.addEventListener('mouseleave', handleMouseLeave);
     return () => {
       el.removeEventListener('mousemove', handleMouseMove);
       el.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [handleMouseMove, handleMouseLeave]);
+  }, [x, y, strength]);
 
   return { ref, x, y };
 }
@@ -73,28 +71,31 @@ export default function Home() {
 
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isPending, startTransition] = useTransition();
   const magnetic = useMagnetic(0.35);
 
   useEffect(() => {
     if (!isAutoPlaying) return;
     const timer = setInterval(() => {
-      setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+      startTransition(() => {
+        setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+      });
     }, 5000);
     return () => clearInterval(timer);
   }, [isAutoPlaying]);
 
-  const nextHeroSlide = () => {
+  const nextHeroSlide = useCallback(() => {
     setIsAutoPlaying(false);
     setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
-  };
-  const prevHeroSlide = () => {
+  }, []);
+
+  const prevHeroSlide = useCallback(() => {
     setIsAutoPlaying(false);
     setCurrentHeroIndex((prev) => (prev - 1 + HERO_IMAGES.length) % HERO_IMAGES.length);
-  };
+  }, []);
 
   return (
     <div className="flex flex-col w-full page-transition">
-      {/* ─── HERO ─────────────────────────────────────────── */}
       <section ref={heroRef} className="relative min-h-[80vh] md:min-h-[900px] flex items-center justify-center overflow-hidden py-20 lg:py-32">
         <motion.div className="absolute inset-0 z-0" style={{ y: backgroundY, scale: heroScale }}>
           <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/80 via-brand-navy/60 to-brand-navy/80 z-10" />
@@ -113,7 +114,6 @@ export default function Home() {
           </AnimatePresence>
         </motion.div>
 
-        {/* Slide controls */}
         <motion.button
           onClick={prevHeroSlide}
           whileHover={{ scale: 1.15, backgroundColor: 'rgba(201,168,76,0.2)' }}
@@ -133,7 +133,6 @@ export default function Home() {
           <ChevronRight size={24} />
         </motion.button>
 
-        {/* Dots */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-3">
           {HERO_IMAGES.map((_, idx) => (
             <motion.button
@@ -147,7 +146,6 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Hero content */}
         <motion.div className="z-10 container mx-auto px-4 text-center flex flex-col items-center" style={{ opacity: heroOpacity }}>
           <motion.span
             initial={{ opacity: 0, y: -10 }}
@@ -215,7 +213,6 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
-          {/* Scroll indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -232,7 +229,6 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ─── ABOUT ────────────────────────────────────────── */}
       <section className="py-24 md:py-32 bg-white dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-16 items-center">
@@ -284,7 +280,6 @@ export default function Home() {
                   className="w-full h-[500px] object-cover"
                 />
               </div>
-              {/* Floating badge */}
               <motion.div
                 className="absolute -bottom-6 -left-6 bg-brand-gold text-brand-navy p-5 shadow-2xl z-20"
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -301,13 +296,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── STATS ───────────────────────────────────────── */}
       <section className="bg-brand-navy border-y border-brand-gold border-opacity-30 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5 pointer-events-none" style={GRADIENT_STYLE} />
         <StatsCounter />
       </section>
 
-      {/* ─── FEATURES ────────────────────────────────────── */}
       <section className="py-24 bg-gray-50 dark:bg-gray-800" style={{ contentVisibility: 'auto' }}>
         <div className="container mx-auto px-4">
           <AnimatedSection type="fadeUp" className="text-center max-w-3xl mx-auto mb-20">
@@ -326,7 +319,6 @@ export default function Home() {
                   transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                   className="bg-white dark:bg-gray-900 p-12 border border-gray-200 dark:border-gray-700 hover:border-brand-gold transition-colors group h-full relative overflow-hidden"
                 >
-                  {/* Animated corner accent */}
                   <motion.div
                     className="absolute bottom-0 right-0 w-24 h-24 bg-brand-gold/5 rounded-tl-full"
                     whileHover={{ scale: 3, opacity: 0.15 }}
@@ -348,7 +340,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── PROJECTS ────────────────────────────────────── */}
       <section className="py-24 bg-white dark:bg-gray-900" style={{ contentVisibility: 'auto' }}>
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-end mb-16 border-b border-gray-200 dark:border-gray-700 pb-8">
@@ -421,10 +412,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── CTA ─────────────────────────────────────────── */}
       <section className="py-24 bg-brand-navy relative overflow-hidden" style={{ contentVisibility: 'auto' }}>
         <div className="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none" style={GRADIENT_STYLE} />
-        {/* Animated orbs */}
         <motion.div
           className="absolute -top-32 -right-32 w-96 h-96 bg-brand-gold/10 rounded-full blur-3xl"
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}

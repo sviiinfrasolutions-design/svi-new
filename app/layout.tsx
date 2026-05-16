@@ -1,26 +1,21 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
-import { ThemeProvider } from '@/src/components/ThemeProvider';
-import ErrorBoundary from '@/src/components/common/ErrorBoundary';
-import Header from '@/src/components/Header';
-import Footer from '@/src/components/Footer';
-import ScrollToTop from '@/src/components/common/ScrollToTop';
-import WhatsAppChat from '@/src/components/common/WhatsAppChat';
-import BackToTop from '@/src/components/common/BackToTop';
-import CookieConsent from '@/src/components/common/CookieConsent';
-import Analytics from '@/src/components/common/Analytics';
+import ClientProviders from '@/src/components/ClientProviders';
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
+  preload: true,
 });
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-serif',
   display: 'swap',
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -54,6 +49,8 @@ export const viewport: Viewport = {
   themeColor: '#1a2744',
 };
 
+const THEME_SCRIPT = `(function(){try{var t=document.documentElement,e=localStorage.getItem('svi-theme-v1');if(e==='dark'||e==='light')t.classList.add(e);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)t.classList.add('dark');else t.classList.add('light')}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: {
@@ -62,6 +59,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -110,22 +112,14 @@ export default function RootLayout({
             }),
           }}
         />
+        <link rel="preload" as="image" href="/images/hero1.png" />
+        <link rel="preload" as="image" href="/images/hero2.png" />
+        <link rel="preload" as="image" href="/images/hero3.png" />
       </head>
       <body className={`${inter.variable} ${playfair.variable}`}>
-        <ErrorBoundary>
-          <ThemeProvider>
-            <ScrollToTop />
-            <Analytics />
-            <Header />
-            <main className="flex-grow flex flex-col min-h-screen">
-              {children}
-            </main>
-            <Footer />
-            <WhatsAppChat />
-            <BackToTop />
-            <CookieConsent />
-          </ThemeProvider>
-        </ErrorBoundary>
+        <ClientProviders>
+          {children}
+        </ClientProviders>
       </body>
     </html>
   );

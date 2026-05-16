@@ -12,7 +12,7 @@ type ThemeProviderProps = {
 
 type ThemeProviderState = {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
+  setTheme: (theme: Theme | ((prev: Theme) => Theme)) => void;
 };
 
 const initialState: ThemeProviderState = {
@@ -30,7 +30,7 @@ export function ThemeProvider({
   storageKey = THEME_STORAGE_KEY,
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
+  const [theme, setThemeState] = useState<Theme>(
     () => {
       if (typeof window !== 'undefined') {
         return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
@@ -45,13 +45,16 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
+  const setTheme = useMemo(() => (newTheme: Theme | ((prev: Theme) => Theme)) => {
+    const resolved = typeof newTheme === 'function' ? newTheme(theme) : newTheme;
+    localStorage.setItem(storageKey, resolved);
+    setThemeState(resolved);
+  }, [theme, storageKey]);
+
   const value = useMemo(() => ({
     theme,
-    setTheme: (newTheme: Theme) => {
-      localStorage.setItem(storageKey, newTheme);
-      setTheme(newTheme);
-    },
-  }), [theme, storageKey]);
+    setTheme,
+  }), [theme, setTheme]);
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, lazy, useCallback, useEffect, useState, type MouseEvent, type FormEvent } from 'react';
+import { Suspense, lazy, useCallback, useState, type MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
 import { Download, ArrowRight, MapPin, X, ChevronLeft, ChevronRight, Facebook, Twitter, Linkedin, Share2 } from 'lucide-react';
@@ -71,10 +71,6 @@ export default function CompletedProjects() {
   const [direction, setDirection] = useState(0);
   const [highlightedProject, setHighlightedProject] = useState<string | null>(null);
 
-  useEffect(() => {
-    return () => { document.body.style.overflow = 'auto'; };
-  }, []);
-
   const openModal = useCallback((project: typeof completedProjectsData[0]) => {
     setSelectedProject(project);
     setCurrentGalleryIndex(0);
@@ -96,7 +92,7 @@ export default function CompletedProjects() {
     }
   }, []);
 
-  const nextImage = useCallback((e?: MouseEvent | Event) => {
+  const nextImage = useCallback((e?: MouseEvent) => {
     if (e && 'stopPropagation' in e) e.stopPropagation();
     if (selectedProject && selectedProject.gallery) {
       setDirection(1);
@@ -104,7 +100,7 @@ export default function CompletedProjects() {
     }
   }, [selectedProject]);
 
-  const prevImage = useCallback((e?: MouseEvent | Event) => {
+  const prevImage = useCallback((e?: MouseEvent) => {
     if (e && 'stopPropagation' in e) e.stopPropagation();
     if (selectedProject && selectedProject.gallery) {
       setDirection(-1);
