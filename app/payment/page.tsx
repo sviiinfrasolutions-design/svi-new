@@ -1,11 +1,19 @@
 "use client";
 
 import { motion } from 'motion/react';
-import { ShieldCheck, CreditCard, Landmark } from 'lucide-react';
+import { ShieldCheck, CreditCard, Landmark, X, Copy, Check } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 
 export default function Payment() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const handleCopy = (text: string, fieldId: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldId);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -99,10 +107,113 @@ export default function Payment() {
                   "Proceed to Pay"
                 )}
               </button>
+
+              <div className="pt-4 border-t border-gray-200 mt-6 text-center">
+                <span className="text-sm text-gray-500 mb-4 block">Alternatively, pay directly to our bank account</span>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-full bg-white text-brand-navy border border-brand-navy py-4 font-bold uppercase tracking-widest text-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Landmark size={18} />
+                  Pay via UPI / Bank Transfer
+                </button>
+              </div>
             </form>
           </div>
         </div>
       </section>
+
+      {/* Payment Details Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            className="bg-white rounded-[2rem] w-full max-w-[600px] overflow-hidden relative shadow-2xl p-8"
+          >
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-6 right-6 p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X size={20} className="text-gray-500" />
+            </button>
+
+            <div className="mb-8 mt-2">
+              <h2 className="text-[28px] font-serif text-[#1e293b] mb-1">For Application Amount</h2>
+              <p className="text-gray-500 text-sm">Payment Details</p>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Left Column: QR Code */}
+              <div className="md:w-5/12 flex flex-col items-center justify-start">
+                <div className="bg-[#fcfbf9] rounded-2xl p-5 w-full border border-gray-50 flex flex-col items-center justify-center mb-4 shadow-sm">
+                  {/* Dynamic QR code generated with the official SVI Infra Solutions UPI details */}
+                  <img 
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=1000221207001410.7300007643@idbi&pn=SVI%20INFRA%20SOLUTIONS%20PVT.%20LTD." 
+                    alt="UPI QR Code" 
+                    className="w-full h-auto aspect-square object-contain mix-blend-multiply"
+                  />
+                </div>
+                <p className="text-sm text-gray-500 font-medium text-center">Scan to pay with any UPI app</p>
+              </div>
+
+              {/* Right Column: Bank Details */}
+              <div className="md:w-7/12 flex flex-col space-y-4">
+                <div className="flex flex-col space-y-1.5">
+                  <span className="text-sm text-gray-500 font-medium">Account Name</span>
+                  <div className="bg-[#f8fafc] rounded-xl p-3.5 flex justify-between items-center border border-gray-100">
+                    <span className="text-[13px] font-mono text-[#1e293b] tracking-wider break-words mr-2 uppercase leading-tight">Svi Infra Solutions Pvt. Ltd</span>
+                    <button 
+                      onClick={() => handleCopy("Svi Infra Solutions Pvt. Ltd", "name")}
+                      className="text-brand-navy hover:text-brand-gold transition-colors p-1 shrink-0"
+                      title="Copy"
+                    >
+                      {copiedField === "name" ? <Check size={18} className="text-green-600" /> : <Copy size={18} className="text-gray-600" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <span className="text-sm text-gray-500 font-medium">Account Number</span>
+                  <div className="bg-[#f8fafc] rounded-xl p-3.5 flex justify-between items-center border border-gray-100">
+                    <span className="text-[13px] font-mono text-[#1e293b] tracking-wider">0894102000013837</span>
+                    <button 
+                      onClick={() => handleCopy("0894102000013837", "account")}
+                      className="text-brand-navy hover:text-brand-gold transition-colors p-1 shrink-0"
+                      title="Copy"
+                    >
+                      {copiedField === "account" ? <Check size={18} className="text-green-600" /> : <Copy size={18} className="text-gray-600" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <span className="text-sm text-gray-500 font-medium">IFSC Code</span>
+                  <div className="bg-[#f8fafc] rounded-xl p-3.5 flex justify-between items-center border border-gray-100">
+                    <span className="text-[13px] font-mono text-[#1e293b] tracking-wider">IBKL0000894</span>
+                    <button 
+                      onClick={() => handleCopy("IBKL0000894", "ifsc")}
+                      className="text-brand-navy hover:text-brand-gold transition-colors p-1 shrink-0"
+                      title="Copy"
+                    >
+                      {copiedField === "ifsc" ? <Check size={18} className="text-green-600" /> : <Copy size={18} className="text-gray-600" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <span className="text-sm text-gray-500 font-medium">Bank / Branch</span>
+                  <div className="bg-[#f8fafc] rounded-xl p-3.5 flex justify-between items-center border border-gray-100">
+                    <span className="text-[13px] font-mono text-[#1e293b] tracking-wider">IDBI BANK</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
