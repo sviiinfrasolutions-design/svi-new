@@ -68,7 +68,7 @@ export default function About() {
                    {val.icon}
                  </div>
                  <h3 className="text-xl font-serif text-white dark:text-gray-100 mb-4">{val.title}</h3>
-                 <p className="text-gray-300 dark:text-gray-400 text-sm leading-relaxed">{val.desc}</p>
+                 <p className="text-gray-300 dark:text-gray-300 text-sm leading-relaxed">{val.desc}</p>
               </motion.div>
             ))}
           </div>

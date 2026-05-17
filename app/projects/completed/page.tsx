@@ -111,8 +111,8 @@ export default function CompletedProjects() {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   return (
-    <div className="pt-24 pb-20 bg-gray-50 min-h-screen">
-      <section className="bg-brand-bg py-20 text-center border-b border-gray-200">
+    <div className="pt-24 pb-20 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen">
+      <section className="bg-brand-bg dark:bg-gray-900 py-20 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -127,7 +127,7 @@ export default function CompletedProjects() {
             transition={{ delay: 0.2 }}
             className="w-16 h-px bg-brand-gold mx-auto mb-6"
           ></motion.div>
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
             Explore our portfolio of successfully delivered projects. Each property is a testament to our commitment to excellence, timely delivery, and unmatched quality.
           </p>
         </div>
@@ -140,8 +140,8 @@ export default function CompletedProjects() {
            viewport={{ once: true }}
            className="mb-12"
         >
-          <div className="flex items-center gap-2 mb-6 text-brand-navy dark:text-brand-gold">
-            <MapPin size={24} />
+          <div className="flex items-center gap-2 mb-6 text-brand-navy dark:text-gray-100">
+            <MapPin size={24} className="text-brand-gold" />
             <h2 className="text-2xl font-serif">Project Locations</h2>
           </div>
           <Suspense fallback={<div className="h-[500px] bg-gray-100 dark:bg-gray-800 flex items-center justify-center"><div className="w-8 h-8 border-2 border-brand-gold border-t-transparent rounded-full animate-spin" /></div>}>
@@ -306,7 +306,7 @@ export default function CompletedProjects() {
                   </>
                 ) : (
                   <img
-                    src={selectedProject.img + '&fm=webp'}
+                    src={selectedProject.img + '?fm=webp'}
                     alt={selectedProject.title}
                     loading="lazy"
                     decoding="async"

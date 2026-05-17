@@ -53,7 +53,7 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled ? 'bg-white/97 dark:bg-gray-900/97 backdrop-blur-xl shadow-lg py-4 border-b border-gray-100 dark:border-gray-800' : 'bg-white/70 dark:bg-gray-900/70 backdrop-blur-md py-5'
+        isScrolled ? 'bg-white/97 dark:bg-[#0C0C0C]/97 backdrop-blur-xl shadow-lg py-4 border-b border-gray-100 dark:border-gray-800' : 'bg-white/70 dark:bg-[#0C0C0C]/70 backdrop-blur-md py-5'
       }`}
     >
       <div ref={sentinelRef} className="absolute top-0 left-0 w-px h-px pointer-events-none" aria-hidden="true" />
@@ -190,7 +190,7 @@ export default function Header() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 top-0 bg-white dark:bg-gray-900 z-40 md:hidden overflow-y-auto pt-24 pb-8 px-6"
+            className="fixed inset-0 top-0 bg-white dark:bg-[#0C0C0C] z-40 md:hidden overflow-y-auto pt-24 pb-8 px-6"
             role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation menu"

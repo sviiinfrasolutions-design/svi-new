@@ -21,7 +21,7 @@ const ONSITE_ROLES = [
 export default function Careers() {
   return (
     <div className="pt-24 pb-20">
-      <section className="bg-brand-bg dark:bg-gray-800 py-24 text-center border-b border-gray-200 dark:border-gray-700">
+      <section className="bg-brand-bg dark:bg-gray-900 py-24 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -82,7 +82,7 @@ export default function Careers() {
         </div>
       </section>
 
-      <section className="py-24 bg-white dark:bg-gray-800">
+      <section className="py-24 bg-white dark:bg-[#0C0C0C]">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-16">
             <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-400 mb-6">Sales & Promotion</h4>

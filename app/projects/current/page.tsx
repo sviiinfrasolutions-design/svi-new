@@ -90,8 +90,8 @@ export default function Projects() {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   return (
-    <div className="pt-24 pb-20 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <section className="bg-brand-bg dark:bg-gray-800 py-20 text-center border-b border-gray-200 dark:border-gray-700">
+    <div className="pt-24 pb-20 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen">
+      <section className="bg-brand-bg dark:bg-gray-900 py-20 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -221,15 +221,15 @@ export default function Projects() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 30 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300, mass: 1 }}
-              className="bg-white w-full max-w-5xl my-8 relative overflow-hidden shadow-2xl flex flex-col md:flex-row"
+              className="bg-white dark:bg-gray-800 w-full max-w-5xl my-8 relative overflow-hidden shadow-2xl flex flex-col md:flex-row"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={closeModal}
-                className="absolute top-4 right-4 z-50 w-10 h-10 bg-white/50 backdrop-blur border border-gray-200 flex items-center justify-center hover:bg-white transition-colors"
+                className="absolute top-4 right-4 z-50 w-10 h-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-white dark:hover:bg-gray-800 transition-colors"
                 aria-label="Close modal"
               >
-                <X size={20} className="text-brand-navy" />
+                <X size={20} className="text-brand-navy dark:text-gray-100" />
               </button>
 
               <div className="md:w-1/2 relative bg-gray-100 min-h-[300px] md:min-h-auto flex items-center justify-center group overflow-hidden">
@@ -288,7 +288,7 @@ export default function Projects() {
                   </>
                 ) : (
                   <img
-                    src={selectedProject.img + '&fm=webp'}
+                    src={selectedProject.img + '?fm=webp'}
                     alt={selectedProject.title}
                     loading="lazy"
                     decoding="async"
@@ -309,9 +309,9 @@ export default function Projects() {
                   <span className="text-xs font-bold text-brand-gold uppercase tracking-widest">{selectedProject.type}</span>
                 </div>
 
-                <h3 className="text-3xl font-serif text-brand-navy mb-6">{selectedProject.title}</h3>
+                <h3 className="text-3xl font-serif text-brand-navy dark:text-gray-100 mb-6">{selectedProject.title}</h3>
 
-                <div className="prose prose-sm text-gray-600 mb-8 leading-relaxed">
+                <div className="prose prose-sm text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
                   <p>{selectedProject.fullDescription || selectedProject.description}</p>
                 </div>
 
@@ -320,19 +320,19 @@ export default function Projects() {
                   Get Notified First
                 </Link>
 
-                <div className="mt-8 pt-8 border-t border-gray-100 mt-auto">
+                <div className="mt-8 pt-8 border-t border-gray-100 dark:border-gray-700 mt-auto">
                   <div className="flex items-center gap-4">
                     <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest flex items-center gap-2">
                        <Share2 size={12} /> Share Project
                     </span>
                     <div className="flex items-center gap-3">
-                      <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-[#1877F2] hover:text-white transition-colors" aria-label="Share on Facebook">
+                      <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-300 hover:bg-[#1877F2] hover:text-white transition-colors" aria-label="Share on Facebook">
                         <Facebook size={14} />
                       </a>
-                      <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(`Check out ${selectedProject.title} by SVI Infra Solutions!`)}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-[#1DA1F2] hover:text-white transition-colors" aria-label="Share on Twitter">
+                      <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(`Check out ${selectedProject.title} by SVI Infra Solutions!`)}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-300 hover:bg-[#1DA1F2] hover:text-white transition-colors" aria-label="Share on Twitter">
                         <Twitter size={14} />
                       </a>
-                      <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(selectedProject.title)}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-[#0A66C2] hover:text-white transition-colors" aria-label="Share on LinkedIn">
+                      <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(selectedProject.title)}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-300 hover:bg-[#0A66C2] hover:text-white transition-colors" aria-label="Share on LinkedIn">
                         <Linkedin size={14} />
                       </a>
                     </div>

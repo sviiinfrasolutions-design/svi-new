@@ -68,10 +68,10 @@ export default function Registration() {
   }, [validateForm, router]);
 
   return (
-    <div className="pt-32 pb-24 bg-brand-bg min-h-screen">
+    <div className="pt-32 pb-24 bg-brand-bg dark:bg-gray-900 min-h-screen">
       <div className="container mx-auto px-4">
 
-        <div className="max-w-5xl mx-auto bg-white shadow-2xl flex flex-col md:flex-row border border-gray-200">
+        <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-2xl flex flex-col md:flex-row border border-gray-200 dark:border-gray-700">
 
           <div className="md:w-5/12 bg-brand-navy p-12 lg:p-16 text-white flex flex-col justify-between relative overflow-hidden">
              <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={GRADIENT_STYLE}></div>
@@ -108,7 +108,7 @@ export default function Registration() {
           </div>
 
           <div className="md:w-7/12 p-12 lg:p-16">
-            <h3 className="text-2xl font-serif text-brand-navy mb-8">Your Details</h3>
+            <h3 className="text-2xl font-serif text-brand-navy dark:text-gray-100 mb-8">Your Details</h3>
 
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               <div className="space-y-2">
@@ -122,7 +122,7 @@ export default function Registration() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                     placeholder="John Doe"
                   />
                 </div>
@@ -143,7 +143,7 @@ export default function Registration() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                      className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                       placeholder="john@example.com"
                     />
                   </div>
@@ -162,7 +162,7 @@ export default function Registration() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                      className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                       placeholder="+91"
                     />
                   </div>
@@ -182,7 +182,7 @@ export default function Registration() {
                     name="propertyInterest"
                     value={formData.propertyInterest}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 appearance-none rounded-none ${errors.propertyInterest ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white appearance-none rounded-none ${errors.propertyInterest ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                   >
                     <option value="" disabled>Select an option</option>
                     <option value="residential_3bhk">Residential 3BHK</option>
@@ -209,7 +209,7 @@ export default function Registration() {
                     value={formData.message}
                     onChange={handleChange}
                     maxLength={500}
-                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 resize-none ${errors.message ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white resize-none ${errors.message ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                     placeholder="Tell us about your requirements... (optional)"
                   ></textarea>
                 </div>
@@ -225,7 +225,7 @@ export default function Registration() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-brand-navy hover:bg-brand-gold text-brand-gold hover:text-brand-navy font-bold uppercase text-xs tracking-widest py-4 transition-colors flex items-center justify-center gap-2 border border-brand-navy disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full bg-brand-navy dark:bg-gray-700 hover:bg-brand-gold text-brand-gold hover:text-brand-navy font-bold uppercase text-xs tracking-widest py-4 transition-colors flex items-center justify-center gap-2 border border-brand-navy dark:border-gray-600 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin"></div>

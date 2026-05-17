@@ -25,20 +25,20 @@ export default function Payment() {
   };
 
   return (
-    <div className="pt-24 pb-20 bg-gray-50 min-h-screen">
+    <div className="pt-24 pb-20 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen">
       <section className="container mx-auto px-4 py-12 max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl font-serif text-brand-navy mb-4">Secure Online Payment</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-serif text-brand-navy dark:text-white mb-4">Secure Online Payment</h1>
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Pay your booking amount or installment securely through our integrated payment portal. All transactions are encrypted.
           </p>
         </motion.div>
 
-        <div className="bg-white shadow-xl border border-gray-200 overflow-hidden flex flex-col md:flex-row">
+        <div className="bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col md:flex-row">
           <div className="md:w-1/3 bg-brand-navy p-8 text-white flex flex-col justify-between">
             <div>
               <h3 className="text-xl font-serif mb-6">Payment Guidelines</h3>
@@ -58,24 +58,24 @@ export default function Payment() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-brand-navy">Full Name</label>
-                  <input type="text" required className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:outline-none focus:border-brand-gold transition-colors" placeholder="As per records" />
+                  <label className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-300">Full Name</label>
+                  <input type="text" required className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-brand-gold transition-colors" placeholder="As per records" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-brand-navy">Phone Number</label>
-                  <input type="tel" required className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:outline-none focus:border-brand-gold transition-colors" placeholder="+91" />
+                  <label className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-300">Phone Number</label>
+                  <input type="tel" required className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-brand-gold transition-colors" placeholder="+91" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-brand-navy">Email Address</label>
-                <input type="email" required className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:outline-none focus:border-brand-gold transition-colors" placeholder="For payment receipt" />
+                <label className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-300">Email Address</label>
+                <input type="email" required className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-brand-gold transition-colors" placeholder="For payment receipt" />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-brand-navy">Project Name</label>
-                  <select required className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:outline-none focus:border-brand-gold transition-colors appearance-none">
+                  <label className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-300">Project Name</label>
+                  <select required className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-brand-gold transition-colors appearance-none">
                     <option value="">Select Project</option>
                     <option value="shyam-aangan">Shyam Aangan</option>
                     <option value="shivani-vatika">Shivani Vatika</option>
@@ -83,16 +83,16 @@ export default function Payment() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-brand-navy">Unit / Plot Number</label>
-                  <input type="text" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:outline-none focus:border-brand-gold transition-colors" placeholder="If known" />
+                  <label className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-300">Unit / Plot Number</label>
+                  <input type="text" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-brand-gold transition-colors" placeholder="If known" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-brand-navy">Payment Amount (INR)</label>
+                <label className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-300">Payment Amount (INR)</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">₹</span>
-                  <input type="number" required min="1" className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 focus:outline-none focus:border-brand-gold transition-colors text-lg" placeholder="0.00" />
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold">₹</span>
+                  <input type="number" required min="1" className="w-full pl-8 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-brand-gold transition-colors text-lg" placeholder="0.00" />
                 </div>
               </div>
 
@@ -108,12 +108,12 @@ export default function Payment() {
                 )}
               </button>
 
-              <div className="pt-4 border-t border-gray-200 mt-6 text-center">
-                <span className="text-sm text-gray-500 mb-4 block">Alternatively, pay directly to our bank account</span>
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mt-6 text-center">
+                <span className="text-sm text-gray-500 dark:text-gray-400 mb-4 block">Alternatively, pay directly to our bank account</span>
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(true)}
-                  className="w-full bg-white text-brand-navy border border-brand-navy py-4 font-bold uppercase tracking-widest text-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-white dark:bg-gray-800 text-brand-navy dark:text-white border border-brand-navy dark:border-gray-600 py-4 font-bold uppercase tracking-widest text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <Landmark size={18} />
                   Pay via UPI / Bank Transfer
@@ -131,7 +131,7 @@ export default function Payment() {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="bg-white rounded-[2rem] w-full max-w-[660px] overflow-hidden relative shadow-2xl p-8"
+            className="bg-white dark:bg-gray-900 rounded-[2rem] w-full max-w-[660px] overflow-hidden relative shadow-2xl p-8 border dark:border-gray-700"
           >
             <button 
               onClick={() => setIsModalOpen(false)}
@@ -141,8 +141,8 @@ export default function Payment() {
             </button>
 
             <div className="mb-6 mt-2">
-              <h2 className="text-[28px] font-serif text-[#1e293b] mb-1">For Application Amount</h2>
-              <p className="text-gray-500 text-sm">Payment Details</p>
+              <h2 className="text-[28px] font-serif text-[#1e293b] dark:text-white mb-1">For Application Amount</h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Payment Details</p>
             </div>
 
             <div className="flex flex-col md:flex-row gap-8 items-start">
@@ -278,9 +278,9 @@ export default function Payment() {
               {/* Right Column: Bank Details */}
               <div className="flex-1 flex flex-col space-y-4 w-full">
                 <div className="flex flex-col space-y-1.5">
-                  <span className="text-sm text-gray-500 font-medium">Account Name</span>
-                  <div className="bg-[#f8fafc] rounded-xl p-3.5 flex justify-between items-center border border-gray-100">
-                    <span className="text-[13px] font-mono text-[#1e293b] tracking-wider break-words mr-2 uppercase leading-tight">Svi Infra Solutions Pvt. Ltd</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Account Name</span>
+                  <div className="bg-[#f8fafc] dark:bg-gray-800 rounded-xl p-3.5 flex justify-between items-center border border-gray-100 dark:border-gray-700">
+                    <span className="text-[13px] font-mono text-[#1e293b] dark:text-white tracking-wider break-words mr-2 uppercase leading-tight">Svi Infra Solutions Pvt. Ltd</span>
                     <button 
                       onClick={() => handleCopy("Svi Infra Solutions Pvt. Ltd", "name")}
                       className="text-brand-navy hover:text-brand-gold transition-colors p-1 shrink-0"
@@ -292,9 +292,9 @@ export default function Payment() {
                 </div>
 
                 <div className="flex flex-col space-y-1.5">
-                  <span className="text-sm text-gray-500 font-medium">Account Number</span>
-                  <div className="bg-[#f8fafc] rounded-xl p-3.5 flex justify-between items-center border border-gray-100">
-                    <span className="text-[13px] font-mono text-[#1e293b] tracking-wider">0894102000013837</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Account Number</span>
+                  <div className="bg-[#f8fafc] dark:bg-gray-800 rounded-xl p-3.5 flex justify-between items-center border border-gray-100 dark:border-gray-700">
+                    <span className="text-[13px] font-mono text-[#1e293b] dark:text-white tracking-wider">0894102000013837</span>
                     <button 
                       onClick={() => handleCopy("0894102000013837", "account")}
                       className="text-brand-navy hover:text-brand-gold transition-colors p-1 shrink-0"
@@ -306,9 +306,9 @@ export default function Payment() {
                 </div>
 
                 <div className="flex flex-col space-y-1.5">
-                  <span className="text-sm text-gray-500 font-medium">IFSC Code</span>
-                  <div className="bg-[#f8fafc] rounded-xl p-3.5 flex justify-between items-center border border-gray-100">
-                    <span className="text-[13px] font-mono text-[#1e293b] tracking-wider">IBKL0000894</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">IFSC Code</span>
+                  <div className="bg-[#f8fafc] dark:bg-gray-800 rounded-xl p-3.5 flex justify-between items-center border border-gray-100 dark:border-gray-700">
+                    <span className="text-[13px] font-mono text-[#1e293b] dark:text-white tracking-wider">IBKL0000894</span>
                     <button 
                       onClick={() => handleCopy("IBKL0000894", "ifsc")}
                       className="text-brand-navy hover:text-brand-gold transition-colors p-1 shrink-0"
@@ -320,9 +320,9 @@ export default function Payment() {
                 </div>
 
                 <div className="flex flex-col space-y-1.5">
-                  <span className="text-sm text-gray-500 font-medium">Bank / Branch</span>
-                  <div className="bg-[#f8fafc] rounded-xl p-3.5 flex justify-between items-center border border-gray-100">
-                    <span className="text-[13px] font-mono text-[#1e293b] tracking-wider">IDBI BANK</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Bank / Branch</span>
+                  <div className="bg-[#f8fafc] dark:bg-gray-800 rounded-xl p-3.5 flex justify-between items-center border border-gray-100 dark:border-gray-700">
+                    <span className="text-[13px] font-mono text-[#1e293b] dark:text-white tracking-wider">IDBI BANK</span>
                   </div>
                 </div>
               </div>

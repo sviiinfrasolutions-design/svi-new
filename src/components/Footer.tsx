@@ -26,7 +26,7 @@ const Footer = memo(function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div>
             <Link href="/" className="inline-block mb-6">
-              <img src="/logo.png" alt="SVI Infra Solutions Pvt. Ltd." className="h-10 w-auto" />
+              <img src="/logo.png" alt="SVI Infra Solutions Pvt. Ltd." className="h-10 w-auto dark:brightness-0 dark:invert" />
             </Link>
             <p className="text-gray-500 dark:text-gray-400 mb-6 leading-relaxed text-sm">
               Where Dreams Take Address. Building trust and delivering excellence in real estate for over 15 years.

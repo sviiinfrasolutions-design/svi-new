@@ -19,7 +19,7 @@ const HoverZoomImage = memo(function HoverZoomImage({ src, alt }: { src: string;
       onMouseLeave={handleMouseLeave}
     >
       <img
-        src={src + '&fm=webp'}
+        src={src}
         alt={alt}
         loading="lazy"
         decoding="async"

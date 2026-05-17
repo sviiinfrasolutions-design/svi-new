@@ -36,8 +36,8 @@ export default function FAQ() {
   }, []);
 
   return (
-    <div className="pt-24 pb-20 bg-brand-bg dark:bg-gray-800 min-h-screen">
-      <section className="bg-brand-bg dark:bg-gray-800 py-20 text-center border-b border-gray-200 dark:border-gray-700">
+    <div className="pt-24 pb-20 bg-brand-bg dark:bg-[#0C0C0C] min-h-screen">
+      <section className="bg-brand-bg dark:bg-gray-900 py-20 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}

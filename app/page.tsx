@@ -10,9 +10,9 @@ import AnimatedSection, { StaggerContainer, StaggerItem } from '@/src/components
 const GRADIENT_STYLE = { backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)', backgroundSize: '40px 40px' };
 
 const COMPLETED_PROJECTS = [
-  { title: 'Shree Shyam Residency', loc: 'Jaipur', type: '3BHK/4BHK' },
-  { title: 'Shivani City', loc: 'Manpura Machedi', type: 'Premier Residential' },
-  { title: 'Shyam Aangan', loc: 'Basri Khurd, Jaipur', type: 'Integrated Township' },
+  { title: 'Shyam Aangan', loc: 'Basri Khurd, Jaipur', type: 'Integrated Township', img: '/images/project1.png' },
+  { title: 'Shivani Vatika', loc: 'Manpura Machedi', type: 'Premier Residential', img: '/images/project2.png' },
+  { title: 'Shree Shyam Residency', loc: 'Jaipur', type: '3BHK/4BHK', img: '/images/hero1.png' },
 ];
 
 const HERO_IMAGES = [
@@ -120,18 +120,18 @@ export default function Home() {
   return (
     <div className="flex flex-col w-full page-transition">
       <section ref={heroRef} className="relative min-h-[80vh] md:min-h-[900px] flex items-center justify-center overflow-hidden py-20 lg:py-32" role="region" aria-label="Hero section">
-        <motion.div className="absolute inset-0 z-0" style={{ y: backgroundY, scale: heroScale }}>
+        <motion.div className="absolute inset-0 z-0 bg-brand-navy" style={{ y: backgroundY, scale: heroScale }}>
           <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/80 via-brand-navy/60 to-brand-navy/80 z-10" />
           <div className="absolute top-0 left-0 w-full h-full opacity-20 z-20 pointer-events-none" style={GRADIENT_STYLE} />
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="sync">
             <motion.img
               key={currentHeroIndex}
               src={HERO_IMAGES[currentHeroIndex].src}
               alt={HERO_IMAGES[currentHeroIndex].alt}
-              initial={{ opacity: 0, scale: 1.06 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.0, ease: 'easeInOut' }}
               className="w-full h-full object-cover absolute inset-0"
               width={1920}
               height={1080}
@@ -298,7 +298,7 @@ export default function Home() {
                 animate={{ x: [24, 20, 24], y: [24, 28, 24] }}
                 transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
               />
-              <div className="img-zoom-container relative z-10 shadow-2xl">
+              <div className="img-zoom-container relative shadow-2xl">
                 <img
                   src="/images/house1.png"
                   alt="Modern luxury home exterior showcasing SVI Infra architectural design quality"
@@ -310,7 +310,7 @@ export default function Home() {
                 />
               </div>
               <motion.div
-                className="absolute -bottom-6 -left-6 bg-brand-gold text-brand-navy p-5 shadow-2xl z-20"
+                className="absolute -bottom-6 -left-2 sm:-left-6 bg-brand-gold text-brand-navy p-5 shadow-2xl z-10"
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -397,7 +397,7 @@ export default function Home() {
                   <div className="relative h-72 overflow-hidden bg-brand-navy img-zoom-container">
                     <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 via-transparent to-transparent z-10 group-hover:opacity-70 transition-opacity" />
                     <img
-                      src={idx === 0 ? "/images/project1.png" : idx === 1 ? "/images/project2.png" : "/images/house1.png"}
+                      src={project.img}
                       alt={`${project.title} - ${project.type} in ${project.loc} by SVI Infra Solutions`}
                       loading="lazy"
                       decoding="async"

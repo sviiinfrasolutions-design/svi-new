@@ -67,13 +67,13 @@ export default function Contact() {
   }, [errors]);
 
   return (
-    <div className="pt-24 pb-20 bg-brand-bg relative">
-      <section className="bg-brand-bg py-20 text-center border-b border-gray-200">
+    <div className="pt-24 pb-20 bg-brand-bg dark:bg-gray-900 relative">
+      <section className="bg-brand-bg dark:bg-gray-800 py-20 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-serif text-brand-navy mb-6"
+            className="text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6"
           >
             Contact Us
           </motion.h1>
@@ -91,9 +91,9 @@ export default function Contact() {
           <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
 
             <div className="lg:w-1/3">
-              <div className="bg-white p-10 border border-gray-200 h-full shadow-sm hover:shadow-xl transition-shadow duration-500">
-                <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-4">Reach Out</h4>
-                <h3 className="text-3xl font-serif text-brand-navy mb-10">Get In Touch</h3>
+              <div className="bg-white dark:bg-gray-800 p-10 border border-gray-200 dark:border-gray-700 h-full shadow-sm hover:shadow-xl transition-shadow duration-500">
+                <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-4">Reach Out</h4>
+                <h3 className="text-3xl font-serif text-brand-navy dark:text-gray-100 mb-10">Get In Touch</h3>
 
                 <div className="space-y-10">
                   <div className="flex items-start gap-5">
@@ -101,8 +101,8 @@ export default function Contact() {
                       <MapPin size={20} />
                     </div>
                     <div>
-                      <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Our Office</h4>
-                      <p className="text-gray-600 font-medium text-sm">A-61 Sector 65,<br />Noida, Uttar Pradesh 201309</p>
+                      <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 dark:text-gray-500 mb-2">Our Office</h4>
+                      <p className="text-gray-600 dark:text-gray-300 font-medium text-sm">A-61 Sector 65,<br />Noida, Uttar Pradesh 201309</p>
                     </div>
                   </div>
 
@@ -111,8 +111,8 @@ export default function Contact() {
                       <PhoneIcon size={20} />
                     </div>
                     <div>
-                      <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Phone</h4>
-                      <p className="text-gray-600 font-medium text-sm">+91 73000 07643</p>
+                      <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 dark:text-gray-500 mb-2">Phone</h4>
+                      <p className="text-gray-600 dark:text-gray-300 font-medium text-sm">+91 73000 07643</p>
                       <p className="text-xs text-brand-gold mt-2 uppercase tracking-widest font-bold">Main Office / Sales</p>
                     </div>
                   </div>
@@ -122,9 +122,9 @@ export default function Contact() {
                       <Mail size={20} />
                     </div>
                     <div>
-                      <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Emails</h4>
-                      <a href="mailto:info@sviinfrasolutions.com" className="text-brand-navy font-medium text-sm hover:text-brand-gold block transition-colors">info@sviinfrasolutions.com</a>
-                      <a href="mailto:sales@sviinfrasolutions.com" className="text-brand-navy font-medium text-sm hover:text-brand-gold block mt-2 transition-colors">sales@sviinfrasolutions.com</a>
+                      <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 dark:text-gray-500 mb-2">Emails</h4>
+                      <a href="mailto:info@sviinfrasolutions.com" className="text-brand-navy dark:text-gray-300 font-medium text-sm hover:text-brand-gold dark:hover:text-brand-gold block transition-colors">info@sviinfrasolutions.com</a>
+                      <a href="mailto:sales@sviinfrasolutions.com" className="text-brand-navy dark:text-gray-300 font-medium text-sm hover:text-brand-gold dark:hover:text-brand-gold block mt-2 transition-colors">sales@sviinfrasolutions.com</a>
                     </div>
                   </div>
 
@@ -133,10 +133,10 @@ export default function Contact() {
                       <Clock size={20} />
                     </div>
                     <div>
-                      <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Business Hours</h4>
-                      <p className="text-gray-600 font-medium text-sm mb-1">Mon-Fri: 9AM - 7PM</p>
-                      <p className="text-gray-600 font-medium text-sm mb-1">Sat: 9AM - 5PM</p>
-                      <p className="text-gray-600 font-medium text-sm">Sun: 10AM - 4PM</p>
+                      <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 dark:text-gray-500 mb-2">Business Hours</h4>
+                      <p className="text-gray-600 dark:text-gray-300 font-medium text-sm mb-1">Mon-Fri: 9AM - 7PM</p>
+                      <p className="text-gray-600 dark:text-gray-300 font-medium text-sm mb-1">Sat: 9AM - 5PM</p>
+                      <p className="text-gray-600 dark:text-gray-300 font-medium text-sm">Sun: 10AM - 4PM</p>
                     </div>
                   </div>
                 </div>
@@ -144,13 +144,13 @@ export default function Contact() {
             </div>
 
             <div className="lg:w-2/3 flex flex-col gap-8">
-              <div className="bg-white p-10 border border-gray-200 shadow-sm">
-                <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-4">Inquiries</h4>
-                <h3 className="text-3xl font-serif text-brand-navy mb-8">Send a Message</h3>
+              <div className="bg-white dark:bg-gray-800 p-10 border border-gray-200 dark:border-gray-700 shadow-sm">
+                <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-4">Inquiries</h4>
+                <h3 className="text-3xl font-serif text-brand-navy dark:text-gray-100 mb-8">Send a Message</h3>
                 <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="name" className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 mb-2">Your Name</label>
+                      <label htmlFor="name" className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-gray-400 mb-2">Your Name</label>
                       <input
                         type="text"
                         id="name"
@@ -159,14 +159,14 @@ export default function Contact() {
                         onChange={handleChange}
                         aria-invalid={errors.name ? 'true' : 'false'}
                         aria-describedby={errors.name ? 'name-error' : undefined}
-                        className={`w-full px-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                        className={`w-full px-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                       />
                       {errors.name && (
                         <p id="name-error" className="text-red-500 text-xs mt-1 flex items-center gap-1" role="alert"><AlertCircle size={12} /> {errors.name}</p>
                       )}
                     </div>
                     <div>
-                      <label htmlFor="email" className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 mb-2">Email Address</label>
+                      <label htmlFor="email" className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-gray-400 mb-2">Email Address</label>
                       <input
                         type="email"
                         id="email"
@@ -175,7 +175,7 @@ export default function Contact() {
                         onChange={handleChange}
                         aria-invalid={errors.email ? 'true' : 'false'}
                         aria-describedby={errors.email ? 'email-error' : undefined}
-                        className={`w-full px-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                        className={`w-full px-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                       />
                       {errors.email && (
                         <p id="email-error" className="text-red-500 text-xs mt-1 flex items-center gap-1" role="alert"><AlertCircle size={12} /> {errors.email}</p>
@@ -184,7 +184,7 @@ export default function Contact() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div>
-                      <label htmlFor="phone" className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 mb-2">Phone Number</label>
+                      <label htmlFor="phone" className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-gray-400 mb-2">Phone Number</label>
                       <input
                         type="tel"
                         id="phone"
@@ -193,7 +193,7 @@ export default function Contact() {
                         onChange={handleChange}
                         aria-invalid={errors.phone ? 'true' : 'false'}
                         aria-describedby={errors.phone ? 'phone-error' : undefined}
-                        className={`w-full px-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                        className={`w-full px-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                         placeholder="+91"
                       />
                       {errors.phone && (
@@ -201,7 +201,7 @@ export default function Contact() {
                       )}
                     </div>
                     <div>
-                      <label htmlFor="subject" className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 mb-2">Subject</label>
+                      <label htmlFor="subject" className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-gray-400 mb-2">Subject</label>
                       <input
                         type="text"
                         id="subject"
@@ -211,7 +211,7 @@ export default function Contact() {
                         maxLength={100}
                         aria-invalid={errors.subject ? 'true' : 'false'}
                         aria-describedby={errors.subject ? 'subject-error' : 'subject-count'}
-                        className={`w-full px-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 ${errors.subject ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                        className={`w-full px-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white ${errors.subject ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                       />
                       <div className="flex justify-between items-center mt-1">
                         {errors.subject ? (
@@ -222,7 +222,7 @@ export default function Contact() {
                     </div>
                   </div>
                   <div>
-                    <label htmlFor="message" className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 mb-2">Message</label>
+                    <label htmlFor="message" className="block text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-gray-400 mb-2">Message</label>
                     <textarea
                       id="message"
                       rows={5}
@@ -232,7 +232,7 @@ export default function Contact() {
                       maxLength={1000}
                       aria-invalid={errors.message ? 'true' : 'false'}
                       aria-describedby={errors.message ? 'message-error' : 'message-count'}
-                      className={`w-full px-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 resize-none ${errors.message ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-brand-gold'}`}
+                      className={`w-full px-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white resize-none ${errors.message ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
                     ></textarea>
                     <div className="flex justify-between items-center mt-1">
                       {errors.message ? (
@@ -255,7 +255,7 @@ export default function Contact() {
                 </form>
               </div>
 
-              <div className="bg-white p-2 shadow-sm border border-gray-200 overflow-hidden h-[400px]">
+              <div className="bg-white dark:bg-gray-800 p-2 shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden h-[400px]">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3503.2847551460337!2d77.38202521508168!3d28.61123488242598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce5b2104bd709%3A0x6b6c2a4cb8c16053!2sSector%2065%2C%20Noida%2C%20Uttar%20Pradesh%20201301%2C%20India!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus"
                   width="100%"

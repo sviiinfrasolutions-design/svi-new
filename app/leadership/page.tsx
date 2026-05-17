@@ -19,7 +19,7 @@ const TEAM_MEMBERS = [
 
 export default function Leadership() {
   return (
-    <div className="pt-24 pb-20 bg-gray-50 dark:bg-gray-900 min-h-screen page-transition">
+    <div className="pt-24 pb-20 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen page-transition">
       <section className="bg-brand-navy py-24 text-center relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)', backgroundSize: '40px 40px' }} />
         {/* Animated orbs */}
@@ -70,7 +70,7 @@ export default function Leadership() {
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.7, delay: idx * 0.15, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -10, boxShadow: '0 24px 64px rgba(0,0,0,0.14)' }}
-              className="bg-white dark:bg-gray-800 group overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-brand-gold transition-all duration-400 flex flex-col p-10 text-center relative"
+              className="bg-white dark:bg-gray-900 group overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-brand-gold transition-all duration-400 flex flex-col p-10 text-center relative"
             >
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-gold/40 via-brand-gold to-brand-gold/40" />
               {/* Animated background accent */}
@@ -118,7 +118,7 @@ export default function Leadership() {
         </div>
       </section>
       
-      <section className="bg-gray-100 dark:bg-gray-800 py-20 border-t border-gray-200 dark:border-gray-700">
+      <section className="bg-gray-100 dark:bg-gray-900 py-20 border-t border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4 text-center max-w-3xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
