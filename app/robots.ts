@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://sviinfrasolutions.com/sitemap.xml',
+    sitemap: 'https://sviiinfrasolutions.com/sitemap.xml',
   };
 }

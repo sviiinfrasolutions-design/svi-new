@@ -20,6 +20,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://sviiinfrasolutions.com'),
   title: 'SVI Infra Solutions - Premium Real Estate Developer | Jaipur & Noida',
   description: 'SVI Infra Solutions Pvt. Ltd. - Premium residential and commercial real estate developer with 15+ years of experience. Specializing in Jaipur, Noida, Phulera Smart City, and DMIC/DFC corridors.',
   keywords: ['Real Estate', 'Infra Solutions', 'SVI Infra', 'Infrastructure', 'Jaipur Properties', 'Noida Real Estate', 'Phulera Smart City', 'DMIC', 'Residential Flats', 'Commercial Properties'],
@@ -31,18 +32,18 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    url: 'https://sviinfrasolutions.com/',
+    url: 'https://sviiinfrasolutions.com/',
     title: 'SVI Infra Solutions - Premium Real Estate Developer',
     description: 'Trusted real estate developer with 15+ years of experience. Premium residential and commercial properties in Jaipur, Noida, and DMIC corridors.',
     siteName: 'SVI Infra Solutions',
     locale: 'en_IN',
-    images: [{ url: 'https://sviinfrasolutions.com/logo.png' }],
+    images: [{ url: 'https://sviiinfrasolutions.com/logo.png' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SVI Infra Solutions - Premium Real Estate Developer',
     description: 'Trusted real estate developer with 15+ years of experience. Premium residential and commercial properties in Jaipur, Noida, and DMIC corridors.',
-    images: ['https://sviinfrasolutions.com/logo.png'],
+    images: ['https://sviiinfrasolutions.com/logo.png'],
   },
 };
 
@@ -71,9 +72,9 @@ export default function RootLayout({
               "@type": "RealEstateAgent",
               "name": "SVI Infra Solutions Pvt. Ltd.",
               "description": "Premium residential and commercial real estate developer with 15+ years of experience in Jaipur, Noida, and DMIC/DFC corridors.",
-              "url": "https://sviinfrasolutions.com/",
-              "logo": "https://sviinfrasolutions.com/logo.png",
-              "image": "https://sviinfrasolutions.com/logo.png",
+              "url": "https://sviiinfrasolutions.com/",
+              "logo": "https://sviiinfrasolutions.com/logo.png",
+              "image": "https://sviiinfrasolutions.com/logo.png",
               "telephone": "+91-73000-07643",
               "email": "info@sviinfrasolutions.com",
               "address": {
