@@ -1,9 +1,20 @@
-"use client";
-
+import type { Metadata } from 'next';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Frequently Asked Questions | SVI Infra Solutions',
+  description: 'Find answers to common questions about SVI Infra properties, booking process, home loans, project approvals, and real estate investment in Jaipur and Noida.',
+  keywords: ['real estate FAQ', 'property buying questions', 'SVI Infra FAQs', 'home loan assistance', 'property booking process'],
+  openGraph: {
+    title: 'FAQs - Your Questions Answered | SVI Infra Solutions',
+    description: 'Get quick answers to frequently asked questions about our properties, services, and investment opportunities.',
+    url: 'https://sviiinfrasolutions.com/faq',
+    type: 'website',
+  },
+};
 
 const FAQ_DATA = [
   {
@@ -35,8 +46,26 @@ export default function FAQ() {
     setActiveFaqIndex((prev) => (prev === index ? null : index));
   }, []);
 
+  // Generate FAQPage structured data
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ_DATA.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
     <div className="pt-20 pb-16 bg-brand-bg dark:bg-[#0C0C0C] min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <section className="bg-brand-bg dark:bg-gray-900 py-14 md:py-20 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6 animate-hero-h1">

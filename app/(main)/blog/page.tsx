@@ -1,8 +1,19 @@
-"use client";
-
+import type { Metadata } from 'next';
 import { motion } from 'motion/react';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Real Estate Blog & Insights | SVI Infra Solutions',
+  description: 'Stay updated with the latest real estate market trends, investment guides, property buying tips, and SVI Infra project updates in Jaipur, Noida, and Phulera Smart City.',
+  keywords: ['real estate blog', 'property investment tips', 'Jaipur real estate news', 'Phulera Smart City updates', 'home buying guide India'],
+  openGraph: {
+    title: 'Real Estate Insights & Market Trends | SVI Infra Blog',
+    description: 'Expert insights on real estate investing, market analysis, and property development updates.',
+    url: 'https://sviiinfrasolutions.com/blog',
+    type: 'website',
+  },
+};
 
 const BLOG_POSTS = [
   {

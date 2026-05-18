@@ -32,7 +32,7 @@ function Badge({ role }: { role: string }) {
         ? 'bg-brand-gold/15 text-brand-gold border border-brand-gold/25'
         : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
     }`}>
-      {role === 'admin' ? <Shield className="w-2.5 h-2.5 text-brand-gold" /> : <Users className="w-2.5 h-2.5 text-gray-400" />}
+      {role === 'admin' ? <Shield className="w-2.5 h-2.5 text-brand-gold" /> : <Users className="w-2.5 h-2.5 text-gray-500 dark:text-gray-400 transition-colors duration-300" />}
       {role}
     </span>
   );
@@ -353,7 +353,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-gray-400 hidden sm:block tracking-wide">
+            <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block tracking-wide transition-colors duration-300">
               Welcome back, <span className="text-brand-navy dark:text-white font-bold transition-colors duration-300">{adminName}</span>
             </span>
             <button
@@ -375,7 +375,7 @@ export default function AdminDashboard() {
             <h1 className="text-4xl font-serif text-brand-navy dark:text-white tracking-tight mb-2 transition-colors duration-300">
               System <span className="text-gradient-gold italic animate-bg-pan inline-block" style={{ backgroundSize: '200% 200%', backgroundImage: 'linear-gradient(135deg, #c9a84c, #f0d080, #b08f36, #dec070, #c9a84c)' }}>Dashboard</span>
             </h1>
-            <p className="text-xs text-gray-400 tracking-wide">
+            <p className="text-xs text-gray-600 dark:text-gray-400 tracking-wide transition-colors duration-300">
               Manage authorized client accounts and monitor administrative access permissions.
             </p>
           </div>
@@ -462,13 +462,13 @@ export default function AdminDashboard() {
           <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
 
           {loading ? (
-            <div className="flex items-center justify-center py-24 text-gray-400 font-sans">
+            <div className="flex items-center justify-center py-24 text-gray-500 dark:text-gray-400 font-sans transition-colors duration-300">
               <RefreshCw className="w-5 h-5 animate-spin mr-3 text-brand-gold" /> Loading client database...
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-24 font-sans">
-              <Users className="w-12 h-12 text-gray-700 mx-auto mb-4" />
-              <p className="text-gray-400 text-sm font-medium">{search ? 'No matches found.' : 'No users created yet. Add one!'}</p>
+              <Users className="w-12 h-12 text-gray-400 dark:text-gray-700 mx-auto mb-4 transition-colors duration-300" />
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium transition-colors duration-300">{search ? 'No matches found.' : 'No users created yet. Add one!'}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -476,7 +476,7 @@ export default function AdminDashboard() {
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-brand-gold/15 bg-gray-50/50 dark:bg-white/2 transition-colors duration-300">
                     {['Name & Notes', 'Email Address', 'Phone Number', 'Property Interest', 'Access Role', 'Created Date', 'Actions'].map(h => (
-                      <th key={h} className="text-left text-[9px] uppercase tracking-widest font-bold text-gray-400 px-6 py-4">
+                      <th key={h} className="text-left text-[9px] uppercase tracking-widest font-bold text-gray-500 dark:text-gray-400 px-6 py-4 transition-colors duration-300">
                         {h}
                       </th>
                     ))}

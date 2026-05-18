@@ -1,7 +1,18 @@
-"use client";
-
+import type { Metadata } from 'next';
 import { motion } from 'motion/react';
 import { Target, Heart, Lightbulb, Award, CheckCircle } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'About SVI Infra Solutions | 15+ Years of Real Estate Excellence',
+  description: 'Learn about SVI Infra Solutions - a trusted real estate developer with 15+ years of experience in Jaipur, Noida, and Phulera Smart City. Discover our mission, values, and commitment to quality.',
+  keywords: ['about SVI Infra', 'real estate developer history', 'SVI Infra mission', 'Jaipur property developers', 'Noida real estate company'],
+  openGraph: {
+    title: 'About SVI Infra Solutions | Building Trust Since 2009',
+    description: 'Discover our journey of delivering excellence in residential and commercial real estate across Rajasthan and Uttar Pradesh.',
+    url: 'https://sviiinfrasolutions.com/about',
+    type: 'website',
+  },
+};
 
 export default function About() {
   return (

@@ -106,6 +106,29 @@ export default function RootLayout({
                   { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Property Management" } },
                   { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Real Estate Consultancy" } }
                 ]
+              },
+              "knowsAbout": ["Residential Real Estate", "Commercial Real Estate", "Property Investment", "Real Estate Development", "DMIC Corridor Properties", "Phulera Smart City"],
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "reviewCount": "5000"
+              }
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "url": "https://sviiinfrasolutions.com",
+              "name": "SVI Infra Solutions",
+              "description": "Premium residential and commercial real estate developer in Jaipur, Noida, and Phulera Smart City",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://sviiinfrasolutions.com/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
               }
             }),
           }}

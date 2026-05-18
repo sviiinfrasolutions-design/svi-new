@@ -1,8 +1,19 @@
-"use client";
-
+import type { Metadata } from 'next';
 import { motion } from 'motion/react';
 import { DollarSign, Laptop, Star, Send, Briefcase, Users, Target, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Careers at SVI Infra Solutions | Join Our Real Estate Team',
+  description: 'Explore career opportunities at SVI Infra Solutions. Join our team as BDM, BDE, or Team Lead in Noida. Competitive salaries up to 60k INR plus commissions.',
+  keywords: ['real estate careers', 'SVI Infra jobs', 'property sales jobs Noida', 'business development jobs', 'real estate commission jobs'],
+  openGraph: {
+    title: 'Join Our Team | Careers at SVI Infra Solutions',
+    description: 'Build your career in real estate with attractive commissions and growth opportunities.',
+    url: 'https://sviiinfrasolutions.com/careers',
+    type: 'website',
+  },
+};
 
 const GRADIENT_STYLE = { backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)', backgroundSize: '40px 40px' };
 
