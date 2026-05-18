@@ -1,24 +1,31 @@
 import type { MetadataRoute } from 'next';
+import { BLOG_POSTS } from '@/src/lib/blog';
+import { SITE_URL } from '@/src/lib/seo';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://sviiinfrasolutions.com';
   const currentDate = new Date();
-
-  return [
-    { url: baseUrl, lastModified: currentDate, changeFrequency: 'weekly', priority: 1 },
-    { url: `${baseUrl}/about`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/careers`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${baseUrl}/faq`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/projects/current`, lastModified: currentDate, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/projects/completed`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/registration`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${baseUrl}/contact`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/privacy-policy`, lastModified: currentDate, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${baseUrl}/terms-conditions`, lastModified: currentDate, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${baseUrl}/leadership`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/blog`, lastModified: currentDate, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/payment`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/grievance`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${baseUrl}/login`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.4 },
+  const staticRoutes: MetadataRoute.Sitemap = [
+    { url: SITE_URL, lastModified: currentDate, changeFrequency: 'weekly', priority: 1 },
+    { url: `${SITE_URL}/about`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${SITE_URL}/careers`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${SITE_URL}/faq`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${SITE_URL}/projects/current`, lastModified: currentDate, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITE_URL}/projects/completed`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${SITE_URL}/registration`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${SITE_URL}/contact`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${SITE_URL}/privacy-policy`, lastModified: currentDate, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/terms-conditions`, lastModified: currentDate, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/leadership`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${SITE_URL}/blog`, lastModified: currentDate, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${SITE_URL}/grievance`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.4 },
   ];
+
+  const blogRoutes: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
+    url: `${SITE_URL}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...blogRoutes];
 }

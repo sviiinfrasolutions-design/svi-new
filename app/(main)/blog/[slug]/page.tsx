@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Tag } from 'lucide-react';
+import { BLOG_POST_MAP, BLOG_POSTS as SHARED_BLOG_POSTS } from '@/src/lib/blog';
+import { absoluteUrl } from '@/src/lib/seo';
 
 // Sample blog posts data (in production, this would come from a CMS or database)
 const BLOG_POSTS = {
@@ -163,7 +165,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = BLOG_POSTS[slug as keyof typeof BLOG_POSTS];
+  const post = BLOG_POST_MAP[slug];
 
   if (!post) {
     return {
@@ -175,9 +177,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${post.title} | SVI Infra Solutions Blog`,
     description: post.excerpt,
     keywords: [...post.tags, 'real estate blog', 'property insights', 'SVI Infra'],
+    alternates: {
+      canonical: absoluteUrl(`/blog/${post.slug}`),
+    },
     openGraph: {
       title: post.title,
       description: post.excerpt,
+      url: absoluteUrl(`/blog/${post.slug}`),
       type: 'article',
       publishedTime: post.date,
       authors: [post.author],
@@ -195,14 +201,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  return Object.keys(BLOG_POSTS).map((slug) => ({
-    slug,
+  return SHARED_BLOG_POSTS.map((post) => ({
+    slug: post.slug,
   }));
 }
 
 export default async function BlogPost({ params }: Props) {
   const { slug } = await params;
-  const post = BLOG_POSTS[slug as keyof typeof BLOG_POSTS];
+  const post = BLOG_POST_MAP[slug];
 
   if (!post) {
     notFound();

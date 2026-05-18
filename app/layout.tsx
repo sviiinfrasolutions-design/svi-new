@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { absoluteUrl, COMPANY_NAME, SITE_NAME, SITE_URL } from '@/src/lib/seo';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -19,30 +20,54 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://sviiinfrasolutions.com'),
-  title: 'SVI Infra Solutions - Premium Real Estate Developer | Jaipur & Noida',
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
+  title: {
+    default: 'SVI Infra Solutions - Premium Real Estate Developer | Jaipur & Noida',
+    template: '%s | SVI Infra Solutions',
+  },
   description: 'SVI Infra Solutions Pvt. Ltd. - Premium residential and commercial real estate developer with 15+ years of experience. Specializing in Jaipur, Noida, Phulera Smart City, and DMIC/DFC corridors.',
   keywords: ['Real Estate', 'Infra Solutions', 'SVI Infra', 'Infrastructure', 'Jaipur Properties', 'Noida Real Estate', 'Phulera Smart City', 'DMIC', 'Residential Flats', 'Commercial Properties'],
-  authors: [{ name: 'SVI Infra Solutions Pvt. Ltd.' }],
-  robots: 'index, follow',
+  authors: [{ name: COMPANY_NAME, url: SITE_URL }],
+  creator: COMPANY_NAME,
+  publisher: COMPANY_NAME,
+  category: 'Real Estate',
+  alternates: {
+    canonical: '/',
+    languages: {
+      'en-IN': '/',
+      'x-default': '/',
+    },
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   icons: {
     icon: '/logo.png',
     apple: '/logo.png',
   },
   openGraph: {
     type: 'website',
-    url: 'https://sviiinfrasolutions.com/',
+    url: SITE_URL,
     title: 'SVI Infra Solutions - Premium Real Estate Developer',
     description: 'Trusted real estate developer with 15+ years of experience. Premium residential and commercial properties in Jaipur, Noida, and DMIC corridors.',
-    siteName: 'SVI Infra Solutions',
+    siteName: SITE_NAME,
     locale: 'en_IN',
-    images: [{ url: 'https://sviiinfrasolutions.com/logo.png' }],
+    images: [{ url: absoluteUrl('/opengraph-image'), width: 1200, height: 630, alt: 'SVI Infra Solutions premium real estate developer' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SVI Infra Solutions - Premium Real Estate Developer',
     description: 'Trusted real estate developer with 15+ years of experience. Premium residential and commercial properties in Jaipur, Noida, and DMIC corridors.',
-    images: ['https://sviiinfrasolutions.com/logo.png'],
+    images: [absoluteUrl('/opengraph-image')],
   },
 };
 
@@ -67,7 +92,8 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "RealEstateAgent",
+              "@type": ["Organization", "RealEstateAgent"],
+              "@id": "https://sviiinfrasolutions.com/#organization",
               "name": "SVI Infra Solutions Pvt. Ltd.",
               "description": "Premium residential and commercial real estate developer with 15+ years of experience in Jaipur, Noida, and DMIC/DFC corridors.",
               "url": "https://sviiinfrasolutions.com/",
@@ -122,13 +148,12 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
+              "@id": "https://sviiinfrasolutions.com/#website",
               "url": "https://sviiinfrasolutions.com",
               "name": "SVI Infra Solutions",
               "description": "Premium residential and commercial real estate developer in Jaipur, Noida, and Phulera Smart City",
-              "potentialAction": {
-                "@type": "SearchAction",
-                "target": "https://sviiinfrasolutions.com/search?q={search_term_string}",
-                "query-input": "required name=search_term_string"
+              "publisher": {
+                "@id": "https://sviiinfrasolutions.com/#organization"
               }
             }),
           }}
