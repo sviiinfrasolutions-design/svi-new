@@ -1,13 +1,13 @@
 "use client";
 
 import { motion, Variants } from 'motion/react';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 type AnimationType = 'fadeUp' | 'fadeIn' | 'fadeLeft' | 'fadeRight' | 'scale' | 'stagger';
 
 const VARIANTS: Record<AnimationType, Variants> = {
   fadeUp: {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0 },
   },
   fadeIn: {
@@ -15,15 +15,15 @@ const VARIANTS: Record<AnimationType, Variants> = {
     visible: { opacity: 1 },
   },
   fadeLeft: {
-    hidden: { opacity: 0, x: -40 },
+    hidden: { opacity: 0, x: -30 },
     visible: { opacity: 1, x: 0 },
   },
   fadeRight: {
-    hidden: { opacity: 0, x: 40 },
+    hidden: { opacity: 0, x: 30 },
     visible: { opacity: 1, x: 0 },
   },
   scale: {
-    hidden: { opacity: 0, scale: 0.9 },
+    hidden: { opacity: 0, scale: 0.92 },
     visible: { opacity: 1, scale: 1 },
   },
   stagger: {
@@ -49,15 +49,25 @@ export default function AnimatedSection({
   duration = 0.6,
   className = '',
   once = true,
-  margin = '-80px',
 }: AnimatedSectionProps) {
+  // On mobile (small viewports), use no negative margin so whileInView
+  // triggers as soon as the element enters the viewport at all.
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check, { passive: true });
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   return (
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once, margin }}
+      viewport={{ once, margin: isMobile ? '0px' : '-60px', amount: 0.05 }}
       variants={VARIANTS[type]}
-      transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration, delay: isMobile ? Math.min(delay, 0.1) : delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}
@@ -68,25 +78,34 @@ export default function AnimatedSection({
 export function StaggerContainer({
   children,
   className = '',
-  staggerDelay = 0.12,
-  delayChildren = 0.1,
+  staggerDelay = 0.1,
+  delayChildren = 0.05,
 }: {
   children: ReactNode;
   className?: string;
   staggerDelay?: number;
   delayChildren?: number;
 }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check, { passive: true });
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   return (
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: '-60px' }}
+      viewport={{ once: true, margin: isMobile ? '0px' : '-40px', amount: 0.05 }}
       variants={{
         hidden: {},
         visible: {
           transition: {
-            staggerChildren: staggerDelay,
-            delayChildren,
+            staggerChildren: isMobile ? Math.min(staggerDelay, 0.08) : staggerDelay,
+            delayChildren: isMobile ? 0 : delayChildren,
           },
         },
       }}
@@ -109,7 +128,7 @@ export function StaggerItem({
   return (
     <motion.div
       variants={VARIANTS[type]}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}

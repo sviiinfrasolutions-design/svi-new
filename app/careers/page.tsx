@@ -20,26 +20,17 @@ const ONSITE_ROLES = [
 
 export default function Careers() {
   return (
-    <div className="pt-24 pb-20">
-      <section className="bg-brand-bg dark:bg-gray-900 py-24 text-center border-b border-gray-200 dark:border-gray-700">
+    <div className="pt-20 pb-16">
+      <section className="bg-brand-bg dark:bg-gray-900 py-14 md:py-24 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6"
-          >
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6 animate-hero-h1">
             Careers at SVI Infra Solutions
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-16 h-px bg-brand-gold mx-auto"
-          ></motion.div>
+          </h1>
+          <div className="w-16 h-px bg-brand-gold mx-auto animate-hero-divider"></div>
         </div>
       </section>
 
-      <section className="py-24 bg-brand-navy dark:bg-gray-900 text-white relative">
+      <section className="py-14 md:py-24 bg-brand-navy dark:bg-gray-900 text-white relative">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={GRADIENT_STYLE}></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center mb-16">
@@ -58,9 +49,9 @@ export default function Careers() {
                 key={idx}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-white/5 dark:bg-gray-800/50 p-10 border border-white/10 dark:border-gray-700 hover:border-brand-gold dark:hover:border-brand-gold transition-colors text-center"
+                viewport={{ once: true, margin: '0px', amount: 0.05 }}
+                transition={{ delay: idx * 0.08 }}
+                className="bg-white/5 dark:bg-gray-800/50 p-8 md:p-10 border border-white/10 dark:border-gray-700 hover:border-brand-gold dark:hover:border-brand-gold transition-colors text-center"
               >
                  <div className="w-16 h-16 mx-auto bg-brand-gold/10 text-brand-gold flex items-center justify-center mb-8 rounded-full">
                    {val.icon}

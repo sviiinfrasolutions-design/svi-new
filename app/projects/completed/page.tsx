@@ -111,22 +111,13 @@ export default function CompletedProjects() {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   return (
-    <div className="pt-24 pb-20 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen">
-      <section className="bg-brand-bg dark:bg-gray-900 py-20 text-center border-b border-gray-200 dark:border-gray-700">
+    <div className="pt-20 pb-16 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen">
+      <section className="bg-brand-bg dark:bg-gray-900 py-14 md:py-20 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-serif text-brand-navy leading-tight mb-6"
-          >
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 leading-tight mb-6 animate-hero-h1">
             Completed Projects
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-16 h-px bg-brand-gold mx-auto mb-6"
-          ></motion.div>
+          </h1>
+          <div className="w-16 h-px bg-brand-gold mx-auto mb-6 animate-hero-divider"></div>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
             Explore our portfolio of successfully delivered projects. Each property is a testament to our commitment to excellence, timely delivery, and unmatched quality.
           </p>
@@ -134,12 +125,7 @@ export default function CompletedProjects() {
       </section>
 
       <section className="container mx-auto px-4 lg:px-8 py-12">
-        <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           whileInView={{ opacity: 1, y: 0 }}
-           viewport={{ once: true }}
-           className="mb-12"
-        >
+        <div className="mb-10">
           <div className="flex items-center gap-2 mb-6 text-brand-navy dark:text-gray-100">
             <MapPin size={24} className="text-brand-gold" />
             <h2 className="text-2xl font-serif">Project Locations</h2>
@@ -147,7 +133,7 @@ export default function CompletedProjects() {
           <Suspense fallback={<div className="h-[500px] bg-gray-100 dark:bg-gray-800 flex items-center justify-center"><div className="w-8 h-8 border-2 border-brand-gold border-t-transparent rounded-full animate-spin" /></div>}>
             <CompletedProjectsMap projects={completedProjectsData as any} onProjectClick={scrollToProject} />
           </Suspense>
-        </motion.div>
+        </div>
       </section>
 
       <section className="pb-24 pt-8">
@@ -159,7 +145,7 @@ export default function CompletedProjects() {
                 id={`project-${project.id}`}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
+                viewport={{ once: true, margin: '0px', amount: 0.05 }}
                 transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
                 className={`bg-white dark:bg-gray-800 group overflow-hidden border ${highlightedProject === project.id ? 'border-brand-gold shadow-2xl scale-[1.02] dark:shadow-brand-gold/20' : 'border-gray-200 dark:border-gray-700 hover:shadow-2xl dark:hover:shadow-brand-gold/20 hover:border-brand-gold hover:-translate-y-2 hover:scale-[1.02]'} flex flex-col h-full transition-all duration-400`}
               >

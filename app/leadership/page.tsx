@@ -19,8 +19,8 @@ const TEAM_MEMBERS = [
 
 export default function Leadership() {
   return (
-    <div className="pt-24 pb-20 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen page-transition">
-      <section className="bg-brand-navy py-24 text-center relative overflow-hidden">
+    <div className="pt-20 pb-16 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen page-transition">
+      <section className="bg-brand-navy py-14 md:py-24 text-center relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)', backgroundSize: '40px 40px' }} />
         {/* Animated orbs */}
         <motion.div
@@ -34,28 +34,13 @@ export default function Leadership() {
           transition={{ duration: 9, repeat: Infinity }}
         />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="text-4xl md:text-6xl font-serif text-white leading-tight mb-6"
-          >
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-white leading-tight mb-6 animate-hero-h1">
             Our Leadership
-          </motion.h1>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            className="w-16 h-px bg-brand-gold mx-auto mb-6 origin-left"
-          />
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-gray-300 max-w-2xl mx-auto text-lg leading-relaxed"
-          >
+          </h1>
+          <div className="w-16 h-px bg-brand-gold mx-auto mb-6 animate-hero-divider"></div>
+          <p className="text-gray-300 max-w-2xl mx-auto text-lg leading-relaxed animate-hero-subtitle">
             Incorporated in December 2022 in Delhi, SVI Infra Solutions Private Limited is a non-government private company involved in building construction and civil engineering, based in Dwarka, Delhi. Meet the visionaries behind our success.
-          </motion.p>
+          </p>
         </div>
       </section>
 

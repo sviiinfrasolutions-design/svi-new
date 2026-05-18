@@ -118,25 +118,23 @@ export default function Home() {
   }, [nextHeroSlide, prevHeroSlide]);
 
   return (
-    <div className="flex flex-col w-full page-transition">
+    <div className="flex flex-col w-full page-transition overflow-x-hidden">
       <section ref={heroRef} className="relative min-h-[80vh] md:min-h-[900px] flex items-center justify-center overflow-hidden py-20 lg:py-32" role="region" aria-label="Hero section">
         <motion.div className="absolute inset-0 z-0 bg-brand-navy" style={{ y: backgroundY, scale: heroScale }}>
           <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/80 via-brand-navy/60 to-brand-navy/80 z-10" />
           <div className="absolute top-0 left-0 w-full h-full opacity-20 z-20 pointer-events-none" style={GRADIENT_STYLE} />
-          <AnimatePresence mode="sync">
-            <motion.img
-              key={currentHeroIndex}
-              src={HERO_IMAGES[currentHeroIndex].src}
-              alt={HERO_IMAGES[currentHeroIndex].alt}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.0, ease: 'easeInOut' }}
-              className="w-full h-full object-cover absolute inset-0"
+          {HERO_IMAGES.map((img, idx) => (
+            <img
+              key={idx}
+              src={img.src}
+              alt={img.alt}
+              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                idx === currentHeroIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
+              }`}
               width={1920}
               height={1080}
             />
-          </AnimatePresence>
+          ))}
         </motion.div>
 
         <motion.button
@@ -173,47 +171,33 @@ export default function Home() {
           ))}
         </div>
 
-        <motion.div className="z-10 container mx-auto px-4 text-center flex flex-col items-center" style={{ opacity: heroOpacity }}>
-          <motion.span
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-block px-4 py-1.5 bg-brand-gold/20 text-brand-gold text-[10px] font-bold uppercase tracking-[0.3em] mb-6 rounded-sm border border-brand-gold/30 backdrop-blur-sm"
+        <motion.div className="z-10 container mx-auto px-14 sm:px-8 md:px-4 text-center flex flex-col items-center" style={{ opacity: heroOpacity }}>
+          <span
+            className="inline-block px-4 py-1.5 bg-brand-gold/20 text-brand-gold text-[10px] font-bold uppercase tracking-[0.3em] mb-6 rounded-sm border border-brand-gold/30 backdrop-blur-sm animate-hero-1"
           >
             Legacy of Excellence
-          </motion.span>
+          </span>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-white text-5xl md:text-7xl font-serif leading-[1.1] mb-8"
+          <h1
+            className="text-white text-4xl sm:text-5xl md:text-7xl font-serif leading-[1.1] mb-8 animate-hero-2"
           >
             Where Dreams Take<br />
-            <motion.span
-              className="italic text-gradient-gold"
-              animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
-              transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+            <span
+              className="italic text-gradient-gold animate-bg-pan inline-block"
               style={{ backgroundSize: '200% 200%', backgroundImage: 'linear-gradient(135deg, #c9a84c, #f0d080, #b08f36, #dec070, #c9a84c)' }}
             >
               Address
-            </motion.span>
-          </motion.h1>
+            </span>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.25 }}
-            className="text-gray-300 text-lg md:text-xl max-w-2xl text-center leading-relaxed mb-10"
+          <p
+            className="text-gray-300 text-sm md:text-xl max-w-2xl text-center leading-relaxed mb-10 px-2 animate-hero-3"
           >
             Specializing in premium residential flats and strategic plot investments across Jaipur and Noida.
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-6"
+          <div
+            className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-hero-4"
           >
             <motion.div ref={magnetic.ref} style={{ x: magnetic.x, y: magnetic.y }}>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
@@ -238,13 +222,10 @@ export default function Home() {
                 <span className="text-[10px] font-bold uppercase tracking-widest hover-underline-gold">Invest with us</span>
               </Link>
             </motion.div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-            className="absolute bottom-16 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2"
+          <div
+            className="absolute bottom-16 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 animate-hero-5"
           >
             <span className="text-white/40 text-[9px] uppercase tracking-[0.3em]">Scroll</span>
             <motion.div
@@ -252,11 +233,11 @@ export default function Home() {
               animate={{ scaleY: [1, 0.3, 1], opacity: [0.6, 1, 0.6] }}
               transition={{ duration: 1.8, repeat: Infinity }}
             />
-          </motion.div>
+          </div>
         </motion.div>
       </section>
 
-      <section className="py-24 md:py-32 bg-white dark:bg-gray-900" role="region" aria-label="About SVI Infra Solutions">
+      <section className="py-16 md:py-32 bg-white dark:bg-gray-900" role="region" aria-label="About SVI Infra Solutions">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-16 items-center">
             <AnimatedSection type="fadeLeft" className="lg:w-1/2">
@@ -330,7 +311,7 @@ export default function Home() {
         <StatsCounter />
       </section>
 
-      <section className="py-24 bg-gray-50 dark:bg-gray-800" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }} role="region" aria-label="Why invest with us">
+      <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-800" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }} role="region" aria-label="Why invest with us">
         <div className="container mx-auto px-4">
           <AnimatedSection type="fadeUp" className="text-center max-w-3xl mx-auto mb-20">
             <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">Why Invest With Us</h4>
@@ -346,7 +327,7 @@ export default function Home() {
                 <motion.div
                   whileHover={{ y: -8, boxShadow: '0 20px 60px rgba(0,0,0,0.12)' }}
                   transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                  className="bg-white dark:bg-gray-900 p-12 border border-gray-200 dark:border-gray-700 hover:border-brand-gold transition-colors group h-full relative overflow-hidden"
+                  className="bg-white dark:bg-gray-900 p-8 md:p-12 border border-gray-200 dark:border-gray-700 hover:border-brand-gold transition-colors group h-full relative overflow-hidden"
                 >
                   <motion.div
                     className="absolute bottom-0 right-0 w-24 h-24 bg-brand-gold/5 rounded-tl-full"
@@ -369,7 +350,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-24 bg-white dark:bg-gray-900" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 800px' }} role="region" aria-label="Featured projects portfolio">
+      <section className="py-16 md:py-24 bg-white dark:bg-gray-900" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 800px' }} role="region" aria-label="Featured projects portfolio">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-end mb-16 border-b border-gray-200 dark:border-gray-700 pb-8">
             <AnimatedSection type="fadeLeft">
@@ -421,12 +402,13 @@ export default function Home() {
                     </h3>
                     <Link href="/projects/completed" className="text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 text-brand-navy dark:text-gray-200 group-hover:text-brand-gold transition-colors">
                       Explore Details{' '}
-                      <motion.span
-                        animate={{ x: [0, 4, 0] }}
+                      <motion.div
+                        animate={{ y: [0, 8, 0] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                        className="w-4 h-6 border-2 border-brand-gold/50 rounded-full flex justify-center p-1"
                       >
-                        <ArrowRight size={14} />
-                      </motion.span>
+                        <div className="w-1 h-1 bg-brand-gold rounded-full" />
+                      </motion.div>
                     </Link>
                   </div>
                 </motion.div>

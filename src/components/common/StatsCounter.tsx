@@ -12,40 +12,54 @@ const StatItem = memo(function StatItem({ end, label, suffix = '', duration = 20
   const hasAnimatedRef = useRef(false);
   const nodeRef = useRef<HTMLDivElement>(null);
 
+  const runAnimation = () => {
+    if (hasAnimatedRef.current) return;
+    hasAnimatedRef.current = true;
+    let startTimestamp: number;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const easeProgress = 1 - Math.pow(1 - progress, 4);
+      setCount(Math.floor(easeProgress * end));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  };
+
   useEffect(() => {
+    // Intersection Observer for desktop scroll trigger
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !hasAnimatedRef.current) {
-          hasAnimatedRef.current = true;
-
-          let startTimestamp: number;
-          const step = (timestamp: number) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            const easeProgress = 1 - Math.pow(1 - progress, 4);
-            setCount(Math.floor(easeProgress * end));
-            if (progress < 1) {
-              window.requestAnimationFrame(step);
-            }
-          };
-          window.requestAnimationFrame(step);
-        }
+        if (entries[0].isIntersecting) runAnimation();
       },
-      { threshold: 0.1 }
+      { threshold: 0.05, rootMargin: '0px' }
     );
 
     if (nodeRef.current) observer.observe(nodeRef.current);
+
+    // Fallback: on mobile the section may already be visible on load —
+    // fire after 400ms if not yet triggered by observer
+    const fallback = setTimeout(() => {
+      if (nodeRef.current) {
+        const rect = nodeRef.current.getBoundingClientRect();
+        if (rect.top < window.innerHeight) runAnimation();
+      }
+    }, 400);
+
     return () => {
       if (nodeRef.current) observer.unobserve(nodeRef.current);
+      clearTimeout(fallback);
     };
   }, [end, duration]);
 
   return (
-    <div ref={nodeRef} className="text-center p-6">
-      <div className="text-4xl md:text-5xl font-bold font-serif text-brand-gold mb-2">
+    <div ref={nodeRef} className="text-center p-4 md:p-6">
+      <div className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-brand-gold mb-2">
         {count}{suffix}
       </div>
-      <div className="text-gray-300 font-medium tracking-wide uppercase text-sm">
+      <div className="text-gray-300 font-medium tracking-wide uppercase text-xs sm:text-sm">
         {label}
       </div>
     </div>
@@ -54,8 +68,8 @@ const StatItem = memo(function StatItem({ end, label, suffix = '', duration = 20
 
 export default function StatsCounter() {
   return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/10">
+    <div className="container mx-auto px-4 py-12 md:py-16">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 divide-x divide-white/10">
         <StatItem end={5000} suffix="+" label="Properties Sold" />
         <StatItem end={5000} suffix="+" label="Happy Clients" />
         <StatItem end={15} suffix="+" label="Years Experience" />

@@ -36,22 +36,13 @@ export default function FAQ() {
   }, []);
 
   return (
-    <div className="pt-24 pb-20 bg-brand-bg dark:bg-[#0C0C0C] min-h-screen">
-      <section className="bg-brand-bg dark:bg-gray-900 py-20 text-center border-b border-gray-200 dark:border-gray-700">
+    <div className="pt-20 pb-16 bg-brand-bg dark:bg-[#0C0C0C] min-h-screen">
+      <section className="bg-brand-bg dark:bg-gray-900 py-14 md:py-20 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6"
-          >
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6 animate-hero-h1">
             Frequently Asked Questions
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-16 h-px bg-brand-gold mx-auto mb-6"
-          ></motion.div>
+          </h1>
+          <div className="w-16 h-px bg-brand-gold mx-auto mb-6 animate-hero-divider"></div>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
             Find answers to common questions about our projects and services.
           </p>
@@ -66,8 +57,8 @@ export default function FAQ() {
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true, margin: '0px', amount: 0.05 }}
+                transition={{ delay: index * 0.06 }}
                 className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm"
               >
                 <button

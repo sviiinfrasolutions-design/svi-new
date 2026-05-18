@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, ChevronDown, Sun, Moon } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { useTheme } from './ThemeProvider';
 
 const NAV_LINKS = [
@@ -39,6 +38,17 @@ export default function Header() {
     setIsProjectsOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   const toggleTheme = useCallback(() => {
     setTheme((prev: 'dark' | 'light') => prev === 'dark' ? 'light' : 'dark');
   }, [setTheme]);
@@ -51,11 +61,12 @@ export default function Header() {
   const handleMouseLeave = useCallback(() => setIsProjectsOpen(false), []);
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled ? 'bg-white/97 dark:bg-[#0C0C0C]/97 backdrop-blur-xl shadow-lg py-4 border-b border-gray-100 dark:border-gray-800' : 'bg-white/70 dark:bg-[#0C0C0C]/70 backdrop-blur-md py-5'
-      }`}
-    >
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          isScrolled ? 'bg-white/97 dark:bg-[#0C0C0C]/97 backdrop-blur-xl shadow-lg py-4 border-b border-gray-100 dark:border-gray-800' : 'bg-white/70 dark:bg-[#0C0C0C]/70 backdrop-blur-md py-5'
+        }`}
+      >
       <div ref={sentinelRef} className="absolute top-0 left-0 w-px h-px pointer-events-none" aria-hidden="true" />
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between">
@@ -93,30 +104,24 @@ export default function Header() {
                 Projects <ChevronDown size={16} />
               </span>
 
-              <AnimatePresence>
-                {isProjectsOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute top-full left-0 mt-2 w-48 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md shadow-lg rounded-sm overflow-hidden border border-gray-100 dark:border-gray-700"
-                  >
-                    <Link
-                      href="/projects/current"
-                      className="block px-4 py-3 text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors"
-                    >
-                      Current Projects
-                    </Link>
-                    <Link
-                      href="/projects/completed"
-                      className="block px-4 py-3 text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors"
-                    >
-                      Completed Projects
-                    </Link>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <div
+                className={`absolute top-full left-0 mt-2 w-48 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md shadow-lg rounded-sm overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-200 ${
+                  isProjectsOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'
+                }`}
+              >
+                <Link
+                  href="/projects/current"
+                  className="block px-4 py-3 text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors"
+                >
+                  Current Projects
+                </Link>
+                <Link
+                  href="/projects/completed"
+                  className="block px-4 py-3 text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors"
+                >
+                  Completed Projects
+                </Link>
+              </div>
             </div>
 
             <Link
@@ -181,91 +186,77 @@ export default function Header() {
           </div>
         </div>
       </div>
+      </header>
 
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            id="mobile-menu"
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 top-0 bg-white dark:bg-[#0C0C0C] z-40 md:hidden overflow-y-auto pt-24 pb-8 px-6"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobile navigation menu"
+      <div
+        id="mobile-menu"
+        className={`fixed inset-0 top-0 bg-white dark:bg-[#0C0C0C] z-40 md:hidden overflow-y-auto pt-24 pb-8 px-6 transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'opacity-100 translate-x-0 pointer-events-auto' : 'opacity-0 translate-x-full pointer-events-none'
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile navigation menu"
+      >
+        <div className="flex flex-col gap-6">
+          {NAV_LINKS.map((link) => (
+            <div key={link.name}>
+              <Link
+                href={link.path}
+                className="text-2xl font-serif text-brand-navy dark:text-gray-100 hover:text-brand-gold transition-colors block"
+              >
+                {link.name}
+              </Link>
+            </div>
+          ))}
+
+          <div className="flex flex-col gap-4">
+            <span className="text-2xl font-serif text-brand-navy dark:text-gray-100">Projects</span>
+            <div className="flex flex-col gap-3 pl-4 border-l-2 border-brand-gold/30">
+              <Link
+                href="/projects/current"
+                className="text-lg text-gray-600 dark:text-gray-400 hover:text-brand-gold block"
+              >
+                Current Projects
+              </Link>
+              <Link
+                href="/projects/completed"
+                className="text-lg text-gray-600 dark:text-gray-400 hover:text-brand-gold block"
+              >
+                Completed Projects
+              </Link>
+            </div>
+          </div>
+
+          <Link
+            href="/payment"
+            className="text-2xl font-serif text-brand-navy dark:text-gray-100 block"
           >
-            <motion.div
-              className="flex flex-col gap-6"
-              variants={{ visible: { transition: { staggerChildren: 0.07 } } }}
-              initial="hidden"
-              animate="visible"
+            Payment
+          </Link>
+
+          <Link
+            href="/contact"
+            className="text-2xl font-serif text-brand-navy dark:text-gray-100 block"
+          >
+            Contact Us
+          </Link>
+
+          <div className="mt-8 flex flex-col gap-4">
+            <Link
+              href="/login"
+              className="inline-block w-full text-center border-2 border-brand-navy dark:border-brand-gold text-brand-navy dark:text-brand-gold text-lg font-semibold px-6 py-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors block"
             >
-              {NAV_LINKS.map((link) => (
-                <motion.div
-                  key={link.name}
-                  variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0 } }}
-                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <Link
-                    href={link.path}
-                    className="text-2xl font-serif text-brand-navy dark:text-gray-100 hover:text-brand-gold transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </motion.div>
-              ))}
-
-              <div className="flex flex-col gap-4">
-                <span className="text-2xl font-serif text-brand-navy dark:text-gray-100">Projects</span>
-                <div className="flex flex-col gap-3 pl-4 border-l-2 border-brand-gold/30">
-                  <Link
-                    href="/projects/current"
-                    className="text-lg text-gray-600 dark:text-gray-400 hover:text-brand-gold"
-                  >
-                    Current Projects
-                  </Link>
-                  <Link
-                    href="/projects/completed"
-                    className="text-lg text-gray-600 dark:text-gray-400 hover:text-brand-gold"
-                  >
-                    Completed Projects
-                  </Link>
-                </div>
-              </div>
-
-              <Link
-                href="/payment"
-                className="text-2xl font-serif text-brand-navy dark:text-gray-100"
-              >
-                Payment
-              </Link>
-
-              <Link
-                href="/contact"
-                className="text-2xl font-serif text-brand-navy dark:text-gray-100"
-              >
-                Contact Us
-              </Link>
-
-              <div className="mt-8 flex flex-col gap-4">
-                <Link
-                  href="/login"
-                  className="inline-block w-full text-center border-2 border-brand-navy dark:border-brand-gold text-brand-navy dark:text-brand-gold text-lg font-semibold px-6 py-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                >
-                  Client Login
-                </Link>
-                <Link
-                  href="/registration"
-                  className="inline-block w-full text-center bg-brand-navy dark:bg-brand-gold text-white dark:text-brand-navy text-lg font-semibold px-6 py-4 rounded-md"
-                >
-                  Register Now
-                </Link>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+              Client Login
+            </Link>
+            <Link
+              href="/registration"
+              className="inline-block w-full text-center bg-brand-navy dark:bg-brand-gold text-white dark:text-brand-navy text-lg font-semibold px-6 py-4 rounded-md block"
+            >
+              Register Now
+            </Link>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

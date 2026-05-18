@@ -90,22 +90,13 @@ export default function Projects() {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   return (
-    <div className="pt-24 pb-20 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen">
-      <section className="bg-brand-bg dark:bg-gray-900 py-20 text-center border-b border-gray-200 dark:border-gray-700">
+    <div className="pt-20 pb-16 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen">
+      <section className="bg-brand-bg dark:bg-gray-900 py-14 md:py-20 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 leading-tight mb-6"
-          >
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 leading-tight mb-6 animate-hero-h1">
             Current Projects
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-16 h-px bg-brand-gold mx-auto mb-6"
-          ></motion.div>
+          </h1>
+          <div className="w-16 h-px bg-brand-gold mx-auto mb-6 animate-hero-divider"></div>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
             Discover our ongoing developments. We are currently working on exciting new residential and commercial projects in prime locations, offering unparalleled amenities and lifestyle options.
           </p>

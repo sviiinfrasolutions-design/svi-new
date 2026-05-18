@@ -5,22 +5,13 @@ import { Target, Heart, Lightbulb, Award, CheckCircle } from 'lucide-react';
 
 export default function About() {
   return (
-    <div className="pt-24 pb-20 bg-white dark:bg-gray-900 min-h-screen">
-      <section className="bg-brand-bg dark:bg-gray-800 py-24 text-center border-b border-gray-200 dark:border-gray-700">
+    <div className="pt-20 pb-20 bg-white dark:bg-gray-900 min-h-screen">
+      <section className="bg-brand-bg dark:bg-gray-800 py-16 md:py-24 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6"
-          >
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6 px-2 animate-hero-h1">
             About SVI Infra Solutions
-          </motion.h1>
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-16 h-px bg-brand-gold mx-auto"
-          ></motion.div>
+          </h1>
+          <div className="w-16 h-px bg-brand-gold mx-auto animate-hero-divider"></div>
         </div>
       </section>
 
@@ -49,7 +40,7 @@ export default function About() {
              <h2 className="text-4xl font-serif text-white mb-8">Mission & Values</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { icon: <Target />, title: "Integrity", desc: "Honesty and transparency in every transaction." },
               { icon: <Heart />, title: "Customer-Centricity", desc: "Putting our clients' needs and aspirations first." },
@@ -60,9 +51,9 @@ export default function About() {
                 key={idx}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-white/5 dark:bg-gray-800/50 p-10 border border-white/10 dark:border-gray-700 hover:border-brand-gold dark:hover:border-brand-gold transition-colors text-center"
+                viewport={{ once: true, margin: '0px', amount: 0.05 }}
+                transition={{ delay: idx * 0.08 }}
+                className="bg-white/5 dark:bg-gray-800/50 p-8 md:p-10 border border-white/10 dark:border-gray-700 hover:border-brand-gold dark:hover:border-brand-gold transition-colors text-center"
               >
                  <div className="w-16 h-16 mx-auto bg-brand-gold/10 text-brand-gold flex items-center justify-center mb-8 rounded-full">
                    {val.icon}
@@ -77,7 +68,7 @@ export default function About() {
 
       <section className="py-24 bg-white dark:bg-gray-800">
          <div className="container mx-auto px-4">
-           <div className="flex flex-col md:flex-row gap-16 items-center">
+           <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-center">
              <div className="md:w-1/2">
                 <img 
                   src="/images/house1.png" 
@@ -104,8 +95,8 @@ export default function About() {
                      key={idx}
                      initial={{ opacity: 0, x: 20 }}
                      whileInView={{ opacity: 1, x: 0 }}
-                     viewport={{ once: true }}
-                     transition={{ delay: idx * 0.1 }}
+                     viewport={{ once: true, margin: '0px', amount: 0.05 }}
+                     transition={{ delay: idx * 0.08 }}
                      className="flex items-center gap-6 border-b border-gray-100 dark:border-gray-700 pb-4 group"
                    >
                      <div className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center group-hover:border-brand-gold dark:group-hover:border-brand-gold transition-colors">

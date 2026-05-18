@@ -67,31 +67,22 @@ export default function Contact() {
   }, [errors]);
 
   return (
-    <div className="pt-24 pb-20 bg-brand-bg dark:bg-gray-900 relative">
-      <section className="bg-brand-bg dark:bg-gray-800 py-20 text-center border-b border-gray-200 dark:border-gray-700">
+    <div className="pt-20 pb-16 bg-brand-bg dark:bg-gray-900 relative">
+      <section className="bg-brand-bg dark:bg-gray-800 py-14 md:py-20 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6"
-          >
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6 animate-hero-h1">
             Contact Us
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-16 h-px bg-brand-gold mx-auto"
-          ></motion.div>
+          </h1>
+          <div className="w-16 h-px bg-brand-gold mx-auto animate-hero-divider"></div>
         </div>
       </section>
 
-      <section className="py-24">
+      <section className="py-12 md:py-24">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
 
             <div className="lg:w-1/3">
-              <div className="bg-white dark:bg-gray-800 p-10 border border-gray-200 dark:border-gray-700 h-full shadow-sm hover:shadow-xl transition-shadow duration-500">
+              <div className="bg-white dark:bg-gray-800 p-6 md:p-10 border border-gray-200 dark:border-gray-700 h-full shadow-sm hover:shadow-xl transition-shadow duration-500">
                 <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-4">Reach Out</h4>
                 <h3 className="text-3xl font-serif text-brand-navy dark:text-gray-100 mb-10">Get In Touch</h3>
 
@@ -143,8 +134,8 @@ export default function Contact() {
               </div>
             </div>
 
-            <div className="lg:w-2/3 flex flex-col gap-8">
-              <div className="bg-white dark:bg-gray-800 p-10 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <div className="lg:w-2/3 flex flex-col gap-6 md:gap-8">
+              <div className="bg-white dark:bg-gray-800 p-6 md:p-10 border border-gray-200 dark:border-gray-700 shadow-sm">
                 <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-4">Inquiries</h4>
                 <h3 className="text-3xl font-serif text-brand-navy dark:text-gray-100 mb-8">Send a Message</h3>
                 <form onSubmit={handleSubmit} className="space-y-6" noValidate>
@@ -255,7 +246,7 @@ export default function Contact() {
                 </form>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 p-2 shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden h-[400px]">
+              <div className="bg-white dark:bg-gray-800 p-2 shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden h-[280px] md:h-[400px]">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3503.2847551460337!2d77.38202521508168!3d28.61123488242598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce5b2104bd709%3A0x6b6c2a4cb8c16053!2sSector%2065%2C%20Noida%2C%20Uttar%20Pradesh%20201301%2C%20India!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus"
                   width="100%"
