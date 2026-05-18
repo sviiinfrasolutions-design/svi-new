@@ -30,7 +30,7 @@ function Badge({ role }: { role: string }) {
     <span className={`inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.15em] font-bold px-2.5 py-1 rounded-full ${
       role === 'admin'
         ? 'bg-brand-gold/15 text-brand-gold border border-brand-gold/25'
-        : 'bg-white/5 text-gray-300 border border-white/10'
+        : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
     }`}>
       {role === 'admin' ? <Shield className="w-2.5 h-2.5 text-brand-gold" /> : <Users className="w-2.5 h-2.5 text-gray-400" />}
       {role}
@@ -87,27 +87,27 @@ function CreateUserModal({ onClose, onSuccess, token }: CreateUserModalProps) {
     }
   };
 
-  const inputCls = "w-full bg-[#111118] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/15 transition-all font-sans";
-  const labelCls = "text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1.5 block";
+  const inputCls = "w-full bg-white dark:bg-[#111118] border border-gray-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/15 transition-all font-sans";
+  const labelCls = "text-[10px] uppercase tracking-widest font-bold text-gray-500 dark:text-gray-400 mb-1.5 block transition-colors duration-300";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 dark:bg-black/85 backdrop-blur-md">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[#0e0e14] border border-brand-gold/20 rounded-2xl shadow-2xl w-full max-w-lg relative overflow-hidden"
+        className="bg-white dark:bg-[#0e0e14] border border-gray-200 dark:border-brand-gold/20 rounded-2xl shadow-2xl w-full max-w-lg relative overflow-hidden transition-colors duration-300"
       >
         {/* Subtle gold line on top of the modal */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-gold/50 to-transparent" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/8">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-white/8">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center">
               <Plus className="w-4 h-4 text-brand-gold" />
             </div>
-            <h2 className="font-serif font-semibold text-white text-lg tracking-tight">Create Client User</h2>
+            <h2 className="font-serif font-semibold text-brand-navy dark:text-white text-lg tracking-tight transition-colors duration-300">Create Client User</h2>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-brand-gold transition-colors cursor-pointer">
             <X className="w-5 h-5" />
@@ -192,7 +192,7 @@ function CreateUserModal({ onClose, onSuccess, token }: CreateUserModalProps) {
 
           <div className="flex gap-3 pt-4">
             <button type="button" onClick={onClose}
-              className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 font-bold text-xs uppercase tracking-widest py-3.5 rounded-lg transition-all cursor-pointer">
+              className="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-bold text-xs uppercase tracking-widest py-3.5 rounded-lg transition-all cursor-pointer">
               Cancel
             </button>
             <button type="submit" disabled={loading}
@@ -218,24 +218,24 @@ interface DeleteConfirmProps {
 
 function DeleteConfirm({ user, onConfirm, onClose, loading }: DeleteConfirmProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 dark:bg-black/85 backdrop-blur-md">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[#0e0e14] border border-brand-gold/20 rounded-2xl p-6 shadow-2xl w-full max-w-sm text-center relative overflow-hidden"
+        className="bg-white dark:bg-[#0e0e14] border border-gray-200 dark:border-brand-gold/20 rounded-2xl p-6 shadow-2xl w-full max-w-sm text-center relative overflow-hidden transition-colors duration-300"
       >
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-red-500/50" />
         <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
           <Trash2 className="w-5 h-5 text-red-400" />
         </div>
-        <h3 className="font-serif text-white text-lg tracking-tight mb-2">Delete User?</h3>
-        <p className="text-sm text-gray-400 mb-6 font-sans">
-          This will permanently delete <span className="text-white font-medium">{user.full_name}</span> and all associated data. This action is irreversible.
+        <h3 className="font-serif text-brand-navy dark:text-white text-lg tracking-tight mb-2 transition-colors duration-300">Delete User?</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-sans transition-colors duration-300">
+          This will permanently delete <span className="text-brand-navy dark:text-white font-medium">{user.full_name}</span> and all associated data. This action is irreversible.
         </p>
         <div className="flex gap-3 font-sans">
           <button onClick={onClose}
-            className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 font-bold text-xs uppercase tracking-widest py-3 rounded-lg transition-all cursor-pointer">
+            className="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-bold text-xs uppercase tracking-widest py-3 rounded-lg transition-all cursor-pointer">
             Cancel
           </button>
           <button onClick={onConfirm} disabled={loading}
@@ -331,7 +331,7 @@ export default function AdminDashboard() {
   const clientCount = users.filter(u => u.role === 'client').length;
 
   return (
-    <div className="min-h-screen bg-[#0C0C0C] flex flex-col font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0C0C0C] flex flex-col font-sans relative overflow-x-hidden transition-colors duration-300">
       
       {/* Background ambient lighting effects */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -341,20 +341,20 @@ export default function AdminDashboard() {
       </div>
 
       {/* Topbar */}
-      <header className="relative z-30 border-b border-brand-gold/15 bg-[#0d0d14]/75 backdrop-blur-xl sticky top-0">
+      <header className="relative z-30 border-b border-gray-200 dark:border-brand-gold/15 bg-white/80 dark:bg-[#0d0d14]/75 backdrop-blur-xl sticky top-0 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3.5">
             <div className="w-8 h-8 rounded-lg bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center">
               <Shield className="w-4 h-4 text-brand-gold" />
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-serif font-bold text-white text-base tracking-tight">SVI Infra</span>
+              <span className="font-serif font-bold text-brand-navy dark:text-white text-base tracking-tight transition-colors duration-300">SVI Infra</span>
               <span className="text-[9px] uppercase tracking-widest text-brand-gold font-bold px-2 py-0.5 bg-brand-gold/15 rounded border border-brand-gold/25">Admin Panel</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-xs text-gray-400 hidden sm:block tracking-wide">
-              Welcome back, <span className="text-white font-bold">{adminName}</span>
+              Welcome back, <span className="text-brand-navy dark:text-white font-bold transition-colors duration-300">{adminName}</span>
             </span>
             <button
               onClick={handleSignOut}
@@ -372,7 +372,7 @@ export default function AdminDashboard() {
         {/* Header section with page-mount animation */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
           <div>
-            <h1 className="text-4xl font-serif text-white tracking-tight mb-2">
+            <h1 className="text-4xl font-serif text-brand-navy dark:text-white tracking-tight mb-2 transition-colors duration-300">
               System <span className="text-gradient-gold italic animate-bg-pan inline-block" style={{ backgroundSize: '200% 200%', backgroundImage: 'linear-gradient(135deg, #c9a84c, #f0d080, #b08f36, #dec070, #c9a84c)' }}>Dashboard</span>
             </h1>
             <p className="text-xs text-gray-400 tracking-wide">
@@ -388,7 +388,7 @@ export default function AdminDashboard() {
               label: 'Total Accounts',
               value: users.length,
               icon: Users,
-              bgCls: 'bg-[#0e0e14]/65 backdrop-blur-xl border border-brand-gold/15 relative overflow-hidden',
+              bgCls: 'bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-brand-gold/15 relative overflow-hidden transition-colors duration-300',
               iconBg: 'bg-brand-gold/10 border border-brand-gold/25',
               iconColor: 'text-brand-gold',
               showLine: true
@@ -397,7 +397,7 @@ export default function AdminDashboard() {
               label: 'Client Profiles',
               value: clientCount,
               icon: Building2,
-              bgCls: 'bg-[#0e0e14]/65 backdrop-blur-xl border border-white/8 hover:border-brand-gold/15 transition-colors relative overflow-hidden',
+              bgCls: 'bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-white/8 hover:border-brand-gold/15 transition-colors relative overflow-hidden',
               iconBg: 'bg-white/5 border border-white/10',
               iconColor: 'text-gray-300',
               showLine: false
@@ -406,7 +406,7 @@ export default function AdminDashboard() {
               label: 'Administrators',
               value: users.length - clientCount,
               icon: Shield,
-              bgCls: 'bg-[#0e0e14]/65 backdrop-blur-xl border border-white/8 hover:border-brand-gold/15 transition-colors relative overflow-hidden',
+              bgCls: 'bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-white/8 hover:border-brand-gold/15 transition-colors relative overflow-hidden',
               iconBg: 'bg-white/5 border border-white/10',
               iconColor: 'text-gray-300',
               showLine: false
@@ -421,7 +421,7 @@ export default function AdminDashboard() {
                   <Icon className={`w-5 h-5 ${iconColor}`} />
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-white tracking-tight">{value}</p>
+                  <p className="text-3xl font-bold text-brand-navy dark:text-white tracking-tight transition-colors duration-300">{value}</p>
                   <p className="text-[10px] uppercase tracking-wider font-semibold text-gray-500">{label}</p>
                 </div>
               </div>
@@ -438,7 +438,7 @@ export default function AdminDashboard() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by name, email or phone..."
-              className="w-full bg-[#0e0e14]/85 border border-white/10 rounded-lg pl-10 pr-10 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/15 transition-all"
+              className="w-full bg-white dark:bg-[#0e0e14]/85 border border-gray-200 dark:border-white/10 rounded-lg pl-10 pr-10 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/15 transition-all"
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-brand-gold cursor-pointer">
@@ -447,7 +447,7 @@ export default function AdminDashboard() {
             )}
           </div>
           <button onClick={() => { setLoading(true); fetchUsers(token); }}
-            className="flex items-center gap-2 bg-[#0e0e14]/85 hover:bg-white/5 border border-white/10 text-gray-300 text-xs font-bold uppercase tracking-widest px-5 py-3 rounded-lg transition-all cursor-pointer">
+            className="flex items-center gap-2 bg-white dark:bg-[#0e0e14]/85 hover:bg-gray-50 dark:hover:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 text-xs font-bold uppercase tracking-widest px-5 py-3 rounded-lg transition-all cursor-pointer">
             <RefreshCw className="w-3.5 h-3.5" /> Refresh
           </button>
           <button onClick={() => setShowCreate(true)}
@@ -457,7 +457,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Users Table glassmorphic container */}
-        <div className="bg-[#0e0e14]/65 backdrop-blur-xl border border-white/8 rounded-xl overflow-hidden relative shadow-2xl">
+        <div className="bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-white/8 rounded-xl overflow-hidden relative shadow-2xl transition-colors duration-300">
           {/* Subtle gold line on top */}
           <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
 
@@ -474,7 +474,7 @@ export default function AdminDashboard() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm font-sans">
                 <thead>
-                  <tr className="border-b border-brand-gold/15 bg-white/2">
+                  <tr className="border-b border-gray-200 dark:border-brand-gold/15 bg-gray-50/50 dark:bg-white/2 transition-colors duration-300">
                     {['Name & Notes', 'Email Address', 'Phone Number', 'Property Interest', 'Access Role', 'Created Date', 'Actions'].map(h => (
                       <th key={h} className="text-left text-[9px] uppercase tracking-widest font-bold text-gray-400 px-6 py-4">
                         {h}
@@ -489,23 +489,23 @@ export default function AdminDashboard() {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.02, duration: 0.4 }}
-                      className="border-b border-white/5 hover:bg-[#111118]/60 transition-colors group"
+                      className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-[#111118]/60 transition-colors group"
                     >
                       <td className="px-6 py-4.5">
-                        <div className="font-semibold text-white tracking-wide">{u.full_name}</div>
+                        <div className="font-semibold text-gray-900 dark:text-white tracking-wide transition-colors duration-300">{u.full_name}</div>
                         {u.notes ? (
                           <div className="text-xs text-gray-500 mt-1 max-w-[200px] truncate" title={u.notes}>{u.notes}</div>
                         ) : (
-                          <div className="text-xs text-gray-600 italic mt-1">No notes added</div>
+                          <div className="text-xs text-gray-400 dark:text-gray-600 italic mt-1 transition-colors duration-300">No notes added</div>
                         )}
                       </td>
-                      <td className="px-6 py-4.5 text-gray-300 font-medium">{u.email}</td>
-                      <td className="px-6 py-4.5 text-gray-300">{u.phone || <span className="text-gray-600">—</span>}</td>
-                      <td className="px-6 py-4.5 text-gray-300">
+                      <td className="px-6 py-4.5 text-gray-700 dark:text-gray-300 font-medium transition-colors duration-300">{u.email}</td>
+                      <td className="px-6 py-4.5 text-gray-700 dark:text-gray-300 transition-colors duration-300">{u.phone || <span className="text-gray-400 dark:text-gray-600">—</span>}</td>
+                      <td className="px-6 py-4.5 text-gray-700 dark:text-gray-300 transition-colors duration-300">
                         {u.property_interest ? (
                           <span className="font-semibold text-brand-gold/90">{PROPERTY_LABELS[u.property_interest] || u.property_interest}</span>
                         ) : (
-                          <span className="text-gray-600">—</span>
+                          <span className="text-gray-400 dark:text-gray-600 transition-colors duration-300">—</span>
                         )}
                       </td>
                       <td className="px-6 py-4.5"><Badge role={u.role} /></td>
@@ -562,8 +562,8 @@ export default function AdminDashboard() {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-semibold shadow-2xl border font-sans ${
               toast.type === 'success'
-                ? 'bg-emerald-950/95 border-emerald-500/30 text-emerald-300'
-                : 'bg-red-950/95 border-red-500/30 text-red-300'
+                ? 'bg-emerald-50 dark:bg-emerald-950/95 border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-300'
+                : 'bg-red-50 dark:bg-red-950/95 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-300'
             }`}
           >
             {toast.type === 'success'

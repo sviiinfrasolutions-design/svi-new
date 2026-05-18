@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
-import ClientProviders from '@/src/components/ClientProviders';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
@@ -51,6 +50,7 @@ export const viewport: Viewport = {
   themeColor: '#1a2744',
 };
 
+// Inline theme script — runs before React hydrates to avoid flash
 const THEME_SCRIPT = `(function(){try{var t=document.documentElement,e=localStorage.getItem('svi-theme-v1');if(e==='dark'||e==='light')t.classList.add(e);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)t.classList.add('dark');else t.classList.add('light')}catch(e){}})();`;
 
 export default function RootLayout({
@@ -61,9 +61,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -117,9 +115,7 @@ export default function RootLayout({
         <link rel="preload" as="image" href="/images/hero3.png" />
       </head>
       <body className={`${inter.variable} ${playfair.variable}`}>
-        <ClientProviders>
-          {children}
-        </ClientProviders>
+        {children}
         <Analytics />
         <SpeedInsights />
       </body>

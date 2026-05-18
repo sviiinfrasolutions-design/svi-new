@@ -53,7 +53,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0C0C0C] flex items-center justify-center p-4 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0C0C0C] flex items-center justify-center p-4 relative overflow-hidden font-sans transition-colors duration-300">
       {/* Background glow & luxury accents */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div 
@@ -76,7 +76,7 @@ export default function AdminLogin() {
         className="relative z-10 w-full max-w-md"
       >
         {/* Card */}
-        <div className="bg-[#0e0e14]/75 backdrop-blur-xl border border-brand-gold/15 rounded-2xl p-10 shadow-2xl relative overflow-hidden">
+        <div className="bg-white/80 dark:bg-[#0e0e14]/75 backdrop-blur-xl border border-gray-200 dark:border-brand-gold/15 rounded-2xl p-10 shadow-2xl relative overflow-hidden transition-colors duration-300">
           {/* Subtle gold line on top of the card */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-gold/60 to-transparent" />
 
@@ -87,7 +87,7 @@ export default function AdminLogin() {
             </div>
           </div>
 
-          <h1 className="text-3xl font-serif text-center text-white mb-2 tracking-tight">
+          <h1 className="text-3xl font-serif text-center text-brand-navy dark:text-white mb-2 tracking-tight transition-colors duration-300">
             Admin <span className="text-gradient-gold italic animate-bg-pan inline-block" style={{ backgroundSize: '200% 200%', backgroundImage: 'linear-gradient(135deg, #c9a84c, #f0d080, #b08f36, #dec070, #c9a84c)' }}>Portal</span>
           </h1>
           
@@ -101,7 +101,7 @@ export default function AdminLogin() {
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
-              className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-3 text-sm mb-6"
+              className="flex items-center gap-2 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 rounded-lg px-4 py-3 text-sm mb-6 transition-colors duration-300"
             >
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {error}
@@ -110,7 +110,7 @@ export default function AdminLogin() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-[0.15em] font-bold text-gray-400">
+              <label className="text-[10px] uppercase tracking-[0.15em] font-bold text-gray-500 dark:text-gray-400 transition-colors duration-300">
                 Email Address
               </label>
               <input
@@ -119,12 +119,12 @@ export default function AdminLogin() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="admin@sviinfra.com"
-                className="w-full bg-[#111118]/80 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:bg-white/5 focus:ring-2 focus:ring-brand-gold/20 transition-all font-sans"
+                className="w-full bg-white dark:bg-[#111118]/80 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:bg-gray-50 dark:focus:bg-white/5 focus:ring-2 focus:ring-brand-gold/20 transition-all font-sans"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-[0.15em] font-bold text-gray-400">
+              <label className="text-[10px] uppercase tracking-[0.15em] font-bold text-gray-500 dark:text-gray-400 transition-colors duration-300">
                 Password
               </label>
               <div className="relative">
@@ -134,7 +134,7 @@ export default function AdminLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full bg-[#111118]/80 border border-white/10 rounded-lg px-4 py-3 pr-12 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:bg-white/5 focus:ring-2 focus:ring-brand-gold/20 transition-all font-sans"
+                  className="w-full bg-white dark:bg-[#111118]/80 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 pr-12 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:bg-gray-50 dark:focus:bg-white/5 focus:ring-2 focus:ring-brand-gold/20 transition-all font-sans"
                 />
                 <button
                   type="button"
@@ -159,7 +159,7 @@ export default function AdminLogin() {
             </button>
           </form>
 
-          <p className="text-center text-[9px] text-gray-600 mt-8 uppercase tracking-[0.15em] font-semibold">
+          <p className="text-center text-[9px] text-gray-500 dark:text-gray-600 mt-8 uppercase tracking-[0.15em] font-semibold transition-colors duration-300">
             Authorized Personnel Only
           </p>
         </div>
