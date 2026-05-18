@@ -138,6 +138,10 @@ export default function Contact() {
 
   return (
     <div className="pt-20 pb-16 bg-brand-bg dark:bg-gray-900 relative">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+      />
       <section className="bg-brand-bg dark:bg-gray-800 py-14 md:py-20 text-center border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6 animate-hero-h1">

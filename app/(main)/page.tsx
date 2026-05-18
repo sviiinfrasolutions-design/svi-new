@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform, AnimatePresence, useSpring } from 'motion/react';
 import { useRef, useState, useEffect, useCallback, useTransition } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Building2, Shield, TrendingUp, CheckCircle, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import StatsCounter from '@/src/components/common/StatsCounter';
 import AnimatedSection, { StaggerContainer, StaggerItem } from '@/src/components/common/AnimatedSection';
@@ -124,16 +125,21 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/80 via-brand-navy/60 to-brand-navy/80 z-10" />
           <div className="absolute top-0 left-0 w-full h-full opacity-20 z-20 pointer-events-none" style={GRADIENT_STYLE} />
           {HERO_IMAGES.map((img, idx) => (
-            <img
+            <div
               key={idx}
-              src={img.src}
-              alt={img.alt}
-              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
                 idx === currentHeroIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
               }`}
-              width={1920}
-              height={1080}
-            />
+            >
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                priority={idx === 0}
+                quality={85}
+                className="object-cover"
+              />
+            </div>
           ))}
         </motion.div>
 
@@ -280,14 +286,14 @@ export default function Home() {
                 transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
               />
               <div className="img-zoom-container relative shadow-2xl">
-                <img
+                <Image
                   src="/images/house1.png"
                   alt="Modern luxury home exterior showcasing SVI Infra architectural design quality"
                   loading="lazy"
-                  decoding="async"
                   width={800}
                   height={500}
                   className="w-full h-[500px] object-cover"
+                  quality={85}
                 />
               </div>
               <motion.div
@@ -377,14 +383,12 @@ export default function Home() {
                 >
                   <div className="relative h-72 overflow-hidden bg-brand-navy img-zoom-container">
                     <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 via-transparent to-transparent z-10 group-hover:opacity-70 transition-opacity" />
-                    <img
+                    <Image
                       src={project.img}
                       alt={`${project.title} - ${project.type} in ${project.loc} by SVI Infra Solutions`}
-                      loading="lazy"
-                      decoding="async"
-                      width={600}
-                      height={400}
-                      className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                      fill
+                      quality={85}
+                      className="object-cover opacity-90 group-hover:opacity-100 transition-opacity"
                     />
                     <motion.div
                       className="absolute top-4 right-4 z-20 bg-white text-brand-navy text-[10px] font-bold uppercase tracking-widest px-3 py-1 shadow-sm"

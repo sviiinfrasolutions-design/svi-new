@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { motion } from 'motion/react';
+import Image from 'next/image';
 import { Target, Heart, Lightbulb, Award, CheckCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -81,14 +82,13 @@ export default function About() {
          <div className="container mx-auto px-4">
            <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-center">
              <div className="md:w-1/2">
-                <img 
+                <Image 
                   src="/images/house1.png" 
                   alt="SVI Infra residential property showcasing quality construction and modern design"
-                  loading="lazy"
-                  decoding="async"
                   width={800}
                   height={600}
                   className="shadow-2xl dark:shadow-none border dark:border-gray-700"
+                  quality={85}
                 />
              </div>
              <div className="md:w-1/2">

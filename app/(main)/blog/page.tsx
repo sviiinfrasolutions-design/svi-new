@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { motion } from 'motion/react';
+import Image from 'next/image';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import Link from 'next/link';
 
