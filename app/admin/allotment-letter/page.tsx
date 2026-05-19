@@ -38,7 +38,7 @@ export default function AllotmentLetterPage() {
   const totalCost = calculateTotalCost();
   const initialPayment = totalCost * 0.1;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 

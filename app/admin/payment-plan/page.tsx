@@ -21,7 +21,7 @@ export default function PaymentPlanPage() {
   const [schedule, setSchedule] = useState<any[]>([]);
   const [totals, setTotals] = useState({ totalCost: 0, balance: 0, emiAmount: 0 });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 

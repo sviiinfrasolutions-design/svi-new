@@ -10,6 +10,10 @@ import {
   AlertCircle, Phone, Mail, Building2, FileText, Eye, EyeOff,
   Shield, RefreshCw, ChevronDown
 } from 'lucide-react';
+import UserGrowthChart from '@/src/components/admin/ChartComponents/UserGrowthChart';
+import DocumentStatsChart from '@/src/components/admin/ChartComponents/DocumentStatsChart';
+import ActivityTimeline from '@/src/components/admin/ActivityTimeline';
+import QuickActions from '@/src/components/admin/QuickActions';
 
 const GRID_STYLE = {
   backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(201, 168, 76, 0.05) 1px, transparent 0)',
@@ -330,6 +334,28 @@ export default function AdminDashboard() {
 
   const clientCount = users.filter(u => u.role === 'client').length;
 
+  // Mock data for charts (replace with real API calls later)
+  const userGrowthData = Array.from({ length: 30 }, (_, i) => ({
+    date: `${i + 1}d`,
+    users: Math.floor(Math.random() * 20) + 5 + (i * 0.5),
+  }));
+
+  const documentStatsData = [
+    { name: 'Allotment', count: 45 },
+    { name: 'Receipt', count: 78 },
+    { name: 'Plan', count: 32 },
+    { name: 'Offer', count: 28 },
+    { name: 'BBA', count: 15 },
+  ];
+
+  const recentActivities = [
+    { id: '1', type: 'user' as const, title: 'New user created', description: 'John Doe was added as a client', timestamp: '2 min ago', user: adminName },
+    { id: '2', type: 'document' as const, title: 'Allotment letter generated', description: 'For unit A-301, Shyam Aangan', timestamp: '15 min ago', user: adminName },
+    { id: '3', type: 'download' as const, title: 'Payment receipt downloaded', description: 'Receipt #INV-2024-089', timestamp: '1 hour ago', user: adminName },
+    { id: '4', type: 'settings' as const, title: 'Settings updated', description: 'Company information modified', timestamp: '3 hours ago', user: adminName },
+    { id: '5', type: 'user' as const, title: 'User profile updated', description: 'Jane Smith contact details changed', timestamp: '5 hours ago', user: adminName },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0C0C0C] flex flex-col font-sans relative overflow-x-hidden transition-colors duration-300">
       
@@ -391,7 +417,8 @@ export default function AdminDashboard() {
               bgCls: 'bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-brand-gold/15 relative overflow-hidden transition-colors duration-300',
               iconBg: 'bg-brand-gold/10 border border-brand-gold/25',
               iconColor: 'text-brand-gold',
-              showLine: true
+              showLine: true,
+              trend: '+12%'
             },
             {
               label: 'Client Profiles',
@@ -400,7 +427,8 @@ export default function AdminDashboard() {
               bgCls: 'bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-white/8 hover:border-brand-gold/15 transition-colors relative overflow-hidden',
               iconBg: 'bg-white/5 border border-white/10',
               iconColor: 'text-gray-300',
-              showLine: false
+              showLine: false,
+              trend: '+8%'
             },
             {
               label: 'Administrators',
@@ -409,24 +437,40 @@ export default function AdminDashboard() {
               bgCls: 'bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-white/8 hover:border-brand-gold/15 transition-colors relative overflow-hidden',
               iconBg: 'bg-white/5 border border-white/10',
               iconColor: 'text-gray-300',
-              showLine: false
+              showLine: false,
+              trend: '0%'
             }
-          ].map(({ label, value, icon: Icon, bgCls, iconBg, iconColor, showLine }) => (
+          ].map(({ label, value, icon: Icon, bgCls, iconBg, iconColor, showLine, trend }) => (
             <div key={label} className={`${bgCls} rounded-xl p-5 shadow-lg`}>
               {showLine && (
                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-gold/50 to-transparent" />
               )}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between mb-3">
                 <div className={`w-11 h-11 rounded-lg ${iconBg} flex items-center justify-center`}>
                   <Icon className={`w-5 h-5 ${iconColor}`} />
                 </div>
-                <div>
-                  <p className="text-3xl font-bold text-brand-navy dark:text-white tracking-tight transition-colors duration-300">{value}</p>
-                  <p className="text-[10px] uppercase tracking-wider font-semibold text-gray-500">{label}</p>
-                </div>
+                <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full">{trend}</span>
               </div>
+              <p className="text-3xl font-bold text-brand-navy dark:text-white tracking-tight transition-colors duration-300">{value}</p>
+              <p className="text-[10px] uppercase tracking-wider font-semibold text-gray-500 mt-1">{label}</p>
             </div>
           ))}
+        </div>
+
+        {/* Charts & Analytics Section */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+          <UserGrowthChart data={userGrowthData} />
+          <DocumentStatsChart data={documentStatsData} />
+        </div>
+
+        {/* Quick Actions & Activity Timeline */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+          <div className="xl:col-span-1">
+            <QuickActions />
+          </div>
+          <div className="xl:col-span-2">
+            <ActivityTimeline activities={recentActivities} />
+          </div>
         </div>
 
         {/* Toolbar */}

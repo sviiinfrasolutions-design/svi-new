@@ -1,0 +1,56 @@
+'use client';
+
+import { motion } from 'motion/react';
+import { FileText, Users, Settings, Download, Plus, TrendingUp, Calculator, Receipt } from 'lucide-react';
+import Link from 'next/link';
+
+interface QuickAction {
+  label: string;
+  icon: any;
+  href: string;
+  color: string;
+}
+
+const actions: QuickAction[] = [
+  { label: 'New User', icon: Plus, href: '/admin/dashboard?action=create-user', color: 'bg-green-500/20 text-green-400 hover:bg-green-500/30' },
+  { label: 'Allotment Letter', icon: FileText, href: '/admin/allotment-letter', color: 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30' },
+  { label: 'Payment Receipt', icon: Receipt, href: '/admin/payment-receipt', color: 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30' },
+  { label: 'Payment Plan', icon: Calculator, href: '/admin/payment-plan', color: 'bg-orange-500/20 text-orange-400 hover:bg-orange-500/30' },
+  { label: 'View Reports', icon: TrendingUp, href: '/admin/dashboard?tab=analytics', color: 'bg-brand-gold/20 text-brand-gold hover:bg-brand-gold/30' },
+  { label: 'Settings', icon: Settings, href: '/admin/settings', color: 'bg-gray-500/20 text-gray-400 hover:bg-gray-500/30' },
+];
+
+export default function QuickActions() {
+  return (
+    <div className="bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl rounded-2xl p-6 shadow-xl">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Quick Actions</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Frequently used</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {actions.map((action, index) => {
+          const Icon = action.icon;
+          
+          return (
+            <Link key={action.label} href={action.href}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.05, duration: 0.3 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl ${action.color} transition-all cursor-pointer`}
+              >
+                <Icon className="w-6 h-6" />
+                <span className="text-xs font-medium text-center">{action.label}</span>
+              </motion.div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
