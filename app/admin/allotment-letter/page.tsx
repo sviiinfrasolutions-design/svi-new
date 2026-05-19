@@ -17,6 +17,7 @@ export default function AllotmentLetterPage() {
   const { token } = useAdminSession();
   const [formData, setFormData] = useState({
     clientName: '',
+    salutation: 'Mr.', // Default salutation
     address: '',
     ticketId: '',
     projectName: 'Shyam Aangan',
@@ -269,6 +270,18 @@ export default function AllotmentLetterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormSelect
+                label="Salutation"
+                name="salutation"
+                value={formData.salutation}
+                onChange={handleChange}
+                options={[
+                  { value: 'Mr.', label: 'Mr.' },
+                  { value: 'Mrs.', label: 'Mrs.' },
+                  { value: 'Ms.', label: 'Ms.' },
+                  { value: 'Dr.', label: 'Dr.' },
+                ]}
+              />
               <FormField
                 label="Client Name"
                 name="clientName"
@@ -518,7 +531,7 @@ export default function AllotmentLetterPage() {
                 {/* Body */}
                 <div className="mb-6">
                   <p className="mb-2">
-                    Dear Mr./Mrs./Ms.{' '}
+                    Dear {formData.salutation}{' '}
                     <span className="font-bold">{formData.clientName || '[Client Name]'}</span>
                   </p>
                   <p className="mb-1 text-justify">
