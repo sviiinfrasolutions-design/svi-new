@@ -33,10 +33,122 @@ export default function PaymentReceiptPage() {
   const [preview, setPreview] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
 
+  // Function to convert number to words (Indian numbering system)
+  const numberToWords = (num: string): string => {
+    if (!num || num === '0') return '';
+
+    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+    const teens = [
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+      'Fifteen',
+      'Sixteen',
+      'Seventeen',
+      'Eighteen',
+      'Nineteen',
+    ];
+    const tens = [
+      '',
+      '',
+      'Twenty',
+      'Thirty',
+      'Forty',
+      'Fifty',
+      'Sixty',
+      'Seventy',
+      'Eighty',
+      'Ninety',
+    ];
+
+    const convertLessThanOneThousand = (n: number): string => {
+      let result = '';
+
+      if (n >= 100) {
+        result += ones[Math.floor(n / 100)] + ' Hundred';
+        n %= 100;
+        if (n > 0) result += ' ';
+      }
+
+      if (n >= 20) {
+        result += tens[Math.floor(n / 10)];
+        n %= 10;
+        if (n > 0) result += ' ';
+      }
+
+      if (n >= 10 && n < 20) {
+        result += teens[n - 10];
+        n = 0;
+      }
+
+      if (n > 0 && n < 10) {
+        result += ones[n];
+      }
+
+      return result;
+    };
+
+    const numValue = parseFloat(num);
+    let integerPart = Math.floor(numValue);
+    const decimalPart = Math.round((numValue - integerPart) * 100);
+
+    let words = '';
+
+    if (integerPart === 0) {
+      words = 'Zero';
+    } else {
+      // Crores
+      if (integerPart >= 10000000) {
+        words += convertLessThanOneThousand(Math.floor(integerPart / 10000000)) + ' Crore';
+        integerPart %= 10000000;
+        if (integerPart > 0) words += ' ';
+      }
+
+      // Lakhs
+      if (integerPart >= 100000) {
+        words += convertLessThanOneThousand(Math.floor(integerPart / 100000)) + ' Lakh';
+        integerPart %= 100000;
+        if (integerPart > 0) words += ' ';
+      }
+
+      // Thousands
+      if (integerPart >= 1000) {
+        words += convertLessThanOneThousand(Math.floor(integerPart / 1000)) + ' Thousand';
+        integerPart %= 1000;
+        if (integerPart > 0) words += ' ';
+      }
+
+      // Hundreds and below
+      if (integerPart > 0) {
+        words += convertLessThanOneThousand(integerPart);
+      }
+    }
+
+    words += ' Rupees';
+
+    // Add paise if decimal part exists
+    if (decimalPart > 0) {
+      words += ' and ' + convertLessThanOneThousand(decimalPart) + ' Paise';
+    }
+
+    words += ' Only';
+
+    return words;
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    // Auto-convert amount to words when amount field changes
+    if (name === 'amount' && value) {
+      const words = numberToWords(value);
+      setFormData((prev) => ({ ...prev, amountWords: words }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -250,10 +362,8 @@ export default function PaymentReceiptPage() {
         <div className="relative flex h-[calc(100vh-140px)] min-h-[600px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:border-white/8 dark:bg-[#0e0e14]/65">
           <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
 
-          <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-              Live Preview
-            </h2>
+          <div className="mb-4 flex items-center justify-between border-b border-gray-100 pb-4">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Live Preview</h2>
             {preview && (
               <button
                 onClick={() => {
@@ -262,16 +372,26 @@ export default function PaymentReceiptPage() {
                     if (document.fullscreenElement) {
                       document.exitFullscreen();
                     } else {
-                      previewElement.requestFullscreen().catch(err => {
+                      previewElement.requestFullscreen().catch((err) => {
                         console.error('Error attempting to enable fullscreen:', err);
                       });
                     }
                   }
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-white/10"
+                className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
                 title="Toggle Fullscreen"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M8 3H5a2 2 0 0 0-2 2v3" />
                   <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
                   <path d="M3 16v3a2 2 0 0 0 2 2h3" />
@@ -283,85 +403,107 @@ export default function PaymentReceiptPage() {
           </div>
 
           <PreviewContainer previewId="receiptPreview" hasPreview={preview}>
-            <div className="bg-white text-black p-8 font-sans">
+            <div className="bg-white p-8 font-sans text-black">
               {/* Header */}
-              <div className="flex justify-between items-start mb-6 border-b-2 border-brand-gold pb-6">
+              <div className="border-brand-gold mb-6 flex items-start justify-between border-b-2 pb-6">
                 <div>
-                  <h1 className="text-[#1e3a8a] text-2xl font-bold mb-2 tracking-wide uppercase">
+                  <h1 className="mb-2 text-2xl font-bold tracking-wide text-[#1e3a8a] uppercase">
                     SVI INFRA SOLUTIONS PVT. LTD
                   </h1>
-                  <p className="text-gray-700 text-[13px]">Cell: +91 9216014579 | Email: info@sviinfrasolutions.com</p>
-                  <p className="text-gray-700 text-[13px]">Website: www.sviinfrasolutions.in | www.sviinfrasolutions.com</p>
-                  <p className="text-gray-700 text-[13px]">Office Address : A-61 Sector 65 Noida Uttar Pradesh 201309</p>
+                  <p className="text-[13px] text-gray-700">
+                    Cell: +91 9216014579 | Email: info@sviinfrasolutions.com
+                  </p>
+                  <p className="text-[13px] text-gray-700">
+                    Website: www.sviinfrasolutions.in | www.sviinfrasolutions.com
+                  </p>
+                  <p className="text-[13px] text-gray-700">
+                    Office Address : A-61 Sector 65 Noida Uttar Pradesh 201309
+                  </p>
                 </div>
                 <div className="w-48">
-                  <img src="/images/logo.png" alt="SVI Infra Solutions" className="w-full h-auto object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                  <img
+                    src="/images/logo.png"
+                    alt="SVI Infra Solutions"
+                    className="h-auto w-full object-contain"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
                 </div>
               </div>
 
               <div className="mb-6 text-center">
-                <h2 className="inline-block bg-[#1e3a8a] text-white px-6 py-2 rounded text-lg font-bold tracking-widest uppercase shadow-md">
+                <h2 className="inline-block rounded bg-[#1e3a8a] px-6 py-2 text-lg font-bold tracking-widest text-white uppercase shadow-md">
                   Payment Receipt
                 </h2>
               </div>
 
               <div className="mb-8 flex justify-between font-sans text-sm font-bold">
                 <p className="rounded border-l-4 border-[#1e3a8a] bg-gray-50 px-4 py-2 shadow-sm">
-                  Receipt No: <span className="ml-1 text-red-600">{formData.receiptNo || '___________'}</span>
+                  Receipt No:{' '}
+                  <span className="ml-1 text-red-600">{formData.receiptNo || '___________'}</span>
                 </p>
                 <p className="rounded border-l-4 border-[#1e3a8a] bg-gray-50 px-4 py-2 shadow-sm">
                   Date: <span className="ml-1 text-red-600">{formData.date || '___________'}</span>
                 </p>
               </div>
 
-              <div className="space-y-6 font-sans text-[15px] leading-relaxed p-6 border border-gray-200 rounded-xl bg-gray-50 shadow-sm relative">
+              <div className="relative space-y-6 rounded-xl border border-gray-200 bg-gray-50 p-6 font-sans text-[15px] leading-relaxed shadow-sm">
                 {/* Watermark Logo (optional) */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-                   <img src="/images/logo.png" alt="" className="w-96" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.03]">
+                  <img
+                    src="/images/logo.png"
+                    alt=""
+                    className="w-96"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
                 </div>
 
-                <div className="flex items-end relative z-10">
+                <div className="relative z-10 flex items-end">
                   <span className="mr-2 whitespace-nowrap">
                     Received with thanks from Mr. / Mrs. / M/s :
                   </span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold italic text-[#1e3a8a]">
+                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold text-[#1e3a8a] italic">
                     {formData.name}
                   </span>
                 </div>
 
-                <div className="flex items-end relative z-10">
+                <div className="relative z-10 flex items-end">
                   <span className="mr-2 whitespace-nowrap">Ref. Id :</span>
                   <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
                     {formData.refId}
                   </span>
                 </div>
 
-                <div className="flex items-end relative z-10">
+                <div className="relative z-10 flex items-end">
                   <span className="mr-2 whitespace-nowrap">The sum of Rupees :</span>
                   <span className="flex-1 border-b border-gray-400 pb-0.5 text-lg font-bold text-gray-800">
-                    ₹ {parseFloat(formData.amount || '0').toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    ₹{' '}
+                    {parseFloat(formData.amount || '0').toLocaleString('en-IN', {
+                      minimumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
 
-                <div className="flex items-end relative z-10">
+                <div className="relative z-10 flex items-end">
                   <span className="mr-2 whitespace-nowrap">Rupees in Words :</span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold italic text-[#1e3a8a]">
+                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold text-[#1e3a8a] italic">
                     {formData.amountWords}
                   </span>
                 </div>
 
-                <div className="flex items-end relative z-10">
+                <div className="relative z-10 flex items-end">
                   <span className="mr-2 whitespace-nowrap">By {formData.paymentMethod} No :</span>
                   <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
                     {formData.paymentRef}
                   </span>
                 </div>
 
-                <div className="flex justify-between gap-6 pt-2 relative z-10">
+                <div className="relative z-10 flex justify-between gap-6 pt-2">
                   <div className="flex flex-1 items-end">
                     <span className="mr-2 whitespace-nowrap">Drawn On :</span>
                     <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
-                      {formData.drawnOn ? new Date(formData.drawnOn).toLocaleDateString('en-GB') : ''}
+                      {formData.drawnOn
+                        ? new Date(formData.drawnOn).toLocaleDateString('en-GB')
+                        : ''}
                     </span>
                   </div>
                   <div className="flex flex-1 items-end">
@@ -378,7 +520,7 @@ export default function PaymentReceiptPage() {
                   </div>
                 </div>
 
-                <div className="flex items-end pt-2 relative z-10">
+                <div className="relative z-10 flex items-end pt-2">
                   <span className="mr-2 whitespace-nowrap">On Account of :</span>
                   <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
                     {formData.account}
@@ -387,20 +529,32 @@ export default function PaymentReceiptPage() {
               </div>
 
               <div className="mt-12 flex items-end justify-between pb-8">
-                <div className="border-[#1e3a8a] rounded-lg border-2 bg-white px-8 py-4 text-2xl font-bold shadow-md text-[#1e3a8a]">
-                  ₹ {parseFloat(formData.amount || '0').toLocaleString('en-IN', { minimumFractionDigits: 2 })}/-
+                <div className="rounded-lg border-2 border-[#1e3a8a] bg-white px-8 py-4 text-2xl font-bold text-[#1e3a8a] shadow-md">
+                  ₹{' '}
+                  {parseFloat(formData.amount || '0').toLocaleString('en-IN', {
+                    minimumFractionDigits: 2,
+                  })}
+                  /-
                 </div>
-                <div className="text-center relative">
-                  <img src="/images/signature.png" alt="Signature" className="absolute bottom-10 left-1/2 -translate-x-1/2 h-16 w-auto opacity-90 mix-blend-multiply" onError={(e) => (e.currentTarget.style.display = 'none')} />
-                  <div className="w-56 border-t-2 border-black pt-2 relative z-10">
-                    <p className="text-sm font-bold text-[#1e3a8a]">For SVI Infra Solutions Pvt. Ltd</p>
+                <div className="relative text-center">
+                  <img
+                    src="/images/signature.png"
+                    alt="Signature"
+                    className="absolute bottom-10 left-1/2 h-16 w-auto -translate-x-1/2 opacity-90 mix-blend-multiply"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
+                  <div className="relative z-10 w-56 border-t-2 border-black pt-2">
+                    <p className="text-sm font-bold text-[#1e3a8a]">
+                      For SVI Infra Solutions Pvt. Ltd
+                    </p>
                     <p className="mt-1 text-xs font-bold text-gray-700">Authorized Signatory</p>
                   </div>
                 </div>
               </div>
 
               <p className="mt-8 border-t border-gray-200 pt-4 text-center text-[11px] text-gray-500 italic">
-                Thank you for your business. Please keep this receipt for your records. This is a computer generated document.
+                Thank you for your business. Please keep this receipt for your records. This is a
+                computer generated document.
               </p>
             </div>
           </PreviewContainer>
