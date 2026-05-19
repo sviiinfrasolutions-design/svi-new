@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, Image as ImageIcon, RefreshCw } from 'lucide-react';
+import { RefreshCw, FileText } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { FormField, FormSelect, PreviewContainer, DownloadOptions } from '@/src/components/admin/DocumentGenerator/Shared';
 
 export default function AllotmentLetterPage() {
   const [formData, setFormData] = useState({
@@ -69,137 +70,156 @@ export default function AllotmentLetterPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Form Section */}
-      <div className="bg-white dark:bg-[#16161f] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
-        <h2 className="text-2xl font-serif text-brand-gold mb-6">Enter Your Details</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Client Name</label>
-              <input type="text" name="clientName" required value={formData.clientName} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
-              <input type="text" name="address" required value={formData.address} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ticket ID</label>
-              <input type="text" name="ticketId" required value={formData.ticketId} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Name</label>
-              <select name="projectName" value={formData.projectName} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors">
-                <option value="Shyam Aangan">Shyam Aangan</option>
-                <option value="Shyam Aangan Farm House">Shyam Aangan Farm House</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Unit Number</label>
-              <input type="text" name="unitNumber" required value={formData.unitNumber} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Area (Sq. Yds.)</label>
-              <input type="number" step="0.01" name="area" required value={formData.area} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">BSP (Per Sq.Yd)</label>
-              <input type="number" step="0.01" name="bsp" required value={formData.bsp} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">PLC (%)</label>
-              <input type="number" step="0.01" name="plc" value={formData.plc} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Plan (Months)</label>
-              <select name="paymentPlan" value={formData.paymentPlan} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors">
-                <option value="3">3 Months</option>
-                <option value="6">6 Months</option>
-                <option value="12">12 Months</option>
-                <option value="18">18 Months</option>
-                <option value="24">24 Months</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Booking Date</label>
-              <input type="date" name="bookingDate" required value={formData.bookingDate} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Second Payment Days</label>
-              <select name="secondPaymentDays" value={formData.secondPaymentDays} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors">
-                <option value="15">15 days</option>
-                <option value="28">28 days</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Advisor Name</label>
-              <input type="text" name="advisorName" required value={formData.advisorName} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Advisor Number</label>
-              <input type="text" name="advisorNumber" required value={formData.advisorNumber} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-          </div>
-
-          <div className="bg-gray-50 dark:bg-[#0e0e14] p-4 rounded-xl border border-gray-200 dark:border-gray-800 mt-6">
-            <p className="font-medium">Total Cost: ₹{totalCost.toFixed(2)}</p>
-            <p className="font-medium text-brand-gold">Initial Payment (10%): ₹{initialPayment.toFixed(2)}</p>
-          </div>
-
-          <button type="submit" className="w-full flex items-center justify-center gap-2 bg-brand-gold text-black font-semibold py-3 px-4 rounded-lg hover:bg-yellow-500 transition-colors">
-            <RefreshCw className="w-5 h-5" /> Generate Allotment Letter
-          </button>
-        </form>
+    <div className="max-w-7xl mx-auto w-full font-sans">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-serif text-brand-navy dark:text-white tracking-tight mb-2">
+            Allotment <span className="text-brand-gold italic">Letter</span>
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Generate and download official allotment letters for clients.
+          </p>
+        </div>
       </div>
 
-      {/* Preview Section */}
-      <div className="bg-white dark:bg-[#16161f] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col">
-        <h2 className="text-2xl font-serif text-brand-gold mb-6">Allotment Letter Preview</h2>
-        
-        <div className="flex-1 bg-gray-50 dark:bg-[#0e0e14] p-6 rounded-xl border border-gray-200 dark:border-gray-800 overflow-y-auto">
-          {preview ? (
-            <div id="allotmentPreview" className="space-y-4 text-gray-800 dark:text-gray-200 bg-white dark:bg-black p-8 rounded border border-gray-200 dark:border-gray-800 shadow-sm relative">
-              <h1 className="text-xl font-bold text-center border-b pb-4 mb-6 uppercase">Allotment Letter</h1>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div><span className="font-semibold">Client Name:</span> {formData.clientName}</div>
-                <div><span className="font-semibold">Project:</span> {formData.projectName}</div>
-                <div><span className="font-semibold">Ticket ID:</span> {formData.ticketId}</div>
-                <div><span className="font-semibold">Unit Number:</span> {formData.unitNumber}</div>
-                <div className="col-span-2"><span className="font-semibold">Address:</span> {formData.address}</div>
-                <div><span className="font-semibold">Area:</span> {formData.area} Sq. Yds.</div>
-                <div><span className="font-semibold">BSP:</span> ₹{formData.bsp} / Sq.Yd</div>
-                <div><span className="font-semibold">PLC:</span> {formData.plc || 0}%</div>
-                <div><span className="font-semibold">Plan:</span> {formData.paymentPlan} Months</div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        {/* Form Section */}
+        <div className="bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-white/8 rounded-2xl p-6 shadow-xl relative overflow-hidden h-fit">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
+          
+          <div className="flex items-center gap-3 mb-6 border-b border-gray-100 dark:border-white/10 pb-4">
+            <div className="w-8 h-8 rounded bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center">
+              <FileText className="w-4 h-4 text-brand-gold" />
+            </div>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Document Details</h2>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField label="Client Name" name="clientName" value={formData.clientName} onChange={handleChange} required />
+              <FormField label="Address" name="address" value={formData.address} onChange={handleChange} required />
+              <FormField label="Ticket ID" name="ticketId" value={formData.ticketId} onChange={handleChange} required />
+              
+              <FormSelect 
+                label="Project Name" 
+                name="projectName" 
+                value={formData.projectName} 
+                onChange={handleChange} 
+                options={[
+                  { value: 'Shyam Aangan', label: 'Shyam Aangan' },
+                  { value: 'Shyam Aangan Farm House', label: 'Shyam Aangan Farm House' }
+                ]}
+              />
+              
+              <FormField label="Unit Number" name="unitNumber" value={formData.unitNumber} onChange={handleChange} required />
+              <FormField label="Area (Sq. Yds.)" name="area" type="number" value={formData.area} onChange={handleChange} required />
+              <FormField label="BSP (Per Sq.Yd)" name="bsp" type="number" value={formData.bsp} onChange={handleChange} required />
+              <FormField label="PLC (%)" name="plc" type="number" value={formData.plc} onChange={handleChange} />
+              
+              <FormSelect 
+                label="Payment Plan" 
+                name="paymentPlan" 
+                value={formData.paymentPlan} 
+                onChange={handleChange} 
+                options={[
+                  { value: '3', label: '3 Months' },
+                  { value: '6', label: '6 Months' },
+                  { value: '12', label: '12 Months' },
+                  { value: '18', label: '18 Months' },
+                  { value: '24', label: '24 Months' }
+                ]}
+              />
+              
+              <FormField label="Booking Date" name="bookingDate" type="date" value={formData.bookingDate} onChange={handleChange} required />
+              
+              <FormSelect 
+                label="Second Payment Days" 
+                name="secondPaymentDays" 
+                value={formData.secondPaymentDays} 
+                onChange={handleChange} 
+                options={[
+                  { value: '15', label: '15 days' },
+                  { value: '28', label: '28 days' }
+                ]}
+              />
+              
+              <FormField label="Advisor Name" name="advisorName" value={formData.advisorName} onChange={handleChange} required />
+              <FormField label="Advisor Number" name="advisorNumber" value={formData.advisorNumber} onChange={handleChange} required />
+            </div>
+
+            <div className="bg-brand-navy/5 dark:bg-brand-gold/5 p-4 rounded-xl border border-brand-navy/10 dark:border-brand-gold/10 mt-6 flex justify-between items-center">
+              <div>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-gray-500 dark:text-gray-400">Total Cost</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">₹{totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800 space-y-2 text-sm">
-                <p><span className="font-semibold">Total Cost:</span> ₹{totalCost.toFixed(2)}</p>
-                <p><span className="font-semibold">Initial Payment (10%):</span> ₹{initialPayment.toFixed(2)}</p>
-                <p><span className="font-semibold">Booking Date:</span> {formData.bookingDate}</p>
-                <p><span className="font-semibold">Second Payment:</span> {formData.secondPaymentDays} days after booking</p>
-              </div>
-              <div className="mt-8 grid grid-cols-2 gap-4 text-sm">
-                <div><span className="font-semibold">Advisor:</span> {formData.advisorName}</div>
-                <div><span className="font-semibold">Contact:</span> {formData.advisorNumber}</div>
+              <div className="text-right">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-gray-500 dark:text-gray-400">Initial Payment (10%)</p>
+                <p className="text-lg font-bold text-brand-gold">₹{initialPayment.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
             </div>
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400 text-center mt-10">Please fill out the form and generate your allotment letter to see the preview.</p>
-          )}
+
+            <button type="submit" className="w-full mt-4 flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-navy font-bold text-xs uppercase tracking-widest py-3.5 rounded-lg shadow-lg glow-gold transition-all cursor-pointer">
+              <RefreshCw className="w-4 h-4" /> Generate Letter
+            </button>
+          </form>
         </div>
 
-        {preview && (
-          <div className="mt-6">
-            <h3 className="text-lg font-medium mb-4">Download Options</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <button onClick={handleDownloadPDF} className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors">
-                <Download className="w-5 h-5" /> Download PDF
-              </button>
-              <button onClick={handleDownloadImage} className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors">
-                <ImageIcon className="w-5 h-5" /> Save as Image
-              </button>
+        {/* Preview Section */}
+        <div className="bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-white/8 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[600px]">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
+          
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-100 dark:border-white/10 pb-4">Live Preview</h2>
+          
+          <PreviewContainer previewId="allotmentPreview" hasPreview={preview}>
+            <div className="border-b-2 border-brand-gold pb-4 text-center">
+              <h1 className="text-2xl font-bold font-serif text-brand-navy">SVI Infra Solutions Pvt. Ltd</h1>
+              <p className="text-sm font-sans">A-61 Sector 65 Noida Uttar Pradesh 201309</p>
+              <h2 className="text-xl font-bold mt-4 uppercase tracking-widest border-b pb-2 mb-4">Allotment Letter</h2>
             </div>
-          </div>
-        )}
+            
+            <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm mt-6 font-sans">
+              <div className="border-b border-gray-100 pb-2"><span className="text-gray-500">Client Name:</span> <span className="font-semibold block mt-1">{formData.clientName}</span></div>
+              <div className="border-b border-gray-100 pb-2"><span className="text-gray-500">Project:</span> <span className="font-semibold block mt-1">{formData.projectName}</span></div>
+              <div className="border-b border-gray-100 pb-2"><span className="text-gray-500">Ticket ID:</span> <span className="font-semibold block mt-1">{formData.ticketId}</span></div>
+              <div className="border-b border-gray-100 pb-2"><span className="text-gray-500">Unit Number:</span> <span className="font-semibold block mt-1">{formData.unitNumber}</span></div>
+              <div className="col-span-2 border-b border-gray-100 pb-2"><span className="text-gray-500">Address:</span> <span className="font-semibold block mt-1">{formData.address}</span></div>
+              <div className="border-b border-gray-100 pb-2"><span className="text-gray-500">Area:</span> <span className="font-semibold block mt-1">{formData.area} Sq. Yds.</span></div>
+              <div className="border-b border-gray-100 pb-2"><span className="text-gray-500">BSP:</span> <span className="font-semibold block mt-1">₹{formData.bsp} / Sq.Yd</span></div>
+              <div className="border-b border-gray-100 pb-2"><span className="text-gray-500">PLC:</span> <span className="font-semibold block mt-1">{formData.plc || 0}%</span></div>
+              <div className="border-b border-gray-100 pb-2"><span className="text-gray-500">Plan:</span> <span className="font-semibold block mt-1">{formData.paymentPlan} Months</span></div>
+            </div>
+            
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-2 text-sm font-sans">
+              <div className="flex justify-between border-b border-gray-200 pb-2"><span className="font-semibold text-gray-700">Total Cost:</span> <span className="font-bold">₹{totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+              <div className="flex justify-between border-b border-gray-200 pb-2"><span className="font-semibold text-gray-700">Initial Payment (10%):</span> <span className="font-bold">₹{initialPayment.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+              <div className="flex justify-between border-b border-gray-200 pb-2"><span className="font-semibold text-gray-700">Booking Date:</span> <span className="font-bold">{formData.bookingDate}</span></div>
+              <div className="flex justify-between"><span className="font-semibold text-gray-700">Second Payment:</span> <span className="font-bold">{formData.secondPaymentDays} days after booking</span></div>
+            </div>
+            
+            <div className="mt-12 pt-8 grid grid-cols-2 gap-4 text-sm font-sans">
+              <div className="border-t border-gray-300 pt-2 w-48 text-center">
+                <span className="font-bold text-gray-800">Client Signature</span>
+              </div>
+              <div className="text-right flex flex-col items-end">
+                <div className="border-t border-gray-300 pt-2 w-48 text-center">
+                  <span className="font-bold text-gray-800">Authorized Signatory</span>
+                  <div className="text-xs text-gray-500 mt-1">SVI Infra Solutions</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 pt-4 border-t border-gray-100 grid grid-cols-2 gap-4 text-xs text-gray-500 font-sans">
+              <div>Advisor: {formData.advisorName}</div>
+              <div className="text-right">Contact: {formData.advisorNumber}</div>
+            </div>
+          </PreviewContainer>
+
+          <DownloadOptions 
+            onDownloadPDF={handleDownloadPDF} 
+            onDownloadImage={handleDownloadImage} 
+            disabled={!preview} 
+          />
+        </div>
       </div>
     </div>
   );

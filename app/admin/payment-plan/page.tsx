@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, Image as ImageIcon, Calculator } from 'lucide-react';
+import { Calculator, Map } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { FormField, FormSelect, PreviewContainer, DownloadOptions } from '@/src/components/admin/DocumentGenerator/Shared';
 
 export default function PaymentPlanPage() {
   const [formData, setFormData] = useState({
@@ -78,122 +79,123 @@ export default function PaymentPlanPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Form Section */}
-      <div className="bg-white dark:bg-[#16161f] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
-        <h2 className="text-2xl font-serif text-brand-gold mb-6">Payment Plan Calculator</h2>
-        <form onSubmit={calculatePlan} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Unit Number</label>
-              <input type="text" name="unitNo" required value={formData.unitNo} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Size of Plot (Sq. Yds.)</label>
-              <input type="number" step="0.01" name="plotSize" required value={formData.plotSize} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div className="col-span-1 md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Type</label>
-              <input type="text" name="propertyType" required value={formData.propertyType} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cost / Sq.Yd (₹)</label>
-              <input type="number" step="0.01" name="costPerSqYd" required value={formData.costPerSqYd} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Booking Amount (₹)</label>
-              <input type="number" step="0.01" name="bookingAmount" required value={formData.bookingAmount} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No of EMI's Required</label>
-              <input type="number" min="1" max="120" name="emis" required value={formData.emis} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Plan Start Date</label>
-              <input type="date" name="startDate" required value={formData.startDate} onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-[#0e0e14] border border-gray-200 dark:border-gray-800 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" />
-            </div>
-          </div>
-
-          <button type="submit" className="w-full mt-6 flex items-center justify-center gap-2 bg-brand-gold text-black font-semibold py-3 px-4 rounded-lg hover:bg-yellow-500 transition-colors">
-            <Calculator className="w-5 h-5" /> Calculate & Generate Plan
-          </button>
-        </form>
+    <div className="max-w-7xl mx-auto w-full font-sans">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-serif text-brand-navy dark:text-white tracking-tight mb-2">
+            Payment <span className="text-brand-gold italic">Plan Calculator</span>
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Generate and download structured payment plans and EMIs.
+          </p>
+        </div>
       </div>
 
-      {/* Preview Section */}
-      <div className="bg-white dark:bg-[#16161f] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col">
-        <h2 className="text-2xl font-serif text-brand-gold mb-6">Payment Plan Preview</h2>
-        
-        <div className="flex-1 bg-gray-50 dark:bg-[#0e0e14] p-6 rounded-xl border border-gray-200 dark:border-gray-800 overflow-y-auto max-h-[600px]">
-          {preview ? (
-            <div id="planPreview" className="text-gray-800 bg-white p-8 rounded border border-gray-200 shadow-sm relative">
-              <div className="text-center border-b-2 border-brand-gold pb-6 mb-6">
-                <h1 className="text-2xl font-bold font-serif text-brand-gold">Payment Plan</h1>
-                <p className="font-semibold mt-2">{formData.propertyType}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 text-sm mb-8 font-medium">
-                <div>Unit Number: {formData.unitNo}</div>
-                <div>Plot Size: {formData.plotSize} Sq. Yds.</div>
-                <div>Cost/Sq.Yd: ₹ {formData.costPerSqYd}</div>
-                <div>Total Cost: ₹ {totals.totalCost.toFixed(2)}</div>
-                <div>Booking Amount: ₹ {formData.bookingAmount}</div>
-                <div>Balance Amount: ₹ {totals.balance.toFixed(2)}</div>
-              </div>
-
-              <table className="w-full text-sm text-left border-collapse border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border border-gray-300 p-2">Month</th>
-                    <th className="border border-gray-300 p-2">Expected Date</th>
-                    <th className="border border-gray-300 p-2">Details</th>
-                    <th className="border border-gray-300 p-2">Expected Amount (₹)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="font-semibold bg-green-50">
-                    <td className="border border-gray-300 p-2">0</td>
-                    <td className="border border-gray-300 p-2">{new Date(formData.startDate).toLocaleDateString('en-GB')}</td>
-                    <td className="border border-gray-300 p-2">Booking Amount</td>
-                    <td className="border border-gray-300 p-2 underline">{parseFloat(formData.bookingAmount).toFixed(2)}</td>
-                  </tr>
-                  {schedule.map((row) => (
-                    <tr key={row.month}>
-                      <td className="border border-gray-300 p-2">{row.month}</td>
-                      <td className="border border-gray-300 p-2">{row.date}</td>
-                      <td className="border border-gray-300 p-2">EMI {row.month}</td>
-                      <td className="border border-gray-300 p-2">{row.amount}</td>
-                    </tr>
-                  ))}
-                  <tr className="font-bold bg-gray-100">
-                    <td className="border border-gray-300 p-2" colSpan={3}>Grand Total</td>
-                    <td className="border border-gray-300 p-2 underline text-red-600">₹ {totals.totalCost.toFixed(2)}</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div className="mt-12 pt-8 text-center text-xs text-gray-500 border-t">
-                Disclaimer: This is a computer generated document and does not require physical signature. Dates are approximate and subject to realization.
-              </div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        {/* Form Section */}
+        <div className="bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-white/8 rounded-2xl p-6 shadow-xl relative overflow-hidden h-fit">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
+          
+          <div className="flex items-center gap-3 mb-6 border-b border-gray-100 dark:border-white/10 pb-4">
+            <div className="w-8 h-8 rounded bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center">
+              <Calculator className="w-4 h-4 text-brand-gold" />
             </div>
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400 text-center mt-10">Please fill out the form and calculate the plan to see the schedule.</p>
-          )}
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Plan Configuration</h2>
+          </div>
+
+          <form onSubmit={calculatePlan} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField label="Unit Number" name="unitNo" value={formData.unitNo} onChange={handleChange} required />
+              <FormField label="Size of Plot (Sq. Yds.)" name="plotSize" type="number" value={formData.plotSize} onChange={handleChange} required />
+              
+              <FormSelect 
+                label="Property Type" 
+                name="propertyType" 
+                value={formData.propertyType} 
+                onChange={handleChange} 
+                className="md:col-span-2"
+                options={[
+                  { value: 'Residential Farm House', label: 'Residential Farm House' },
+                  { value: 'Commercial Plot', label: 'Commercial Plot' },
+                  { value: 'Residential Plot', label: 'Residential Plot' }
+                ]}
+              />
+              
+              <FormField label="Cost / Sq.Yd (₹)" name="costPerSqYd" type="number" value={formData.costPerSqYd} onChange={handleChange} required />
+              <FormField label="Booking Amount (₹)" name="bookingAmount" type="number" value={formData.bookingAmount} onChange={handleChange} required />
+              <FormField label="No of EMI's Required" name="emis" type="number" value={formData.emis} onChange={handleChange} required />
+              <FormField label="Plan Start Date" name="startDate" type="date" value={formData.startDate} onChange={handleChange} required />
+            </div>
+
+            <button type="submit" className="w-full mt-6 flex items-center justify-center gap-2 bg-brand-gold hover:bg-brand-gold-light text-brand-navy font-bold text-xs uppercase tracking-widest py-3.5 rounded-lg shadow-lg glow-gold transition-all cursor-pointer">
+              <Calculator className="w-4 h-4" /> Calculate & Generate Plan
+            </button>
+          </form>
         </div>
 
-        {preview && (
-          <div className="mt-6">
-            <h3 className="text-lg font-medium mb-4">Download Options</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <button onClick={handleDownloadPDF} className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors">
-                <Download className="w-5 h-5" /> Download PDF
-              </button>
-              <button onClick={handleDownloadImage} className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors">
-                <ImageIcon className="w-5 h-5" /> Save as Image
-              </button>
+        {/* Preview Section */}
+        <div className="bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-white/8 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[600px]">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
+          
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-100 dark:border-white/10 pb-4">Live Preview</h2>
+          
+          <PreviewContainer previewId="planPreview" hasPreview={preview}>
+            <div className="text-center border-b-2 border-brand-gold pb-6 mb-6">
+              <h1 className="text-2xl font-bold font-serif text-brand-navy">Payment Plan</h1>
+              <p className="font-semibold mt-2 font-sans text-gray-600">{formData.propertyType}</p>
             </div>
-          </div>
-        )}
+
+            <div className="grid grid-cols-2 gap-4 text-sm mb-8 font-medium font-sans">
+              <div><span className="text-gray-500">Unit Number:</span> {formData.unitNo}</div>
+              <div><span className="text-gray-500">Plot Size:</span> {formData.plotSize} Sq. Yds.</div>
+              <div><span className="text-gray-500">Cost/Sq.Yd:</span> ₹ {formData.costPerSqYd}</div>
+              <div><span className="text-gray-500">Total Cost:</span> ₹ {totals.totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              <div><span className="text-gray-500">Booking Amount:</span> ₹ {parseFloat(formData.bookingAmount || '0').toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              <div><span className="text-gray-500">Balance Amount:</span> ₹ {totals.balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            </div>
+
+            <table className="w-full text-sm text-left border-collapse border border-gray-300 font-sans">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 p-2 font-semibold">Month</th>
+                  <th className="border border-gray-300 p-2 font-semibold">Expected Date</th>
+                  <th className="border border-gray-300 p-2 font-semibold">Details</th>
+                  <th className="border border-gray-300 p-2 font-semibold">Expected Amount (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="font-semibold bg-green-50">
+                  <td className="border border-gray-300 p-2 text-center">0</td>
+                  <td className="border border-gray-300 p-2">{new Date(formData.startDate).toLocaleDateString('en-GB')}</td>
+                  <td className="border border-gray-300 p-2">Booking Amount</td>
+                  <td className="border border-gray-300 p-2 underline">{parseFloat(formData.bookingAmount || '0').toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>
+                {schedule.map((row) => (
+                  <tr key={row.month}>
+                    <td className="border border-gray-300 p-2 text-center">{row.month}</td>
+                    <td className="border border-gray-300 p-2">{row.date}</td>
+                    <td className="border border-gray-300 p-2 text-gray-600">EMI {row.month}</td>
+                    <td className="border border-gray-300 p-2">{parseFloat(row.amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  </tr>
+                ))}
+                <tr className="font-bold bg-gray-100">
+                  <td className="border border-gray-300 p-2 text-right" colSpan={3}>Grand Total</td>
+                  <td className="border border-gray-300 p-2 underline text-red-600">₹ {totals.totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div className="mt-12 pt-8 text-center text-xs text-gray-500 border-t font-sans">
+              Disclaimer: This is a computer generated document and does not require physical signature. Dates are approximate and subject to realization.
+            </div>
+          </PreviewContainer>
+
+          <DownloadOptions 
+            onDownloadPDF={handleDownloadPDF} 
+            onDownloadImage={handleDownloadImage} 
+            disabled={!preview} 
+          />
+        </div>
       </div>
     </div>
   );
