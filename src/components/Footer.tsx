@@ -42,9 +42,17 @@ const Footer = memo(function Footer() {
             </p>
             <div className="flex gap-4">
               {[
-                { icon: <Facebook size={18} />, label: 'Facebook', href: '#' },
+                {
+                  icon: <Facebook size={18} />,
+                  label: 'Facebook',
+                  href: 'https://www.facebook.com/profile.php?id=61574028993364',
+                },
                 { icon: <Twitter size={18} />, label: 'Twitter', href: '#' },
-                { icon: <Instagram size={18} />, label: 'Instagram', href: '#' },
+                {
+                  icon: <Instagram size={18} />,
+                  label: 'Instagram',
+                  href: 'https://www.instagram.com/sviinfrasolution/?hl=en',
+                },
                 { icon: <Youtube size={18} />, label: 'YouTube', href: '#' },
               ].map(({ icon, label, href }) => (
                 <motion.a
