@@ -358,6 +358,21 @@ export default function AdminDashboard() {
   const [deleteTarget, setDeleteTarget] = useState<UserProfile | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+  const [analytics, setAnalytics] = useState<{
+    userGrowth: Array<{ date: string; users: number }>;
+    documentStats: Array<{ name: string; count: number }>;
+    trends: { userGrowth: string; clientGrowth: string; adminCount: string };
+  } | null>(null);
+  const [activities, setActivities] = useState<
+    Array<{
+      id: string;
+      type: 'user' | 'document' | 'settings' | 'download';
+      title: string;
+      description: string;
+      timestamp: string;
+      user: string;
+    }>
+  >([]);
 
   const showToast = (type: 'success' | 'error', msg: string) => {
     setToast({ type, msg });
@@ -435,62 +450,34 @@ export default function AdminDashboard() {
 
   const clientCount = users.filter((u) => u.role === 'client').length;
 
-  // Mock data for charts (replace with real API calls later)
-  const userGrowthData = Array.from({ length: 30 }, (_, i) => ({
-    date: `${i + 1}d`,
-    users: Math.floor(Math.random() * 20) + 5 + i * 0.5,
-  }));
+  // Fetch real analytics data
+  useEffect(() => {
+    if (!token) return;
 
-  const documentStatsData = [
-    { name: 'Allotment', count: 45 },
-    { name: 'Receipt', count: 78 },
-    { name: 'Plan', count: 32 },
-    { name: 'Offer', count: 28 },
-    { name: 'BBA', count: 15 },
-  ];
+    fetch('/api/admin/analytics', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setAnalytics(data))
+      .catch(console.error);
+  }, [token]);
 
-  const recentActivities = [
-    {
-      id: '1',
-      type: 'user' as const,
-      title: 'New user created',
-      description: 'John Doe was added as a client',
-      timestamp: '2 min ago',
-      user: adminName,
-    },
-    {
-      id: '2',
-      type: 'document' as const,
-      title: 'Allotment letter generated',
-      description: 'For unit A-301, Shyam Aangan',
-      timestamp: '15 min ago',
-      user: adminName,
-    },
-    {
-      id: '3',
-      type: 'download' as const,
-      title: 'Payment receipt downloaded',
-      description: 'Receipt #INV-2024-089',
-      timestamp: '1 hour ago',
-      user: adminName,
-    },
-    {
-      id: '4',
-      type: 'settings' as const,
-      title: 'Settings updated',
-      description: 'Company information modified',
-      timestamp: '3 hours ago',
-      user: adminName,
-    },
-    {
-      id: '5',
-      type: 'user' as const,
-      title: 'User profile updated',
-      description: 'Jane Smith contact details changed',
-      timestamp: '5 hours ago',
-      user: adminName,
-    },
-  ];
+  // Fetch real activity logs
+  useEffect(() => {
+    if (!token) return;
+
+    fetch('/api/admin/activities?limit=10', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setActivities(data.activities || []))
+      .catch(console.error);
+  }, [token]);
+
+  // Use real data or fallback to empty arrays
+  const userGrowthData = analytics?.userGrowth || [];
+  const documentStatsData = analytics?.documentStats || [];
+  const recentActivities = activities;
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-gray-50 font-sans transition-colors duration-300 dark:bg-[#0C0C0C]">
@@ -570,7 +557,7 @@ export default function AdminDashboard() {
               iconBg: 'bg-brand-gold/10 border border-brand-gold/25',
               iconColor: 'text-brand-gold',
               showLine: true,
-              trend: '+12%',
+              trend: analytics?.trends?.userGrowth || '+0%',
             },
             {
               label: 'Client Profiles',
@@ -581,7 +568,7 @@ export default function AdminDashboard() {
               iconBg: 'bg-white/5 border border-white/10',
               iconColor: 'text-gray-300',
               showLine: false,
-              trend: '+8%',
+              trend: analytics?.trends?.clientGrowth || '+0%',
             },
             {
               label: 'Administrators',
@@ -592,7 +579,7 @@ export default function AdminDashboard() {
               iconBg: 'bg-white/5 border border-white/10',
               iconColor: 'text-gray-300',
               showLine: false,
-              trend: '0%',
+              trend: analytics?.trends?.adminCount || '0%',
             },
           ].map(({ label, value, icon: Icon, bgCls, iconBg, iconColor, showLine, trend }) => (
             <div key={label} className={`${bgCls} rounded-xl p-5 shadow-lg`}>
