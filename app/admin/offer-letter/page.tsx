@@ -8,7 +8,7 @@ import {
 import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
 import { FileSignature, RefreshCw } from 'lucide-react';
 
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
 import { useState } from 'react';
 

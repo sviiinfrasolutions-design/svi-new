@@ -86,41 +86,4 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ document: data }, { status: 201 });
 }
 
-// PATCH /api/admin/documents/[id] — update document status
-export async function PATCH(request: NextRequest) {
-  const admin = await verifyAdmin(request);
-  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const urlParts = request.url.split('/');
-  const documentId = urlParts[urlParts.length - 1];
-
-  const body = await request.json();
-  const { status, pdf_url, image_url } = body;
-
-  const updateData: Record<string, unknown> = {};
-  if (status) updateData.status = status;
-  if (pdf_url) updateData.pdf_url = pdf_url;
-  if (image_url) updateData.image_url = image_url;
-
-  const { data, error } = await supabaseAdmin
-    .from('documents')
-    .update(updateData)
-    .eq('id', documentId)
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  // If status changed to completed, log download activity
-  if (status === 'completed') {
-    await supabaseAdmin.from('activity_logs').insert({
-      user_id: admin.id,
-      action_type: 'document_downloaded',
-      description: `${data.document_type.replace(/_/g, ' ')} downloaded`,
-      target_id: data.id,
-      target_type: 'document',
-    });
-  }
-
-  return NextResponse.json({ document: data });
-}
