@@ -321,3 +321,20 @@
     transition: none;
   }
 }
+
+/* Fullscreen scrolling support */
+:fullscreen,
+:-webkit-full-screen,
+:-moz-full-screen,
+:-ms-fullscreen {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+:fullscreen > div,
+:-webkit-full-screen > div,
+:-moz-full-screen > div,
+:-ms-fullscreen > div {
+  max-height: 100vh !important;
+  overflow-y: auto !important;
+}

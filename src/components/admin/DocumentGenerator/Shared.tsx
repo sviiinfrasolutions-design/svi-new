@@ -136,6 +136,11 @@ export function PreviewContainer({
         <div
           id={previewId}
           className="mx-auto w-full max-w-3xl origin-top transform rounded-lg border border-gray-200 bg-white p-8 text-gray-800 shadow-sm"
+          style={{
+            // Ensure fullscreen content is scrollable
+            maxHeight: '100vh',
+            overflowY: 'auto',
+          }}
         >
           {children}
         </div>
