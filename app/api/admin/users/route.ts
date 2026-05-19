@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import type { CreateUserPayload } from '@/src/lib/supabase/types';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 // Helper: verify the caller is an authenticated admin
 async function verifyAdmin(request: NextRequest) {
@@ -100,6 +101,14 @@ export async function POST(request: NextRequest) {
     // Rollback: delete the auth user we just created
     await supabaseAdmin.auth.admin.deleteUser(newUserId);
     return NextResponse.json({ error: profileError.message }, { status: 500 });
+  }
+
+  // Create notification for all admins about new user registration
+  try {
+    await NotificationHelper.userRegistered(full_name, newUserId);
+  } catch (notifError) {
+    console.error('Failed to create notification:', notifError);
+    // Don't fail the request if notification fails
   }
 
   return NextResponse.json({ user: profile }, { status: 201 });

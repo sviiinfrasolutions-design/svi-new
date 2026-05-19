@@ -6,6 +6,7 @@ import {
   FormSelect,
   PreviewContainer,
 } from '@/src/components/admin/DocumentGenerator/Shared';
+import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
 import { FileText, RefreshCw } from 'lucide-react';
 
 import html2canvas from 'html2canvas';
@@ -13,6 +14,7 @@ import jsPDF from 'jspdf';
 import { useState } from 'react';
 
 export default function AllotmentLetterPage() {
+  const { token } = useAdminSession();
   const [formData, setFormData] = useState({
     clientName: '',
     address: '',
@@ -30,6 +32,7 @@ export default function AllotmentLetterPage() {
   });
 
   const [preview, setPreview] = useState(false);
+  const [documentId, setDocumentId] = useState<string | null>(null);
 
   const calculateTotalCost = () => {
     const area = parseFloat(formData.area) || 0;
@@ -50,8 +53,34 @@ export default function AllotmentLetterPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Save document record to database
+    if (token) {
+      try {
+        const response = await fetch('/api/admin/documents', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            document_type: 'allotment_letter',
+            form_data: formData,
+            status: 'draft',
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setDocumentId(data.document.id);
+        }
+      } catch (error) {
+        console.error('Failed to save document:', error);
+      }
+    }
+
     setPreview(true);
   };
 
@@ -65,6 +94,22 @@ export default function AllotmentLetterPage() {
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
     pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
     pdf.save('Allotment_Letter.pdf');
+
+    // Update document status to completed
+    if (documentId && token) {
+      try {
+        await fetch(`/api/admin/documents/${documentId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: 'completed' }),
+        });
+      } catch (error) {
+        console.error('Failed to update document status:', error);
+      }
+    }
   };
 
   const handleDownloadImage = async () => {

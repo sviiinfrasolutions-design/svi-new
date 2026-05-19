@@ -1,7 +1,8 @@
 'use client';
 
-import { Bell, Moon, Search, Sun } from 'lucide-react';
+import { Moon, Search, Sun } from 'lucide-react';
 
+import NotificationDropdown from './NotificationDropdown';
 import { usePathname } from 'next/navigation';
 // import { supabase } from '@/src/lib/supabase/client';
 import { useState } from 'react';
@@ -10,12 +11,14 @@ interface AdminHeaderProps {
   isDark: boolean;
   toggleTheme: () => void;
   adminName?: string;
+  userId?: string;
 }
 
 export default function AdminHeader({
   isDark,
   toggleTheme,
   adminName = 'Admin',
+  userId,
 }: AdminHeaderProps) {
   const pathname = usePathname();
   // const router = useRouter();
@@ -64,10 +67,8 @@ export default function AdminHeader({
             />
           </div>
 
-          <button className="hover:text-brand-gold relative cursor-pointer p-2 text-gray-500 transition-colors">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full border border-white bg-red-500 dark:border-[#0d0d14]"></span>
-          </button>
+          {/* Notifications */}
+          {userId && <NotificationDropdown userId={userId} />}
 
           <button
             onClick={toggleTheme}

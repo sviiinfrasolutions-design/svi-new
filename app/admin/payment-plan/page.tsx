@@ -6,6 +6,7 @@ import {
   FormSelect,
   PreviewContainer,
 } from '@/src/components/admin/DocumentGenerator/Shared';
+import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
 
 import { Calculator } from 'lucide-react';
 import html2canvas from 'html2canvas';
@@ -13,6 +14,7 @@ import jsPDF from 'jspdf';
 import { useState } from 'react';
 
 export default function PaymentPlanPage() {
+  const { token } = useAdminSession();
   const [formData, setFormData] = useState({
     unitNo: '',
     plotSize: '',
@@ -24,6 +26,7 @@ export default function PaymentPlanPage() {
   });
 
   const [preview, setPreview] = useState(false);
+  const [documentId, setDocumentId] = useState<string | null>(null);
   const [schedule, setSchedule] = useState<Array<{ month: number; date: string; amount: string }>>(
     []
   );
@@ -35,7 +38,7 @@ export default function PaymentPlanPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const calculatePlan = (e: React.FormEvent) => {
+  const calculatePlan = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const size = parseFloat(formData.plotSize) || 0;
@@ -63,6 +66,36 @@ export default function PaymentPlanPage() {
 
     setTotals({ totalCost, balance, emiAmount });
     setSchedule(newSchedule);
+
+    // Save document record to database
+    if (token) {
+      try {
+        const response = await fetch('/api/admin/documents', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            document_type: 'payment_plan',
+            form_data: {
+              ...formData,
+              schedule: newSchedule,
+              totals: { totalCost, balance, emiAmount },
+            },
+            status: 'draft',
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setDocumentId(data.document.id);
+        }
+      } catch (error) {
+        console.error('Failed to save document:', error);
+      }
+    }
+
     setPreview(true);
   };
 
@@ -76,6 +109,22 @@ export default function PaymentPlanPage() {
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
     pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
     pdf.save('Payment_Plan.pdf');
+
+    // Update document status to completed
+    if (documentId && token) {
+      try {
+        await fetch(`/api/admin/documents/${documentId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: 'completed' }),
+        });
+      } catch (error) {
+        console.error('Failed to update document status:', error);
+      }
+    }
   };
 
   const handleDownloadImage = async () => {

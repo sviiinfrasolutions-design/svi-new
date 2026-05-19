@@ -150,3 +150,134 @@ VALUES ('d7b7e8d6-6cbe-4b96-9812-32b0f4ef54ea', 'admin@sviinfra.com', 'System Ad
 ON CONFLICT (id) DO UPDATE 
 SET role = 'admin', full_name = 'System Admin';
 
+-- ============================================================
+-- Documents Table - Track all generated documents
+-- ============================================================
+
+create table if not exists public.documents (
+  id uuid primary key default uuid_generate_v4(),
+  document_type text not null check (document_type in ('allotment_letter', 'payment_receipt', 'payment_plan', 'offer_letter', 'bba')),
+  user_id uuid references public.profiles(id) on delete cascade,
+  created_by uuid references auth.users(id) on delete set null,
+  form_data jsonb not null default '{}'::jsonb,
+  pdf_url text,
+  image_url text,
+  status text not null default 'draft' check (status in ('draft', 'completed', 'archived')),
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Indexes for performance
+create index idx_documents_user_id on public.documents(user_id);
+create index idx_documents_type on public.documents(document_type);
+create index idx_documents_created_at on public.documents(created_at desc);
+
+-- RLS Policies
+alter table public.documents enable row level security;
+
+drop policy if exists "Admins can read all documents" on public.documents;
+drop policy if exists "Users can read own documents" on public.documents;
+drop policy if exists "Service role full access" on public.documents;
+
+create policy "Admins can read all documents"
+  on public.documents for select
+  using (public.is_admin());
+
+create policy "Users can read own documents"
+  on public.documents for select
+  using (auth.uid() = user_id);
+
+create policy "Service role full access"
+  on public.documents for all
+  using (auth.role() = 'service_role');
+
+-- Auto-update trigger
+drop trigger if exists documents_updated_at on public.documents;
+create trigger documents_updated_at
+  before update on public.documents
+  for each row execute procedure public.handle_updated_at();
+
+-- ============================================================
+-- Notifications Table - Real-time admin notifications
+-- ============================================================
+
+create table if not exists public.notifications (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references public.profiles(id) on delete cascade,
+  title text not null,
+  message text not null,
+  type text not null check (type in ('info', 'success', 'warning', 'error')),
+  is_read boolean not null default false,
+  action_url text,
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+-- Indexes for performance
+create index idx_notifications_user_id on public.notifications(user_id);
+create index idx_notifications_is_read on public.notifications(is_read);
+create index idx_notifications_created_at on public.notifications(created_at desc);
+
+-- RLS Policies
+alter table public.notifications enable row level security;
+
+drop policy if exists "Admins can read all notifications" on public.notifications;
+drop policy if exists "Users can read own notifications" on public.notifications;
+drop policy if exists "Service role full access" on public.notifications;
+drop policy if exists "Insert notifications" on public.notifications;
+
+create policy "Admins can read all notifications"
+  on public.notifications for select
+  using (public.is_admin());
+
+create policy "Users can read own notifications"
+  on public.notifications for select
+  using (auth.uid() = user_id);
+
+create policy "Service role full access"
+  on public.notifications for all
+  using (auth.role() = 'service_role');
+
+create policy "Insert notifications"
+  on public.notifications for insert
+  with check (true);
+
+-- Auto-update trigger for updated_at (if needed later)
+drop trigger if exists notifications_updated_at on public.notifications;
+create trigger notifications_updated_at
+  before update on public.notifications
+  for each row execute procedure public.handle_updated_at();
+
+-- ============================================================
+-- Activity Logs Table - Track all admin activities
+-- ============================================================
+
+create table if not exists public.activity_logs (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users(id) on delete set null,
+  action_type text not null check (action_type in ('user_created', 'user_deleted', 'document_generated', 'document_downloaded', 'settings_updated', 'profile_updated')),
+  description text not null,
+  target_id uuid,
+  target_type text,
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index idx_activity_logs_user_id on public.activity_logs(user_id);
+create index idx_activity_logs_action_type on public.activity_logs(action_type);
+create index idx_activity_logs_created_at on public.activity_logs(created_at desc);
+
+alter table public.activity_logs enable row level security;
+
+drop policy if exists "Admins can read all activities" on public.activity_logs;
+drop policy if exists "Service role full access" on public.activity_logs;
+
+create policy "Admins can read all activities"
+  on public.activity_logs for select
+  using (public.is_admin());
+
+create policy "Service role full access"
+  on public.activity_logs for all
+  using (auth.role() = 'service_role');
+

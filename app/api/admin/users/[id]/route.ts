@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 // DELETE /api/admin/users/[id]
 export async function DELETE(
@@ -32,10 +33,27 @@ export async function DELETE(
 
   const { id } = await params;
 
+  // Get user info before deletion for notification
+  const { data: userProfile } = await supabaseAdmin
+    .from('profiles')
+    .select('full_name')
+    .eq('id', id)
+    .single();
+
   // Delete from auth (cascades via DB trigger to profiles table)
   const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Create notification for all admins about user deletion
+  if (userProfile) {
+    try {
+      await NotificationHelper.userDeleted(userProfile.full_name);
+    } catch (notifError) {
+      console.error('Failed to create notification:', notifError);
+      // Don't fail the request if notification fails
+    }
   }
 
   return NextResponse.json({ success: true });

@@ -27,20 +27,20 @@ export async function GET(request: NextRequest) {
   const admin = await verifyAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  // User growth over last 30 days
+  // User growth over last 30 days (cumulative)
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const { data: userGrowth, error: growthError } = await supabaseAdmin
+  // Fetch ALL profiles to calculate cumulative growth properly
+  const { data: allProfiles, error: growthError } = await supabaseAdmin
     .from('profiles')
     .select('created_at')
-    .gte('created_at', thirtyDaysAgo.toISOString())
     .order('created_at', { ascending: true });
 
   if (growthError) return NextResponse.json({ error: growthError.message }, { status: 500 });
 
-  // Aggregate by day
-  const userGrowthByDay = aggregateByDay(userGrowth || [], 30);
+  // Aggregate by day with cumulative counts
+  const userGrowthByDay = aggregateByDay(allProfiles || [], 30);
 
   // Document stats by type
   const { data: docStats, error: docError } = await supabaseAdmin
@@ -65,17 +65,27 @@ export async function GET(request: NextRequest) {
 function aggregateByDay(records: Array<{ created_at: string }>, days: number) {
   const result = [];
   const today = new Date();
+  
+  // Get all profiles ever created (not just last 30 days) for cumulative count
+  const allRecords = records;
 
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
     const dateStr = date.toISOString().split('T')[0];
+    const dateEnd = new Date(date);
+    dateEnd.setHours(23, 59, 59, 999);
+    const dateEndStr = dateEnd.toISOString();
 
-    const count = records.filter((r) => r.created_at.startsWith(dateStr)).length;
+    // Count cumulative users up to this date
+    const cumulativeCount = allRecords.filter((r) => {
+      const createdAt = new Date(r.created_at);
+      return createdAt <= dateEnd;
+    }).length;
 
     result.push({
-      date: `${i === 0 ? 'Today' : i + 'd ago'}`,
-      users: count,
+      date: i === 0 ? 'Today' : `${date.getMonth() + 1}/${date.getDate()}`,
+      users: cumulativeCount,
     });
   }
 

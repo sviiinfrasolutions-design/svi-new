@@ -1,0 +1,322 @@
+'use client';
+
+import { Bell, Check, FileText, Info, Trash2, Users, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+
+import { supabase } from '@/src/lib/supabase/client';
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  is_read: boolean;
+  action_url?: string;
+  created_at: string;
+}
+
+interface NotificationDropdownProps {
+  userId: string;
+}
+
+export default function NotificationDropdown({ userId }: NotificationDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch notifications
+  const fetchNotifications = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      setNotifications(data || []);
+      setUnreadCount(data?.filter((n) => !n.is_read).length || 0);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mark notification as read
+  const markAsRead = async (notificationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', notificationId);
+
+      if (error) throw error;
+
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
+
+  // Mark all as read
+  const markAllAsRead = async () => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', userId)
+        .eq('is_read', false);
+
+      if (error) throw error;
+
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+    }
+  };
+
+  // Delete notification
+  const deleteNotification = async (notificationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId);
+
+      if (error) throw error;
+
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+      const deletedNotification = notifications.find((n) => n.id === notificationId);
+      if (deletedNotification && !deletedNotification.is_read) {
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      }
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  };
+
+  // Get icon based on notification type
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'success':
+        return <Check className="h-4 w-4 text-emerald-500" />;
+      case 'warning':
+        return <Info className="h-4 w-4 text-amber-500" />;
+      case 'error':
+        return <X className="h-4 w-4 text-red-500" />;
+      default:
+        return <Info className="h-4 w-4 text-blue-500" />;
+    }
+  };
+
+  // Format timestamp
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
+
+  // Initial fetch
+  useEffect(() => {
+    if (userId) {
+      fetchNotifications();
+    }
+  }, [userId]);
+
+  // Real-time subscription for new notifications
+  useEffect(() => {
+    if (!userId) return;
+
+    const channel = supabase
+      .channel('notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          fetchNotifications();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId]);
+
+  return (
+    <div className="relative">
+      {/* Bell Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="hover:text-brand-gold relative cursor-pointer p-2 text-gray-500 transition-colors"
+        aria-label="Notifications"
+      >
+        <Bell className="h-5 w-5" />
+        {unreadCount > 0 && (
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-red-500 text-[9px] font-bold text-white dark:border-[#0d0d14]"
+          >
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </motion.span>
+        )}
+      </button>
+
+      {/* Dropdown */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40"
+              onClick={() => setIsOpen(false)}
+            />
+
+            {/* Dropdown Panel */}
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="dark:border-brand-gold/15 absolute top-full right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:bg-[#0e0e14]"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-white/5">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  Notifications
+                </h3>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-xs font-medium text-brand-gold hover:text-brand-gold/80 transition-colors"
+                  >
+                    Mark all read
+                  </button>
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="max-h-96 overflow-y-auto">
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-200 border-t-brand-gold"></div>
+                  </div>
+                ) : notifications.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <Bell className="mb-3 h-10 w-10 text-gray-300 dark:text-gray-600" />
+                    <p className="text-sm text-gray-500 dark:text-gray-400">No notifications</p>
+                    <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                      You're all caught up!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-100 dark:divide-white/5">
+                    {notifications.map((notification) => (
+                      <motion.div
+                        key={notification.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className={`group relative px-4 py-3 transition-colors ${
+                          !notification.is_read
+                            ? 'bg-brand-gold/5 dark:bg-brand-gold/10'
+                            : 'hover:bg-gray-50 dark:hover:bg-white/5'
+                        }`}
+                      >
+                        <div className="flex gap-3">
+                          {/* Icon */}
+                          <div className="mt-0.5 flex-shrink-0">
+                            {getTypeIcon(notification.type)}
+                          </div>
+
+                          {/* Content */}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <p
+                                className={`text-xs font-semibold ${
+                                  !notification.is_read
+                                    ? 'text-gray-900 dark:text-white'
+                                    : 'text-gray-700 dark:text-gray-300'
+                                }`}
+                              >
+                                {notification.title}
+                              </p>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteNotification(notification.id);
+                                }}
+                                className="opacity-0 group-hover:opacity-100 cursor-pointer text-gray-400 transition-opacity hover:text-red-500"
+                                aria-label="Delete notification"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                            <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                              {notification.message}
+                            </p>
+                            <div className="mt-2 flex items-center gap-2">
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                                {formatTime(notification.created_at)}
+                              </span>
+                              {!notification.is_read && (
+                                <span className="h-1.5 w-1.5 rounded-full bg-brand-gold"></span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Click to mark as read */}
+                        {!notification.is_read && (
+                          <div
+                            className="absolute inset-0 cursor-pointer"
+                            onClick={() => markAsRead(notification.id)}
+                          />
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              {notifications.length > 0 && (
+                <div className="border-t border-gray-100 px-4 py-2.5 dark:border-white/5">
+                  <button className="w-full text-center text-xs font-medium text-brand-gold hover:text-brand-gold/80 transition-colors">
+                    View all notifications
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
