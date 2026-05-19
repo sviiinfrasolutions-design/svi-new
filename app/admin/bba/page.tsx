@@ -3,6 +3,7 @@
 import {
   DownloadOptions,
   FormField,
+  FormSelect,
   PreviewContainer,
 } from '@/src/components/admin/DocumentGenerator/Shared';
 import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
@@ -15,20 +16,36 @@ import { useState } from 'react';
 export default function BbaPage() {
   const { token } = useAdminSession();
   const [formData, setFormData] = useState({
-    date: '',
-    name: '',
+    clientName: '',
     address: '',
-    mobileNo: '',
-    emailId: '',
-    courseName: '',
-    duration: '',
-    semester: '',
-    fees: '',
-    admissionDate: '',
+    ticketId: '',
+    projectName: 'Shyam Aangan',
+    unitNumber: '',
+    area: '',
+    bsp: '',
+    plc: '',
+    paymentPlan: '12',
+    bookingDate: '',
+    secondPaymentDays: '15',
+    advisorName: '',
+    advisorNumber: '',
   });
 
   const [preview, setPreview] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
+
+  const calculateTotalCost = () => {
+    const area = parseFloat(formData.area) || 0;
+    const bsp = parseFloat(formData.bsp) || 0;
+    const plc = parseFloat(formData.plc) || 0;
+
+    const base = area * bsp;
+    const plcAmount = base * (plc / 100);
+    return base + plcAmount;
+  };
+
+  const totalCost = calculateTotalCost();
+  const initialPayment = totalCost * 0.1;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -110,15 +127,16 @@ export default function BbaPage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-brand-navy mb-2 font-serif text-3xl tracking-tight dark:text-white">
-            BBA Document <span className="text-brand-gold italic">Generator</span>
+            Builder Buyer <span className="text-brand-gold italic">Agreement (BBA)</span>
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Generate and download official BBA enrollment documents.
+            Generate and download official Builder Buyer Agreements for clients.
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
+        {/* Form Section */}
         <div className="relative h-fit overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:border-white/8 dark:bg-[#0e0e14]/65">
           <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
 
@@ -126,23 +144,15 @@ export default function BbaPage() {
             <div className="bg-brand-gold/10 border-brand-gold/20 flex h-8 w-8 items-center justify-center rounded border">
               <FileText className="text-brand-gold h-4 w-4" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Enrollment Details</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Agreement Details</h2>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
-                label="Date"
-                name="date"
-                type="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-              />
-              <FormField
-                label="Student Name"
-                name="name"
-                value={formData.name}
+                label="Client Name"
+                name="clientName"
+                value={formData.clientName}
                 onChange={handleChange}
                 required
               />
@@ -152,73 +162,145 @@ export default function BbaPage() {
                 value={formData.address}
                 onChange={handleChange}
                 required
-                className="md:col-span-2"
               />
               <FormField
-                label="Mobile No"
-                name="mobileNo"
-                type="tel"
-                value={formData.mobileNo}
+                label="Ticket ID"
+                name="ticketId"
+                value={formData.ticketId}
+                onChange={handleChange}
+                required
+              />
+
+              <FormSelect
+                label="Project Name"
+                name="projectName"
+                value={formData.projectName}
+                onChange={handleChange}
+                options={[
+                  { value: 'Shyam Aangan', label: 'Shyam Aangan' },
+                  { value: 'Shyam Aangan Farm House', label: 'Shyam Aangan Farm House' },
+                ]}
+              />
+
+              <FormField
+                label="Unit Number"
+                name="unitNumber"
+                value={formData.unitNumber}
                 onChange={handleChange}
                 required
               />
               <FormField
-                label="Email ID"
-                name="emailId"
-                type="email"
-                value={formData.emailId}
-                onChange={handleChange}
-                required
-              />
-              <FormField
-                label="Course Name"
-                name="courseName"
-                value={formData.courseName}
-                onChange={handleChange}
-                required
-              />
-              <FormField
-                label="Duration"
-                name="duration"
-                value={formData.duration}
-                onChange={handleChange}
-                required
-              />
-              <FormField
-                label="Semester"
-                name="semester"
-                value={formData.semester}
-                onChange={handleChange}
-                required
-              />
-              <FormField
-                label="Total Fees"
-                name="fees"
+                label="Area (Sq. Yds.)"
+                name="area"
                 type="number"
-                value={formData.fees}
+                value={formData.area}
                 onChange={handleChange}
                 required
               />
               <FormField
-                label="Admission Date"
-                name="admissionDate"
+                label="BSP (Per Sq.Yd)"
+                name="bsp"
+                type="number"
+                value={formData.bsp}
+                onChange={handleChange}
+                required
+              />
+              <FormField
+                label="PLC (%)"
+                name="plc"
+                type="number"
+                value={formData.plc}
+                onChange={handleChange}
+              />
+
+              <FormSelect
+                label="Payment Plan"
+                name="paymentPlan"
+                value={formData.paymentPlan}
+                onChange={handleChange}
+                options={[
+                  { value: '3', label: '3 Months' },
+                  { value: '6', label: '6 Months' },
+                  { value: '12', label: '12 Months' },
+                  { value: '18', label: '18 Months' },
+                  { value: '24', label: '24 Months' },
+                ]}
+              />
+
+              <FormField
+                label="Booking Date"
+                name="bookingDate"
                 type="date"
-                value={formData.admissionDate}
+                value={formData.bookingDate}
+                onChange={handleChange}
+                required
+              />
+
+              <FormSelect
+                label="Second Payment Days"
+                name="secondPaymentDays"
+                value={formData.secondPaymentDays}
+                onChange={handleChange}
+                options={[
+                  { value: '15', label: '15 days' },
+                  { value: '28', label: '28 days' },
+                ]}
+              />
+
+              <FormField
+                label="Advisor Name"
+                name="advisorName"
+                value={formData.advisorName}
+                onChange={handleChange}
+                required
+              />
+              <FormField
+                label="Advisor Number"
+                name="advisorNumber"
+                value={formData.advisorNumber}
                 onChange={handleChange}
                 required
               />
             </div>
 
+            <div className="bg-brand-navy/5 dark:bg-brand-gold/5 border-brand-navy/10 dark:border-brand-gold/10 mt-6 flex items-center justify-between rounded-xl border p-4">
+              <div>
+                <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
+                  Total Cost
+                </p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                  ₹
+                  {totalCost.toLocaleString('en-IN', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
+                  Initial Payment (10%)
+                </p>
+                <p className="text-brand-gold text-lg font-bold">
+                  ₹
+                  {initialPayment.toLocaleString('en-IN', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </p>
+              </div>
+            </div>
+
             <button
               type="submit"
-              className="bg-brand-gold hover:bg-brand-gold-light text-brand-navy glow-gold mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-3.5 text-xs font-bold tracking-widest uppercase shadow-lg transition-all"
+              className="bg-brand-gold hover:bg-brand-gold-light text-brand-navy glow-gold mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-3.5 text-xs font-bold tracking-widest uppercase shadow-lg transition-all"
             >
-              <RefreshCw className="h-4 w-4" /> Generate BBA Document
+              <RefreshCw className="h-4 w-4" /> Generate BBA
             </button>
           </form>
         </div>
 
-        <div className="relative flex h-[calc(100vh-140px)] min-h-[600px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:border-white/8 dark:bg-[#0e0e14]/65">
+        {/* Preview Section */}
+        <div className="relative flex h-[calc(100vh-140px)] min-h-[600px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-white/8 dark:bg-[#0e0e14]">
           <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
 
           <h2 className="mb-4 border-b border-gray-100 pb-4 text-lg font-bold text-gray-900 dark:border-white/10 dark:text-white">
@@ -226,92 +308,181 @@ export default function BbaPage() {
           </h2>
 
           <PreviewContainer previewId="bbaPreview" hasPreview={preview}>
-            <div className="border-brand-gold border-b-2 pb-4 text-center">
-              <h1 className="text-brand-navy font-serif text-2xl font-bold">
-                SVI Infra Solutions Pvt. Ltd
-              </h1>
-              <p className="mt-1 font-sans text-sm">A-61 Sector 65 Noida Uttar Pradesh 201309</p>
-              <p className="font-sans text-sm">
-                Cell: +91 9216014579 | Email: info@sviinfrasolutions.com
-              </p>
-              <p className="font-sans text-sm">Website: www.sviinfrasolutions.in</p>
-            </div>
-
-            <div className="mt-6 mb-6 space-y-1 font-sans text-sm">
-              <p>
-                <span className="font-semibold text-gray-600">Date:</span> {formData.date}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-600">To:</span> {formData.name}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-600">Address:</span> {formData.address}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-600">Mobile:</span> {formData.mobileNo}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-600">Email:</span> {formData.emailId}
-              </p>
-            </div>
-
-            <div className="mb-6 border-b border-gray-100 pb-4 text-center font-sans">
-              <h3 className="text-lg font-bold tracking-wider uppercase underline">
-                Subject: BBA Course Enrollment - {formData.courseName}
-              </h3>
-            </div>
-
-            <div className="space-y-4 text-justify font-sans text-sm leading-relaxed text-gray-800">
-              <p>
-                Dear <span className="font-semibold">{formData.name}</span>,
-              </p>
-              <p>
-                We are pleased to confirm your enrollment in the{' '}
-                <span className="font-bold">{formData.courseName}</span> program at SVI Infra
-                Solutions Pvt. Ltd. This is a <span className="font-bold">{formData.duration}</span>{' '}
-                course.
-              </p>
-              <p>
-                You are currently enrolled in <span className="font-bold">{formData.semester}</span>
-                . Your admission date was
-                <span className="font-bold">
-                  {' '}
-                  {new Date(formData.admissionDate).toLocaleDateString('en-GB')}
-                </span>
-                . The total course fees amount to
-                <span className="font-bold">
-                  {' '}
-                  ₹
-                  {parseFloat(formData.fees || '0').toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-                .
-              </p>
-              <p>
-                Please ensure all fee payments are made on time to continue your studies without
-                interruption. For any queries regarding your course, please contact the
-                administration office.
-              </p>
-            </div>
-
-            <div className="mt-16 flex items-end justify-between font-sans text-sm">
-              <div>
-                <p>Warm regards,</p>
-                <p>
-                  For{' '}
-                  <span className="text-brand-navy font-bold">SVI Infra Solutions Pvt. Ltd</span>
-                </p>
-                <div className="mt-12 w-48 border-t border-gray-400 pt-2 text-center">
-                  <p className="font-bold">Authorized Signatory</p>
+            <div className="bg-white text-black p-8 font-sans text-[13px] leading-relaxed">
+              {/* Header */}
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <h1 className="text-[#1e3a8a] text-2xl font-bold mb-2 tracking-wide uppercase">
+                    SVI INFRA SOLUTIONS PVT. LTD
+                  </h1>
+                  <p className="text-gray-700">Cell: +91 9216014579 | Email: info@sviinfrasolutions.com</p>
+                  <p className="text-gray-700">Website: www.sviinfrasolutions.in | www.sviinfrasolutions.com</p>
+                  <p className="text-gray-700">Office Address : A-61 Sector 65 Noida Uttar Pradesh 201309</p>
+                </div>
+                <div className="w-48">
+                  {/* We can use a standard logo image here, or text fallback. The user's pdf had a logo on the right. */}
+                  <img src="/images/logo.png" alt="SVI Infra Solutions" className="w-full h-auto object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
                 </div>
               </div>
 
-              <div className="text-center">
-                <div className="mt-12 w-48 border-t border-gray-400 pt-2 text-center">
-                  <p className="font-bold">Student Signature</p>
-                  <p className="text-xs text-gray-500">Accepted</p>
+              {/* Date & To */}
+              <div className="mb-6">
+                <p className="font-bold mb-4">Dated: {formData.bookingDate || new Date().toISOString().split('T')[0].split('-').reverse().join('-')}</p>
+                <p className="font-bold">To,</p>
+                <p className="font-bold">{formData.clientName || '[Client Name]'}</p>
+                <p className="font-bold whitespace-pre-wrap">{formData.address || '[Address]'}</p>
+              </div>
+
+              {/* Body */}
+              <div className="mb-6">
+                <p className="mb-2">
+                  Dear Mr./Mrs./Ms. <span className="font-bold">{formData.clientName || '[Client Name]'}</span>
+                </p>
+                <p className="mb-1 text-justify">
+                  Congratulations from Svi Infra Solutions Pvt. Ltd. on your new investment in {formData.projectName} (Kishan Garh Renwal, Jaipur, Rajasthan). It is a perfect choice and you are one of the few lucky ones to get unit at such reasonable rates.
+                </p>
+                <p className="mb-4 text-justify">
+                  We at Svi Infra Solutions Pvt. Ltd. feel privileged to be part of your great investment. We thank you for giving us an opportunity to assist you in making this very investment. We sincerely hope that you are satisfied with our services and will refer us in your circle.
+                </p>
+
+                <p className="font-bold mb-2">Your Allotment is as Follows:</p>
+                <p>Ticket Id : <span className="font-bold">{formData.ticketId}</span></p>
+                <p>Project Name : <span className="font-bold">{formData.projectName}</span></p>
+                <p>Unit Number : <span className="font-bold">{formData.unitNumber}</span></p>
+                
+                <p className="mt-4 mb-2">Brief details about the total cost of the unit and payment plan are as follows:</p>
+              </div>
+
+              {/* Details Table */}
+              <div className="mb-6 overflow-hidden border border-gray-400">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-[#00b0f0] text-black">
+                      <th className="border border-gray-400 p-2 font-bold">Client Name</th>
+                      <th className="border border-gray-400 p-2 font-bold">Allotted Unit</th>
+                      <th className="border border-gray-400 p-2 font-bold">Area (Sq. Yds.)</th>
+                      <th className="border border-gray-400 p-2 font-bold">Payment Plan</th>
+                      <th className="border border-gray-400 p-2 font-bold">BSP (PSq.Yd)</th>
+                      <th className="border border-gray-400 p-2 font-bold">PLC (in %)</th>
+                      <th className="border border-gray-400 p-2 font-bold">Total Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.clientName}</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.unitNumber}</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.area}</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.paymentPlan} Months</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.bsp}</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.plc || '0'}</td>
+                      <td className="border border-gray-400 p-2 font-bold">{totalCost.toFixed(2)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Payment Schedule Table */}
+              <h3 className="font-bold text-lg mb-2 text-gray-800">Payment Schedule</h3>
+              <div className="mb-6 overflow-hidden border border-gray-400">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-[#00b0f0] text-black">
+                      <th className="border border-gray-400 p-2 font-bold">SNO</th>
+                      <th className="border border-gray-400 p-2 font-bold">Date</th>
+                      <th className="border border-gray-400 p-2 font-bold">Particulars</th>
+                      <th className="border border-gray-400 p-2 font-bold">%</th>
+                      <th className="border border-gray-400 p-2 font-bold">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Booking (10%) */}
+                    <tr>
+                      <td className="border border-gray-400 p-2 font-bold">1</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.bookingDate}</td>
+                      <td className="border border-gray-400 p-2 font-bold">On Booking</td>
+                      <td className="border border-gray-400 p-2">10%</td>
+                      <td className="border border-gray-400 p-2 font-bold">Rs. {initialPayment.toFixed(2)}</td>
+                    </tr>
+                    {/* Second Payment (20%) */}
+                    <tr>
+                      <td className="border border-gray-400 p-2 font-bold">2</td>
+                      <td className="border border-gray-400 p-2 font-bold">
+                        {(() => {
+                          if (!formData.bookingDate) return '-';
+                          const d = new Date(formData.bookingDate);
+                          d.setDate(d.getDate() + parseInt(formData.secondPaymentDays || '15'));
+                          return d.toISOString().split('T')[0];
+                        })()}
+                      </td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.secondPaymentDays} days</td>
+                      <td className="border border-gray-400 p-2">20%</td>
+                      <td className="border border-gray-400 p-2 font-bold">Rs. {(totalCost * 0.2).toFixed(2)}</td>
+                    </tr>
+                    {/* EMIs */}
+                    {(() => {
+                      const remainingCost = totalCost * 0.7;
+                      const months = parseInt(formData.paymentPlan || '12');
+                      const emiAmount = remainingCost / months;
+                      const emiPercent = 70 / months;
+                      
+                      return Array.from({ length: months }).map((_, i) => {
+                        let emiDate = '-';
+                        if (formData.bookingDate) {
+                          const d = new Date(formData.bookingDate);
+                          d.setMonth(d.getMonth() + i + 2); // Start EMIs roughly 2 months after booking
+                          emiDate = d.toISOString().split('T')[0];
+                        }
+                        
+                        return (
+                          <tr key={i}>
+                            <td className="border border-gray-400 p-2 font-bold">{i + 3}</td>
+                            <td className="border border-gray-400 p-2 font-bold">{emiDate}</td>
+                            <td className="border border-gray-400 p-2 font-bold">{i + 1} EMI</td>
+                            <td className="border border-gray-400 p-2">{emiPercent.toFixed(1)}%</td>
+                            <td className="border border-gray-400 p-2 font-bold">Rs. {emiAmount.toFixed(2)}</td>
+                          </tr>
+                        );
+                      });
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Terms Box */}
+              <div className="bg-[#f0f8ff] p-4 rounded-lg mb-8 text-gray-800 italic border-l-4 border-[#00b0f0]">
+                <p className="mb-2">
+                  Please transfer the initial amount of 10% (Rs. {initialPayment.toFixed(2)}) by {formData.bookingDate || '[Date]'} to confirm allotment under {formData.projectName}, and the second instalment of 20% (Rs. {(totalCost * 0.2).toFixed(2)}) by {
+                    (() => {
+                      if (!formData.bookingDate) return '[Date]';
+                      const d = new Date(formData.bookingDate);
+                      d.setDate(d.getDate() + parseInt(formData.secondPaymentDays || '15'));
+                      return d.toISOString().split('T')[0];
+                    })()
+                  }.
+                </p>
+                <p className="mb-2">The remaining 70% will be paid as per the selected payment plan and is scheduled to complete accordingly.</p>
+                <p className="mb-2">Note: Allotment under {formData.projectName} will only be confirmed upon receipt of the initial 10% (Rs. {initialPayment.toFixed(2)}) by {formData.bookingDate || '[Date]'}.</p>
+                <p>In the event you fail to make the payments as per the payment plan chosen by you, the allotment of these plots will be automatically cancelled.</p>
+              </div>
+
+              {/* Footer details */}
+              <div className="flex justify-between items-end pb-8">
+                <div>
+                  <p className="font-bold mb-2">Payment can be transferred online using the following details:</p>
+                  <p><span className="font-bold">Account Name:</span> Svi Infra Solutions Pvt. Ltd</p>
+                  <p><span className="font-bold">Account Number:</span> 0894102000013837</p>
+                  <p><span className="font-bold">Bank:</span> IDBI BANK</p>
+                  <p><span className="font-bold">IFSC CODE:</span> IBKL0000894</p>
+                  <p className="mt-4">
+                    Your account manager is <span className="font-bold">{formData.advisorName}</span> and will be reachable on <span className="font-bold">{formData.advisorNumber}</span> for any queries.
+                  </p>
+                </div>
+                <div className="text-right flex flex-col items-end">
+                  <p className="mb-2">With Best Regards</p>
+                  <p className="mb-16">For SVI Infra Solutions Pvt. Ltd</p>
+                  <div className="w-48 text-center border-t border-black pt-2">
+                    <p>Director</p>
+                  </div>
                 </div>
               </div>
             </div>

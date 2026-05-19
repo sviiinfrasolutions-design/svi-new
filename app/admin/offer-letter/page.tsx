@@ -251,7 +251,7 @@ export default function OfferLetterPage() {
           </form>
         </div>
 
-        <div className="relative flex h-[calc(100vh-140px)] min-h-[600px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:border-white/8 dark:bg-[#0e0e14]/65">
+        <div className="relative flex h-[calc(100vh-140px)] min-h-[600px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-white/8 dark:bg-[#0e0e14]">
           <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
 
           <h2 className="mb-4 border-b border-gray-100 pb-4 text-lg font-bold text-gray-900 dark:border-white/10 dark:text-white">
@@ -259,92 +259,84 @@ export default function OfferLetterPage() {
           </h2>
 
           <PreviewContainer previewId="offerPreview" hasPreview={preview}>
-            <div className="border-brand-gold border-b-2 pb-4 text-center">
-              <h1 className="text-brand-navy font-serif text-2xl font-bold">
-                SVI Infra Solutions Pvt. Ltd
-              </h1>
-              <p className="mt-1 font-sans text-sm">A-61 Sector 65 Noida Uttar Pradesh 201309</p>
-              <p className="font-sans text-sm">
-                Cell: +91 9216014579 | Email: info@sviinfrasolutions.com
-              </p>
-              <p className="font-sans text-sm">Website: www.sviinfrasolutions.in</p>
-            </div>
-
-            <div className="mt-6 mb-6 space-y-1 font-sans text-sm">
-              <p>
-                <span className="font-semibold text-gray-600">Date:</span> {formData.date}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-600">To:</span> {formData.name}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-600">Address:</span> {formData.address}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-600">Mobile:</span> {formData.mobileNo}
-                {formData.alternativeNo ? ` / ${formData.alternativeNo}` : ''}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-600">Email:</span> {formData.emailId}
-              </p>
-            </div>
-
-            <div className="mb-6 border-b border-gray-100 pb-4 text-center font-sans">
-              <h3 className="text-lg font-bold tracking-wider uppercase underline">
-                Subject: Offer Letter - {formData.designation}
-              </h3>
-            </div>
-
-            <div className="space-y-4 text-justify font-sans text-sm leading-relaxed text-gray-800">
-              <p>
-                Dear <span className="font-semibold">{formData.name}</span>,
-              </p>
-              <p>
-                We are pleased to offer you the position of{' '}
-                <span className="font-bold">{formData.designation}</span> in the
-                <span className="font-bold"> {formData.department}</span> department at SVI Infra
-                Solutions Pvt. Ltd. You will report to{' '}
-                <span className="font-bold">{formData.reportingTo}</span> and be based at
-                <span className="font-bold"> {formData.location}</span>.
-              </p>
-              <p>
-                Your appointment date is{' '}
-                <span className="font-bold">{formData.appointmentDate}</span>. The monthly CTC
-                offered is
-                <span className="font-bold">
-                  {' '}
-                  ₹
-                  {parseFloat(formData.salaryCtc || '0').toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>{' '}
-                with a target of
-                <span className="font-bold"> {formData.target}</span> and offer slab per month of
-                <span className="font-bold"> {formData.offerSlab}</span>.
-              </p>
-              <p>
-                Please confirm your acceptance of this offer by signing and returning a copy of this
-                letter. We look forward to welcoming you to the team.
-              </p>
-            </div>
-
-            <div className="mt-16 flex items-end justify-between font-sans text-sm">
-              <div>
-                <p>Warm regards,</p>
-                <p>
-                  For{' '}
-                  <span className="text-brand-navy font-bold">SVI Infra Solutions Pvt. Ltd</span>
-                </p>
-                <div className="mt-12 w-48 border-t border-gray-400 pt-2 text-center">
-                  <p className="font-bold">Authorized Signatory</p>
+            <div className="bg-white text-black p-8 font-sans text-[13px] leading-relaxed">
+              {/* Header */}
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <h1 className="text-[#1e3a8a] text-2xl font-bold mb-2 tracking-wide uppercase">
+                    SVI INFRA SOLUTIONS PVT. LTD
+                  </h1>
+                  <p className="text-gray-700">Cell: +91 9216014579 | Email: info@sviinfrasolutions.com</p>
+                  <p className="text-gray-700">Website: www.sviinfrasolutions.in | www.sviinfrasolutions.com</p>
+                  <p className="text-gray-700">Office Address : A-61 Sector 65 Noida Uttar Pradesh 201309</p>
+                </div>
+                <div className="w-48">
+                  <img src="/images/logo.png" alt="SVI Infra Solutions" className="w-full h-auto object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
                 </div>
               </div>
 
-              <div className="text-center">
-                <div className="mt-12 w-48 border-t border-gray-400 pt-2 text-center">
-                  <p className="font-bold">Candidate Signature</p>
-                  <p className="text-xs text-gray-500">Accepted</p>
+              {/* Date & To */}
+              <div className="mb-6">
+                <p className="font-bold mb-4">Date: {formData.date || new Date().toISOString().split('T')[0].split('-').reverse().join('-')}</p>
+                <p className="font-bold">To,</p>
+                <p className="font-bold">{formData.name || '[Candidate Name]'}</p>
+                <p className="font-bold whitespace-pre-wrap">{formData.address || '[Address]'}</p>
+              </div>
+
+              {/* Subject */}
+              <div className="mb-6 text-center">
+                <h3 className="font-bold uppercase underline">
+                  Subject: Offer Letter - {formData.designation || '[Designation]'}
+                </h3>
+              </div>
+
+              {/* Body */}
+              <div className="space-y-4 text-justify mb-16">
+                <p>
+                  Dear <span className="font-bold">{formData.name || '[Candidate Name]'}</span>,
+                </p>
+                <p>
+                  We are pleased to offer you the position of{' '}
+                  <span className="font-bold">{formData.designation || '[Designation]'}</span> in the
+                  <span className="font-bold"> {formData.department || '[Department]'}</span> department at SVI Infra
+                  Solutions Pvt. Ltd. You will report to{' '}
+                  <span className="font-bold">{formData.reportingTo || '[Reporting To]'}</span> and be based at
+                  <span className="font-bold"> {formData.location || '[Location]'}</span>.
+                </p>
+                <p>
+                  Your appointment date is{' '}
+                  <span className="font-bold">{formData.appointmentDate || '[Date]'}</span>. The monthly CTC
+                  offered is
+                  <span className="font-bold">
+                    {' '}
+                    ₹
+                    {parseFloat(formData.salaryCtc || '0').toLocaleString('en-IN', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>{' '}
+                  with a target of
+                  <span className="font-bold"> {formData.target || '[Target]'}</span> and offer slab per month of
+                  <span className="font-bold"> {formData.offerSlab || '[Offer Slab]'}</span>.
+                </p>
+                <p>
+                  Please confirm your acceptance of this offer by signing and returning a copy of this
+                  letter. We look forward to welcoming you to the team.
+                </p>
+              </div>
+
+              {/* Footer / Signatures */}
+              <div className="flex justify-between items-end mt-12">
+                <div>
+                  <p className="mb-2">For <span className="font-bold text-[#1e3a8a]">SVI Infra Solutions Pvt. Ltd</span></p>
+                  <img src="/images/signature.png" alt="Signature" className="h-12 w-auto mb-2 opacity-80 mix-blend-multiply" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                  <p className="font-bold">Ilyas Ali</p>
+                  <p className="text-gray-600">(Director)</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-48 border-t border-black pt-2 mx-auto">
+                    <p className="font-bold">Candidate Signature</p>
+                  </div>
                 </div>
               </div>
             </div>

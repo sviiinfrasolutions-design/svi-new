@@ -245,98 +245,71 @@ export default function PaymentPlanPage() {
           </h2>
 
           <PreviewContainer previewId="planPreview" hasPreview={preview}>
-            <div className="border-brand-gold mb-6 border-b-2 pb-6 text-center">
-              <h1 className="text-brand-navy font-serif text-2xl font-bold">Payment Plan</h1>
-              <p className="mt-2 font-sans font-semibold text-gray-600">{formData.propertyType}</p>
-            </div>
+            <div className="bg-white text-black p-8 font-sans">
+              <div className="border-brand-gold mb-8 border-b-2 pb-6 text-center">
+                <h1 className="text-brand-navy font-serif text-3xl font-bold">Payment Plan ({formData.emis} Months)</h1>
+                <p className="mt-2 font-sans font-semibold text-gray-600 text-lg uppercase tracking-wider">{formData.propertyType}</p>
+              </div>
 
-            <div className="mb-8 grid grid-cols-2 gap-4 font-sans text-sm font-medium">
-              <div>
-                <span className="text-gray-500">Unit Number:</span> {formData.unitNo}
+              <div className="mb-10 grid grid-cols-2 md:grid-cols-3 gap-6 rounded-xl bg-gray-50 p-6 border border-gray-200">
+                <div>
+                  <span className="text-gray-500 text-xs font-bold uppercase tracking-wider block mb-1">Unit Number</span> 
+                  <span className="text-lg font-semibold">{formData.unitNo || '-'}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 text-xs font-bold uppercase tracking-wider block mb-1">Plot Size</span> 
+                  <span className="text-lg font-semibold">{formData.plotSize || '0'} Sq. Yds.</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 text-xs font-bold uppercase tracking-wider block mb-1">Cost/Sq.Yd</span> 
+                  <span className="text-lg font-semibold">₹ {parseFloat(formData.costPerSqYd || '0').toLocaleString('en-IN')}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 text-xs font-bold uppercase tracking-wider block mb-1">Total Cost</span> 
+                  <span className="text-lg font-semibold text-brand-navy">₹ {totals.totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 text-xs font-bold uppercase tracking-wider block mb-1">Booking Amount</span> 
+                  <span className="text-lg font-semibold text-green-600">₹ {parseFloat(formData.bookingAmount || '0').toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 text-xs font-bold uppercase tracking-wider block mb-1">Balance Amount</span> 
+                  <span className="text-lg font-semibold text-orange-600">₹ {totals.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                </div>
               </div>
-              <div>
-                <span className="text-gray-500">Plot Size:</span> {formData.plotSize} Sq. Yds.
-              </div>
-              <div>
-                <span className="text-gray-500">Cost/Sq.Yd:</span> ₹ {formData.costPerSqYd}
-              </div>
-              <div>
-                <span className="text-gray-500">Total Cost:</span> ₹{' '}
-                {totals.totalCost.toLocaleString('en-IN', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </div>
-              <div>
-                <span className="text-gray-500">Booking Amount:</span> ₹{' '}
-                {parseFloat(formData.bookingAmount || '0').toLocaleString('en-IN', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </div>
-              <div>
-                <span className="text-gray-500">Balance Amount:</span> ₹{' '}
-                {totals.balance.toLocaleString('en-IN', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </div>
-            </div>
 
-            <table className="w-full border-collapse border border-gray-300 text-left font-sans text-sm">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-300 p-2 font-semibold">Month</th>
-                  <th className="border border-gray-300 p-2 font-semibold">Expected Date</th>
-                  <th className="border border-gray-300 p-2 font-semibold">Details</th>
-                  <th className="border border-gray-300 p-2 font-semibold">Expected Amount (₹)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-green-50 font-semibold">
-                  <td className="border border-gray-300 p-2 text-center">0</td>
-                  <td className="border border-gray-300 p-2">
-                    {new Date(formData.startDate).toLocaleDateString('en-GB')}
-                  </td>
-                  <td className="border border-gray-300 p-2">Booking Amount</td>
-                  <td className="border border-gray-300 p-2 underline">
-                    {parseFloat(formData.bookingAmount || '0').toLocaleString('en-IN', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                </tr>
+              <h3 className="text-xl font-bold mb-6 text-gray-800 border-b pb-2">Installment Schedule</h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {/* Initial Payment Card */}
+                <div className="bg-green-50 border border-green-200 rounded-xl p-5 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
+                  <h4 className="font-bold text-green-800 mb-1 text-sm uppercase tracking-wide">Initial Payment</h4>
+                  <p className="text-xs text-green-600 mb-3">{new Date(formData.startDate).toLocaleDateString('en-GB')}</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    ₹ {parseFloat(formData.bookingAmount || '0').toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+
+                {/* EMI Cards */}
                 {schedule.map((row) => (
-                  <tr key={row.month}>
-                    <td className="border border-gray-300 p-2 text-center">{row.month}</td>
-                    <td className="border border-gray-300 p-2">{row.date}</td>
-                    <td className="border border-gray-300 p-2 text-gray-600">EMI {row.month}</td>
-                    <td className="border border-gray-300 p-2">
-                      {parseFloat(row.amount).toLocaleString('en-IN', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </td>
-                  </tr>
+                  <div key={row.month} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:border-brand-gold/50 transition-colors">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-400"></div>
+                    <div className="flex justify-between items-start mb-1">
+                      <h4 className="font-bold text-gray-700 text-sm uppercase tracking-wide">EMI {row.month}</h4>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-3">{row.date}</p>
+                    <p className="text-xl font-bold text-gray-900">
+                      ₹ {parseFloat(row.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
                 ))}
-                <tr className="bg-gray-100 font-bold">
-                  <td className="border border-gray-300 p-2 text-right" colSpan={3}>
-                    Grand Total
-                  </td>
-                  <td className="border border-gray-300 p-2 text-red-600 underline">
-                    ₹{' '}
-                    {totals.totalCost.toLocaleString('en-IN', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+              </div>
 
-            <div className="mt-12 border-t pt-8 text-center font-sans text-xs text-gray-500">
-              Disclaimer: This is a computer generated document and does not require physical
-              signature. Dates are approximate and subject to realization.
+              <div className="mt-12 border-t pt-8 text-center font-sans text-xs text-gray-500">
+                Disclaimer: This is a computer generated document and does not require physical
+                signature. Dates are approximate and subject to realization.
+              </div>
             </div>
           </PreviewContainer>
 

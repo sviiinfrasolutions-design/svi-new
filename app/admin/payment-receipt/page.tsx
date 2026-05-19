@@ -255,115 +255,126 @@ export default function PaymentReceiptPage() {
           </h2>
 
           <PreviewContainer previewId="receiptPreview" hasPreview={preview}>
-            {/* Header */}
-            <div className="border-brand-gold flex items-start justify-between border-b-2 pb-6">
-              <div>
-                <h1 className="text-brand-navy font-serif text-2xl font-bold">
-                  SVI Infra Solutions Pvt. Ltd
-                </h1>
-                <p className="mt-1 font-sans text-sm">A-61 Sector 65 Noida Uttar Pradesh 201309</p>
-                <p className="font-sans text-sm">
-                  Cell: +91 9216014579 | Email: info@sviinfrasolutions.com
+            <div className="bg-white text-black p-8 font-sans">
+              {/* Header */}
+              <div className="flex justify-between items-start mb-6 border-b-2 border-brand-gold pb-6">
+                <div>
+                  <h1 className="text-[#1e3a8a] text-2xl font-bold mb-2 tracking-wide uppercase">
+                    SVI INFRA SOLUTIONS PVT. LTD
+                  </h1>
+                  <p className="text-gray-700 text-[13px]">Cell: +91 9216014579 | Email: info@sviinfrasolutions.com</p>
+                  <p className="text-gray-700 text-[13px]">Website: www.sviinfrasolutions.in | www.sviinfrasolutions.com</p>
+                  <p className="text-gray-700 text-[13px]">Office Address : A-61 Sector 65 Noida Uttar Pradesh 201309</p>
+                </div>
+                <div className="w-48">
+                  <img src="/images/logo.png" alt="SVI Infra Solutions" className="w-full h-auto object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                </div>
+              </div>
+
+              <div className="mb-6 text-center">
+                <h2 className="inline-block bg-[#1e3a8a] text-white px-6 py-2 rounded text-lg font-bold tracking-widest uppercase shadow-md">
+                  Payment Receipt
+                </h2>
+              </div>
+
+              <div className="mb-8 flex justify-between font-sans text-sm font-bold">
+                <p className="rounded border-l-4 border-[#1e3a8a] bg-gray-50 px-4 py-2 shadow-sm">
+                  Receipt No: <span className="ml-1 text-red-600">{formData.receiptNo || '___________'}</span>
                 </p>
-                <p className="font-sans text-sm">Website: www.sviinfrasolutions.in</p>
+                <p className="rounded border-l-4 border-[#1e3a8a] bg-gray-50 px-4 py-2 shadow-sm">
+                  Date: <span className="ml-1 text-red-600">{formData.date || '___________'}</span>
+                </p>
               </div>
-            </div>
 
-            <div className="mt-6 mb-8 text-center">
-              <h2 className="inline-block text-xl font-bold tracking-widest uppercase underline">
-                Payment Receipt
-              </h2>
-            </div>
+              <div className="space-y-6 font-sans text-[15px] leading-relaxed p-6 border border-gray-200 rounded-xl bg-gray-50 shadow-sm relative">
+                {/* Watermark Logo (optional) */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+                   <img src="/images/logo.png" alt="" className="w-96" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                </div>
 
-            <div className="mb-8 flex justify-between font-sans text-sm font-bold">
-              <p className="rounded border border-gray-200 bg-gray-50 px-3 py-1.5">
-                Receipt No: <span className="ml-1 text-red-600">{formData.receiptNo}</span>
+                <div className="flex items-end relative z-10">
+                  <span className="mr-2 whitespace-nowrap">
+                    Received with thanks from Mr. / Mrs. / M/s :
+                  </span>
+                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold italic text-[#1e3a8a]">
+                    {formData.name}
+                  </span>
+                </div>
+
+                <div className="flex items-end relative z-10">
+                  <span className="mr-2 whitespace-nowrap">Ref. Id :</span>
+                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
+                    {formData.refId}
+                  </span>
+                </div>
+
+                <div className="flex items-end relative z-10">
+                  <span className="mr-2 whitespace-nowrap">The sum of Rupees :</span>
+                  <span className="flex-1 border-b border-gray-400 pb-0.5 text-lg font-bold text-gray-800">
+                    ₹ {parseFloat(formData.amount || '0').toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+
+                <div className="flex items-end relative z-10">
+                  <span className="mr-2 whitespace-nowrap">Rupees in Words :</span>
+                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold italic text-[#1e3a8a]">
+                    {formData.amountWords}
+                  </span>
+                </div>
+
+                <div className="flex items-end relative z-10">
+                  <span className="mr-2 whitespace-nowrap">By {formData.paymentMethod} No :</span>
+                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
+                    {formData.paymentRef}
+                  </span>
+                </div>
+
+                <div className="flex justify-between gap-6 pt-2 relative z-10">
+                  <div className="flex flex-1 items-end">
+                    <span className="mr-2 whitespace-nowrap">Drawn On :</span>
+                    <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
+                      {formData.drawnOn ? new Date(formData.drawnOn).toLocaleDateString('en-GB') : ''}
+                    </span>
+                  </div>
+                  <div className="flex flex-1 items-end">
+                    <span className="mr-2 whitespace-nowrap">Plot No :</span>
+                    <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold text-red-600">
+                      {formData.plotNo}
+                    </span>
+                  </div>
+                  <div className="flex flex-1 items-end">
+                    <span className="mr-2 whitespace-nowrap">Plot Size :</span>
+                    <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
+                      {formData.plotSize} Sq. Yds.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-end pt-2 relative z-10">
+                  <span className="mr-2 whitespace-nowrap">On Account of :</span>
+                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
+                    {formData.account}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-12 flex items-end justify-between pb-8">
+                <div className="border-[#1e3a8a] rounded-lg border-2 bg-white px-8 py-4 text-2xl font-bold shadow-md text-[#1e3a8a]">
+                  ₹ {parseFloat(formData.amount || '0').toLocaleString('en-IN', { minimumFractionDigits: 2 })}/-
+                </div>
+                <div className="text-center relative">
+                  <img src="/images/signature.png" alt="Signature" className="absolute bottom-10 left-1/2 -translate-x-1/2 h-16 w-auto opacity-90 mix-blend-multiply" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                  <div className="w-56 border-t-2 border-black pt-2 relative z-10">
+                    <p className="text-sm font-bold text-[#1e3a8a]">For SVI Infra Solutions Pvt. Ltd</p>
+                    <p className="mt-1 text-xs font-bold text-gray-700">Authorized Signatory</p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="mt-8 border-t border-gray-200 pt-4 text-center text-[11px] text-gray-500 italic">
+                Thank you for your business. Please keep this receipt for your records. This is a computer generated document.
               </p>
-              <p className="rounded border border-gray-200 bg-gray-50 px-3 py-1.5">
-                Date: <span className="ml-1 text-red-600">{formData.date}</span>
-              </p>
             </div>
-
-            <div className="mt-4 space-y-6 font-sans text-sm leading-relaxed">
-              <div className="flex items-end">
-                <span className="mr-2 whitespace-nowrap">
-                  Received with thanks from Mr. / Mrs. / M/s :
-                </span>
-                <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
-                  {formData.name}
-                </span>
-              </div>
-
-              <div className="flex items-end">
-                <span className="mr-2 whitespace-nowrap">Ref. Id :</span>
-                <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
-                  {formData.refId}
-                </span>
-              </div>
-
-              <div className="flex items-end">
-                <span className="mr-2 whitespace-nowrap">The sum of Rupees :</span>
-                <span className="flex-1 border-b border-gray-400 pb-0.5 text-lg font-bold">
-                  ₹ {formData.amount}
-                </span>
-              </div>
-
-              <div className="flex items-end">
-                <span className="mr-2 whitespace-nowrap">Rupees in Words :</span>
-                <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold italic">
-                  {formData.amountWords}
-                </span>
-              </div>
-
-              <div className="flex items-end">
-                <span className="mr-2 whitespace-nowrap">By {formData.paymentMethod} No :</span>
-                <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
-                  {formData.paymentRef}
-                </span>
-              </div>
-
-              <div className="flex justify-between gap-6 pt-2">
-                <div className="flex flex-1 items-end">
-                  <span className="mr-2 whitespace-nowrap">Drawn On :</span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
-                    {formData.drawnOn}
-                  </span>
-                </div>
-                <div className="flex flex-1 items-end">
-                  <span className="mr-2 whitespace-nowrap">Plot No :</span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
-                    {formData.plotNo}
-                  </span>
-                </div>
-                <div className="flex flex-1 items-end">
-                  <span className="mr-2 whitespace-nowrap">Plot Size :</span>
-                  <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
-                    {formData.plotSize}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-end pt-2">
-                <span className="mr-2 whitespace-nowrap">On Account of :</span>
-                <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
-                  {formData.account}
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-16 flex items-end justify-between pb-8">
-              <div className="border-brand-navy rounded-sm border-2 bg-gray-50 px-6 py-3 text-2xl font-bold shadow-inner">
-                ₹ {formData.amount}/-
-              </div>
-              <div className="w-56 border-t border-gray-400 pt-2 text-center">
-                <p className="text-sm font-bold">Authorized Signatory</p>
-                <p className="mt-1 text-xs text-gray-500">Stamp & Signature</p>
-              </div>
-            </div>
-
-            <p className="mt-8 border-t border-gray-200 pt-4 text-center text-xs text-gray-500 italic">
-              Thank you for your business. Please keep this receipt for your records.
-            </p>
           </PreviewContainer>
 
           <DownloadOptions

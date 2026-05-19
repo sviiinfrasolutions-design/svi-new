@@ -300,7 +300,7 @@ export default function AllotmentLetterPage() {
         </div>
 
         {/* Preview Section */}
-        <div className="relative flex h-[calc(100vh-140px)] min-h-[600px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:border-white/8 dark:bg-[#0e0e14]/65">
+        <div className="relative flex h-[calc(100vh-140px)] min-h-[600px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-white/8 dark:bg-[#0e0e14]">
           <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
 
           <h2 className="mb-4 border-b border-gray-100 pb-4 text-lg font-bold text-gray-900 dark:border-white/10 dark:text-white">
@@ -308,101 +308,183 @@ export default function AllotmentLetterPage() {
           </h2>
 
           <PreviewContainer previewId="allotmentPreview" hasPreview={preview}>
-            <div className="border-brand-gold border-b-2 pb-4 text-center">
-              <h1 className="text-brand-navy font-serif text-2xl font-bold">
-                SVI Infra Solutions Pvt. Ltd
-              </h1>
-              <p className="font-sans text-sm">A-61 Sector 65 Noida Uttar Pradesh 201309</p>
-              <h2 className="mt-4 mb-4 border-b pb-2 text-xl font-bold tracking-widest uppercase">
-                Allotment Letter
-              </h2>
-            </div>
-
-            <div className="mt-6 grid grid-cols-2 gap-x-8 gap-y-4 font-sans text-sm">
-              <div className="border-b border-gray-100 pb-2">
-                <span className="text-gray-500">Client Name:</span>{' '}
-                <span className="mt-1 block font-semibold">{formData.clientName}</span>
-              </div>
-              <div className="border-b border-gray-100 pb-2">
-                <span className="text-gray-500">Project:</span>{' '}
-                <span className="mt-1 block font-semibold">{formData.projectName}</span>
-              </div>
-              <div className="border-b border-gray-100 pb-2">
-                <span className="text-gray-500">Ticket ID:</span>{' '}
-                <span className="mt-1 block font-semibold">{formData.ticketId}</span>
-              </div>
-              <div className="border-b border-gray-100 pb-2">
-                <span className="text-gray-500">Unit Number:</span>{' '}
-                <span className="mt-1 block font-semibold">{formData.unitNumber}</span>
-              </div>
-              <div className="col-span-2 border-b border-gray-100 pb-2">
-                <span className="text-gray-500">Address:</span>{' '}
-                <span className="mt-1 block font-semibold">{formData.address}</span>
-              </div>
-              <div className="border-b border-gray-100 pb-2">
-                <span className="text-gray-500">Area:</span>{' '}
-                <span className="mt-1 block font-semibold">{formData.area} Sq. Yds.</span>
-              </div>
-              <div className="border-b border-gray-100 pb-2">
-                <span className="text-gray-500">BSP:</span>{' '}
-                <span className="mt-1 block font-semibold">₹{formData.bsp} / Sq.Yd</span>
-              </div>
-              <div className="border-b border-gray-100 pb-2">
-                <span className="text-gray-500">PLC:</span>{' '}
-                <span className="mt-1 block font-semibold">{formData.plc || 0}%</span>
-              </div>
-              <div className="border-b border-gray-100 pb-2">
-                <span className="text-gray-500">Plan:</span>{' '}
-                <span className="mt-1 block font-semibold">{formData.paymentPlan} Months</span>
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-4 font-sans text-sm">
-              <div className="flex justify-between border-b border-gray-200 pb-2">
-                <span className="font-semibold text-gray-700">Total Cost:</span>{' '}
-                <span className="font-bold">
-                  ₹
-                  {totalCost.toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
-              <div className="flex justify-between border-b border-gray-200 pb-2">
-                <span className="font-semibold text-gray-700">Initial Payment (10%):</span>{' '}
-                <span className="font-bold">
-                  ₹
-                  {initialPayment.toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
-              <div className="flex justify-between border-b border-gray-200 pb-2">
-                <span className="font-semibold text-gray-700">Booking Date:</span>{' '}
-                <span className="font-bold">{formData.bookingDate}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-semibold text-gray-700">Second Payment:</span>{' '}
-                <span className="font-bold">{formData.secondPaymentDays} days after booking</span>
-              </div>
-            </div>
-
-            <div className="mt-12 grid grid-cols-2 gap-4 pt-8 font-sans text-sm">
-              <div className="w-48 border-t border-gray-300 pt-2 text-center">
-                <span className="font-bold text-gray-800">Client Signature</span>
-              </div>
-              <div className="flex flex-col items-end text-right">
-                <div className="w-48 border-t border-gray-300 pt-2 text-center">
-                  <span className="font-bold text-gray-800">Authorized Signatory</span>
-                  <div className="mt-1 text-xs text-gray-500">SVI Infra Solutions</div>
+            <div className="bg-white text-black p-8 font-sans text-[13px] leading-relaxed">
+              {/* Header */}
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <h1 className="text-[#1e3a8a] text-2xl font-bold mb-2 tracking-wide uppercase">
+                    SVI INFRA SOLUTIONS PVT. LTD
+                  </h1>
+                  <p className="text-gray-700">Cell: +91 9216014579 | Email: info@sviinfrasolutions.com</p>
+                  <p className="text-gray-700">Website: www.sviinfrasolutions.in | www.sviinfrasolutions.com</p>
+                  <p className="text-gray-700">Office Address : A-61 Sector 65 Noida Uttar Pradesh 201309</p>
+                </div>
+                <div className="w-48">
+                  {/* We can use a standard logo image here, or text fallback. The user's pdf had a logo on the right. */}
+                  <img src="/images/logo.png" alt="SVI Infra Solutions" className="w-full h-auto object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
                 </div>
               </div>
-            </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-4 border-t border-gray-100 pt-4 font-sans text-xs text-gray-500">
-              <div>Advisor: {formData.advisorName}</div>
-              <div className="text-right">Contact: {formData.advisorNumber}</div>
+              {/* Date & To */}
+              <div className="mb-6">
+                <p className="font-bold mb-4">Dated: {formData.bookingDate || new Date().toISOString().split('T')[0].split('-').reverse().join('-')}</p>
+                <p className="font-bold">To,</p>
+                <p className="font-bold">{formData.clientName || '[Client Name]'}</p>
+                <p className="font-bold whitespace-pre-wrap">{formData.address || '[Address]'}</p>
+              </div>
+
+              {/* Body */}
+              <div className="mb-6">
+                <p className="mb-2">
+                  Dear Mr./Mrs./Ms. <span className="font-bold">{formData.clientName || '[Client Name]'}</span>
+                </p>
+                <p className="mb-1 text-justify">
+                  Congratulations from Svi Infra Solutions Pvt. Ltd. on your new investment in {formData.projectName} (Kishan Garh Renwal, Jaipur, Rajasthan). It is a perfect choice and you are one of the few lucky ones to get unit at such reasonable rates.
+                </p>
+                <p className="mb-4 text-justify">
+                  We at Svi Infra Solutions Pvt. Ltd. feel privileged to be part of your great investment. We thank you for giving us an opportunity to assist you in making this very investment. We sincerely hope that you are satisfied with our services and will refer us in your circle.
+                </p>
+
+                <p className="font-bold mb-2">Your Allotment is as Follows:</p>
+                <p>Ticket Id : <span className="font-bold">{formData.ticketId}</span></p>
+                <p>Project Name : <span className="font-bold">{formData.projectName}</span></p>
+                <p>Unit Number : <span className="font-bold">{formData.unitNumber}</span></p>
+                
+                <p className="mt-4 mb-2">Brief details about the total cost of the unit and payment plan are as follows:</p>
+              </div>
+
+              {/* Details Table */}
+              <div className="mb-6 overflow-hidden border border-gray-400">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-[#00b0f0] text-black">
+                      <th className="border border-gray-400 p-2 font-bold">Client Name</th>
+                      <th className="border border-gray-400 p-2 font-bold">Allotted Unit</th>
+                      <th className="border border-gray-400 p-2 font-bold">Area (Sq. Yds.)</th>
+                      <th className="border border-gray-400 p-2 font-bold">Payment Plan</th>
+                      <th className="border border-gray-400 p-2 font-bold">BSP (PSq.Yd)</th>
+                      <th className="border border-gray-400 p-2 font-bold">PLC (in %)</th>
+                      <th className="border border-gray-400 p-2 font-bold">Total Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.clientName}</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.unitNumber}</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.area}</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.paymentPlan} Months</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.bsp}</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.plc || '0'}</td>
+                      <td className="border border-gray-400 p-2 font-bold">{totalCost.toFixed(2)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Payment Schedule Table */}
+              <h3 className="font-bold text-lg mb-2 text-gray-800">Payment Schedule</h3>
+              <div className="mb-6 overflow-hidden border border-gray-400">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-[#00b0f0] text-black">
+                      <th className="border border-gray-400 p-2 font-bold">SNO</th>
+                      <th className="border border-gray-400 p-2 font-bold">Date</th>
+                      <th className="border border-gray-400 p-2 font-bold">Particulars</th>
+                      <th className="border border-gray-400 p-2 font-bold">%</th>
+                      <th className="border border-gray-400 p-2 font-bold">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Booking (10%) */}
+                    <tr>
+                      <td className="border border-gray-400 p-2 font-bold">1</td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.bookingDate}</td>
+                      <td className="border border-gray-400 p-2 font-bold">On Booking</td>
+                      <td className="border border-gray-400 p-2">10%</td>
+                      <td className="border border-gray-400 p-2 font-bold">Rs. {initialPayment.toFixed(2)}</td>
+                    </tr>
+                    {/* Second Payment (20%) */}
+                    <tr>
+                      <td className="border border-gray-400 p-2 font-bold">2</td>
+                      <td className="border border-gray-400 p-2 font-bold">
+                        {(() => {
+                          if (!formData.bookingDate) return '-';
+                          const d = new Date(formData.bookingDate);
+                          d.setDate(d.getDate() + parseInt(formData.secondPaymentDays || '15'));
+                          return d.toISOString().split('T')[0];
+                        })()}
+                      </td>
+                      <td className="border border-gray-400 p-2 font-bold">{formData.secondPaymentDays} days</td>
+                      <td className="border border-gray-400 p-2">20%</td>
+                      <td className="border border-gray-400 p-2 font-bold">Rs. {(totalCost * 0.2).toFixed(2)}</td>
+                    </tr>
+                    {/* EMIs */}
+                    {(() => {
+                      const remainingCost = totalCost * 0.7;
+                      const months = parseInt(formData.paymentPlan || '12');
+                      const emiAmount = remainingCost / months;
+                      const emiPercent = 70 / months;
+                      
+                      return Array.from({ length: months }).map((_, i) => {
+                        let emiDate = '-';
+                        if (formData.bookingDate) {
+                          const d = new Date(formData.bookingDate);
+                          d.setMonth(d.getMonth() + i + 2); // Start EMIs roughly 2 months after booking
+                          emiDate = d.toISOString().split('T')[0];
+                        }
+                        
+                        return (
+                          <tr key={i}>
+                            <td className="border border-gray-400 p-2 font-bold">{i + 3}</td>
+                            <td className="border border-gray-400 p-2 font-bold">{emiDate}</td>
+                            <td className="border border-gray-400 p-2 font-bold">{i + 1} EMI</td>
+                            <td className="border border-gray-400 p-2">{emiPercent.toFixed(1)}%</td>
+                            <td className="border border-gray-400 p-2 font-bold">Rs. {emiAmount.toFixed(2)}</td>
+                          </tr>
+                        );
+                      });
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Terms Box */}
+              <div className="bg-[#f0f8ff] p-4 rounded-lg mb-8 text-gray-800 italic border-l-4 border-[#00b0f0]">
+                <p className="mb-2">
+                  Please transfer the initial amount of 10% (Rs. {initialPayment.toFixed(2)}) by {formData.bookingDate || '[Date]'} to confirm allotment under {formData.projectName}, and the second instalment of 20% (Rs. {(totalCost * 0.2).toFixed(2)}) by {
+                    (() => {
+                      if (!formData.bookingDate) return '[Date]';
+                      const d = new Date(formData.bookingDate);
+                      d.setDate(d.getDate() + parseInt(formData.secondPaymentDays || '15'));
+                      return d.toISOString().split('T')[0];
+                    })()
+                  }.
+                </p>
+                <p className="mb-2">The remaining 70% will be paid as per the selected payment plan and is scheduled to complete accordingly.</p>
+                <p className="mb-2">Note: Allotment under {formData.projectName} will only be confirmed upon receipt of the initial 10% (Rs. {initialPayment.toFixed(2)}) by {formData.bookingDate || '[Date]'}.</p>
+                <p>In the event you fail to make the payments as per the payment plan chosen by you, the allotment of these plots will be automatically cancelled.</p>
+              </div>
+
+              {/* Footer details */}
+              <div className="flex justify-between items-end pb-8">
+                <div>
+                  <p className="font-bold mb-2">Payment can be transferred online using the following details:</p>
+                  <p><span className="font-bold">Account Name:</span> Svi Infra Solutions Pvt. Ltd</p>
+                  <p><span className="font-bold">Account Number:</span> 0894102000013837</p>
+                  <p><span className="font-bold">Bank:</span> IDBI BANK</p>
+                  <p><span className="font-bold">IFSC CODE:</span> IBKL0000894</p>
+                  <p className="mt-4">
+                    Your account manager is <span className="font-bold">{formData.advisorName}</span> and will be reachable on <span className="font-bold">{formData.advisorNumber}</span> for any queries.
+                  </p>
+                </div>
+                <div className="text-right flex flex-col items-end">
+                  <p className="mb-2">With Best Regards</p>
+                  <p className="mb-16">For SVI Infra Solutions Pvt. Ltd</p>
+                  <div className="w-48 text-center border-t border-black pt-2">
+                    <p>Director</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </PreviewContainer>
 
