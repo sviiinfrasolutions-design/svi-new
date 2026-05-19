@@ -174,16 +174,11 @@ export default function Home() {
           className="bg-brand-navy absolute inset-0 z-0"
           style={{ y: backgroundY, scale: heroScale }}
         >
-          <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/90 via-black/75 to-black/85" />
-          <div
-            className="pointer-events-none absolute top-0 left-0 z-20 h-full w-full opacity-20"
-            style={GRADIENT_STYLE}
-          />
           {HERO_IMAGES.map((img, idx) => (
             <div
               key={idx}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                idx === currentHeroIndex ? 'z-10 opacity-100' : 'z-0 opacity-0'
+                idx === currentHeroIndex ? 'z-0 opacity-100' : '-z-10 opacity-0'
               }`}
             >
               <Image
@@ -196,6 +191,11 @@ export default function Home() {
               />
             </div>
           ))}
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/80 via-black/50 to-black/80" />
+          <div
+            className="pointer-events-none absolute top-0 left-0 z-20 h-full w-full opacity-20"
+            style={GRADIENT_STYLE}
+          />
         </motion.div>
 
         <motion.button
