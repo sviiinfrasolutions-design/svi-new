@@ -55,11 +55,12 @@ const StatItem = memo(function StatItem({ end, label, suffix = '', duration = 20
   }, [end, duration]);
 
   return (
-    <div ref={nodeRef} className="text-center p-4 md:p-6">
-      <div className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-brand-gold mb-2">
-        {count}{suffix}
+    <div ref={nodeRef} className="p-4 text-center md:p-6">
+      <div className="text-brand-gold mb-2 font-serif text-3xl font-bold sm:text-4xl md:text-5xl">
+        {count}
+        {suffix}
       </div>
-      <div className="text-gray-300 font-medium tracking-wide uppercase text-xs sm:text-sm">
+      <div className="text-xs font-medium tracking-wide text-gray-300 uppercase sm:text-sm">
         {label}
       </div>
     </div>
@@ -69,7 +70,7 @@ const StatItem = memo(function StatItem({ end, label, suffix = '', duration = 20
 export default function StatsCounter() {
   return (
     <div className="container mx-auto px-4 py-12 md:py-16">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 divide-x divide-white/10">
+      <div className="grid grid-cols-2 gap-4 divide-x divide-white/10 md:grid-cols-4 md:gap-8">
         <StatItem end={5000} suffix="+" label="Properties Sold" />
         <StatItem end={5000} suffix="+" label="Happy Clients" />
         <StatItem end={15} suffix="+" label="Years Experience" />

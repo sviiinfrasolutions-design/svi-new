@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { ThemeProvider } from '@/src/components/ThemeProvider';
-import ErrorBoundary from '@/src/components/common/ErrorBoundary';
-import Header from '@/src/components/Header';
-import Footer from '@/src/components/Footer';
-import ScrollToTop from '@/src/components/common/ScrollToTop';
-import WhatsAppChat from '@/src/components/common/WhatsAppChat';
+import Analytics from '@/src/components/common/Analytics';
 import BackToTop from '@/src/components/common/BackToTop';
 import CookieConsent from '@/src/components/common/CookieConsent';
-import Analytics from '@/src/components/common/Analytics';
+import ErrorBoundary from '@/src/components/common/ErrorBoundary';
+import Footer from '@/src/components/Footer';
+import Header from '@/src/components/Header';
 import type { ReactNode } from 'react';
+import ScrollToTop from '@/src/components/common/ScrollToTop';
+import { ThemeProvider } from '@/src/components/ThemeProvider';
+import WhatsAppChat from '@/src/components/common/WhatsAppChat';
 
 export default function ClientProviders({ children }: { children: ReactNode }) {
   return (
@@ -17,9 +17,7 @@ export default function ClientProviders({ children }: { children: ReactNode }) {
       <ThemeProvider>
         <ScrollToTop />
         <Header />
-        <main className="flex-grow flex flex-col min-h-screen">
-          {children}
-        </main>
+        <main className="flex min-h-screen flex-grow flex-col">{children}</main>
         <Footer />
         <WhatsAppChat />
         <BackToTop />

@@ -12,7 +12,10 @@ export async function DELETE(
   }
 
   const token = authHeader.replace('Bearer ', '');
-  const { data: { user }, error: authErr } = await supabaseAdmin.auth.getUser(token);
+  const {
+    data: { user },
+    error: authErr,
+  } = await supabaseAdmin.auth.getUser(token);
   if (authErr || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -39,17 +42,17 @@ export async function DELETE(
 }
 
 // PATCH /api/admin/users/[id] — update profile fields
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const token = authHeader.replace('Bearer ', '');
-  const { data: { user }, error: authErr } = await supabaseAdmin.auth.getUser(token);
+  const {
+    data: { user },
+    error: authErr,
+  } = await supabaseAdmin.auth.getUser(token);
   if (authErr || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

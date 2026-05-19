@@ -1,7 +1,8 @@
 'use client';
 
+import { Clock, Download, FileText, Settings, UserPlus } from 'lucide-react';
+
 import { motion } from 'motion/react';
-import { FileText, UserPlus, Settings, Download, Clock } from 'lucide-react';
 
 interface Activity {
   id: string;
@@ -48,18 +49,18 @@ const getActivityColor = (type: Activity['type']) => {
 
 export default function ActivityTimeline({ activities }: ActivityTimelineProps) {
   return (
-    <div className="bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl rounded-2xl p-6 shadow-xl">
-      <div className="flex items-center justify-between mb-6">
+    <div className="rounded-2xl bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-[#0e0e14]/65">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recent Activity</h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Latest actions</p>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Latest actions</p>
         </div>
       </div>
 
-      <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+      <div className="max-h-[400px] space-y-4 overflow-y-auto pr-2">
         {activities.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
-            <Clock className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <div className="py-8 text-center text-gray-400">
+            <Clock className="mx-auto mb-3 h-12 w-12 opacity-30" />
             <p className="text-sm">No recent activity</p>
           </div>
         ) : (
@@ -73,28 +74,30 @@ export default function ActivityTimeline({ activities }: ActivityTimelineProps) 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05, duration: 0.4 }}
-                className="relative flex gap-4 pb-4 border-l-2 border-gray-200 dark:border-gray-700 ml-3 pl-6 last:border-0"
+                className="relative ml-3 flex gap-4 border-l-2 border-gray-200 pb-4 pl-6 last:border-0 dark:border-gray-700"
               >
                 {/* Timeline dot */}
-                <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 ${colorClass}`} />
+                <div
+                  className={`absolute top-0 -left-[9px] h-4 w-4 rounded-full border-2 ${colorClass}`}
+                />
 
                 {/* Content */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
                         {activity.title}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                      <p className="mt-0.5 line-clamp-2 text-xs text-gray-500 dark:text-gray-400">
                         {activity.description}
                       </p>
                       {activity.user && (
-                        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
+                        <p className="mt-1 text-[10px] text-gray-400 dark:text-gray-500">
                           by {activity.user}
                         </p>
                       )}
                     </div>
-                    <span className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
+                    <span className="text-[10px] whitespace-nowrap text-gray-400 dark:text-gray-500">
                       {activity.timestamp}
                     </span>
                   </div>

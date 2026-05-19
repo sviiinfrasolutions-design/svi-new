@@ -1,0 +1,28 @@
+{
+  "IgnoreDefaults": true,
+  "SpacesAfterTabs": false,
+  "Verbose": false,
+  "Debug": false,
+  "Disable": {
+    "EndOfLine": false,
+    "Indentation": false,
+    "InsertFinalNewline": false,
+    "TrimTrailingWhitespace": false,
+    "MaxLineLength": false,
+    "IndentSize": false
+  },
+  "AllowedContentTypes": [],
+  "PassedFiles": [],
+  "Exclude": [
+    "\\.git/",
+    "node_modules/",
+    "\\.next/",
+    "out/",
+    "dist/",
+    "build/",
+    "coverage/",
+    "\\.husky/",
+    "supabase/\\.temp/",
+    "\\.(png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$"
+  ]
+}

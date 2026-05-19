@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import path from 'path';
 import { fileURLToPath } from 'url';
+import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,21 +18,23 @@ async function createAdmin() {
   const password = 'AdminPass123!';
 
   console.log(`\nRegistering user ${email} via official Supabase Auth API...`);
-  
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
         full_name: 'System Admin',
-      }
-    }
+      },
+    },
   });
 
   if (error) {
     console.error('\n❌ Failed to register user:', error.message);
     if (error.message.includes('already registered') || error.message.includes('Database error')) {
-      console.log('\n💡 Tip: Please run the clean-up SQL query in your Supabase SQL Editor first, to remove the corrupted manually-inserted rows.');
+      console.log(
+        '\n💡 Tip: Please run the clean-up SQL query in your Supabase SQL Editor first, to remove the corrupted manually-inserted rows.'
+      );
     }
     return;
   }

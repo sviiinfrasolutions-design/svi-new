@@ -34,11 +34,13 @@ A modern web application built with Next.js 16, React 19, TypeScript, and Tailwi
 ### Installation
 
 1. Clone the repository and navigate to the project directory:
+
    ```bash
    cd svi-new
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -55,6 +57,7 @@ A modern web application built with Next.js 16, React 19, TypeScript, and Tailwi
      - `NEXT_PUBLIC_ANALYTICS_ID`: Google Analytics tracking ID (optional)
 
 4. Run the development server:
+
    ```bash
    npm run dev
    ```

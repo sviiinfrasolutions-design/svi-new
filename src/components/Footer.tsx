@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import { useCallback, memo, useState, type FormEvent } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Facebook, Instagram, Mail, MapPin, Phone, Send, Twitter, Youtube } from 'lucide-react';
+import { type FormEvent, memo, useCallback, useState } from 'react';
+
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'motion/react';
-import { Facebook, Twitter, Youtube, Instagram, MapPin, Phone, Mail, Send } from 'lucide-react';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -11,25 +12,33 @@ const Footer = memo(function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleNewsletterSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (email && email.includes('@')) {
-      setSubscribed(true);
-      setEmail('');
-      setTimeout(() => setSubscribed(false), 3000);
-    }
-  }, [email]);
+  const handleNewsletterSubmit = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (email && email.includes('@')) {
+        setSubscribed(true);
+        setEmail('');
+        setTimeout(() => setSubscribed(false), 3000);
+      }
+    },
+    [email]
+  );
 
   return (
-    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 pt-16 pb-8">
+    <footer className="border-t border-gray-200 bg-white pt-16 pb-8 dark:border-gray-800 dark:bg-gray-900">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="mb-12 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Link href="/" className="inline-block mb-6">
-              <img src="/logo.png" alt="SVI Infra Solutions Pvt. Ltd." className="h-10 w-auto dark:brightness-0 dark:invert" />
+            <Link href="/" className="mb-6 inline-block">
+              <img
+                src="/logo.png"
+                alt="SVI Infra Solutions Pvt. Ltd."
+                className="h-10 w-auto dark:brightness-0 dark:invert"
+              />
             </Link>
-            <p className="text-gray-500 dark:text-gray-400 mb-6 leading-relaxed text-sm">
-              Where Dreams Take Address. Building trust and delivering excellence in real estate for over 15 years.
+            <p className="mb-6 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+              Where Dreams Take Address. Building trust and delivering excellence in real estate for
+              over 15 years.
             </p>
             <div className="flex gap-4">
               {[
@@ -44,7 +53,7 @@ const Footer = memo(function Footer() {
                   aria-label={`Follow us on ${label}`}
                   whileHover={{ scale: 1.2, borderColor: '#c9a84c', color: '#c9a84c' }}
                   whileTap={{ scale: 0.9 }}
-                  className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-brand-navy dark:text-gray-200 transition-colors"
+                  className="text-brand-navy flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 transition-colors dark:border-gray-700 dark:text-gray-200"
                 >
                   {icon}
                 </motion.a>
@@ -53,80 +62,173 @@ const Footer = memo(function Footer() {
           </div>
 
           <div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">
+            <h4 className="mb-6 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-500">
               Quick Links
             </h4>
             <ul className="flex flex-col gap-4">
-              <li><Link href="/" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors">Home</Link></li>
-              <li><Link href="/about" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors">About Us</Link></li>
-              <li><Link href="/leadership" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors">Leadership</Link></li>
-              <li><Link href="/faq" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors">FAQ</Link></li>
-              <li><Link href="/projects/completed" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors">Completed Projects</Link></li>
-              <li><Link href="/registration" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors">Register</Link></li>
-              <li><Link href="/contact" className="text-xs font-bold uppercase tracking-widest text-brand-navy dark:text-gray-200 hover:text-brand-gold-text dark:hover:text-brand-gold transition-colors">Contact Us</Link></li>
+              <li>
+                <Link
+                  href="/"
+                  className="text-brand-navy hover:text-brand-gold-text dark:hover:text-brand-gold text-xs font-bold tracking-widest uppercase transition-colors dark:text-gray-200"
+                >
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  className="text-brand-navy hover:text-brand-gold-text dark:hover:text-brand-gold text-xs font-bold tracking-widest uppercase transition-colors dark:text-gray-200"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/leadership"
+                  className="text-brand-navy hover:text-brand-gold-text dark:hover:text-brand-gold text-xs font-bold tracking-widest uppercase transition-colors dark:text-gray-200"
+                >
+                  Leadership
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/faq"
+                  className="text-brand-navy hover:text-brand-gold-text dark:hover:text-brand-gold text-xs font-bold tracking-widest uppercase transition-colors dark:text-gray-200"
+                >
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/projects/completed"
+                  className="text-brand-navy hover:text-brand-gold-text dark:hover:text-brand-gold text-xs font-bold tracking-widest uppercase transition-colors dark:text-gray-200"
+                >
+                  Completed Projects
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/registration"
+                  className="text-brand-navy hover:text-brand-gold-text dark:hover:text-brand-gold text-xs font-bold tracking-widest uppercase transition-colors dark:text-gray-200"
+                >
+                  Register
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-brand-navy hover:text-brand-gold-text dark:hover:text-brand-gold text-xs font-bold tracking-widest uppercase transition-colors dark:text-gray-200"
+                >
+                  Contact Us
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">
+            <h4 className="mb-6 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-500">
               Services & Support
             </h4>
             <ul className="flex flex-col gap-4">
-              <li><Link href="/payment" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-brand-gold-text transition-colors">Pay Online</Link></li>
-              <li><Link href="/grievance" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-brand-gold-text transition-colors">Raise a Grievance</Link></li>
-              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Residential Properties</li>
-              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Commercial Properties</li>
-              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">Property Management</li>
+              <li>
+                <Link
+                  href="/payment"
+                  className="hover:text-brand-gold-text text-sm font-semibold text-gray-600 transition-colors dark:text-gray-400"
+                >
+                  Pay Online
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/grievance"
+                  className="hover:text-brand-gold-text text-sm font-semibold text-gray-600 transition-colors dark:text-gray-400"
+                >
+                  Raise a Grievance
+                </Link>
+              </li>
+              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                Residential Properties
+              </li>
+              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                Commercial Properties
+              </li>
+              <li className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                Property Management
+              </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-500 mb-6">
+            <h4 className="mb-6 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-500">
               Contact Info
             </h4>
             <ul className="flex flex-col gap-5">
               <li className="flex items-start gap-3">
-                <MapPin className="text-brand-gold shrink-0 mt-1" size={18} />
-                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">A-61 Sector 65, Noida,<br />Uttar Pradesh 201309</span>
+                <MapPin className="text-brand-gold mt-1 shrink-0" size={18} />
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  A-61 Sector 65, Noida,
+                  <br />
+                  Uttar Pradesh 201309
+                </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="text-brand-gold shrink-0" size={18} />
-                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">+91 73000 07643</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  +91 73000 07643
+                </span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="text-brand-gold shrink-0" size={18} />
-                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">info@sviinfrasolutions.com</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  info@sviinfrasolutions.com
+                </span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-b border-gray-200 dark:border-gray-800 py-8 mb-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mb-8 border-t border-b border-gray-200 py-8 dark:border-gray-800">
+          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div>
-              <h4 className="text-sm font-bold uppercase tracking-widest text-brand-navy dark:text-gray-100 mb-1">Stay Updated</h4>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Get the latest property updates and exclusive offers in your inbox.</p>
+              <h4 className="text-brand-navy mb-1 text-sm font-bold tracking-widest uppercase dark:text-gray-100">
+                Stay Updated
+              </h4>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Get the latest property updates and exclusive offers in your inbox.
+              </p>
             </div>
-            <form onSubmit={handleNewsletterSubmit} className="flex w-full md:w-auto relative">
+            <form onSubmit={handleNewsletterSubmit} className="relative flex w-full md:w-auto">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="flex-1 md:w-64 px-4 py-3 border border-r-0 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-brand-navy dark:text-gray-100 focus:outline-none focus:border-brand-gold transition-colors"
+                className="text-brand-navy focus:border-brand-gold flex-1 border border-r-0 border-gray-200 bg-gray-50 px-4 py-3 text-sm transition-colors focus:outline-none md:w-64 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                 required
               />
               <motion.button
                 type="submit"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="bg-brand-gold text-brand-navy px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-brand-navy hover:text-brand-gold border border-brand-gold transition-colors flex items-center gap-2 relative overflow-hidden"
+                className="bg-brand-gold text-brand-navy hover:bg-brand-navy hover:text-brand-gold border-brand-gold relative flex items-center gap-2 overflow-hidden border px-6 py-3 text-xs font-bold tracking-widest uppercase transition-colors"
               >
                 <AnimatePresence mode="wait">
                   {subscribed ? (
-                    <motion.span key="ok" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>✓ Done!</motion.span>
+                    <motion.span
+                      key="ok"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      ✓ Done!
+                    </motion.span>
                   ) : (
-                    <motion.span key="sub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+                    <motion.span
+                      key="sub"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center gap-2"
+                    >
                       <Send size={14} /> Subscribe
                     </motion.span>
                   )}
@@ -136,13 +238,17 @@ const Footer = memo(function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest text-center md:text-left">
+        <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+          <p className="text-center text-xs font-bold tracking-widest text-gray-400 uppercase md:text-left dark:text-gray-500">
             &copy; {CURRENT_YEAR} SVI Infra Solutions.
           </p>
-          <div className="flex gap-6 text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
-            <Link href="/privacy-policy" className="hover:text-brand-gold transition-colors">Privacy</Link>
-            <Link href="/terms-conditions" className="hover:text-brand-gold transition-colors">Terms</Link>
+          <div className="flex gap-6 text-xs font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
+            <Link href="/privacy-policy" className="hover:text-brand-gold transition-colors">
+              Privacy
+            </Link>
+            <Link href="/terms-conditions" className="hover:text-brand-gold transition-colors">
+              Terms
+            </Link>
           </div>
         </div>
       </div>

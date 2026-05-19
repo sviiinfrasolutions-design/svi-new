@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
 import { ChevronRight, Home } from 'lucide-react';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface BreadcrumbItem {
   label: string;
@@ -35,12 +36,13 @@ export default function Breadcrumbs() {
   if (pathname === '/') return null;
 
   const paths = pathname.split('/').filter(Boolean);
-  
+
   const breadcrumbs: BreadcrumbItem[] = [
     { label: 'Home', href: '/' },
     ...paths.map((path, index) => {
       const href = `/${paths.slice(0, index + 1).join('/')}`;
-      const label = routeLabels[path] || path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
+      const label =
+        routeLabels[path] || path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
       return { label, href };
     }),
   ];
@@ -71,21 +73,21 @@ export default function Breadcrumbs() {
               {index === 0 ? (
                 <Link
                   href={item.href}
-                  className="flex items-center gap-1 hover:text-brand-gold transition-colors"
+                  className="hover:text-brand-gold flex items-center gap-1 transition-colors"
                   aria-label="Go to homepage"
                 >
                   <Home size={14} />
                   <span className="sr-only md:not-sr-only">{item.label}</span>
                 </Link>
               ) : index === breadcrumbs.length - 1 ? (
-                <span className="text-brand-navy dark:text-gray-200 font-medium" aria-current="page">
+                <span
+                  className="text-brand-navy font-medium dark:text-gray-200"
+                  aria-current="page"
+                >
                   {item.label}
                 </span>
               ) : (
-                <Link
-                  href={item.href}
-                  className="hover:text-brand-gold transition-colors"
-                >
+                <Link href={item.href} className="hover:text-brand-gold transition-colors">
                   {item.label}
                 </Link>
               )}

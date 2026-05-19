@@ -1,7 +1,8 @@
 'use client';
 
-import { ReactNode } from 'react';
 import { Download, Image as ImageIcon } from 'lucide-react';
+
+import { ReactNode } from 'react';
 
 interface DownloadOptionsProps {
   onDownloadPDF: () => void;
@@ -9,24 +10,28 @@ interface DownloadOptionsProps {
   disabled?: boolean;
 }
 
-export function DownloadOptions({ onDownloadPDF, onDownloadImage, disabled = false }: DownloadOptionsProps) {
+export function DownloadOptions({
+  onDownloadPDF,
+  onDownloadImage,
+  disabled = false,
+}: DownloadOptionsProps) {
   return (
     <div className="mt-6">
-      <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">Download Options</h3>
+      <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">Download Options</h3>
       <div className="grid grid-cols-2 gap-4">
         <button
           onClick={onDownloadPDF}
           disabled={disabled}
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <Download className="w-5 h-5" /> Download as PDF
+          <Download className="h-5 w-5" /> Download as PDF
         </button>
         <button
           onClick={onDownloadImage}
           disabled={disabled}
-          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 rounded-lg bg-green-600 py-3 font-medium text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <ImageIcon className="w-5 h-5" /> Save as Image
+          <ImageIcon className="h-5 w-5" /> Save as Image
         </button>
       </div>
     </div>
@@ -38,16 +43,27 @@ interface FormFieldProps {
   name: string;
   type?: 'text' | 'number' | 'date' | 'email' | 'tel';
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => void;
   required?: boolean;
   placeholder?: string;
   className?: string;
 }
 
-export function FormField({ label, name, type = 'text', value, onChange, required = false, placeholder, className = '' }: FormFieldProps) {
+export function FormField({
+  label,
+  name,
+  type = 'text',
+  value,
+  onChange,
+  required = false,
+  placeholder,
+  className = '',
+}: FormFieldProps) {
   return (
     <div className={className}>
-      <label className="text-[10px] uppercase tracking-widest font-bold text-gray-500 dark:text-gray-400 mb-1.5 block transition-colors duration-300">
+      <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400">
         {label} {required && '*'}
       </label>
       <input
@@ -57,7 +73,7 @@ export function FormField({ label, name, type = 'text', value, onChange, require
         onChange={onChange}
         required={required}
         placeholder={placeholder}
-        className="w-full bg-white dark:bg-[#111118] border border-gray-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/50 transition-all font-sans"
+        className="focus:border-brand-gold focus:ring-brand-gold/50 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 font-sans text-sm text-gray-900 placeholder-gray-400 transition-all focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white dark:placeholder-gray-600"
       />
     </div>
   );
@@ -72,17 +88,24 @@ interface FormSelectProps {
   className?: string;
 }
 
-export function FormSelect({ label, name, value, onChange, options, className = '' }: FormSelectProps) {
+export function FormSelect({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+  className = '',
+}: FormSelectProps) {
   return (
     <div className={className}>
-      <label className="text-[10px] uppercase tracking-widest font-bold text-gray-500 dark:text-gray-400 mb-1.5 block transition-colors duration-300">
+      <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400">
         {label}
       </label>
       <select
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full bg-white dark:bg-[#111118] border border-gray-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/50 transition-all font-sans appearance-none"
+        className="focus:border-brand-gold focus:ring-brand-gold/50 w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2.5 font-sans text-sm text-gray-900 transition-all focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white"
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -94,15 +117,26 @@ export function FormSelect({ label, name, value, onChange, options, className = 
   );
 }
 
-export function PreviewContainer({ children, previewId, hasPreview }: { children: ReactNode, previewId: string, hasPreview: boolean }) {
+export function PreviewContainer({
+  children,
+  previewId,
+  hasPreview,
+}: {
+  children: ReactNode;
+  previewId: string;
+  hasPreview: boolean;
+}) {
   return (
-    <div className="flex-1 bg-gray-50 dark:bg-[#0e0e14] p-4 sm:p-6 rounded-xl border border-gray-200 dark:border-white/10 overflow-y-auto max-h-[800px] shadow-inner custom-scrollbar relative">
+    <div className="custom-scrollbar relative max-h-[800px] flex-1 overflow-y-auto rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-inner sm:p-6 dark:border-white/10 dark:bg-[#0e0e14]">
       {!hasPreview ? (
-        <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-600 text-sm font-medium">
+        <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-gray-400 dark:text-gray-600">
           Fill the form to generate a preview.
         </div>
       ) : (
-        <div id={previewId} className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 text-gray-800 mx-auto max-w-3xl transform origin-top w-full">
+        <div
+          id={previewId}
+          className="mx-auto w-full max-w-3xl origin-top transform rounded-lg border border-gray-200 bg-white p-8 text-gray-800 shadow-sm"
+        >
           {children}
         </div>
       )}

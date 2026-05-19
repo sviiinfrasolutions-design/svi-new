@@ -1,14 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Inter, Playfair_Display } from 'next/font/google';
-import { Sun, Moon } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { Moon, Sun } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
 import AdminHeader from '@/src/components/admin/AdminHeader';
 import AdminSidebar from '@/src/components/admin/AdminSidebar';
+import type { ReactNode } from 'react';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
-const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
+});
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -34,16 +39,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className={`${inter.variable} ${playfair.variable} font-sans bg-gray-50 dark:bg-[#0a0a0f] text-gray-900 dark:text-white min-h-screen w-full flex`}
+      className={`${inter.variable} ${playfair.variable} flex min-h-screen w-full bg-gray-50 font-sans text-gray-900 dark:bg-[#0a0a0f] dark:text-white`}
       style={{ visibility: mounted ? 'visible' : 'hidden' }}
     >
       <AdminSidebar />
-      <div className="flex-1 flex flex-col relative w-full overflow-x-hidden h-screen">
+      <div className="relative flex h-screen w-full flex-1 flex-col overflow-x-hidden">
         <AdminHeader isDark={isDark} toggleTheme={toggleTheme} />
 
-        <main className="flex-1 p-6 sm:p-8 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-6 sm:p-8">{children}</main>
       </div>
     </div>
   );

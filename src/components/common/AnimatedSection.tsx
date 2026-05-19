@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { motion, Variants } from 'motion/react';
 import { ReactNode, useEffect, useState } from 'react';
+import { Variants, motion } from 'motion/react';
 
 type AnimationType = 'fadeUp' | 'fadeIn' | 'fadeLeft' | 'fadeRight' | 'scale' | 'stagger';
 
@@ -67,7 +67,11 @@ export default function AnimatedSection({
       whileInView="visible"
       viewport={{ once, margin: isMobile ? '0px' : '-60px', amount: 0.05 }}
       variants={VARIANTS[type]}
-      transition={{ duration, delay: isMobile ? Math.min(delay, 0.1) : delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        duration,
+        delay: isMobile ? Math.min(delay, 0.1) : delay,
+        ease: [0.22, 1, 0.36, 1],
+      }}
       className={className}
     >
       {children}

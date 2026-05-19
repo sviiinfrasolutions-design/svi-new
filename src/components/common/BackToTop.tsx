@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { ArrowUp } from 'lucide-react';
 
 export default function BackToTop() {
@@ -16,10 +17,10 @@ export default function BackToTop() {
     sentinel.style.height = '1px';
     document.body.appendChild(sentinel);
 
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(!entry.isIntersecting),
-      { threshold: [0], rootMargin: '0px 0px 0px 0px' }
-    );
+    const observer = new IntersectionObserver(([entry]) => setIsVisible(!entry.isIntersecting), {
+      threshold: [0],
+      rootMargin: '0px 0px 0px 0px',
+    });
     observer.observe(sentinel);
 
     return () => {
@@ -35,8 +36,13 @@ export default function BackToTop() {
   return (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-brand-navy dark:bg-brand-gold text-brand-gold dark:text-brand-navy rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center hover:scale-110"
-      style={{ opacity: isVisible ? 1 : 0, pointerEvents: isVisible ? 'auto' : 'none', transform: isVisible ? 'none' : 'translateY(10px)', transition: 'opacity 0.3s ease, transform 0.3s ease' }}
+      className="bg-brand-navy dark:bg-brand-gold text-brand-gold dark:text-brand-navy fixed right-6 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-xl"
+      style={{
+        opacity: isVisible ? 1 : 0,
+        pointerEvents: isVisible ? 'auto' : 'none',
+        transform: isVisible ? 'none' : 'translateY(10px)',
+        transition: 'opacity 0.3s ease, transform 0.3s ease',
+      }}
       aria-label="Back to top"
     >
       <ArrowUp size={20} />

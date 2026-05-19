@@ -165,4 +165,3 @@ export const BLOG_POSTS: BlogPost[] = [
 ];
 
 export const BLOG_POST_MAP = Object.fromEntries(BLOG_POSTS.map((post) => [post.slug, post]));
-

@@ -1,7 +1,14 @@
-"use client";
+'use client';
 
+import {
+  APIProvider,
+  AdvancedMarker,
+  InfoWindow,
+  Map,
+  Pin,
+  useAdvancedMarkerRef,
+} from '@vis.gl/react-google-maps';
 import { memo, useState } from 'react';
-import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow, useAdvancedMarkerRef } from '@vis.gl/react-google-maps';
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_PLATFORM_KEY || '';
 const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
@@ -33,7 +40,13 @@ interface Props {
   onProjectClick: (project: Project) => void;
 }
 
-const MarkerWithInfoWindow = memo(function MarkerWithInfoWindow({ project, onProjectClick }: { project: Project, onProjectClick: (project: Project) => void }) {
+const MarkerWithInfoWindow = memo(function MarkerWithInfoWindow({
+  project,
+  onProjectClick,
+}: {
+  project: Project;
+  onProjectClick: (project: Project) => void;
+}) {
   const [markerRef, marker] = useAdvancedMarkerRef();
   const [open, setOpen] = useState(false);
 
@@ -48,19 +61,25 @@ const MarkerWithInfoWindow = memo(function MarkerWithInfoWindow({ project, onPro
       </AdvancedMarker>
       {open && (
         <InfoWindow anchor={marker} onCloseClick={() => setOpen(false)}>
-          <div className="p-2 max-w-xs font-sans">
-             <div className="font-bold text-gray-900 mb-1">{project.title}</div>
-             <div className="text-xs text-gray-500 mb-2">{project.location}</div>
-             <img src={project.img + '&fm=webp'} alt={project.title} loading="lazy" decoding="async" className="w-full h-24 object-cover rounded-sm mb-2" />
-             <div className="flex justify-between items-center mt-2">
-                <span className="text-[10px] uppercase font-bold text-gray-400">{project.type}</span>
-                <button
-                  onClick={() => onProjectClick(project)}
-                  className="text-xs bg-[#1a2744] hover:bg-[#c9a84c] text-[#c9a84c] hover:text-[#1a2744] px-3 py-1 transition-colors uppercase tracking-wider font-bold rounded-sm border border-[#1a2744]"
-                >
-                  Details
-                </button>
-             </div>
+          <div className="max-w-xs p-2 font-sans">
+            <div className="mb-1 font-bold text-gray-900">{project.title}</div>
+            <div className="mb-2 text-xs text-gray-500">{project.location}</div>
+            <img
+              src={project.img + '&fm=webp'}
+              alt={project.title}
+              loading="lazy"
+              decoding="async"
+              className="mb-2 h-24 w-full rounded-sm object-cover"
+            />
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-[10px] font-bold text-gray-400 uppercase">{project.type}</span>
+              <button
+                onClick={() => onProjectClick(project)}
+                className="rounded-sm border border-[#1a2744] bg-[#1a2744] px-3 py-1 text-xs font-bold tracking-wider text-[#c9a84c] uppercase transition-colors hover:bg-[#c9a84c] hover:text-[#1a2744]"
+              >
+                Details
+              </button>
+            </div>
           </div>
         </InfoWindow>
       )}
@@ -71,25 +90,32 @@ const MarkerWithInfoWindow = memo(function MarkerWithInfoWindow({ project, onPro
 export default function CompletedProjectsMap({ projects, onProjectClick }: Props) {
   if (!hasValidKey) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-center p-8">
-        <h3 className="text-xl font-serif text-brand-navy dark:text-gray-100 mb-4">Interactive Map Unavailable</h3>
-        <p className="text-gray-600 dark:text-gray-400 text-sm max-w-md mx-auto mb-4">
+      <div className="flex h-96 flex-col items-center justify-center border border-gray-200 bg-gray-100 p-8 text-center dark:border-gray-700 dark:bg-gray-800">
+        <h3 className="text-brand-navy mb-4 font-serif text-xl dark:text-gray-100">
+          Interactive Map Unavailable
+        </h3>
+        <p className="mx-auto mb-4 max-w-md text-sm text-gray-600 dark:text-gray-400">
           Google Maps API Key is required to view project locations on the map.
         </p>
-        <div className="bg-white dark:bg-gray-900 p-4 rounded text-left text-xs text-gray-600 dark:text-gray-400 max-w-md w-full border border-gray-200 dark:border-gray-700">
-           <p className="mb-2"><strong>To setup mapping:</strong></p>
-           <ol className="list-decimal list-inside space-y-1">
-             <li>Open Settings (⚙️ top-right)</li>
-             <li>Go to Secrets</li>
-             <li>Add <code className="bg-gray-100 dark:bg-gray-800 px-1">GOOGLE_MAPS_PLATFORM_KEY</code></li>
-           </ol>
+        <div className="w-full max-w-md rounded border border-gray-200 bg-white p-4 text-left text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400">
+          <p className="mb-2">
+            <strong>To setup mapping:</strong>
+          </p>
+          <ol className="list-inside list-decimal space-y-1">
+            <li>Open Settings (⚙️ top-right)</li>
+            <li>Go to Secrets</li>
+            <li>
+              Add{' '}
+              <code className="bg-gray-100 px-1 dark:bg-gray-800">GOOGLE_MAPS_PLATFORM_KEY</code>
+            </li>
+          </ol>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-[500px] w-full border border-gray-200 dark:border-gray-700 shadow-md">
+    <div className="h-[500px] w-full border border-gray-200 shadow-md dark:border-gray-700">
       <APIProvider apiKey={API_KEY} version="weekly">
         <Map
           defaultCenter={{ lat: 26.9124, lng: 75.7873 }}

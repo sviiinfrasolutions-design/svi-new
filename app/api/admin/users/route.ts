@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/src/lib/supabase/admin';
+
 import type { CreateUserPayload } from '@/src/lib/supabase/types';
+import { supabaseAdmin } from '@/src/lib/supabase/admin';
 
 // Helper: verify the caller is an authenticated admin
 async function verifyAdmin(request: NextRequest) {
@@ -8,7 +9,10 @@ async function verifyAdmin(request: NextRequest) {
   if (!authHeader?.startsWith('Bearer ')) return null;
 
   const token = authHeader.replace('Bearer ', '');
-  const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+  const {
+    data: { user },
+    error,
+  } = await supabaseAdmin.auth.getUser(token);
   if (error || !user) return null;
 
   // Look up user profile to confirm role = admin

@@ -1,11 +1,15 @@
-"use client";
+'use client';
 
 import { useCallback, useState, type ChangeEvent, type FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { Building2, User, Phone, Mail, MessageSquare, AlertCircle } from 'lucide-react';
 
-const GRADIENT_STYLE = { backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)', backgroundSize: '40px 40px' };
+const GRADIENT_STYLE = {
+  backgroundImage:
+    'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)',
+  backgroundSize: '40px 40px',
+};
 const DIGIT_REGEX = /\d/g;
 
 export default function Registration() {
@@ -16,7 +20,7 @@ export default function Registration() {
     email: '',
     phone: '',
     propertyInterest: '',
-    message: ''
+    message: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -25,11 +29,13 @@ export default function Registration() {
 
     if (!formData.name.trim()) newErrors.name = 'Name is required';
     else if (formData.name.length < 2) newErrors.name = 'Name must be at least 2 characters';
-    else if (!/^[a-zA-Z\s]+$/.test(formData.name)) newErrors.name = 'Name can only contain letters and spaces';
+    else if (!/^[a-zA-Z\s]+$/.test(formData.name))
+      newErrors.name = 'Name can only contain letters and spaces';
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email) newErrors.email = 'Email is required';
-    else if (!emailRegex.test(formData.email)) newErrors.email = 'Please enter a valid email address';
+    else if (!emailRegex.test(formData.email))
+      newErrors.email = 'Please enter a valid email address';
 
     const phoneRegex = /^\+?[\d\s-]{10,15}$/;
     const digitCount = (formData.phone.match(DIGIT_REGEX) || []).length;
@@ -38,83 +44,110 @@ export default function Registration() {
       newErrors.phone = 'Please enter a valid phone number (10-15 digits)';
     }
 
-    if (!formData.propertyInterest) newErrors.propertyInterest = 'Please select a property interest';
+    if (!formData.propertyInterest)
+      newErrors.propertyInterest = 'Please select a property interest';
 
     if (formData.message && formData.message.length > 500) {
-       newErrors.message = 'Message cannot exceed 500 characters';
+      newErrors.message = 'Message cannot exceed 500 characters';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 
-  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-  }, [errors]);
+  const handleChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      if (errors[name]) {
+        setErrors((prev) => ({ ...prev, [name]: '' }));
+      }
+    },
+    [errors]
+  );
 
-  const handleSubmit = useCallback((e: FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      if (!validateForm()) return;
 
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      router.push('/thank-you');
-    }, 1500);
-  }, [validateForm, router]);
+      setIsSubmitting(true);
+      setTimeout(() => {
+        setIsSubmitting(false);
+        router.push('/thank-you');
+      }, 1500);
+    },
+    [validateForm, router]
+  );
 
   return (
-    <div className="pt-32 pb-24 bg-brand-bg dark:bg-gray-900 min-h-screen">
+    <div className="bg-brand-bg min-h-screen pt-32 pb-24 dark:bg-gray-900">
       <div className="container mx-auto px-4">
+        <div className="mx-auto flex max-w-5xl flex-col border border-gray-200 bg-white shadow-2xl md:flex-row dark:border-gray-700 dark:bg-gray-800">
+          <div className="bg-brand-navy relative flex flex-col justify-between overflow-hidden p-12 text-white md:w-5/12 lg:p-16">
+            <div
+              className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-10"
+              style={GRADIENT_STYLE}
+            ></div>
 
-        <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-2xl flex flex-col md:flex-row border border-gray-200 dark:border-gray-700">
+            <div className="relative z-10 block">
+              <h4 className="text-brand-gold mb-4 text-[10px] font-bold tracking-[0.3em] uppercase">
+                Invest With Us
+              </h4>
+              <h2 className="mb-6 font-serif text-4xl leading-tight">
+                Register
+                <br />
+                Interest
+              </h2>
+              <p className="mb-10 text-sm leading-relaxed text-gray-300">
+                Take the first step towards your dream property. Fill out the form and our property
+                agents will get back to you with exclusive options.
+              </p>
 
-          <div className="md:w-5/12 bg-brand-navy p-12 lg:p-16 text-white flex flex-col justify-between relative overflow-hidden">
-             <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={GRADIENT_STYLE}></div>
+              <ul className="space-y-6">
+                <li className="flex items-center gap-4 text-sm font-medium tracking-wide">
+                  <div className="border-brand-gold text-brand-gold flex h-6 w-6 items-center justify-center border text-xs">
+                    ✓
+                  </div>
+                  Early bird pricing
+                </li>
+                <li className="flex items-center gap-4 text-sm font-medium tracking-wide">
+                  <div className="border-brand-gold text-brand-gold flex h-6 w-6 items-center justify-center border text-xs">
+                    ✓
+                  </div>
+                  Priority site visits
+                </li>
+                <li className="flex items-center gap-4 text-sm font-medium tracking-wide">
+                  <div className="border-brand-gold text-brand-gold flex h-6 w-6 items-center justify-center border text-xs">
+                    ✓
+                  </div>
+                  Exclusive project updates
+                </li>
+              </ul>
+            </div>
 
-             <div className="relative z-10 block">
-               <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-gold mb-4">Invest With Us</h4>
-               <h2 className="text-4xl font-serif mb-6 leading-tight">Register<br/>Interest</h2>
-               <p className="text-gray-300 mb-10 leading-relaxed text-sm">
-                 Take the first step towards your dream property. Fill out the form and our property agents will get back to you with exclusive options.
-               </p>
-
-               <ul className="space-y-6">
-                 <li className="flex items-center gap-4 text-sm font-medium tracking-wide">
-                   <div className="w-6 h-6 border border-brand-gold flex items-center justify-center text-brand-gold text-xs">✓</div>
-                   Early bird pricing
-                 </li>
-                 <li className="flex items-center gap-4 text-sm font-medium tracking-wide">
-                   <div className="w-6 h-6 border border-brand-gold flex items-center justify-center text-brand-gold text-xs">✓</div>
-                   Priority site visits
-                 </li>
-                 <li className="flex items-center gap-4 text-sm font-medium tracking-wide">
-                   <div className="w-6 h-6 border border-brand-gold flex items-center justify-center text-brand-gold text-xs">✓</div>
-                   Exclusive project updates
-                 </li>
-               </ul>
-             </div>
-
-             <div className="relative z-10 mt-16 pt-8 border-t border-white/10">
-               <p className="text-sm text-gray-300 italic font-serif">
-                 "Investing with SVI Infra was the best decision for my family's future."
-               </p>
-               <p className="text-[10px] uppercase tracking-widest font-bold mt-4 text-brand-gold">- Recent Buyer</p>
-             </div>
+            <div className="relative z-10 mt-16 border-t border-white/10 pt-8">
+              <p className="font-serif text-sm text-gray-300 italic">
+                "Investing with SVI Infra was the best decision for my family's future."
+              </p>
+              <p className="text-brand-gold mt-4 text-[10px] font-bold tracking-widest uppercase">
+                - Recent Buyer
+              </p>
+            </div>
           </div>
 
-          <div className="md:w-7/12 p-12 lg:p-16">
-            <h3 className="text-2xl font-serif text-brand-navy dark:text-gray-100 mb-8">Your Details</h3>
+          <div className="p-12 md:w-7/12 lg:p-16">
+            <h3 className="text-brand-navy mb-8 font-serif text-2xl dark:text-gray-100">
+              Your Details
+            </h3>
 
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500">Full Name</label>
+                <label className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">
+                  Full Name
+                </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-gold">
+                  <div className="text-brand-gold pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                     <User size={16} />
                   </div>
                   <input
@@ -122,20 +155,24 @@ export default function Registration() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
+                    className={`w-full border bg-gray-50/50 py-3 pr-4 pl-12 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${errors.name ? 'border-red-500 focus:border-red-500' : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'}`}
                     placeholder="John Doe"
                   />
                 </div>
                 {errors.name && (
-                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12} /> {errors.name}</p>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
+                    <AlertCircle size={12} /> {errors.name}
+                  </p>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500">Email Address</label>
+                  <label className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">
+                    Email Address
+                  </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-gold">
+                    <div className="text-brand-gold pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                       <Mail size={16} />
                     </div>
                     <input
@@ -143,18 +180,22 @@ export default function Registration() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
+                      className={`w-full border bg-gray-50/50 py-3 pr-4 pl-12 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${errors.email ? 'border-red-500 focus:border-red-500' : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'}`}
                       placeholder="john@example.com"
                     />
                   </div>
                   {errors.email && (
-                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12} /> {errors.email}</p>
+                    <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
+                      <AlertCircle size={12} /> {errors.email}
+                    </p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500">Phone Number</label>
+                  <label className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">
+                    Phone Number
+                  </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-gold">
+                    <div className="text-brand-gold pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                       <Phone size={16} />
                     </div>
                     <input
@@ -162,29 +203,35 @@ export default function Registration() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white ${errors.phone ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
+                      className={`w-full border bg-gray-50/50 py-3 pr-4 pl-12 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${errors.phone ? 'border-red-500 focus:border-red-500' : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'}`}
                       placeholder="+91"
                     />
                   </div>
                   {errors.phone && (
-                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12} /> {errors.phone}</p>
+                    <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
+                      <AlertCircle size={12} /> {errors.phone}
+                    </p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500">Property Interest</label>
+                <label className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">
+                  Property Interest
+                </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-gold">
+                  <div className="text-brand-gold pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                     <Building2 size={16} />
                   </div>
                   <select
                     name="propertyInterest"
                     value={formData.propertyInterest}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white appearance-none rounded-none ${errors.propertyInterest ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
+                    className={`w-full appearance-none rounded-none border bg-gray-50/50 py-3 pr-4 pl-12 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${errors.propertyInterest ? 'border-red-500 focus:border-red-500' : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'}`}
                   >
-                    <option value="" disabled>Select an option</option>
+                    <option value="" disabled>
+                      Select an option
+                    </option>
                     <option value="residential_3bhk">Residential 3BHK</option>
                     <option value="residential_4bhk">Residential 4BHK</option>
                     <option value="residential_plot">Residential Plot</option>
@@ -193,14 +240,18 @@ export default function Registration() {
                   </select>
                 </div>
                 {errors.propertyInterest && (
-                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12} /> {errors.propertyInterest}</p>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
+                    <AlertCircle size={12} /> {errors.propertyInterest}
+                  </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-500">Additional Message</label>
+                <label className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">
+                  Additional Message
+                </label>
                 <div className="relative">
-                  <div className="absolute top-4 left-4 pointer-events-none text-brand-gold">
+                  <div className="text-brand-gold pointer-events-none absolute top-4 left-4">
                     <MessageSquare size={16} />
                   </div>
                   <textarea
@@ -209,15 +260,19 @@ export default function Registration() {
                     value={formData.message}
                     onChange={handleChange}
                     maxLength={500}
-                    className={`w-full pl-12 pr-4 py-3 border focus:ring-0 outline-none transition-colors text-sm bg-gray-50/50 dark:bg-gray-900 dark:text-white resize-none ${errors.message ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-brand-gold dark:focus:border-brand-gold'}`}
+                    className={`w-full resize-none border bg-gray-50/50 py-3 pr-4 pl-12 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${errors.message ? 'border-red-500 focus:border-red-500' : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'}`}
                     placeholder="Tell us about your requirements... (optional)"
                   ></textarea>
                 </div>
-                <div className="flex justify-between items-center mt-1">
+                <div className="mt-1 flex items-center justify-between">
                   {errors.message ? (
-                    <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle size={12} /> {errors.message}</p>
-                  ) : <span></span>}
-                  <span className="text-gray-400 text-[10px]">{formData.message.length}/500</span>
+                    <p className="flex items-center gap-1 text-xs text-red-500">
+                      <AlertCircle size={12} /> {errors.message}
+                    </p>
+                  ) : (
+                    <span></span>
+                  )}
+                  <span className="text-[10px] text-gray-400">{formData.message.length}/500</span>
                 </div>
               </div>
 
@@ -225,21 +280,20 @@ export default function Registration() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-brand-navy dark:bg-gray-700 hover:bg-brand-gold text-brand-gold hover:text-brand-navy font-bold uppercase text-xs tracking-widest py-4 transition-colors flex items-center justify-center gap-2 border border-brand-navy dark:border-gray-600 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="bg-brand-navy hover:bg-brand-gold text-brand-gold hover:text-brand-navy border-brand-navy flex w-full items-center justify-center gap-2 border py-4 text-xs font-bold tracking-widest uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-600 dark:bg-gray-700"
                 >
                   {isSubmitting ? (
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin"></div>
+                    <div className="h-4 w-4 animate-spin border-2 border-current border-t-transparent"></div>
                   ) : (
                     'Submit Registration'
                   )}
                 </button>
               </div>
-              <p className="text-[10px] uppercase tracking-widest font-bold text-center text-gray-400 mt-6">
+              <p className="mt-6 text-center text-[10px] font-bold tracking-widest text-gray-400 uppercase">
                 By submitting, you agree to our terms and privacy policy.
               </p>
             </form>
           </div>
-
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
 import { memo, useEffect } from 'react';
+
 import { usePathname } from 'next/navigation';
 
 const ScrollToTop = memo(function ScrollToTop() {

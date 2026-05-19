@@ -7,7 +7,12 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "echo 'Linting skipped - install eslint if needed'",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write . && import-sort --write 'src/**/*.{ts,tsx,js,jsx}'",
+    "format:check": "prettier --check . && import-sort --list-different 'src/**/*.{ts,tsx,js,jsx}'",
+    "editorconfig": "editorconfig-checker",
+    "prepare": "husky",
     "clean": "rm -rf .next"
   },
   "dependencies": {
@@ -28,18 +33,47 @@
     "recharts": "^3.8.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
+    "@next/eslint-plugin-next": "^16.2.6",
     "@tailwindcss/postcss": "^4.3.0",
     "@types/node": "^22.14.0",
     "@types/react": "19.2.14",
+    "@typescript-eslint/eslint-plugin": "^8.59.4",
+    "@typescript-eslint/parser": "^8.59.4",
     "autoprefixer": "^10.4.21",
+    "commitlint": "^21.0.1",
+    "editorconfig-checker": "^6.1.1",
     "esbuild": "^0.25.0",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "husky": "^9.1.7",
+    "import-sort-cli": "^6.0.0",
+    "import-sort-parser-babylon": "^6.0.0",
+    "import-sort-style-module": "^6.0.0",
+    "lint-staged": "^17.0.5",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.2",
+    "typescript-eslint": "^8.59.4"
   },
   "overrides": {
     "next": {
       "postcss": "^8.5.10"
     }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "import-sort --write",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }

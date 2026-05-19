@@ -1,21 +1,56 @@
-"use client";
+'use client';
 
 import { motion } from 'motion/react';
-import { DollarSign, Laptop, Star, Send, Briefcase, Users, Target, CheckCircle } from 'lucide-react';
+import {
+  DollarSign,
+  Laptop,
+  Star,
+  Send,
+  Briefcase,
+  Users,
+  Target,
+  CheckCircle,
+} from 'lucide-react';
 import Link from 'next/link';
 
-const GRADIENT_STYLE = { backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)', backgroundSize: '40px 40px' };
+const GRADIENT_STYLE = {
+  backgroundImage:
+    'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)',
+  backgroundSize: '40px 40px',
+};
 
 const FREELANCE_PERKS = [
-  { icon: <Laptop size={28} />, title: "100% Remote", desc: "Work from anywhere, anytime. Be your own boss and manage your own schedule." },
-  { icon: <DollarSign size={28} />, title: "Up to 12% Commission", desc: "Earn highly attractive commissions on every successful closing. Unlimited earning potential." },
-  { icon: <Star size={28} />, title: "Full Support", desc: "Get marketing materials, project details, and dedicated support from our expert team." },
+  {
+    icon: <Laptop size={28} />,
+    title: '100% Remote',
+    desc: 'Work from anywhere, anytime. Be your own boss and manage your own schedule.',
+  },
+  {
+    icon: <DollarSign size={28} />,
+    title: 'Up to 12% Commission',
+    desc: 'Earn highly attractive commissions on every successful closing. Unlimited earning potential.',
+  },
+  {
+    icon: <Star size={28} />,
+    title: 'Full Support',
+    desc: 'Get marketing materials, project details, and dedicated support from our expert team.',
+  },
 ];
 
 const ONSITE_ROLES = [
-  { icon: <Briefcase size={28} />, role: "Business Development Manager (BDM)", type: "Onsite", salary: "Up to 40k INR" },
-  { icon: <Users size={28} />, role: "Business Development Executive (BDE)", type: "Onsite", salary: "Up to 30k INR" },
-  { icon: <Target size={28} />, role: "Team Lead (TL)", type: "Onsite", salary: "Up to 60k INR" },
+  {
+    icon: <Briefcase size={28} />,
+    role: 'Business Development Manager (BDM)',
+    type: 'Onsite',
+    salary: 'Up to 40k INR',
+  },
+  {
+    icon: <Users size={28} />,
+    role: 'Business Development Executive (BDE)',
+    type: 'Onsite',
+    salary: 'Up to 30k INR',
+  },
+  { icon: <Target size={28} />, role: 'Team Lead (TL)', type: 'Onsite', salary: 'Up to 60k INR' },
 ];
 
 export default function Careers() {
@@ -46,29 +81,38 @@ export default function Careers() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <section className="bg-brand-bg dark:bg-gray-900 py-14 md:py-24 text-center border-b border-gray-200 dark:border-gray-700">
+      <section className="bg-brand-bg border-b border-gray-200 py-14 text-center md:py-24 dark:border-gray-700 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-navy dark:text-gray-100 mb-6 animate-hero-h1">
+          <h1 className="text-brand-navy animate-hero-h1 mb-6 font-serif text-3xl sm:text-4xl md:text-6xl dark:text-gray-100">
             Careers at SVI Infra Solutions
           </h1>
-          <div className="w-16 h-px bg-brand-gold mx-auto animate-hero-divider"></div>
+          <div className="bg-brand-gold animate-hero-divider mx-auto h-px w-16"></div>
         </div>
       </section>
 
-      <section className="py-14 md:py-24 bg-brand-navy dark:bg-gray-900 text-white relative">
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={GRADIENT_STYLE}></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-gold mb-6">Join Our Team</h4>
-            <h2 className="text-4xl font-serif text-white mb-8">Freelance Real Estate Consultant</h2>
-            <div className="text-gray-300 space-y-6 text-lg leading-relaxed">
+      <section className="bg-brand-navy relative py-14 text-white md:py-24 dark:bg-gray-900">
+        <div
+          className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-10"
+          style={GRADIENT_STYLE}
+        ></div>
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="mx-auto mb-16 max-w-4xl text-center">
+            <h4 className="text-brand-gold mb-6 text-[10px] font-bold tracking-[0.3em] uppercase">
+              Join Our Team
+            </h4>
+            <h2 className="mb-8 font-serif text-4xl text-white">
+              Freelance Real Estate Consultant
+            </h2>
+            <div className="space-y-6 text-lg leading-relaxed text-gray-300">
               <p>
-                Are you passionate about real estate? Do you want the flexibility to work from anywhere while earning industry-leading commissions? Join SVI Infra Solutions as a Freelance Partner and build your own success story.
+                Are you passionate about real estate? Do you want the flexibility to work from
+                anywhere while earning industry-leading commissions? Join SVI Infra Solutions as a
+                Freelance Partner and build your own success story.
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-3">
             {FREELANCE_PERKS.map((val, idx) => (
               <motion.div
                 key={idx}
@@ -76,13 +120,17 @@ export default function Careers() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '0px', amount: 0.05 }}
                 transition={{ delay: idx * 0.08 }}
-                className="bg-white/5 dark:bg-gray-800/50 p-8 md:p-10 border border-white/10 dark:border-gray-700 hover:border-brand-gold dark:hover:border-brand-gold transition-colors text-center"
+                className="hover:border-brand-gold dark:hover:border-brand-gold border border-white/10 bg-white/5 p-8 text-center transition-colors md:p-10 dark:border-gray-700 dark:bg-gray-800/50"
               >
-                 <div className="w-16 h-16 mx-auto bg-brand-gold/10 text-brand-gold flex items-center justify-center mb-8 rounded-full">
-                   {val.icon}
-                 </div>
-                 <h3 className="text-xl font-serif text-white dark:text-gray-100 mb-4">{val.title}</h3>
-                 <p className="text-gray-300 dark:text-gray-400 text-sm leading-relaxed">{val.desc}</p>
+                <div className="bg-brand-gold/10 text-brand-gold mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full">
+                  {val.icon}
+                </div>
+                <h3 className="mb-4 font-serif text-xl text-white dark:text-gray-100">
+                  {val.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-gray-300 dark:text-gray-400">
+                  {val.desc}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -90,7 +138,7 @@ export default function Careers() {
           <div className="text-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-brand-gold text-brand-navy px-8 py-4 text-sm font-bold uppercase tracking-widest hover:bg-white transition-colors"
+              className="bg-brand-gold text-brand-navy inline-flex items-center gap-2 px-8 py-4 text-sm font-bold tracking-widest uppercase transition-colors hover:bg-white"
             >
               Apply Now <Send size={16} />
             </Link>
@@ -98,19 +146,25 @@ export default function Careers() {
         </div>
       </section>
 
-      <section className="py-24 bg-white dark:bg-[#0C0C0C]">
+      <section className="bg-white py-24 dark:bg-[#0C0C0C]">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-gray-400 dark:text-gray-400 mb-6">Sales & Promotion</h4>
-            <h2 className="text-4xl font-serif text-brand-navy dark:text-gray-100 mb-8">Onsite Opportunities</h2>
-            <div className="text-gray-600 dark:text-gray-300 space-y-6 text-lg leading-relaxed">
+          <div className="mx-auto mb-16 max-w-4xl text-center">
+            <h4 className="mb-6 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-400">
+              Sales & Promotion
+            </h4>
+            <h2 className="text-brand-navy mb-8 font-serif text-4xl dark:text-gray-100">
+              Onsite Opportunities
+            </h2>
+            <div className="space-y-6 text-lg leading-relaxed text-gray-600 dark:text-gray-300">
               <p>
-                We are expanding our Sales & Promotion team. Join us onsite and take your career to the next level with competitive salaries, great growth opportunities, and an inspiring work environment.
+                We are expanding our Sales & Promotion team. Join us onsite and take your career to
+                the next level with competitive salaries, great growth opportunities, and an
+                inspiring work environment.
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+          <div className="mb-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
             {ONSITE_ROLES.map((job, idx) => (
               <motion.div
                 key={idx}
@@ -118,19 +172,21 @@ export default function Careers() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-white dark:bg-gray-900 p-10 text-center shadow-lg dark:shadow-none border border-gray-100 dark:border-gray-700 hover:border-brand-gold dark:hover:border-brand-gold transition-all duration-300 hover:-translate-y-2 group"
+                className="hover:border-brand-gold dark:hover:border-brand-gold group border border-gray-100 bg-white p-10 text-center shadow-lg transition-all duration-300 hover:-translate-y-2 dark:border-gray-700 dark:bg-gray-900 dark:shadow-none"
               >
-                <div className="w-16 h-16 mx-auto bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-brand-navy dark:text-gray-300 group-hover:text-brand-gold dark:group-hover:text-brand-gold group-hover:border-brand-gold flex items-center justify-center mb-6 rounded-full transition-colors">
+                <div className="text-brand-navy group-hover:text-brand-gold dark:group-hover:text-brand-gold group-hover:border-brand-gold mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-gray-100 bg-gray-50 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                   {job.icon}
                 </div>
-                <h3 className="text-xl font-serif text-brand-navy dark:text-gray-100 mb-4">{job.role}</h3>
+                <h3 className="text-brand-navy mb-4 font-serif text-xl dark:text-gray-100">
+                  {job.role}
+                </h3>
 
-                <div className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-4">
+                <div className="mb-4 flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                   <CheckCircle size={14} className="text-brand-gold" />
                   <span>{job.type}</span>
                 </div>
 
-                <div className="inline-block px-4 py-2 bg-brand-bg dark:bg-gray-800 text-brand-gold font-bold text-lg rounded-sm">
+                <div className="bg-brand-bg text-brand-gold inline-block rounded-sm px-4 py-2 text-lg font-bold dark:bg-gray-800">
                   {job.salary}
                 </div>
               </motion.div>
@@ -140,7 +196,7 @@ export default function Careers() {
           <div className="text-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-brand-navy dark:bg-brand-gold text-white dark:text-brand-navy px-8 py-4 text-sm font-bold uppercase tracking-widest hover:bg-brand-gold dark:hover:bg-white hover:text-white transition-colors"
+              className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy hover:bg-brand-gold inline-flex items-center gap-2 px-8 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors hover:text-white dark:hover:bg-white"
             >
               Apply For Onsite Role <Send size={16} />
             </Link>

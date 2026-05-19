@@ -1,13 +1,15 @@
-"use client";
+'use client';
 
-import { useState, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/src/lib/supabase/client';
+import { AlertCircle, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { type FormEvent, useState } from 'react';
+
 import { motion } from 'motion/react';
-import { ShieldCheck, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { supabase } from '@/src/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 const GRID_STYLE = {
-  backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(201, 168, 76, 0.08) 1px, transparent 0)',
+  backgroundImage:
+    'radial-gradient(circle at 1px 1px, rgba(201, 168, 76, 0.08) 1px, transparent 0)',
   backgroundSize: '24px 24px',
 };
 
@@ -53,18 +55,12 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0C0C0C] flex items-center justify-center p-4 relative overflow-hidden font-sans transition-colors duration-300">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gray-50 p-4 font-sans transition-colors duration-300 dark:bg-[#0C0C0C]">
       {/* Background glow & luxury accents */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-gold/5 rounded-full blur-[120px]" 
-        />
-        <div 
-          className="absolute top-0 right-0 w-96 h-96 bg-brand-navy-light/10 rounded-full blur-[100px]" 
-        />
-        <div 
-          className="absolute bottom-0 left-0 w-80 h-80 bg-brand-gold/5 rounded-full blur-[100px]" 
-        />
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div className="bg-brand-gold/5 absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px]" />
+        <div className="bg-brand-navy-light/10 absolute top-0 right-0 h-96 w-96 rounded-full blur-[100px]" />
+        <div className="bg-brand-gold/5 absolute bottom-0 left-0 h-80 w-80 rounded-full blur-[100px]" />
         {/* Subtle grid pattern overlay */}
         <div className="absolute inset-0 opacity-80" style={GRID_STYLE} />
       </div>
@@ -76,23 +72,33 @@ export default function AdminLogin() {
         className="relative z-10 w-full max-w-md"
       >
         {/* Card */}
-        <div className="bg-white/80 dark:bg-[#0e0e14]/75 backdrop-blur-xl border border-gray-200 dark:border-brand-gold/15 rounded-2xl p-10 shadow-2xl relative overflow-hidden transition-colors duration-300">
+        <div className="dark:border-brand-gold/15 relative overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-10 shadow-2xl backdrop-blur-xl transition-colors duration-300 dark:bg-[#0e0e14]/75">
           {/* Subtle gold line on top of the card */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-gold/60 to-transparent" />
+          <div className="via-brand-gold/60 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
 
           {/* Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-full bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center glow-gold">
-              <ShieldCheck className="w-8 h-8 text-brand-gold" />
+          <div className="mb-6 flex justify-center">
+            <div className="bg-brand-gold/10 border-brand-gold/20 glow-gold flex h-16 w-16 items-center justify-center rounded-full border">
+              <ShieldCheck className="text-brand-gold h-8 w-8" />
             </div>
           </div>
 
-          <h1 className="text-3xl font-serif text-center text-brand-navy dark:text-white mb-2 tracking-tight transition-colors duration-300">
-            Admin <span className="text-gradient-gold italic animate-bg-pan inline-block" style={{ backgroundSize: '200% 200%', backgroundImage: 'linear-gradient(135deg, #c9a84c, #f0d080, #b08f36, #dec070, #c9a84c)' }}>Portal</span>
+          <h1 className="text-brand-navy mb-2 text-center font-serif text-3xl tracking-tight transition-colors duration-300 dark:text-white">
+            Admin{' '}
+            <span
+              className="text-gradient-gold animate-bg-pan inline-block italic"
+              style={{
+                backgroundSize: '200% 200%',
+                backgroundImage:
+                  'linear-gradient(135deg, #c9a84c, #f0d080, #b08f36, #dec070, #c9a84c)',
+              }}
+            >
+              Portal
+            </span>
           </h1>
-          
-          <div className="flex justify-center mb-8">
-            <span className="inline-block px-3.5 py-1.5 bg-brand-gold/10 text-brand-gold text-[9px] font-bold uppercase tracking-[0.2em] rounded-sm border border-brand-gold/20 backdrop-blur-sm">
+
+          <div className="mb-8 flex justify-center">
+            <span className="bg-brand-gold/10 text-brand-gold border-brand-gold/20 inline-block rounded-sm border px-3.5 py-1.5 text-[9px] font-bold tracking-[0.2em] uppercase backdrop-blur-sm">
               SVI Infra Solutions — Restricted Access
             </span>
           </div>
@@ -101,16 +107,16 @@ export default function AdminLogin() {
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
-              className="flex items-center gap-2 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 rounded-lg px-4 py-3 text-sm mb-6 transition-colors duration-300"
+              className="mb-6 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 transition-colors duration-300 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400"
             >
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
               {error}
             </motion.div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-[0.15em] font-bold text-gray-500 dark:text-gray-400 transition-colors duration-300">
+              <label className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400">
                 Email Address
               </label>
               <input
@@ -119,12 +125,12 @@ export default function AdminLogin() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="admin@sviinfra.com"
-                className="w-full bg-white dark:bg-[#111118]/80 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:bg-gray-50 dark:focus:bg-white/5 focus:ring-2 focus:ring-brand-gold/20 transition-all font-sans"
+                className="focus:border-brand-gold focus:ring-brand-gold/20 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 font-sans text-sm text-gray-900 placeholder-gray-400 transition-all focus:bg-gray-50 focus:ring-2 focus:outline-none dark:border-white/10 dark:bg-[#111118]/80 dark:text-white dark:placeholder-gray-600 dark:focus:bg-white/5"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-[0.15em] font-bold text-gray-500 dark:text-gray-400 transition-colors duration-300">
+              <label className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400">
                 Password
               </label>
               <div className="relative">
@@ -134,14 +140,14 @@ export default function AdminLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full bg-white dark:bg-[#111118]/80 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 pr-12 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:bg-gray-50 dark:focus:bg-white/5 focus:ring-2 focus:ring-brand-gold/20 transition-all font-sans"
+                  className="focus:border-brand-gold focus:ring-brand-gold/20 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 pr-12 font-sans text-sm text-gray-900 placeholder-gray-400 transition-all focus:bg-gray-50 focus:ring-2 focus:outline-none dark:border-white/10 dark:bg-[#111118]/80 dark:text-white dark:placeholder-gray-600 dark:focus:bg-white/5"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute inset-y-0 right-0 px-4 text-gray-500 hover:text-brand-gold transition-colors cursor-pointer"
+                  className="hover:text-brand-gold absolute inset-y-0 right-0 cursor-pointer px-4 text-gray-500 transition-colors"
                 >
-                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
@@ -149,17 +155,17 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-4 shimmer bg-brand-gold hover:bg-brand-gold-light text-brand-navy font-bold text-xs uppercase tracking-widest py-4 rounded-lg shadow-xl glow-gold transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+              className="shimmer bg-brand-gold hover:bg-brand-gold-light text-brand-navy glow-gold mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-4 text-xs font-bold tracking-widest uppercase shadow-xl transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
-                <span className="w-4 h-4 border-2 border-brand-navy/40 border-t-brand-navy rounded-full animate-spin" />
+                <span className="border-brand-navy/40 border-t-brand-navy h-4 w-4 animate-spin rounded-full border-2" />
               ) : (
                 'Sign In'
               )}
             </button>
           </form>
 
-          <p className="text-center text-[9px] text-gray-500 dark:text-gray-600 mt-8 uppercase tracking-[0.15em] font-semibold transition-colors duration-300">
+          <p className="mt-8 text-center text-[9px] font-semibold tracking-[0.15em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-600">
             Authorized Personnel Only
           </p>
         </div>

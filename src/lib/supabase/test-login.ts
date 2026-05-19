@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import path from 'path';
 import { fileURLToPath } from 'url';
+import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,7 +10,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env.local') });
 async function testLogin() {
   console.log('--- Auth Test ---');
   console.log('Supabase URL loaded:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-  
+
   // Dynamically import client.ts AFTER dotenv has loaded the env variables
   const { supabase } = await import('./client.js');
 

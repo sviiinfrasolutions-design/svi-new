@@ -67,7 +67,7 @@ const BLOG_POSTS = {
     category: 'Investment Tips',
     image: '/images/blog1.png',
     tags: ['investment', 'first-time buyers', 'real estate tips'],
-    readTime: '5 min read'
+    readTime: '5 min read',
   },
   'jaipur-real-estate-market-trends': {
     title: 'Jaipur Real Estate Market Trends 2026',
@@ -106,7 +106,7 @@ const BLOG_POSTS = {
     category: 'Market Analysis',
     image: '/images/blog2.png',
     tags: ['Jaipur', 'market trends', 'property prices'],
-    readTime: '7 min read'
+    readTime: '7 min read',
   },
   'smart-home-features-modern-living': {
     title: 'Smart Home Features Transforming Modern Living',
@@ -155,8 +155,8 @@ const BLOG_POSTS = {
     category: 'Technology',
     image: '/images/blog3.png',
     tags: ['smart home', 'technology', 'modern living'],
-    readTime: '6 min read'
-  }
+    readTime: '6 min read',
+  },
 };
 
 type Props = {
@@ -215,7 +215,7 @@ export default async function BlogPost({ params }: Props) {
   }
 
   return (
-    <div className="pt-20 pb-16 bg-gray-50 dark:bg-[#0C0C0C] min-h-screen">
+    <div className="min-h-screen bg-gray-50 pt-20 pb-16 dark:bg-[#0C0C0C]">
       {/* Article Structured Data */}
       <script
         type="application/ld+json"
@@ -249,28 +249,24 @@ export default async function BlogPost({ params }: Props) {
         }}
       />
 
-      <article className="container mx-auto px-4 max-w-4xl py-12">
+      <article className="container mx-auto max-w-4xl px-4 py-12">
         {/* Back to Blog Link */}
         <Link
           href="/blog"
-          className="inline-flex items-center gap-2 text-brand-navy dark:text-gray-300 hover:text-brand-gold transition-colors mb-8 group"
+          className="text-brand-navy hover:text-brand-gold group mb-8 inline-flex items-center gap-2 transition-colors dark:text-gray-300"
         >
-          <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
           <span className="text-sm font-medium">Back to Blog</span>
         </Link>
 
         {/* Featured Image */}
-        <div className="relative h-[400px] md:h-[500px] rounded-lg overflow-hidden mb-8 bg-gray-200 dark:bg-gray-800">
-          <img
-            src={post.image}
-            alt={post.title}
-            className="w-full h-full object-cover"
-          />
+        <div className="relative mb-8 h-[400px] overflow-hidden rounded-lg bg-gray-200 md:h-[500px] dark:bg-gray-800">
+          <img src={post.image} alt={post.title} className="h-full w-full object-cover" />
         </div>
 
         {/* Article Header */}
         <header className="mb-8">
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
             <span className="inline-flex items-center gap-1">
               <Calendar size={16} />
               {new Date(post.date).toLocaleDateString('en-US', {
@@ -290,28 +286,26 @@ export default async function BlogPost({ params }: Props) {
             <span>{post.readTime}</span>
           </div>
 
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif text-brand-navy dark:text-gray-100 leading-tight mb-4">
+          <h1 className="text-brand-navy mb-4 font-serif text-3xl leading-tight md:text-4xl lg:text-5xl dark:text-gray-100">
             {post.title}
           </h1>
 
-          <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
-            {post.excerpt}
-          </p>
+          <p className="text-xl leading-relaxed text-gray-600 dark:text-gray-400">{post.excerpt}</p>
         </header>
 
         {/* Article Content */}
         <div
-          className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-headings:text-brand-navy dark:prose-headings:text-gray-100 prose-a:text-brand-gold hover:prose-a:text-brand-gold/80 prose-strong:text-brand-navy dark:prose-strong:text-gray-100"
+          className="prose prose-lg dark:prose-invert prose-headings:font-serif prose-headings:text-brand-navy dark:prose-headings:text-gray-100 prose-a:text-brand-gold hover:prose-a:text-brand-gold/80 prose-strong:text-brand-navy dark:prose-strong:text-gray-100 max-w-none"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
         {/* Tags */}
-        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+        <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-700">
           <div className="flex flex-wrap gap-2">
             {post.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-sm"
+                className="rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-300"
               >
                 #{tag}
               </span>
@@ -320,23 +314,21 @@ export default async function BlogPost({ params }: Props) {
         </div>
 
         {/* CTA Section */}
-        <div className="mt-12 p-8 bg-brand-navy dark:bg-gray-800 rounded-lg text-center">
-          <h3 className="text-2xl font-serif text-white mb-4">
-            Interested in Our Properties?
-          </h3>
-          <p className="text-gray-300 mb-6">
+        <div className="bg-brand-navy mt-12 rounded-lg p-8 text-center dark:bg-gray-800">
+          <h3 className="mb-4 font-serif text-2xl text-white">Interested in Our Properties?</h3>
+          <p className="mb-6 text-gray-300">
             Explore our current and completed projects to find your perfect home.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Link
               href="/projects/current"
-              className="inline-block bg-brand-gold text-brand-navy px-6 py-3 font-bold uppercase text-xs tracking-widest hover:bg-white transition-colors"
+              className="bg-brand-gold text-brand-navy inline-block px-6 py-3 text-xs font-bold tracking-widest uppercase transition-colors hover:bg-white"
             >
               View Current Projects
             </Link>
             <Link
               href="/contact"
-              className="inline-block border-2 border-white text-white px-6 py-3 font-bold uppercase text-xs tracking-widest hover:bg-white hover:text-brand-navy transition-colors"
+              className="hover:text-brand-navy inline-block border-2 border-white px-6 py-3 text-xs font-bold tracking-widest text-white uppercase transition-colors hover:bg-white"
             >
               Contact Us
             </Link>

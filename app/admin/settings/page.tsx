@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { Bell, Building2, Globe, Paintbrush, Shield, User } from 'lucide-react';
+
 import { motion } from 'motion/react';
-import { User, Building2, Bell, Shield, Paintbrush, Globe } from 'lucide-react';
+import { useState } from 'react';
 
 const TABS = [
   { id: 'profile', label: 'Profile Settings', icon: User },
@@ -16,9 +17,9 @@ export default function AdminSettings() {
   const [activeTab, setActiveTab] = useState('profile');
 
   return (
-    <div className="max-w-6xl mx-auto w-full font-sans">
+    <div className="mx-auto w-full max-w-6xl font-sans">
       <div className="mb-8">
-        <h1 className="text-3xl font-serif text-brand-navy dark:text-white tracking-tight mb-2">
+        <h1 className="text-brand-navy mb-2 font-serif text-3xl tracking-tight dark:text-white">
           Portal <span className="text-brand-gold italic">Settings</span>
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -26,21 +27,23 @@ export default function AdminSettings() {
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col gap-8 md:flex-row">
         {/* Settings Navigation */}
-        <aside className="w-full md:w-64 shrink-0">
-          <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto pb-4 md:pb-0">
+        <aside className="w-full shrink-0 md:w-64">
+          <nav className="flex flex-row gap-2 overflow-x-auto pb-4 md:flex-col md:pb-0">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 whitespace-nowrap transition-all ${
                   activeTab === tab.id
                     ? 'bg-brand-gold text-brand-navy font-bold shadow-md'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 font-medium'
+                    : 'font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5'
                 }`}
               >
-                <tab.icon className={`w-4.5 h-4.5 ${activeTab === tab.id ? 'text-brand-navy' : 'text-gray-500 dark:text-gray-500'}`} />
+                <tab.icon
+                  className={`h-4.5 w-4.5 ${activeTab === tab.id ? 'text-brand-navy' : 'text-gray-500 dark:text-gray-500'}`}
+                />
                 {tab.label}
               </button>
             ))}
@@ -54,27 +57,42 @@ export default function AdminSettings() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-white/80 dark:bg-[#0e0e14]/65 backdrop-blur-xl border border-gray-200 dark:border-white/8 rounded-2xl p-6 md:p-8 shadow-xl relative overflow-hidden"
+            className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/8 dark:bg-[#0e0e14]/65"
           >
             {/* Top gold line */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
+            <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
 
             {activeTab === 'profile' && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold font-serif text-gray-900 dark:text-white mb-1">Profile Information</h2>
+                  <h2 className="mb-1 font-serif text-xl font-bold text-gray-900 dark:text-white">
+                    Profile Information
+                  </h2>
                   <p className="text-sm text-gray-500">Update your personal details and avatar.</p>
                 </div>
-                <div className="space-y-4 max-w-lg">
+                <div className="max-w-lg space-y-4">
                   <div>
-                    <label className="text-xs uppercase tracking-widest font-bold text-gray-500 mb-1.5 block">Full Name</label>
-                    <input type="text" defaultValue="Admin User" className="w-full bg-transparent border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all" />
+                    <label className="mb-1.5 block text-xs font-bold tracking-widest text-gray-500 uppercase">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="Admin User"
+                      className="focus:border-brand-gold focus:ring-brand-gold w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-gray-900 transition-all outline-none focus:ring-1 dark:border-gray-700 dark:text-white"
+                    />
                   </div>
                   <div>
-                    <label className="text-xs uppercase tracking-widest font-bold text-gray-500 mb-1.5 block">Email Address</label>
-                    <input type="email" defaultValue="admin@sviinfra.com" disabled className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-2.5 text-gray-500 cursor-not-allowed" />
+                    <label className="mb-1.5 block text-xs font-bold tracking-widest text-gray-500 uppercase">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      defaultValue="admin@sviinfra.com"
+                      disabled
+                      className="w-full cursor-not-allowed rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-gray-500 dark:border-gray-800 dark:bg-white/5"
+                    />
                   </div>
-                  <button className="mt-4 bg-brand-gold hover:bg-brand-gold-light text-brand-navy font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-lg shadow-md transition-all cursor-pointer">
+                  <button className="bg-brand-gold hover:bg-brand-gold-light text-brand-navy mt-4 cursor-pointer rounded-lg px-6 py-3 text-xs font-bold tracking-widest uppercase shadow-md transition-all">
                     Save Changes
                   </button>
                 </div>
@@ -82,11 +100,14 @@ export default function AdminSettings() {
             )}
 
             {activeTab !== 'profile' && (
-              <div className="py-12 flex flex-col items-center justify-center text-center">
-                <Globe className="w-12 h-12 text-gray-300 dark:text-gray-700 mb-4" />
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Coming Soon</h3>
-                <p className="text-sm text-gray-500 max-w-sm">
-                  This settings module is currently under development. Additional configuration options will be available in future updates.
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Globe className="mb-4 h-12 w-12 text-gray-300 dark:text-gray-700" />
+                <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+                  Coming Soon
+                </h3>
+                <p className="max-w-sm text-sm text-gray-500">
+                  This settings module is currently under development. Additional configuration
+                  options will be available in future updates.
                 </p>
               </div>
             )}
