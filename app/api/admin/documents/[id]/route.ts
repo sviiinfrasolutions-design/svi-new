@@ -22,14 +22,11 @@ async function verifyAdmin(request: NextRequest) {
 }
 
 // PATCH /api/admin/documents/[id] — update document status / urls
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = await verifyAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { id } = params;
+  const { id } = await params;
   const body = await request.json();
   const { status, pdf_url, image_url } = body;
 
@@ -64,17 +61,14 @@ export async function PATCH(
 // DELETE /api/admin/documents/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const admin = await verifyAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { id } = params;
+  const { id } = await params;
 
-  const { error } = await supabaseAdmin
-    .from('documents')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabaseAdmin.from('documents').delete().eq('id', id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
