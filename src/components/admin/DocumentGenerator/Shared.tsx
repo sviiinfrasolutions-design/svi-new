@@ -49,6 +49,8 @@ interface FormFieldProps {
   required?: boolean;
   placeholder?: string;
   className?: string;
+  step?: string;
+  min?: string;
 }
 
 export function FormField({
@@ -60,6 +62,8 @@ export function FormField({
   required = false,
   placeholder,
   className = '',
+  step,
+  min,
 }: FormFieldProps) {
   return (
     <div className={className}>
@@ -73,6 +77,8 @@ export function FormField({
         onChange={onChange}
         required={required}
         placeholder={placeholder}
+        step={step}
+        min={min}
         className="focus:border-brand-gold focus:ring-brand-gold/50 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 font-sans text-sm text-gray-900 placeholder-gray-400 transition-all focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white dark:placeholder-gray-600"
       />
     </div>
@@ -127,7 +133,7 @@ export function PreviewContainer({
   hasPreview: boolean;
 }) {
   return (
-    <div className="custom-scrollbar relative max-h-[800px] flex-1 overflow-y-auto rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-inner sm:p-6 dark:border-white/10 dark:bg-[#0e0e14]">
+    <div className="custom-scrollbar relative flex-1 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-inner sm:p-6 dark:border-white/10 dark:bg-[#0e0e14] [:fullscreen]:overflow-hidden [:fullscreen]:rounded-none [:fullscreen]:border-none [:fullscreen]:p-0">
       {!hasPreview ? (
         <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-gray-400 dark:text-gray-600">
           Fill the form to generate a preview.
@@ -135,12 +141,7 @@ export function PreviewContainer({
       ) : (
         <div
           id={previewId}
-          className="mx-auto w-full max-w-3xl origin-top transform rounded-lg border border-gray-200 bg-white p-8 text-gray-800 shadow-sm"
-          style={{
-            // Ensure fullscreen content is scrollable
-            maxHeight: '100vh',
-            overflowY: 'auto',
-          }}
+          className="mx-auto h-full w-full max-w-3xl origin-top transform overflow-y-auto rounded-lg border border-gray-200 bg-white p-8 text-gray-800 shadow-sm [:fullscreen]:h-full [:fullscreen]:max-w-none [:fullscreen]:overflow-y-auto [:fullscreen]:rounded-none [:fullscreen]:border-none"
         >
           {children}
         </div>

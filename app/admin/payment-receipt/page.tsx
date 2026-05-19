@@ -186,39 +186,159 @@ export default function PaymentReceiptPage() {
   const handleDownloadPDF = async () => {
     const element = document.getElementById('receiptPreview');
     if (!element) return;
-    const canvas = await html2canvas(element, { scale: 2 });
-    const imgData = canvas.toDataURL('image/jpeg', 1.0);
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save('Payment_Receipt.pdf');
 
-    // Update document status to completed
-    if (documentId && token) {
-      try {
-        await fetch(`/api/admin/documents/${documentId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: 'completed' }),
-        });
-      } catch (error) {
-        console.error('Failed to update document status:', error);
+    // Clone the element to avoid modifying the original
+    const clone = element.cloneNode(true) as HTMLElement;
+
+    // Set a proper width for better text layout (A4-like proportions)
+    clone.style.backgroundColor = 'white';
+    clone.style.color = 'black';
+    clone.style.width = '210mm'; // A4 width
+    clone.style.minHeight = element.offsetHeight + 'px';
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    clone.style.padding = '32px'; // Match original padding
+    clone.style.boxSizing = 'border-box';
+
+    // Wait for all images in the clone to load
+    const images = clone.querySelectorAll('img');
+    const imagePromises = Array.from(images).map((img) => {
+      return new Promise<void>((resolve) => {
+        if (img.complete) {
+          resolve();
+        } else {
+          img.onload = () => resolve();
+          img.onerror = () => resolve(); // Resolve even on error to not block
+        }
+      });
+    });
+
+    document.body.appendChild(clone);
+
+    try {
+      // Wait for images to load
+      await Promise.all(imagePromises);
+
+      // Use high-quality settings for perfect capture
+      const canvas = await html2canvas(clone, {
+        scale: 3, // Higher scale for better quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        imageTimeout: 15000, // Increased timeout for image loading
+        removeContainer: true,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 794, // A4 width in pixels at 96 DPI (210mm)
+        windowHeight: clone.scrollHeight,
+      });
+
+      // Create PDF with exact dimensions
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true,
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 0;
+
+      // Use PNG for better quality (no JPEG compression artifacts)
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.save('Payment_Receipt.pdf');
+
+      // Update document status to completed
+      if (documentId && token) {
+        try {
+          await fetch(`/api/admin/documents/${documentId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ status: 'completed' }),
+          });
+        } catch (error) {
+          console.error('Failed to update document status:', error);
+        }
       }
+    } finally {
+      // Clean up cloned element
+      document.body.removeChild(clone);
     }
   };
 
   const handleDownloadImage = async () => {
     const element = document.getElementById('receiptPreview');
     if (!element) return;
-    const canvas = await html2canvas(element, { scale: 2 });
-    const link = document.createElement('a');
-    link.download = 'Payment_Receipt.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+
+    // Clone the element to avoid modifying the original
+    const clone = element.cloneNode(true) as HTMLElement;
+
+    // Set a proper width for better text layout (A4-like proportions)
+    clone.style.backgroundColor = 'white';
+    clone.style.color = 'black';
+    clone.style.width = '210mm'; // A4 width
+    clone.style.minHeight = element.offsetHeight + 'px';
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    clone.style.padding = '32px'; // Match original padding
+    clone.style.boxSizing = 'border-box';
+
+    // Wait for all images in the clone to load
+    const images = clone.querySelectorAll('img');
+    const imagePromises = Array.from(images).map((img) => {
+      return new Promise<void>((resolve) => {
+        if (img.complete) {
+          resolve();
+        } else {
+          img.onload = () => resolve();
+          img.onerror = () => resolve(); // Resolve even on error to not block
+        }
+      });
+    });
+
+    document.body.appendChild(clone);
+
+    try {
+      // Wait for images to load
+      await Promise.all(imagePromises);
+
+      // Use high-quality settings for perfect capture
+      const canvas = await html2canvas(clone, {
+        scale: 3, // Higher scale for better quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        imageTimeout: 15000, // Increased timeout for image loading
+        removeContainer: true,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 794, // A4 width in pixels at 96 DPI (210mm)
+        windowHeight: clone.scrollHeight,
+      });
+
+      // Download as PNG with maximum quality
+      const link = document.createElement('a');
+      link.download = 'Payment_Receipt.png';
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+    } finally {
+      // Clean up cloned element
+      document.body.removeChild(clone);
+    }
   };
 
   return (
@@ -294,6 +414,8 @@ export default function PaymentReceiptPage() {
                 label="Amount (in digits)"
                 name="amount"
                 type="number"
+                step="0.01"
+                min="0"
                 value={formData.amount}
                 onChange={handleChange}
                 required
@@ -434,7 +556,7 @@ export default function PaymentReceiptPage() {
                 </div>
                 <div className="w-48">
                   <img
-                    src="/images/logo.png"
+                    src="/logo.png"
                     alt="SVI Infra Solutions"
                     className="h-auto w-full object-contain"
                     onError={(e) => (e.currentTarget.style.display = 'none')}
@@ -454,7 +576,12 @@ export default function PaymentReceiptPage() {
                   <span className="ml-1 text-red-600">{formData.receiptNo || '___________'}</span>
                 </p>
                 <p className="rounded border-l-4 border-[#1e3a8a] bg-gray-50 px-4 py-2 shadow-sm">
-                  Date: <span className="ml-1 text-red-600">{formData.date || '___________'}</span>
+                  Date:{' '}
+                  <span className="ml-1 text-red-600">
+                    {formData.date
+                      ? new Date(formData.date).toLocaleDateString('en-GB')
+                      : '___________'}
+                  </span>
                 </p>
               </div>
 
@@ -462,7 +589,7 @@ export default function PaymentReceiptPage() {
                 {/* Watermark Logo (optional) */}
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.03]">
                   <img
-                    src="/images/logo.png"
+                    src="/logo.png"
                     alt=""
                     className="w-96"
                     onError={(e) => (e.currentTarget.style.display = 'none')}
@@ -550,7 +677,7 @@ export default function PaymentReceiptPage() {
                 </div>
                 <div className="relative text-center">
                   <img
-                    src="/images/signature.png"
+                    src="/signature.png"
                     alt="Signature"
                     className="absolute bottom-10 left-1/2 h-16 w-auto -translate-x-1/2 opacity-90 mix-blend-multiply"
                     onError={(e) => (e.currentTarget.style.display = 'none')}
