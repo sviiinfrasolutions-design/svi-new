@@ -2,6 +2,7 @@
 
 import {
   Calculator,
+  CheckSquare,
   ChevronLeft,
   ChevronRight,
   FileText,
@@ -134,6 +135,40 @@ const AdminSidebar = () => {
             </Link>
           );
         })}
+
+        <motion.div
+          animate={{ opacity: collapsed ? 0 : 1 }}
+          className="mt-6 mb-2 overflow-hidden px-4 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase dark:text-gray-500"
+        >
+          Management
+        </motion.div>
+
+        <Link
+          href="/admin/attendance"
+          className={`group flex items-center gap-3 overflow-hidden rounded-xl px-3 py-2.5 transition-all ${
+            pathname.startsWith('/admin/attendance')
+              ? 'bg-brand-gold/10 text-brand-gold'
+              : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5'
+          }`}
+          title={collapsed ? 'Attendance' : ''}
+        >
+          <div className="relative flex shrink-0 items-center justify-center">
+            {pathname.startsWith('/admin/attendance') && (
+              <motion.div
+                layoutId="active-nav"
+                className="bg-brand-gold absolute -left-3 h-8 w-1 rounded-r-full"
+              />
+            )}
+            <CheckSquare
+              className={`h-4.5 w-4.5 ${pathname.startsWith('/admin/attendance') ? 'text-brand-gold' : 'group-hover:text-brand-gold transition-colors'}`}
+            />
+          </div>
+          <span
+            className={`text-sm font-medium whitespace-nowrap transition-opacity duration-300 ${collapsed ? 'opacity-0' : 'opacity-100'}`}
+          >
+            Attendance
+          </span>
+        </Link>
       </div>
 
       <div className="dark:border-brand-gold/15 border-t border-gray-200 p-3">
