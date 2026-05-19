@@ -480,7 +480,7 @@ export default function AdminDashboard() {
   const recentActivities = activities;
 
   return (
-    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-gray-50 font-sans transition-colors duration-300 dark:bg-[#0C0C0C]">
+    <div className="relative w-full font-sans">
       {/* Background ambient lighting effects */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <div className="bg-brand-navy-light/10 absolute top-0 right-0 h-[450px] w-[450px] rounded-full blur-[120px]" />
@@ -488,41 +488,7 @@ export default function AdminDashboard() {
         <div className="absolute inset-0 opacity-80" style={GRID_STYLE} />
       </div>
 
-      {/* Topbar */}
-      <header className="dark:border-brand-gold/15 relative sticky top-0 z-30 border-b border-gray-200 bg-white/80 backdrop-blur-xl transition-colors duration-300 dark:bg-[#0d0d14]/75">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-brand-gold/10 border-brand-gold/20 flex h-8 w-8 items-center justify-center rounded-lg border">
-              <Shield className="text-brand-gold h-4 w-4" />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-brand-navy font-serif text-base font-bold tracking-tight transition-colors duration-300 dark:text-white">
-                SVI Infra
-              </span>
-              <span className="text-brand-gold bg-brand-gold/15 border-brand-gold/25 rounded border px-2 py-0.5 text-[9px] font-bold tracking-widest uppercase">
-                Admin Panel
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="hidden text-xs tracking-wide text-gray-500 transition-colors duration-300 sm:block dark:text-gray-400">
-              Welcome back,{' '}
-              <span className="text-brand-navy font-bold transition-colors duration-300 dark:text-white">
-                {adminName}
-              </span>
-            </span>
-            <button
-              onClick={handleSignOut}
-              className="flex cursor-pointer items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3.5 py-2 text-[10px] font-bold tracking-widest text-red-400 uppercase transition-all hover:bg-red-500/20 hover:text-red-300"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="relative z-10 mx-auto w-full max-w-7xl flex-1 px-6 py-10">
+      <div className="relative z-10 mx-auto w-full max-w-7xl">
         {/* Header section with page-mount animation */}
         <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
@@ -767,7 +733,7 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
-      </main>
+      </div>
 
       {/* Modals */}
       <AnimatePresence>
