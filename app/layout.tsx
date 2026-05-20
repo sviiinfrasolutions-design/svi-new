@@ -2,6 +2,7 @@ import './globals.css';
 
 import { COMPANY_NAME, SITE_NAME, SITE_URL, absoluteUrl } from '@/src/lib/seo';
 import { Inter, Playfair_Display } from 'next/font/google';
+import Script from 'next/script';
 import type { Metadata, Viewport } from 'next';
 
 import { Analytics } from '@vercel/analytics/next';
@@ -98,13 +99,10 @@ export const viewport: Viewport = {
   themeColor: '#1a2744',
 };
 
-// Inline theme script — runs before React hydrates to avoid flash
-const THEME_SCRIPT = `(function(){try{var t=document.documentElement,e=localStorage.getItem('svi-theme-v1');if(e==='dark'||e==='light')t.classList.add(e);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)t.classList.add('dark');else t.classList.add('light')}catch(e){}})();`;
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
+      <head suppressHydrationWarning>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -201,9 +199,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preload" as="image" href="/images/hero2.png" />
         <link rel="preload" as="image" href="/images/hero3.png" />
         <link rel="manifest" href="/manifest.json" />
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body className={`${inter.variable} ${playfair.variable}`}>
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=document.documentElement,e=localStorage.getItem('svi-theme-v1');if(e==='dark'||e==='light')t.classList.add(e);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)t.classList.add('dark');else t.classList.add('light')}catch(e){}})();`,
+          }}
+        />
         {children}
         <Analytics />
         <SpeedInsights />

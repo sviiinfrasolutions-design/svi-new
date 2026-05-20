@@ -18,9 +18,14 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -186,9 +191,23 @@ export default function Header() {
               <button
                 onClick={toggleTheme}
                 className="text-brand-navy hover:text-brand-gold-text p-2 transition-colors dark:text-gray-200"
-                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                aria-label={
+                  mounted
+                    ? theme === 'dark'
+                      ? 'Switch to light mode'
+                      : 'Switch to dark mode'
+                    : 'Toggle theme'
+                }
               >
-                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                {mounted ? (
+                  theme === 'dark' ? (
+                    <Sun size={20} />
+                  ) : (
+                    <Moon size={20} />
+                  )
+                ) : (
+                  <Moon size={20} />
+                )}
               </button>
             </nav>
 
@@ -196,9 +215,23 @@ export default function Header() {
               <button
                 onClick={toggleTheme}
                 className="text-brand-navy hover:text-brand-gold-text z-50 p-2 transition-colors dark:text-gray-200"
-                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                aria-label={
+                  mounted
+                    ? theme === 'dark'
+                      ? 'Switch to light mode'
+                      : 'Switch to dark mode'
+                    : 'Toggle theme'
+                }
               >
-                {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+                {mounted ? (
+                  theme === 'dark' ? (
+                    <Sun size={24} />
+                  ) : (
+                    <Moon size={24} />
+                  )
+                ) : (
+                  <Moon size={24} />
+                )}
               </button>
               <button
                 className="text-brand-navy hover:text-brand-gold-text z-50 p-2 transition-colors dark:text-gray-200"
