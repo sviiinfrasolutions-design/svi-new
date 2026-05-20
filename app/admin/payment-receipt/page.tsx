@@ -33,6 +33,7 @@ export default function PaymentReceiptPage() {
 
   const [preview, setPreview] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Function to convert number to words (Indian numbering system)
   const numberToWords = (num: string): string => {
@@ -149,11 +150,22 @@ export default function PaymentReceiptPage() {
     if (name === 'amount' && value) {
       const words = numberToWords(value);
       setFormData((prev) => ({ ...prev, amountWords: words }));
+
+      // Reset terms acceptance if amount changes from 2100
+      if (parseFloat(value) !== 2100) {
+        setTermsAccepted(false);
+      }
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate terms acceptance for ₹2100 amount
+    if (parseFloat(formData.amount) === 2100 && !termsAccepted) {
+      alert('Please accept the terms and conditions for the refundable amount of ₹2100');
+      return;
+    }
 
     // Save document record to database
     if (token) {
@@ -481,6 +493,28 @@ export default function PaymentReceiptPage() {
                 required
                 className="md:col-span-2"
               />
+
+              {/* Terms and Conditions Checkbox - Only show for ₹2100 */}
+              {parseFloat(formData.amount) === 2100 && (
+                <div className="border-brand-gold/30 bg-brand-gold/5 rounded-lg border-2 p-4 md:col-span-2">
+                  <label className="flex cursor-pointer items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="text-brand-gold focus:ring-brand-gold mt-1 h-5 w-5 cursor-pointer rounded border-gray-300"
+                      required
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      <strong className="text-brand-navy dark:text-white">
+                        Terms & Conditions:
+                      </strong>{' '}
+                      This is a refundable amount of ₹2100. If your name is not selected in the
+                      draw, the amount will be automatically refunded within the next 48 hours.
+                    </span>
+                  </label>
+                </div>
+              )}
             </div>
 
             <button
@@ -587,7 +621,7 @@ export default function PaymentReceiptPage() {
 
               <div className="relative space-y-6 rounded-xl border border-gray-200 bg-gray-50 p-6 font-sans text-[15px] leading-relaxed shadow-sm">
                 {/* Watermark Logo (optional) */}
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.03]">
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.12]">
                   <img
                     src="/logo.png"
                     alt=""
@@ -630,7 +664,13 @@ export default function PaymentReceiptPage() {
                 </div>
 
                 <div className="relative z-10 flex items-end">
-                  <span className="mr-2 whitespace-nowrap">By {formData.paymentMethod} No :</span>
+                  <span className="mr-2 whitespace-nowrap">
+                    By{' '}
+                    {formData.paymentMethod === 'UPI' || formData.paymentMethod === 'Cheque'
+                      ? 'UPI No / Cheque no'
+                      : formData.paymentMethod}{' '}
+                    No :
+                  </span>
                   <span className="flex-1 border-b border-gray-400 pb-0.5 font-bold">
                     {formData.paymentRef}
                   </span>
@@ -665,6 +705,17 @@ export default function PaymentReceiptPage() {
                     {formData.account}
                   </span>
                 </div>
+
+                {/* Terms and Conditions - Only show for ₹2100 */}
+                {parseFloat(formData.amount) === 2100 && (
+                  <div className="relative z-10 mt-6 rounded-lg border-2 border-red-500 bg-red-50 p-4">
+                    <p className="text-sm font-bold text-red-700">Terms & Conditions:</p>
+                    <p className="mt-2 text-sm font-medium text-gray-900">
+                      This is a refundable amount of ₹2100. If your name is not selected in the
+                      draw, the amount will be automatically refunded within the next 48 hours.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="mt-12 flex items-end justify-between pb-8">

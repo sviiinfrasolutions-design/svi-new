@@ -281,3 +281,12 @@ create policy "Service role full access"
   on public.activity_logs for all
   using (auth.role() = 'service_role');
 
+-- Fix: extend activity_logs CHECK constraint to include attendance action types
+alter table public.activity_logs drop constraint if exists activity_logs_action_type_check;
+alter table public.activity_logs add constraint activity_logs_action_type_check
+  check (action_type in (
+    'user_created', 'user_deleted', 'document_generated', 'document_downloaded',
+    'settings_updated', 'profile_updated', 'team_created', 'team_deleted',
+    'attendance_marked'
+  ));
+
