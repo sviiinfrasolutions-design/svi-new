@@ -1,7 +1,8 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { Facebook, Instagram, Mail, MapPin, Phone, Send } from 'lucide-react';
+import { Mail, MapPin, Phone, Send } from 'lucide-react';
+import { FacebookIcon, InstagramIcon } from '@/src/components/common/social-icons';
 import { type FormEvent, memo, useCallback, useState } from 'react';
 
 import Link from 'next/link';
@@ -43,12 +44,12 @@ const Footer = memo(function Footer() {
             <div className="flex gap-4">
               {[
                 {
-                  icon: <Facebook size={18} />,
+                  icon: <FacebookIcon size={18} />,
                   label: 'Facebook',
                   href: 'https://www.facebook.com/profile.php?id=61574028993364',
                 },
                 {
-                  icon: <Instagram size={18} />,
+                  icon: <InstagramIcon size={18} />,
                   label: 'Instagram',
                   href: 'https://www.instagram.com/sviinfrasolution/?hl=en',
                 },

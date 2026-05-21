@@ -10,11 +10,13 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Facebook,
-  Twitter,
-  Linkedin,
   Share2,
 } from 'lucide-react';
+import {
+  FacebookIcon,
+  TwitterIcon,
+  LinkedinIcon,
+} from '@/src/components/common/social-icons';
 import HoverZoomImage from '@/src/components/common/HoverZoomImage';
 
 const GRADIENT_STYLE = {
@@ -448,7 +450,7 @@ export default function CompletedProjects() {
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors hover:bg-[#1877F2] hover:text-white"
                         aria-label="Share on Facebook"
                       >
-                        <Facebook size={14} />
+                        <FacebookIcon size={14} />
                       </a>
                       <a
                         href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(`Check out ${selectedProject.title} by SVI Infra Solutions!`)}`}
@@ -457,7 +459,7 @@ export default function CompletedProjects() {
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors hover:bg-[#1DA1F2] hover:text-white"
                         aria-label="Share on Twitter"
                       >
-                        <Twitter size={14} />
+                        <TwitterIcon size={14} />
                       </a>
                       <a
                         href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(selectedProject.title)}`}
@@ -466,7 +468,7 @@ export default function CompletedProjects() {
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors hover:bg-[#0A66C2] hover:text-white"
                         aria-label="Share on LinkedIn"
                       >
-                        <Linkedin size={14} />
+                        <LinkedinIcon size={14} />
                       </a>
                     </div>
                   </div>

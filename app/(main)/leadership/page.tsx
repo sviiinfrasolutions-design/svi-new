@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { Linkedin, Mail, ArrowRight } from 'lucide-react';
+import { Mail, ArrowRight } from 'lucide-react';
+import { LinkedinIcon } from '@/src/components/common/social-icons';
 import Link from 'next/link';
 
 const TEAM_MEMBERS = [
@@ -122,7 +123,7 @@ export default function Leadership() {
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors dark:bg-gray-700"
                     aria-label="LinkedIn"
                   >
-                    <Linkedin size={18} />
+                    <LinkedinIcon size={18} />
                   </motion.a>
                   <motion.a
                     href="#"
