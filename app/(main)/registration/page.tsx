@@ -265,11 +265,16 @@ export default function Registration() {
                     <option value="" disabled>
                       Select an option
                     </option>
-                    <option value="residential_3bhk">Residential 3BHK</option>
-                    <option value="residential_4bhk">Residential 4BHK</option>
-                    <option value="residential_plot">Residential Plot</option>
-                    <option value="commercial">Commercial Property</option>
-                    <option value="investment">Investment / General Inquiry</option>
+                    <optgroup label="Current Projects">
+                      <option value="shivani-vatika">Shivani Vatika — Nayla</option>
+                      <option value="shyam-aangan">Shyam Aangan — Basri Khurd near Jaipur</option>
+                    </optgroup>
+                    <optgroup label="Completed Projects">
+                      <option value="shree-shyam-residency">Shree Shyam Residency — Jaipur</option>
+                      <option value="shivani-city">Shivani City — Manpura Machedi</option>
+                      <option value="shivani-residency">Shivani Residency — Dobadi</option>
+                    </optgroup>
+                    <option value="general">General Inquiry</option>
                   </select>
                 </div>
                 {errors.propertyInterest && (
