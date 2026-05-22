@@ -14,6 +14,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [isDark, setIsDark] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [adminName, setAdminName] = useState('Admin');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem('svi-theme-v1');
@@ -57,16 +58,20 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         className="flex min-h-screen w-full bg-gray-50 font-sans text-gray-900 dark:bg-[#0a0a0f] dark:text-white"
         style={{ visibility: mounted ? 'visible' : 'hidden' }}
       >
-        <AdminSidebar />
+        <AdminSidebar
+          mobileOpen={mobileSidebarOpen}
+          onMobileClose={() => setMobileSidebarOpen(false)}
+        />
         <div className="relative flex h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
           <AdminHeader
             isDark={isDark}
             toggleTheme={toggleTheme}
             userId={userId || ''}
             adminName={adminName}
+            onMenuClick={() => setMobileSidebarOpen(true)}
           />
 
-          <main className="flex-1 overflow-y-auto p-6 sm:p-8">{children}</main>
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">{children}</main>
         </div>
       </div>
     </AdminSessionProvider>

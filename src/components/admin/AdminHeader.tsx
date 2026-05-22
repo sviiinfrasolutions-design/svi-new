@@ -1,10 +1,9 @@
 'use client';
 
-import { Moon, Search, Sun } from 'lucide-react';
+import { Menu, Moon, Search, Sun } from 'lucide-react';
 
 import NotificationDropdown from './NotificationDropdown';
 import { usePathname } from 'next/navigation';
-// import { supabase } from '@/src/lib/supabase/client';
 import { useState } from 'react';
 
 interface AdminHeaderProps {
@@ -12,6 +11,7 @@ interface AdminHeaderProps {
   toggleTheme: () => void;
   adminName?: string;
   userId?: string;
+  onMenuClick?: () => void;
 }
 
 export default function AdminHeader({
@@ -19,6 +19,7 @@ export default function AdminHeader({
   toggleTheme,
   adminName = 'Admin',
   userId,
+  onMenuClick,
 }: AdminHeaderProps) {
   const pathname = usePathname();
   // const router = useRouter();
@@ -36,24 +37,29 @@ export default function AdminHeader({
 
   const [_loggingOut, _setLoggingOut] = useState(false);
 
-  // const handleLogout = async () => {
-  //   setLoggingOut(true);
-  //   await supabase.auth.signOut();
-  //   router.replace('/admin');
-  // };
-
   return (
     <header className="dark:border-brand-gold/15 relative sticky top-0 z-30 border-b border-gray-200 bg-white/80 backdrop-blur-xl transition-colors duration-300 dark:bg-[#0d0d14]/75">
-      <div className="flex h-16 items-center justify-between px-6">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-          <span className="hover:text-brand-gold hidden cursor-pointer transition-colors sm:inline">
-            Admin
-          </span>
-          <span className="hidden sm:inline">/</span>
-          <span className="font-bold tracking-wide text-gray-900 dark:text-white">
-            {breadcrumb}
-          </span>
+      <div className="flex h-16 items-center justify-between px-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          {/* Hamburger button — mobile only */}
+          <button
+            onClick={onMenuClick}
+            aria-label="Open navigation menu"
+            className="hover:text-brand-gold flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 md:hidden dark:text-gray-400 dark:hover:bg-white/10"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+            <span className="hover:text-brand-gold hidden cursor-pointer transition-colors sm:inline">
+              Admin
+            </span>
+            <span className="hidden sm:inline">/</span>
+            <span className="font-bold tracking-wide text-gray-900 dark:text-white">
+              {breadcrumb}
+            </span>
+          </div>
         </div>
 
         {/* Global Search & Actions */}
