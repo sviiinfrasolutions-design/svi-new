@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
     ],
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [320, 420, 768, 1024, 1200, 1920],
+    qualities: [75, 85],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
   },
 };
