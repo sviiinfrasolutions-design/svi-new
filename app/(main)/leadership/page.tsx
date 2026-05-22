@@ -1,27 +1,40 @@
 'use client';
 
-import { motion } from 'motion/react';
-import { Mail, ArrowRight } from 'lucide-react';
-import { LinkedinIcon } from '@/src/components/common/social-icons';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Users, ChevronDown, Award, Briefcase, Plus, Minus } from 'lucide-react';
 import Link from 'next/link';
 
-const TEAM_MEMBERS = [
-  {
-    name: 'Iliyas Ali',
-    role: 'Director',
-    bio: "Key personnel behind SVI Infra Solutions Private Limited. Instrumental in guiding the company's strategic vision and operations.",
-  },
-  {
-    name: 'Vinod Kumar',
-    role: 'Director',
-    bio: 'Key personnel behind SVI Infra Solutions Private Limited. Brings extensive expertise in building construction and civil engineering.',
-  },
-];
+const HIERARCHY = {
+  directors: [
+    {
+      name: 'Iliyas Ali',
+      role: 'Director',
+      bio: "Key personnel behind SVI Infra Solutions Private Limited. Instrumental in guiding the company's strategic vision and operations.",
+    },
+    {
+      name: 'Vinod Kumar',
+      role: 'Director',
+      bio: 'Key personnel behind SVI Infra Solutions Private Limited. Brings extensive expertise in building construction and civil engineering.',
+    },
+  ],
+  areaManagers: [
+    { name: 'Radhe Shyam', role: 'Area Manager' },
+    { name: 'Kailash ', role: 'Area Manager' },
+  ],
+  hrManager: { name: 'To Be Announced', role: 'HR Manager' }, // Or actual name if provided
+  teamLead: { name: 'To Be Announced', role: 'Team Lead (TL)' }, // Or actual name if provided
+  staff: [
+    { role: 'BDE (Business Development Executive)' },
+    { role: 'BDM (Business Development Manager)' },
+    { role: 'Telecaller' },
+  ],
+};
 
 // Structured Data for Person (Leadership Team)
 const personSchema = {
   '@context': 'https://schema.org',
-  '@graph': TEAM_MEMBERS.map((member) => ({
+  '@graph': HIERARCHY.directors.map((member) => ({
     '@type': 'Person',
     name: member.name,
     jobTitle: member.role,
@@ -36,6 +49,23 @@ const personSchema = {
 };
 
 export default function Leadership() {
+  const [maxVisibleLevel, setMaxVisibleLevel] = useState(1);
+
+  const getNextLevelName = (level: number) => {
+    switch (level) {
+      case 1:
+        return 'Area Managers';
+      case 2:
+        return 'HR Department';
+      case 3:
+        return 'Team Lead';
+      case 4:
+        return 'Staff';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className="page-transition min-h-screen bg-gray-50 pt-20 pb-16 dark:bg-[#0C0C0C]">
       {/* Person Schema - Leadership Team */}
@@ -78,66 +108,202 @@ export default function Leadership() {
       </section>
 
       <section className="container mx-auto max-w-5xl px-4 py-20 lg:px-8">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-          {TEAM_MEMBERS.map((member, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.7, delay: idx * 0.15, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -10, boxShadow: '0 24px 64px rgba(0,0,0,0.14)' }}
-              className="group hover:border-brand-gold relative flex flex-col overflow-hidden border border-gray-200 bg-white p-10 text-center transition-all duration-400 dark:border-gray-700 dark:bg-gray-900"
-            >
-              <div className="from-brand-gold/40 via-brand-gold to-brand-gold/40 absolute top-0 left-0 h-1 w-full bg-gradient-to-r" />
-              {/* Animated background accent */}
+        <div className="flex flex-col items-center">
+          {/* Level 1: Directors */}
+          <div className="relative z-10 grid w-full max-w-3xl grid-cols-1 gap-8 md:grid-cols-2">
+            {HIERARCHY.directors.map((member, idx) => (
               <motion.div
-                className="bg-brand-gold/5 absolute right-0 bottom-0 h-32 w-32 rounded-tl-full"
-                whileHover={{ scale: 3, opacity: 0.12 }}
-                transition={{ duration: 0.5 }}
-              />
-              <motion.div
-                className="bg-brand-gold/10 border-brand-gold/20 group-hover:border-brand-gold float-slow mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full border transition-colors"
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ duration: 0.3 }}
+                key={idx}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.7, delay: idx * 0.15, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -10, boxShadow: '0 24px 64px rgba(0,0,0,0.14)' }}
+                className="group hover:border-brand-gold relative flex flex-col overflow-hidden border border-gray-200 bg-white p-8 text-center transition-all duration-400 dark:border-gray-700 dark:bg-gray-900"
               >
-                <span className="text-brand-navy font-serif text-3xl dark:text-gray-100">
-                  {member.name.charAt(0)}
-                </span>
-              </motion.div>
-              <div className="flex flex-grow flex-col">
-                <h3 className="text-brand-navy mb-2 font-serif text-3xl dark:text-gray-100">
+                <div className="from-brand-gold/40 via-brand-gold to-brand-gold/40 absolute top-0 left-0 h-1 w-full bg-gradient-to-r" />
+                <motion.div
+                  className="bg-brand-gold/10 border-brand-gold/20 group-hover:border-brand-gold mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full border transition-colors"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                >
+                  <span className="text-brand-navy font-serif text-2xl dark:text-gray-100">
+                    {member.name.charAt(0)}
+                  </span>
+                </motion.div>
+                <h3 className="text-brand-navy mb-1 font-serif text-2xl dark:text-gray-100">
                   {member.name}
                 </h3>
-                <span className="text-brand-gold mb-6 block text-sm font-bold tracking-widest uppercase">
+                <span className="text-brand-gold mb-4 block text-xs font-bold tracking-widest uppercase">
                   {member.role}
                 </span>
-                <p className="mb-8 flex-grow text-base leading-relaxed text-gray-600 dark:text-gray-400">
+                <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
                   {member.bio}
                 </p>
-                <div className="mt-auto flex justify-center gap-4 border-t border-gray-100 pt-6 dark:border-gray-700">
-                  <motion.a
-                    href="#"
-                    whileHover={{ scale: 1.2, backgroundColor: '#1a2744', color: '#fff' }}
-                    whileTap={{ scale: 0.9 }}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors dark:bg-gray-700"
-                    aria-label="LinkedIn"
-                  >
-                    <LinkedinIcon size={18} />
-                  </motion.a>
-                  <motion.a
-                    href="#"
-                    whileHover={{ scale: 1.2, backgroundColor: '#1a2744', color: '#fff' }}
-                    whileTap={{ scale: 0.9 }}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors dark:bg-gray-700"
-                    aria-label="Email"
-                  >
-                    <Mail size={18} />
-                  </motion.a>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Level 2: Area Managers */}
+          <AnimatePresence>
+            {maxVisibleLevel >= 2 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                className="flex w-full flex-col items-center overflow-hidden"
+              >
+                <ChevronDown className="text-brand-gold my-6 h-8 w-8 animate-bounce opacity-70" />
+
+                <div className="relative z-10 grid w-full max-w-2xl grid-cols-1 gap-8 md:grid-cols-2">
+                  {HIERARCHY.areaManagers.map((member, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: idx * 0.1 }}
+                      whileHover={{ scale: 1.03, boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
+                      className="border-brand-gold/30 hover:border-brand-gold relative flex flex-col items-center rounded-xl border bg-white p-8 shadow-md transition-all duration-300 dark:border-gray-700 dark:bg-gray-800"
+                    >
+                      <div className="bg-brand-gold/10 absolute -top-5 flex h-10 w-10 items-center justify-center rounded-full border border-white shadow-sm dark:border-gray-800">
+                        <Award size={20} className="text-brand-gold" />
+                      </div>
+                      <h4 className="text-brand-navy font-serif text-2xl dark:text-gray-100">
+                        {member.name}
+                      </h4>
+                      <span className="text-brand-gold mt-2 text-sm font-semibold tracking-wider uppercase">
+                        {member.role}
+                      </span>
+                    </motion.div>
+                  ))}
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Level 3: HR Manager */}
+          <AnimatePresence>
+            {maxVisibleLevel >= 3 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                className="flex w-full flex-col items-center overflow-hidden"
+              >
+                <ChevronDown className="text-brand-gold my-6 h-8 w-8 animate-bounce opacity-70" />
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                  whileHover={{ scale: 1.05 }}
+                  className="border-brand-gold/20 relative w-full max-w-md rounded-xl border bg-white p-8 text-center shadow-md dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <div className="bg-brand-navy absolute -top-5 left-1/2 flex h-10 w-10 -translate-x-1/2 transform items-center justify-center rounded-full border-2 border-white shadow-sm dark:border-gray-800">
+                    <Briefcase size={18} className="text-white" />
+                  </div>
+                  <h4 className="text-brand-navy mt-2 font-serif text-xl dark:text-gray-100">
+                    {HIERARCHY.hrManager.role}
+                  </h4>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Level 4: Team Lead */}
+          <AnimatePresence>
+            {maxVisibleLevel >= 4 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                className="flex w-full flex-col items-center overflow-hidden"
+              >
+                <ChevronDown className="text-brand-gold my-6 h-8 w-8 animate-bounce opacity-70" />
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                  whileHover={{ scale: 1.05 }}
+                  className="border-brand-gold/20 w-full max-w-sm rounded-lg border bg-white p-6 text-center shadow-md dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <h4 className="text-brand-navy font-serif text-lg dark:text-gray-100">
+                    {HIERARCHY.teamLead.role}
+                  </h4>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Level 5: Staff */}
+          <AnimatePresence>
+            {maxVisibleLevel >= 5 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                className="flex w-full flex-col items-center overflow-hidden"
+              >
+                <div className="border-brand-gold/40 my-6 h-10 w-px border-l-2 border-dashed"></div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="grid w-full max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3"
+                >
+                  {HIERARCHY.staff.map((staff, idx) => (
+                    <motion.div
+                      key={idx}
+                      whileHover={{ y: -5, borderColor: 'rgba(201, 168, 76, 0.8)' }}
+                      className="group flex flex-col items-center rounded-lg border border-gray-100 bg-gray-50 p-6 text-center shadow-sm transition-all dark:border-gray-800 dark:bg-gray-900"
+                    >
+                      <div className="mb-3 rounded-full bg-white p-3 shadow-sm transition-transform group-hover:scale-110 dark:bg-gray-800">
+                        <Users className="text-brand-gold h-6 w-6" />
+                      </div>
+                      <span className="text-brand-navy text-sm font-medium dark:text-gray-300">
+                        {staff.role}
+                      </span>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Interactive Controls */}
+          <motion.div
+            className="relative z-10 my-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            {maxVisibleLevel < 5 && (
+              <button
+                onClick={() => setMaxVisibleLevel((prev) => prev + 1)}
+                className="group border-brand-gold/50 text-brand-navy hover:border-brand-gold hover:bg-brand-gold dark:text-brand-gold dark:hover:text-brand-navy relative flex cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-full border bg-white px-8 py-3.5 text-sm font-bold tracking-widest uppercase shadow-sm transition-all hover:text-white dark:bg-gray-900"
+              >
+                <span>Reveal {getNextLevelName(maxVisibleLevel)}</span>
+                <Plus
+                  size={18}
+                  className="transition-transform duration-300 group-hover:rotate-90"
+                />
+              </button>
+            )}
+            {maxVisibleLevel > 1 && (
+              <button
+                onClick={() => setMaxVisibleLevel(1)}
+                className="group flex cursor-pointer items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-6 py-3.5 text-sm font-bold tracking-widest text-gray-600 uppercase shadow-sm transition-all hover:border-red-500 hover:text-red-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-red-400 dark:hover:text-red-400"
+              >
+                <span>Collapse Hierarchy</span>
+                <Minus size={18} />
+              </button>
+            )}
+          </motion.div>
         </div>
       </section>
 
