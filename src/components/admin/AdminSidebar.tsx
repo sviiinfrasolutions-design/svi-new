@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Bell,
   Calculator,
   CheckSquare,
   ChevronLeft,
@@ -167,6 +168,33 @@ const AdminSidebar = () => {
             className={`text-sm font-medium whitespace-nowrap transition-opacity duration-300 ${collapsed ? 'opacity-0' : 'opacity-100'}`}
           >
             Attendance
+          </span>
+        </Link>
+
+        <Link
+          href="/admin/notifications"
+          className={`group flex items-center gap-3 overflow-hidden rounded-xl px-3 py-2.5 transition-all ${
+            pathname.startsWith('/admin/notifications')
+              ? 'bg-brand-gold/10 text-brand-gold'
+              : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5'
+          }`}
+          title={collapsed ? 'Notifications' : ''}
+        >
+          <div className="relative flex shrink-0 items-center justify-center">
+            {pathname.startsWith('/admin/notifications') && (
+              <motion.div
+                layoutId="active-nav"
+                className="bg-brand-gold absolute -left-3 h-8 w-1 rounded-r-full"
+              />
+            )}
+            <Bell
+              className={`h-4.5 w-4.5 ${pathname.startsWith('/admin/notifications') ? 'text-brand-gold' : 'group-hover:text-brand-gold transition-colors'}`}
+            />
+          </div>
+          <span
+            className={`text-sm font-medium whitespace-nowrap transition-opacity duration-300 ${collapsed ? 'opacity-0' : 'opacity-100'}`}
+          >
+            Notifications
           </span>
         </Link>
       </div>

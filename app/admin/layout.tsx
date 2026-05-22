@@ -58,7 +58,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         style={{ visibility: mounted ? 'visible' : 'hidden' }}
       >
         <AdminSidebar />
-        <div className="relative flex h-screen w-full flex-1 flex-col overflow-x-hidden">
+        <div className="relative flex h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
           <AdminHeader
             isDark={isDark}
             toggleTheme={toggleTheme}

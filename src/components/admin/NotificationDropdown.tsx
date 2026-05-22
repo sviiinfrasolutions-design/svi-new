@@ -1,9 +1,10 @@
 'use client';
 
-import { Bell, Check, FileText, Info, Trash2, Users, X } from 'lucide-react';
+import { Bell, Check, FileText, Info, Trash2, Users, X, ArrowRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 
+import Link from 'next/link';
 import { supabase } from '@/src/lib/supabase/client';
 
 interface Notification {
@@ -87,10 +88,7 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
   // Delete notification
   const deleteNotification = async (notificationId: string) => {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .delete()
-        .eq('id', notificationId);
+      const { error } = await supabase.from('notifications').delete().eq('id', notificationId);
 
       if (error) throw error;
 
@@ -215,7 +213,7 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="text-xs font-medium text-brand-gold hover:text-brand-gold/80 transition-colors"
+                    className="text-brand-gold hover:text-brand-gold/80 text-xs font-medium transition-colors"
                   >
                     Mark all read
                   </button>
@@ -226,12 +224,14 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
               <div className="max-h-[28rem] overflow-y-auto">
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
-                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-brand-gold"></div>
+                    <div className="border-t-brand-gold h-6 w-6 animate-spin rounded-full border-2 border-gray-200"></div>
                   </div>
                 ) : notifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 text-center">
                     <Bell className="mb-4 h-12 w-12 text-gray-300 dark:text-gray-600" />
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No notifications</p>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      No notifications
+                    </p>
                     <p className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
                       You're all caught up!
                     </p>
@@ -251,15 +251,13 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                       >
                         <div className="flex gap-3">
                           {/* Icon */}
-                          <div className="mt-1 flex-shrink-0">
-                            {getTypeIcon(notification.type)}
-                          </div>
+                          <div className="mt-1 flex-shrink-0">{getTypeIcon(notification.type)}</div>
 
                           {/* Content */}
                           <div className="min-w-0 flex-1 pr-8">
                             <div className="flex items-start justify-between gap-2">
                               <p
-                                className={`text-sm font-semibold leading-tight ${
+                                className={`text-sm leading-tight font-semibold ${
                                   !notification.is_read
                                     ? 'text-gray-900 dark:text-white'
                                     : 'text-gray-700 dark:text-gray-300'
@@ -272,13 +270,13 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                                   e.stopPropagation();
                                   deleteNotification(notification.id);
                                 }}
-                                className="opacity-0 group-hover:opacity-100 cursor-pointer text-gray-400 transition-opacity hover:text-red-500"
+                                className="cursor-pointer text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-500"
                                 aria-label="Delete notification"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
                               </button>
                             </div>
-                            <p className="mt-1.5 text-xs leading-relaxed text-gray-600 dark:text-gray-400 line-clamp-2">
+                            <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                               {notification.message}
                             </p>
                             <div className="mt-2.5 flex items-center gap-2">
@@ -286,7 +284,7 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                                 {formatTime(notification.created_at)}
                               </span>
                               {!notification.is_read && (
-                                <span className="h-2 w-2 rounded-full bg-brand-gold"></span>
+                                <span className="bg-brand-gold h-2 w-2 rounded-full"></span>
                               )}
                             </div>
                           </div>
@@ -308,9 +306,13 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
               {/* Footer */}
               {notifications.length > 0 && (
                 <div className="border-t border-gray-100 px-5 py-3 dark:border-white/5">
-                  <button className="w-full text-center text-xs font-medium text-brand-gold hover:text-brand-gold/80 transition-colors">
+                  <Link
+                    href="/admin/notifications"
+                    className="text-brand-gold hover:text-brand-gold/80 flex w-full items-center justify-center gap-1.5 text-center text-xs font-medium transition-colors"
+                  >
                     View all notifications
-                  </button>
+                    <ArrowRight size={12} />
+                  </Link>
                 </div>
               )}
             </motion.div>
