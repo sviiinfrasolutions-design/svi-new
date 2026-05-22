@@ -20,10 +20,11 @@ import {
   User,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
 import { useTheme } from '@/src/components/ThemeProvider';
 import { supabase } from '@/src/lib/supabase/client';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const TABS = [
   { id: 'profile', label: 'Profile Settings', icon: User },
@@ -70,6 +71,12 @@ const getUserAgentInfo = () => {
 export default function AdminSettings() {
   const { token, userId, loading: sessionLoading } = useAdminSession();
   const { theme, setTheme } = useTheme();
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
+
+  const captchaDisabled = process.env.NEXT_PUBLIC_DISABLE_CAPTCHA === 'true';
+  const resolvedTheme = theme;
 
   // Tab State
   const [activeTab, setActiveTab] = useState('profile');
@@ -364,6 +371,9 @@ export default function AdminSettings() {
       const { error: signInErr } = await supabase.auth.signInWithPassword({
         email: profile.email,
         password: security.currentPassword,
+        options: {
+          captchaToken: captchaToken || undefined,
+        },
       });
 
       if (signInErr) {
@@ -383,6 +393,8 @@ export default function AdminSettings() {
     } catch (err: any) {
       showToast('error', err.message || 'Failed to update security credentials.');
     } finally {
+      captchaRef.current?.resetCaptcha();
+      setCaptchaToken(null);
       setSaveLoading(false);
     }
   };
@@ -954,10 +966,26 @@ export default function AdminSettings() {
                             </div>
                           </div>
 
+                          {/* hCaptcha Widget */}
+                          {!captchaDisabled && (
+                            <div className="flex justify-center py-2">
+                              <HCaptcha
+                                ref={captchaRef}
+                                sitekey={
+                                  process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ||
+                                  '10000000-ffff-ffff-ffff-000000000001'
+                                }
+                                onVerify={(token) => setCaptchaToken(token)}
+                                onExpire={() => setCaptchaToken(null)}
+                                theme={resolvedTheme}
+                              />
+                            </div>
+                          )}
+
                           <div className="flex justify-end pt-2">
                             <button
                               type="submit"
-                              disabled={saveLoading}
+                              disabled={saveLoading || (!captchaDisabled && !captchaToken)}
                               className="shimmer bg-brand-gold hover:bg-brand-gold-light text-brand-navy glow-gold flex cursor-pointer items-center justify-center gap-2 rounded-lg px-6 py-3.5 text-xs font-bold tracking-widest uppercase shadow-md transition-all disabled:opacity-60"
                             >
                               {saveLoading ? (

@@ -1,11 +1,12 @@
 'use client';
 
 import { AlertCircle, Eye, EyeOff, ShieldCheck } from 'lucide-react';
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useState, useRef, useEffect } from 'react';
 
 import { motion } from 'motion/react';
 import { supabase } from '@/src/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const GRID_STYLE = {
   backgroundImage:
@@ -21,6 +22,16 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const captchaDisabled = process.env.NEXT_PUBLIC_DISABLE_CAPTCHA === 'true';
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    setResolvedTheme(isDark ? 'dark' : 'light');
+  }, []);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
@@ -29,10 +40,15 @@ export default function AdminLogin() {
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
+      options: {
+        captchaToken: captchaToken || undefined,
+      },
     });
 
     if (authError || !data.session) {
       setError(authError?.message || 'Login failed');
+      captchaRef.current?.resetCaptcha();
+      setCaptchaToken(null);
       setLoading(false);
       return;
     }
@@ -155,9 +171,25 @@ export default function AdminLogin() {
               </div>
             </div>
 
+            {/* hCaptcha Widget */}
+            {!captchaDisabled && (
+              <div className="flex justify-center py-2">
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey={
+                    process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ||
+                    '10000000-ffff-ffff-ffff-000000000001'
+                  }
+                  onVerify={(token) => setCaptchaToken(token)}
+                  onExpire={() => setCaptchaToken(null)}
+                  theme={resolvedTheme}
+                />
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (!captchaDisabled && !captchaToken)}
               className="shimmer bg-brand-gold hover:bg-brand-gold-light text-brand-navy glow-gold mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-4 text-xs font-bold tracking-widest uppercase shadow-xl transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (

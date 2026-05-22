@@ -2,13 +2,16 @@
 
 import { motion } from 'motion/react';
 import { UserCircle2, ArrowRight, AlertCircle } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useState, useRef, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/src/lib/supabase/client';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { useTheme } from '@/src/components/ThemeProvider';
 
 export default function Login() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
   const [identifier, setIdentifier] = useState('');
@@ -16,6 +19,12 @@ export default function Login() {
   const [error, setError] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
+
+  const captchaDisabled = process.env.NEXT_PUBLIC_DISABLE_CAPTCHA === 'true';
+  const resolvedTheme = theme;
 
   const handlePasswordLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -25,11 +34,16 @@ export default function Login() {
       const { error: authError } = await supabase.auth.signInWithPassword({
         email: identifier,
         password,
+        options: {
+          captchaToken: captchaToken || undefined,
+        },
       });
       if (authError) throw authError;
       router.push('/payment'); // redirect to client portal after login
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
+      captchaRef.current?.resetCaptcha();
+      setCaptchaToken(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -43,11 +57,19 @@ export default function Login() {
     }
     setIsSubmitting(true);
     try {
-      const { error: otpError } = await supabase.auth.signInWithOtp({ email: identifier });
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email: identifier,
+        options: {
+          captchaToken: captchaToken || undefined,
+        },
+      });
       if (otpError) throw otpError;
       setOtpSent(true);
+      setCaptchaToken(null);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to send OTP.');
+      captchaRef.current?.resetCaptcha();
+      setCaptchaToken(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -108,6 +130,8 @@ export default function Login() {
                 setLoginMethod('password');
                 setError('');
                 setOtpSent(false);
+                captchaRef.current?.resetCaptcha();
+                setCaptchaToken(null);
               }}
               className={`flex-1 pb-3 text-xs font-bold tracking-widest uppercase transition-colors ${loginMethod === 'password' ? 'text-brand-navy dark:text-brand-gold border-brand-navy dark:border-brand-gold border-b-2' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
             >
@@ -118,6 +142,8 @@ export default function Login() {
                 setLoginMethod('otp');
                 setError('');
                 setOtpSent(false);
+                captchaRef.current?.resetCaptcha();
+                setCaptchaToken(null);
               }}
               className={`flex-1 pb-3 text-xs font-bold tracking-widest uppercase transition-colors ${loginMethod === 'otp' ? 'text-brand-navy dark:text-brand-gold border-brand-navy dark:border-brand-gold border-b-2' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
             >
@@ -167,10 +193,27 @@ export default function Login() {
                   className="focus:border-brand-gold w-full border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 transition-colors focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                 />
               </div>
+
+              {/* hCaptcha Widget for Password login */}
+              {!captchaDisabled && (
+                <div className="flex justify-center py-2">
+                  <HCaptcha
+                    ref={captchaRef}
+                    sitekey={
+                      process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ||
+                      '10000000-ffff-ffff-ffff-000000000001'
+                    }
+                    onVerify={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken(null)}
+                    theme={resolvedTheme}
+                  />
+                </div>
+              )}
+
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy hover:bg-brand-gold hover:text-brand-navy mt-4 flex w-full items-center justify-center gap-2 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors dark:hover:bg-white"
+                disabled={isSubmitting || (!captchaDisabled && !captchaToken)}
+                className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy hover:bg-brand-gold hover:text-brand-navy flex w-full items-center justify-center gap-2 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors disabled:opacity-50 dark:hover:bg-white"
               >
                 {isSubmitting ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -198,18 +241,36 @@ export default function Login() {
               </div>
 
               {!otpSent ? (
-                <button
-                  type="button"
-                  onClick={handleSendOtp}
-                  disabled={isSubmitting}
-                  className="text-brand-gold border-brand-gold hover:bg-brand-gold hover:text-brand-navy flex w-full items-center justify-center gap-2 border px-4 py-3 text-xs font-bold tracking-widest uppercase transition-colors"
-                >
-                  {isSubmitting ? (
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  ) : (
-                    'Send OTP'
+                <>
+                  {/* hCaptcha Widget for sending OTP */}
+                  {!captchaDisabled && (
+                    <div className="flex justify-center py-2">
+                      <HCaptcha
+                        ref={captchaRef}
+                        sitekey={
+                          process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ||
+                          '10000000-ffff-ffff-ffff-000000000001'
+                        }
+                        onVerify={(token) => setCaptchaToken(token)}
+                        onExpire={() => setCaptchaToken(null)}
+                        theme={resolvedTheme}
+                      />
+                    </div>
                   )}
-                </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={isSubmitting || (!captchaDisabled && !captchaToken)}
+                    className="text-brand-gold border-brand-gold hover:bg-brand-gold hover:text-brand-navy flex w-full items-center justify-center gap-2 border px-4 py-3 text-xs font-bold tracking-widest uppercase transition-colors disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    ) : (
+                      'Send OTP'
+                    )}
+                  </button>
+                </>
               ) : (
                 <form onSubmit={handleOtpVerify} className="space-y-4">
                   <div className="space-y-2">
