@@ -223,22 +223,30 @@ export default function TeamsManager({
   const [addMemberLoading, setAddMemberLoading] = useState(false);
 
   const fetchMembers = async (teamId: string) => {
-    const res = await fetch(`/api/admin/attendance/teams/${teamId}/members`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/admin/attendance/teams/${teamId}/members`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to fetch team members');
       setMembers((prev) => ({ ...prev, [teamId]: json.members }));
+    } catch (err: any) {
+      console.error('Error fetching team members:', err);
+      showToast('error', err.message || 'Failed to fetch team members.');
     }
   };
 
   const fetchUsers = async () => {
-    const res = await fetch('/api/admin/users', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch('/api/admin/users', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to fetch user profiles');
       setUsers(json.users.filter((u: UserProfile) => u.role === 'client'));
+    } catch (err: any) {
+      console.error('Error loading users list:', err);
+      showToast('error', err.message || 'Failed to load user rosters.');
     }
   };
 

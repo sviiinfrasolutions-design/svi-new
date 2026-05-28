@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from './ThemeProvider';
+import { useLotteryVisibility } from '@/src/lib/hooks/useLotteryVisibility';
 
 const NAV_LINKS = [
   { name: 'Home', path: '/' },
@@ -22,6 +23,7 @@ export default function Header() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const { visible: lotteryVisible } = useLotteryVisibility();
 
   useEffect(() => {
     setMounted(true);
@@ -173,6 +175,27 @@ export default function Header() {
                 Contact
               </Link>
 
+              {/* Lucky Draw — only shown when admin has enabled lottery visibility */}
+              {lotteryVisible && (
+                <Link
+                  href="/lottery"
+                  className={`relative flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase transition-all duration-300 hover:-translate-y-0.5 ${
+                    pathname === '/lottery'
+                      ? 'text-brand-gold'
+                      : 'text-brand-gold/80 hover:text-brand-gold'
+                  }`}
+                  aria-label="Lucky Draw"
+                >
+                  <span className="animate-pulse text-[10px]">🎰</span>
+                  Lucky Draw
+                  {pathname !== '/lottery' && (
+                    <span className="bg-brand-gold text-brand-navy absolute -top-2 -right-3 rounded-full px-1 py-px text-[7px] leading-none font-black uppercase">
+                      LIVE
+                    </span>
+                  )}
+                </Link>
+              )}
+
               <div className="flex items-center gap-3">
                 <Link
                   href="/login"
@@ -301,6 +324,19 @@ export default function Header() {
           >
             Contact Us
           </Link>
+
+          {/* Lucky Draw mobile link — admin controlled */}
+          {lotteryVisible && (
+            <Link
+              href="/lottery"
+              className="text-brand-gold flex items-center gap-2 font-serif text-2xl"
+            >
+              <span>🎰</span> Lucky Draw
+              <span className="bg-brand-gold text-brand-navy rounded-full px-2 py-0.5 text-xs font-black uppercase">
+                LIVE
+              </span>
+            </Link>
+          )}
 
           <div className="mt-8 flex flex-col gap-4">
             <Link

@@ -9,6 +9,7 @@ import {
   FileText,
   LayoutDashboard,
   LogOut,
+  Gift,
   Mail,
   Receipt,
   Settings,
@@ -38,6 +39,7 @@ const managementItems = [
   { name: 'Attendance', path: '/admin/attendance', icon: CheckSquare },
   { name: 'Notifications', path: '/admin/notifications', icon: Bell },
   { name: 'Email Center', path: '/admin/email', icon: Mail },
+  { name: 'Lottery Manager', path: '/admin/lottery', icon: Gift },
 ];
 
 // ─── Shared sidebar content ────────────────────────────────────────────────────

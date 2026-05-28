@@ -18,6 +18,9 @@ import AnimatedSection, {
   StaggerContainer,
   StaggerItem,
 } from '@/src/components/common/AnimatedSection';
+import dynamic from 'next/dynamic';
+
+const LotteryCTA = dynamic(() => import('@/src/components/lottery/LotteryCTA'), { ssr: false });
 
 const GRADIENT_STYLE = {
   backgroundImage:
@@ -559,6 +562,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <LotteryCTA />
 
       <section
         className="bg-brand-navy relative overflow-hidden py-24"
