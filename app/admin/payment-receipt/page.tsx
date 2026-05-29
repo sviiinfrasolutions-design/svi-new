@@ -437,6 +437,7 @@ export default function PaymentReceiptPage() {
                 value={formData.receiptNo}
                 onChange={handleChange}
                 required
+                disabled
               />
               <FormField
                 label="Date"
@@ -781,7 +782,7 @@ export default function PaymentReceiptPage() {
                   <img
                     src="/signature.png"
                     alt="Signature"
-                    className="absolute bottom-10 left-1/2 h-28 w-auto -translate-x-1/2 opacity-95 mix-blend-multiply"
+                    className="absolute bottom-10 left-1/2 h-28 w-auto -translate-x-1/2 opacity-100 mix-blend-multiply brightness-75 contrast-125"
                     onError={(e) => (e.currentTarget.style.display = 'none')}
                   />
                   <div className="relative z-10 w-56 border-t-2 border-black pt-2">

@@ -51,6 +51,7 @@ interface FormFieldProps {
   className?: string;
   step?: string;
   min?: string;
+  disabled?: boolean;
 }
 
 export function FormField({
@@ -64,6 +65,7 @@ export function FormField({
   className = '',
   step,
   min,
+  disabled = false,
 }: FormFieldProps) {
   return (
     <div className={className}>
@@ -79,7 +81,8 @@ export function FormField({
         placeholder={placeholder}
         step={step}
         min={min}
-        className="focus:border-brand-gold focus:ring-brand-gold/50 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 font-sans text-sm text-gray-900 placeholder-gray-400 transition-all focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white dark:placeholder-gray-600"
+        disabled={disabled}
+        className="focus:border-brand-gold focus:ring-brand-gold/50 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 font-sans text-sm text-gray-900 placeholder-gray-400 transition-all focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100/70 dark:border-white/10 dark:bg-[#111118] dark:text-white dark:placeholder-gray-600 dark:disabled:bg-gray-900/40"
       />
     </div>
   );
