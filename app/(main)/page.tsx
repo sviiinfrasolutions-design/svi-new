@@ -235,7 +235,10 @@ export default function Home() {
               </Link>
             </motion.div>
 
-            <Link href="/registration" className="group flex items-center gap-2.5 text-white/90 transition-colors hover:text-white">
+            <Link
+              href="/registration"
+              className="group flex items-center gap-2.5 text-white/90 transition-colors hover:text-white"
+            >
               <span className="hover-underline-gold text-[10px] font-semibold tracking-wider uppercase">
                 Invest with us
               </span>
@@ -287,7 +290,10 @@ export default function Home() {
                 <span className="group-hover:text-brand-gold transition-colors">
                   Read Our Full Story
                 </span>
-                <ArrowRight size={14} className="text-brand-gold transition-transform group-hover:translate-x-1" />
+                <ArrowRight
+                  size={14}
+                  className="text-brand-gold transition-transform group-hover:translate-x-1"
+                />
               </Link>
             </AnimatedSection>
 
@@ -398,7 +404,10 @@ export default function Home() {
                 <span className="group-hover:text-brand-gold transition-colors">
                   View Portfolio
                 </span>
-                <ArrowRight size={14} className="text-brand-gold transition-transform group-hover:translate-x-1" />
+                <ArrowRight
+                  size={14}
+                  className="text-brand-gold transition-transform group-hover:translate-x-1"
+                />
               </Link>
             </AnimatedSection>
           </div>
@@ -436,7 +445,10 @@ export default function Home() {
                       className="text-brand-navy group-hover:text-brand-gold inline-flex items-center gap-2 text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
                     >
                       Explore Details
-                      <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                      <ArrowRight
+                        size={14}
+                        className="transition-transform group-hover:translate-x-1"
+                      />
                     </Link>
                   </div>
                 </motion.div>
@@ -452,7 +464,10 @@ export default function Home() {
               <span className="group-hover:text-brand-gold transition-colors">
                 View All Projects
               </span>
-              <ArrowRight size={14} className="text-brand-gold transition-transform group-hover:translate-x-1" />
+              <ArrowRight
+                size={14}
+                className="text-brand-gold transition-transform group-hover:translate-x-1"
+              />
             </Link>
           </div>
         </div>
@@ -469,10 +484,7 @@ export default function Home() {
         <div className="bg-brand-gold/5 absolute -top-32 -right-32 h-96 w-96 rounded-full blur-3xl" />
         <div className="bg-brand-gold/5 absolute -bottom-32 -left-32 h-80 w-80 rounded-full blur-3xl" />
 
-        <AnimatedSection
-          type="fadeUp"
-          className="relative z-10 container mx-auto px-4 text-center"
-        >
+        <AnimatedSection type="fadeUp" className="relative z-10 container mx-auto px-4 text-center">
           <h2 className="mb-8 font-serif text-3xl text-white md:text-5xl">
             Ready to Find Your Dream Home?
           </h2>
@@ -489,7 +501,10 @@ export default function Home() {
                 Register Now
               </Link>
             </motion.div>
-            <Link href="/contact" className="group flex items-center gap-2 text-white/90 transition-colors hover:text-white">
+            <Link
+              href="/contact"
+              className="group flex items-center gap-2 text-white/90 transition-colors hover:text-white"
+            >
               <span className="hover-underline-gold text-[10px] font-semibold tracking-wider uppercase">
                 Contact Us
               </span>
