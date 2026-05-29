@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
                 <h2 style="color: #c9a84c; font-family: serif; text-transform: capitalize;">New ${docTypeFormatted} Generated</h2>
                 <p>Hello <strong>${userProfile.full_name}</strong>,</p>
                 <p>An administrative action was completed on your account. A new document has been uploaded for you:</p>
-                <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <div style="background-color: #f9f9f9; color: #333333; padding: 15px; border-radius: 8px; margin: 20px 0;">
                   <p style="margin: 5px 0;"><strong>Document Type:</strong> <span style="text-transform: capitalize;">${docTypeFormatted}</span></p>
                   <p style="margin: 5px 0;"><strong>Status:</strong> ${status || 'Completed'}</p>
                   ${pdf_url ? `<p style="margin: 5px 0;"><strong>File URL:</strong> <a href="${pdf_url}" style="color: #c9a84c; text-decoration: none;">Download Document</a></p>` : ''}

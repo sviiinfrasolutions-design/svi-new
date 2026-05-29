@@ -338,8 +338,22 @@ export function SentTab() {
                         Preview
                       </p>
                       <div
-                        className="max-h-80 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50/50 p-3 text-xs dark:border-gray-700 dark:bg-gray-900/30"
-                        dangerouslySetInnerHTML={{ __html: selected.html }}
+                        className="email-preview-wrapper max-h-80 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50/50 p-3 text-xs dark:border-gray-700 dark:bg-gray-900/30"
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            `
+                            <style>
+                              .email-preview-wrapper div[style*="background-color: #f9f9f9"],
+                              .email-preview-wrapper div[style*="background-color: #f9f9f9"] *,
+                              .email-preview-wrapper div[style*="background-color:#f9f9f9"],
+                              .email-preview-wrapper div[style*="background-color:#f9f9f9"] *,
+                              .email-preview-wrapper div[style*="background:#f9f9f9"],
+                              .email-preview-wrapper div[style*="background:#f9f9f9"] * {
+                                color: #333333 !important;
+                              }
+                            </style>
+                          ` + selected.html,
+                        }}
                       />
                     </div>
                   )}

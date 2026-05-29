@@ -129,7 +129,7 @@ function SidebarContent({
         {/* Documents section */}
         <motion.div
           animate={{ opacity: collapsed && !isMobile ? 0 : 1 }}
-          className="mt-6 mb-2 overflow-hidden px-4 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase dark:text-gray-500"
+          className="mt-6 mb-2 px-4 pb-0.5 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase dark:text-gray-500"
         >
           Documents
         </motion.div>
@@ -167,7 +167,7 @@ function SidebarContent({
         {/* Management section */}
         <motion.div
           animate={{ opacity: collapsed && !isMobile ? 0 : 1 }}
-          className="mt-6 mb-2 overflow-hidden px-4 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase dark:text-gray-500"
+          className="mt-6 mb-2 px-4 pb-0.5 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase dark:text-gray-500"
         >
           Management
         </motion.div>
