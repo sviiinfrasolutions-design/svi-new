@@ -59,9 +59,12 @@ export async function POST(request: NextRequest) {
 
   const { email, password, full_name, phone, property_interest, notes, real_email } = body;
 
-  if (!email || !password || !full_name) {
+  if (!email || !password || !full_name || !real_email || !phone || !property_interest || !notes) {
     return NextResponse.json(
-      { error: 'email, password, and full_name are required' },
+      {
+        error:
+          'Name, SVI Email, Real Email, Password, Phone, Property Interest, and Notes are required',
+      },
       { status: 400 }
     );
   }

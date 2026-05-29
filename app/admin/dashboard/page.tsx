@@ -133,8 +133,18 @@ function CreateUserModal({ onClose, onSuccess, token, properties }: CreateUserMo
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.email || !form.password || !form.full_name) {
-      setError('Name, email and password are required.');
+    if (
+      !form.email ||
+      !form.password ||
+      !form.full_name ||
+      !form.real_email ||
+      !form.phone ||
+      !form.property_interest ||
+      !form.notes
+    ) {
+      setError(
+        'All fields (Name, SVI Email, Email, Password, Phone, Property Interest, and Notes) are required.'
+      );
       return;
     }
     if (form.password.length < 8) {
@@ -232,7 +242,7 @@ function CreateUserModal({ onClose, onSuccess, token, properties }: CreateUserMo
             </div>
 
             <div>
-              <label className={labelCls}>Real Email Address</label>
+              <label className={labelCls}>Real Email Address *</label>
               <div className="relative">
                 <Mail className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
                 <input
@@ -240,6 +250,7 @@ function CreateUserModal({ onClose, onSuccess, token, properties }: CreateUserMo
                   type="email"
                   value={form.real_email}
                   onChange={handleChange}
+                  required
                   placeholder="client@example.com"
                   className={`${inputCls} pl-9`}
                 />
@@ -269,7 +280,7 @@ function CreateUserModal({ onClose, onSuccess, token, properties }: CreateUserMo
             </div>
 
             <div>
-              <label className={labelCls}>Phone Number</label>
+              <label className={labelCls}>Phone Number *</label>
               <div className="relative">
                 <Phone className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
                 <input
@@ -277,6 +288,7 @@ function CreateUserModal({ onClose, onSuccess, token, properties }: CreateUserMo
                   type="tel"
                   value={form.phone}
                   onChange={handleChange}
+                  required
                   placeholder="+91 98000 00000"
                   className={`${inputCls} pl-9`}
                 />
@@ -284,7 +296,7 @@ function CreateUserModal({ onClose, onSuccess, token, properties }: CreateUserMo
             </div>
 
             <div className="col-span-2">
-              <label className={labelCls}>Property Interest (Select Multiple)</label>
+              <label className={labelCls}>Property Interest * (Select Multiple)</label>
               <div className="grid max-h-36 grid-cols-2 gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50/50 p-3 dark:border-white/10 dark:bg-[#111118]">
                 {displayProperties.map((p) => {
                   const isChecked = selectedProperties.includes(p.slug);
@@ -309,7 +321,7 @@ function CreateUserModal({ onClose, onSuccess, token, properties }: CreateUserMo
             </div>
 
             <div className="col-span-2">
-              <label className={labelCls}>Notes (Internal)</label>
+              <label className={labelCls}>Notes (Internal) *</label>
               <div className="relative">
                 <FileText className="text-brand-gold absolute top-3 left-3 h-3.5 w-3.5" />
                 <textarea
@@ -317,6 +329,7 @@ function CreateUserModal({ onClose, onSuccess, token, properties }: CreateUserMo
                   rows={2}
                   value={form.notes}
                   onChange={handleChange}
+                  required
                   placeholder="Internal notes about this client..."
                   className={`${inputCls} resize-none pl-9`}
                 />
@@ -399,8 +412,14 @@ function EditUserModal({ user, onClose, onSuccess, token, properties }: EditUser
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.full_name) {
-      setError('Name is required.');
+    if (
+      !form.full_name ||
+      !form.real_email ||
+      !form.phone ||
+      !form.property_interest ||
+      !form.notes
+    ) {
+      setError('All fields (Name, Email, Phone, Property Interest, and Notes) are required.');
       return;
     }
     setLoading(true);
@@ -478,7 +497,7 @@ function EditUserModal({ user, onClose, onSuccess, token, properties }: EditUser
             </div>
 
             <div className="col-span-2 sm:col-span-1">
-              <label className={labelCls}>Real Email Address</label>
+              <label className={labelCls}>Real Email Address *</label>
               <div className="relative">
                 <Mail className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
                 <input
@@ -486,6 +505,7 @@ function EditUserModal({ user, onClose, onSuccess, token, properties }: EditUser
                   type="email"
                   value={form.real_email}
                   onChange={handleChange}
+                  required
                   placeholder="client@example.com"
                   className={`${inputCls} pl-9`}
                 />
@@ -493,7 +513,7 @@ function EditUserModal({ user, onClose, onSuccess, token, properties }: EditUser
             </div>
 
             <div className="col-span-2 sm:col-span-1">
-              <label className={labelCls}>Phone Number</label>
+              <label className={labelCls}>Phone Number *</label>
               <div className="relative">
                 <Phone className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
                 <input
@@ -501,6 +521,7 @@ function EditUserModal({ user, onClose, onSuccess, token, properties }: EditUser
                   type="tel"
                   value={form.phone}
                   onChange={handleChange}
+                  required
                   placeholder="+91 98000 00000"
                   className={`${inputCls} pl-9`}
                 />
@@ -508,7 +529,7 @@ function EditUserModal({ user, onClose, onSuccess, token, properties }: EditUser
             </div>
 
             <div className="col-span-2">
-              <label className={labelCls}>Property Interest (Select Multiple)</label>
+              <label className={labelCls}>Property Interest * (Select Multiple)</label>
               <div className="grid max-h-36 grid-cols-2 gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50/50 p-3 dark:border-white/10 dark:bg-[#111118]">
                 {displayProperties.map((p) => {
                   const isChecked = selectedProperties.includes(p.slug);
@@ -550,7 +571,7 @@ function EditUserModal({ user, onClose, onSuccess, token, properties }: EditUser
             </div>
 
             <div className="col-span-2">
-              <label className={labelCls}>Notes (Internal)</label>
+              <label className={labelCls}>Notes (Internal) *</label>
               <div className="relative">
                 <FileText className="text-brand-gold absolute top-3 left-3 h-3.5 w-3.5" />
                 <textarea
@@ -558,6 +579,7 @@ function EditUserModal({ user, onClose, onSuccess, token, properties }: EditUser
                   rows={2}
                   value={form.notes}
                   onChange={handleChange}
+                  required
                   placeholder="Internal notes..."
                   className={`${inputCls} resize-none pl-9`}
                 />

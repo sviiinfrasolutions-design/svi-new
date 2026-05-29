@@ -61,7 +61,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const allowedFields = ['full_name', 'phone', 'property_interest', 'notes', 'real_email', 'role'];
   const updates: Record<string, string> = {};
   for (const key of allowedFields) {
-    if (body[key] !== undefined) updates[key] = body[key];
+    if (body[key] !== undefined) {
+      if (key !== 'role' && !body[key]) {
+        return NextResponse.json(
+          { error: `${key.replace('_', ' ')} cannot be empty` },
+          { status: 400 }
+        );
+      }
+      updates[key] = body[key];
+    }
   }
 
   const { data: updated, error: updateErr } = await supabaseAdmin
