@@ -21,7 +21,7 @@ import {
   Globe,
 } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase/client';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 interface Participant {
   name: string;
@@ -219,13 +219,24 @@ export default function AdminLotteryPage() {
       };
       reader.readAsText(file);
     } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
-          const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[firstSheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          const buffer = e.target?.result as ArrayBuffer;
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(buffer);
+          const worksheet = workbook.worksheets[0];
+          if (!worksheet) {
+            setErrorMessage('No worksheets found in the uploaded file.');
+            return;
+          }
+          const jsonData: any[][] = [];
+          worksheet.eachRow((row) => {
+            const rowData: any[] = [];
+            row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+              rowData[colNumber - 1] = cell.value;
+            });
+            jsonData.push(rowData);
+          });
           parseExcelData(jsonData);
         } catch (error) {
           setErrorMessage('Error reading Excel file. Make sure it is not corrupted.');
