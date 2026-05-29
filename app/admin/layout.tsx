@@ -7,9 +7,11 @@ import AdminHeader from '@/src/components/admin/AdminHeader';
 import AdminSidebar from '@/src/components/admin/AdminSidebar';
 import { AdminSessionProvider } from '@/src/components/admin/AdminSessionProvider';
 import { supabase } from '@/src/lib/supabase/client';
+import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
@@ -51,6 +53,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     document.documentElement.classList.toggle('light', !next);
     localStorage.setItem('svi-theme-v1', next ? 'dark' : 'light');
   };
+
+  // If on the admin login page, completely bypass the admin panel outer frame (header & sidebar)
+  if (pathname === '/admin') {
+    return (
+      <AdminSessionProvider>
+        <div className="min-h-screen w-full" style={{ visibility: mounted ? 'visible' : 'hidden' }}>
+          {children}
+        </div>
+      </AdminSessionProvider>
+    );
+  }
 
   return (
     <AdminSessionProvider>

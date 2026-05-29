@@ -6,6 +6,7 @@ import {
   CheckSquare,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
   FileText,
   LayoutDashboard,
   LogOut,
@@ -36,6 +37,7 @@ const documentItems = [
 ];
 
 const managementItems = [
+  { name: 'Registrations', path: '/admin/registrations', icon: ClipboardList },
   { name: 'Attendance', path: '/admin/attendance', icon: CheckSquare },
   { name: 'Notifications', path: '/admin/notifications', icon: Bell },
   { name: 'Email Center', path: '/admin/email', icon: Mail },

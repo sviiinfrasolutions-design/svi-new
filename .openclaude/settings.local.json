@@ -17,7 +17,8 @@
       "Bash(npm outdated:*)",
       "Bash(npm info:*)",
       "WebSearch",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Skill(firecrawl-crawl)"
     ]
   }
 }

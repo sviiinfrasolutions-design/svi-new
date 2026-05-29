@@ -21,6 +21,19 @@ export default function AdminLogin() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  // Field validation and touched states
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [shake, setShake] = useState(false);
+  const [captchaShake, setCaptchaShake] = useState(false);
+
+  const emailIsValid = email ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) : true;
+  const passwordIsValid = password ? password.length >= 6 : true;
+
+  const showEmailError = emailTouched && !emailIsValid;
+  const showPasswordError = passwordTouched && !passwordIsValid;
 
   const captchaDisabled = process.env.NEXT_PUBLIC_DISABLE_CAPTCHA === 'true';
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -35,6 +48,31 @@ export default function AdminLogin() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setEmailTouched(true);
+    setPasswordTouched(true);
+
+    // Validate email
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address.');
+      setShake(true);
+      return;
+    }
+
+    // Validate password length
+    if (!password || password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      setShake(true);
+      return;
+    }
+
+    // Interactive Captcha reminder feedback
+    if (!captchaDisabled && !captchaToken) {
+      setError('Captcha verification is required to proceed.');
+      setCaptchaShake(true);
+      setShake(true);
+      return;
+    }
+
     setLoading(true);
 
     const { data, error: authError } = await supabase.auth.signInWithPassword({
@@ -46,7 +84,8 @@ export default function AdminLogin() {
     });
 
     if (authError || !data.session) {
-      setError(authError?.message || 'Login failed');
+      setError(authError?.message || 'Login failed. Please verify your credentials.');
+      setShake(true);
       captchaRef.current?.resetCaptcha();
       setCaptchaToken(null);
       setLoading(false);
@@ -63,14 +102,18 @@ export default function AdminLogin() {
     if (profile?.role !== 'admin') {
       await supabase.auth.signOut();
       setError('Access denied. This portal is for administrators only.');
+      setShake(true);
       setLoading(false);
       return;
     }
 
+    // Show premium success overlay stage
+    setSuccess(true);
+
     // Wait a brief moment to ensure cookies are set, then navigate
     setTimeout(() => {
       router.replace('/admin/dashboard');
-    }, 100);
+    }, 1800);
   };
 
   return (
@@ -86,14 +129,51 @@ export default function AdminLogin() {
 
       <motion.div
         initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        animate={shake ? { x: [0, -8, 8, -6, 6, -4, 4, 0], y: 0 } : { opacity: 1, y: 0 }}
+        transition={shake ? { duration: 0.5 } : { duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        onAnimationComplete={() => setShake(false)}
         className="relative z-10 w-full max-w-md"
       >
         {/* Card */}
         <div className="dark:border-brand-gold/15 relative overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-10 shadow-2xl backdrop-blur-xl transition-colors duration-300 dark:bg-[#0e0e14]/75">
           {/* Subtle gold line on top of the card */}
           <div className="via-brand-gold/60 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
+
+          {/* Success Stage Glassmorphism Overlay */}
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/95 p-10 text-center backdrop-blur-xl dark:bg-[#0e0e14]/95"
+            >
+              <motion.div
+                initial={{ scale: 0, rotate: -45 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                className="bg-brand-gold/10 border-brand-gold/30 glow-gold mb-6 flex h-20 w-20 items-center justify-center rounded-full border"
+              >
+                <ShieldCheck className="text-brand-gold h-10 w-10" />
+              </motion.div>
+
+              <h2 className="text-brand-navy mb-3 font-serif text-2xl font-semibold tracking-wide dark:text-white">
+                Access Granted
+              </h2>
+
+              <p className="mb-8 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                Welcome back, Administrator. Initializing your secure dashboard session...
+              </p>
+
+              {/* Luxury progress tracking bar */}
+              <div className="relative h-1 w-48 overflow-hidden rounded-full bg-gray-100 dark:bg-white/10">
+                <motion.div
+                  initial={{ left: '-100%' }}
+                  animate={{ left: '100%' }}
+                  transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
+                  className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-[#c9a84c] to-transparent"
+                />
+              </div>
+            </motion.div>
+          )}
 
           {/* Icon */}
           <div className="mb-6 flex justify-center">
@@ -135,31 +215,69 @@ export default function AdminLogin() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400">
-                Email Address
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400">
+                  Email Address
+                </label>
+                {showEmailError && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-[10px] font-semibold text-red-500 dark:text-red-400"
+                  >
+                    Invalid Email format
+                  </motion.span>
+                )}
+              </div>
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailTouched) setEmailTouched(false);
+                }}
+                onBlur={() => setEmailTouched(true)}
                 required
                 placeholder="admin@sviinfra.com"
-                className="focus:border-brand-gold focus:ring-brand-gold/20 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 font-sans text-sm text-gray-900 placeholder-gray-400 transition-all focus:bg-gray-50 focus:ring-2 focus:outline-none dark:border-white/10 dark:bg-[#111118]/80 dark:text-white dark:placeholder-gray-600 dark:focus:bg-white/5"
+                className={`w-full rounded-lg border px-4 py-3 font-sans text-sm transition-all focus:ring-2 focus:outline-none ${
+                  showEmailError
+                    ? 'border-red-500 bg-red-500/5 text-gray-900 focus:border-red-500 focus:ring-red-500/20 dark:border-red-500/40 dark:bg-red-500/5 dark:text-white'
+                    : 'focus:border-brand-gold focus:ring-brand-gold/20 border-gray-200 bg-white text-gray-900 dark:border-white/10 dark:bg-[#111118]/80 dark:text-white dark:placeholder-gray-600 dark:focus:bg-white/5'
+                }`}
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400">
-                Password
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400">
+                  Password
+                </label>
+                {showPasswordError && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-[10px] font-semibold text-red-500 dark:text-red-400"
+                  >
+                    At least 6 characters
+                  </motion.span>
+                )}
+              </div>
               <div className="relative">
                 <input
                   type={showPass ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordTouched) setPasswordTouched(false);
+                  }}
+                  onBlur={() => setPasswordTouched(true)}
                   required
                   placeholder="••••••••"
-                  className="focus:border-brand-gold focus:ring-brand-gold/20 w-full rounded-lg border border-gray-200 bg-white px-4 py-3 pr-12 font-sans text-sm text-gray-900 placeholder-gray-400 transition-all focus:bg-gray-50 focus:ring-2 focus:outline-none dark:border-white/10 dark:bg-[#111118]/80 dark:text-white dark:placeholder-gray-600 dark:focus:bg-white/5"
+                  className={`w-full rounded-lg border px-4 py-3 pr-12 font-sans text-sm transition-all focus:ring-2 focus:outline-none ${
+                    showPasswordError
+                      ? 'border-red-500 bg-red-500/5 text-gray-900 focus:border-red-500 focus:ring-red-500/20 dark:border-red-500/40 dark:bg-red-500/5 dark:text-white'
+                      : 'focus:border-brand-gold focus:ring-brand-gold/20 border-gray-200 bg-white text-gray-900 dark:border-white/10 dark:bg-[#111118]/80 dark:text-white dark:placeholder-gray-600 dark:focus:bg-white/5'
+                  }`}
                 />
                 <button
                   type="button"
@@ -173,23 +291,32 @@ export default function AdminLogin() {
 
             {/* hCaptcha Widget */}
             {!captchaDisabled && (
-              <div className="flex justify-center py-2">
+              <motion.div
+                animate={captchaShake ? { x: [0, -6, 6, -4, 4, 0] } : {}}
+                onAnimationComplete={() => setCaptchaShake(false)}
+                className={`flex flex-col items-center justify-center rounded-lg py-2 transition-all duration-300 ${
+                  captchaShake ? 'bg-red-500/5 p-1 ring-2 ring-red-500/30' : ''
+                }`}
+              >
                 <HCaptcha
                   ref={captchaRef}
                   sitekey={
                     process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ||
                     '10000000-ffff-ffff-ffff-000000000001'
                   }
-                  onVerify={(token) => setCaptchaToken(token)}
+                  onVerify={(token) => {
+                    setCaptchaToken(token);
+                    setError('');
+                  }}
                   onExpire={() => setCaptchaToken(null)}
                   theme={resolvedTheme}
                 />
-              </div>
+              </motion.div>
             )}
 
             <button
               type="submit"
-              disabled={loading || (!captchaDisabled && !captchaToken)}
+              disabled={loading}
               className="shimmer bg-brand-gold hover:bg-brand-gold-light text-brand-navy glow-gold mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-4 text-xs font-bold tracking-widest uppercase shadow-xl transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (

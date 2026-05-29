@@ -19,6 +19,22 @@ export default function Login() {
   const [error, setError] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  // Validation & touched states
+  const [identifierTouched, setIdentifierTouched] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [otpTouched, setOtpTouched] = useState(false);
+  const [shake, setShake] = useState(false);
+  const [captchaShake, setCaptchaShake] = useState(false);
+
+  const identifierIsValid = identifier ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier) : true;
+  const passwordIsValid = password ? password.length >= 6 : true;
+  const otpIsValid = otp ? /^\d{6}$/.test(otp) : true;
+
+  const showIdentifierError = identifierTouched && !identifierIsValid;
+  const showPasswordError = passwordTouched && !passwordIsValid;
+  const showOtpError = otpTouched && !otpIsValid;
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<HCaptcha>(null);
@@ -29,6 +45,28 @@ export default function Login() {
   const handlePasswordLogin = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setIdentifierTouched(true);
+    setPasswordTouched(true);
+
+    if (!identifier || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) {
+      setError('Please enter a valid email address.');
+      setShake(true);
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      setShake(true);
+      return;
+    }
+
+    if (!captchaDisabled && !captchaToken) {
+      setError('Captcha verification is required to log in.');
+      setCaptchaShake(true);
+      setShake(true);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { error: authError } = await supabase.auth.signInWithPassword({
@@ -39,9 +77,14 @@ export default function Login() {
         },
       });
       if (authError) throw authError;
-      router.push('/payment'); // redirect to client portal after login
+
+      setSuccess(true);
+      setTimeout(() => {
+        router.push('/payment'); // redirect to client portal after login
+      }, 1800);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
+      setShake(true);
       captchaRef.current?.resetCaptcha();
       setCaptchaToken(null);
     } finally {
@@ -51,10 +94,21 @@ export default function Login() {
 
   const handleSendOtp = async () => {
     setError('');
-    if (!identifier) {
-      setError('Please enter your email first.');
+    setIdentifierTouched(true);
+
+    if (!identifier || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) {
+      setError('Please enter a valid email address.');
+      setShake(true);
       return;
     }
+
+    if (!captchaDisabled && !captchaToken) {
+      setError('Captcha verification is required to send OTP.');
+      setCaptchaShake(true);
+      setShake(true);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { error: otpError } = await supabase.auth.signInWithOtp({
@@ -68,6 +122,7 @@ export default function Login() {
       setCaptchaToken(null);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to send OTP.');
+      setShake(true);
       captchaRef.current?.resetCaptcha();
       setCaptchaToken(null);
     } finally {
@@ -78,6 +133,14 @@ export default function Login() {
   const handleOtpVerify = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setOtpTouched(true);
+
+    if (!otp || !/^\d{6}$/.test(otp)) {
+      setError('Please enter a valid 6-digit numeric OTP.');
+      setShake(true);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { error: verifyError } = await supabase.auth.verifyOtp({
@@ -86,9 +149,14 @@ export default function Login() {
         type: 'email',
       });
       if (verifyError) throw verifyError;
-      router.push('/payment');
+
+      setSuccess(true);
+      setTimeout(() => {
+        router.push('/payment');
+      }, 1800);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'OTP verification failed.');
+      setShake(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -108,9 +176,47 @@ export default function Login() {
       <div className="relative z-10 container mx-auto flex justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md border bg-white p-8 shadow-2xl md:p-12 dark:border-gray-700 dark:bg-gray-900"
+          animate={shake ? { x: [0, -8, 8, -6, 6, -4, 4, 0], y: 0 } : { opacity: 1, y: 0 }}
+          transition={shake ? { duration: 0.5 } : { duration: 0.6 }}
+          onAnimationComplete={() => setShake(false)}
+          className="relative w-full max-w-md overflow-hidden border bg-white p-8 shadow-2xl md:p-12 dark:border-gray-700 dark:bg-gray-900"
         >
+          {/* Success Stage Glassmorphism Overlay */}
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/95 p-8 text-center backdrop-blur-xl dark:bg-gray-900/95"
+            >
+              <motion.div
+                initial={{ scale: 0, rotate: -45 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                className="bg-brand-gold/10 border-brand-gold/30 glow-gold dark:border-brand-gold/40 mb-6 flex h-20 w-20 items-center justify-center rounded-full border"
+              >
+                <UserCircle2 className="text-brand-navy dark:text-brand-gold h-10 w-10 animate-pulse" />
+              </motion.div>
+
+              <h2 className="text-brand-navy mb-3 font-serif text-2xl font-semibold tracking-wide dark:text-white">
+                Welcome Back
+              </h2>
+
+              <p className="mb-8 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                Authentication successful. Initializing your client document portal...
+              </p>
+
+              {/* Luxury progress tracking bar */}
+              <div className="relative h-1 w-48 overflow-hidden rounded-full bg-gray-100 dark:bg-white/10">
+                <motion.div
+                  initial={{ left: '-100%' }}
+                  animate={{ left: '100%' }}
+                  transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
+                  className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-[#c9a84c] to-transparent"
+                />
+              </div>
+            </motion.div>
+          )}
+
           <div className="mb-8 text-center">
             <div className="text-brand-navy dark:text-brand-gold mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
               <UserCircle2 size={32} />
@@ -130,6 +236,9 @@ export default function Login() {
                 setLoginMethod('password');
                 setError('');
                 setOtpSent(false);
+                setIdentifierTouched(false);
+                setPasswordTouched(false);
+                setOtpTouched(false);
                 captchaRef.current?.resetCaptcha();
                 setCaptchaToken(null);
               }}
@@ -142,6 +251,9 @@ export default function Login() {
                 setLoginMethod('otp');
                 setError('');
                 setOtpSent(false);
+                setIdentifierTouched(false);
+                setPasswordTouched(false);
+                setOtpTouched(false);
                 captchaRef.current?.resetCaptcha();
                 setCaptchaToken(null);
               }}
@@ -166,16 +278,35 @@ export default function Login() {
           {loginMethod === 'password' ? (
             <form onSubmit={handlePasswordLogin} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
-                  Registered Email
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
+                    Registered Email
+                  </label>
+                  {showIdentifierError && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-[10px] font-semibold text-red-500 dark:text-red-400"
+                    >
+                      Invalid Email format
+                    </motion.span>
+                  )}
+                </div>
                 <input
                   type="email"
                   value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
+                  onChange={(e) => {
+                    setIdentifier(e.target.value);
+                    if (identifierTouched) setIdentifierTouched(false);
+                  }}
+                  onBlur={() => setIdentifierTouched(true)}
                   required
                   placeholder="you@example.com"
-                  className="focus:border-brand-gold w-full border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 transition-colors focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  className={`focus:border-brand-gold w-full border px-4 py-3 text-gray-900 transition-colors focus:outline-none ${
+                    showIdentifierError
+                      ? 'border-red-500 bg-red-500/5 focus:ring-1 focus:ring-red-500/20 dark:border-red-500/40 dark:bg-red-500/5 dark:text-white'
+                      : 'border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                  }`}
                 />
               </div>
               <div className="space-y-2">
@@ -183,37 +314,63 @@ export default function Login() {
                   <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
                     Password
                   </label>
+                  {showPasswordError && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-[10px] font-semibold text-red-500 dark:text-red-400"
+                    >
+                      At least 6 characters
+                    </motion.span>
+                  )}
                 </div>
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordTouched) setPasswordTouched(false);
+                  }}
+                  onBlur={() => setPasswordTouched(true)}
                   required
                   placeholder="••••••••"
-                  className="focus:border-brand-gold w-full border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 transition-colors focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  className={`focus:border-brand-gold w-full border px-4 py-3 text-gray-900 transition-colors focus:outline-none ${
+                    showPasswordError
+                      ? 'border-red-500 bg-red-500/5 focus:ring-1 focus:ring-red-500/20 dark:border-red-500/40 dark:bg-red-500/5 dark:text-white'
+                      : 'border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                  }`}
                 />
               </div>
 
               {/* hCaptcha Widget for Password login */}
               {!captchaDisabled && (
-                <div className="flex justify-center py-2">
+                <motion.div
+                  animate={captchaShake ? { x: [0, -6, 6, -4, 4, 0] } : {}}
+                  onAnimationComplete={() => setCaptchaShake(false)}
+                  className={`flex flex-col items-center justify-center rounded-lg py-2 transition-all duration-300 ${
+                    captchaShake ? 'bg-red-500/5 p-1 ring-2 ring-red-500/30' : ''
+                  }`}
+                >
                   <HCaptcha
                     ref={captchaRef}
                     sitekey={
                       process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ||
                       '10000000-ffff-ffff-ffff-000000000001'
                     }
-                    onVerify={(token) => setCaptchaToken(token)}
+                    onVerify={(token) => {
+                      setCaptchaToken(token);
+                      setError('');
+                    }}
                     onExpire={() => setCaptchaToken(null)}
                     theme={resolvedTheme}
                   />
-                </div>
+                </motion.div>
               )}
 
               <button
                 type="submit"
-                disabled={isSubmitting || (!captchaDisabled && !captchaToken)}
-                className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy hover:bg-brand-gold hover:text-brand-navy flex w-full items-center justify-center gap-2 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors disabled:opacity-50 dark:hover:bg-white"
+                disabled={isSubmitting}
+                className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy hover:bg-brand-gold hover:text-brand-navy flex w-full cursor-pointer items-center justify-center gap-2 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors disabled:opacity-50 dark:hover:bg-white"
               >
                 {isSubmitting ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -227,16 +384,35 @@ export default function Login() {
           ) : (
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
-                  Registered Email
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
+                    Registered Email
+                  </label>
+                  {showIdentifierError && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-[10px] font-semibold text-red-500 dark:text-red-400"
+                    >
+                      Invalid Email format
+                    </motion.span>
+                  )}
+                </div>
                 <input
                   type="email"
                   value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
+                  onChange={(e) => {
+                    setIdentifier(e.target.value);
+                    if (identifierTouched) setIdentifierTouched(false);
+                  }}
+                  onBlur={() => setIdentifierTouched(true)}
                   placeholder="you@example.com"
                   disabled={otpSent}
-                  className="focus:border-brand-gold w-full border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 transition-colors focus:outline-none disabled:opacity-60 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  className={`focus:border-brand-gold w-full border px-4 py-3 text-gray-900 transition-colors focus:outline-none disabled:opacity-60 ${
+                    showIdentifierError
+                      ? 'border-red-500 bg-red-500/5 focus:ring-1 focus:ring-red-500/20 dark:border-red-500/40 dark:bg-red-500/5 dark:text-white'
+                      : 'border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                  }`}
                 />
               </div>
 
@@ -244,25 +420,34 @@ export default function Login() {
                 <>
                   {/* hCaptcha Widget for sending OTP */}
                   {!captchaDisabled && (
-                    <div className="flex justify-center py-2">
+                    <motion.div
+                      animate={captchaShake ? { x: [0, -6, 6, -4, 4, 0] } : {}}
+                      onAnimationComplete={() => setCaptchaShake(false)}
+                      className={`flex flex-col items-center justify-center rounded-lg py-2 transition-all duration-300 ${
+                        captchaShake ? 'bg-red-500/5 p-1 ring-2 ring-red-500/30' : ''
+                      }`}
+                    >
                       <HCaptcha
                         ref={captchaRef}
                         sitekey={
                           process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ||
                           '10000000-ffff-ffff-ffff-000000000001'
                         }
-                        onVerify={(token) => setCaptchaToken(token)}
+                        onVerify={(token) => {
+                          setCaptchaToken(token);
+                          setError('');
+                        }}
                         onExpire={() => setCaptchaToken(null)}
                         theme={resolvedTheme}
                       />
-                    </div>
+                    </motion.div>
                   )}
 
                   <button
                     type="button"
                     onClick={handleSendOtp}
-                    disabled={isSubmitting || (!captchaDisabled && !captchaToken)}
-                    className="text-brand-gold border-brand-gold hover:bg-brand-gold hover:text-brand-navy flex w-full items-center justify-center gap-2 border px-4 py-3 text-xs font-bold tracking-widest uppercase transition-colors disabled:opacity-50"
+                    disabled={isSubmitting}
+                    className="text-brand-gold border-brand-gold hover:bg-brand-gold hover:text-brand-navy flex w-full cursor-pointer items-center justify-center gap-2 border px-4 py-3 text-xs font-bold tracking-widest uppercase transition-colors disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -274,17 +459,36 @@ export default function Login() {
               ) : (
                 <form onSubmit={handleOtpVerify} className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
-                      Enter OTP
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
+                        Enter OTP
+                      </label>
+                      {showOtpError && (
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="text-[10px] font-semibold text-red-500 dark:text-red-400"
+                        >
+                          Must be 6 digits
+                        </motion.span>
+                      )}
+                    </div>
                     <input
                       type="text"
                       inputMode="numeric"
                       maxLength={6}
                       value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                      onChange={(e) => {
+                        setOtp(e.target.value.replace(/\D/g, ''));
+                        if (otpTouched) setOtpTouched(false);
+                      }}
+                      onBlur={() => setOtpTouched(true)}
                       placeholder="6-digit code"
-                      className="focus:border-brand-gold w-full border border-gray-200 bg-gray-50 px-4 py-3 text-center text-2xl tracking-[0.5em] text-gray-900 transition-colors focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      className={`focus:border-brand-gold w-full border px-4 py-3 text-center text-2xl tracking-[0.5em] text-gray-900 transition-colors focus:outline-none ${
+                        showOtpError
+                          ? 'border-red-500 bg-red-500/5 focus:ring-1 focus:ring-red-500/20 dark:border-red-500/40 dark:bg-red-500/5 dark:text-white'
+                          : 'border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
                     />
                     <p className="text-center text-xs text-gray-500">
                       Check your inbox at <span className="text-brand-gold">{identifier}</span>
@@ -293,7 +497,7 @@ export default function Login() {
                   <button
                     type="submit"
                     disabled={isSubmitting || otp.length < 6}
-                    className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy hover:bg-brand-gold hover:text-brand-navy flex w-full items-center justify-center gap-2 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors disabled:opacity-60 dark:hover:bg-white"
+                    className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy hover:bg-brand-gold hover:text-brand-navy flex w-full cursor-pointer items-center justify-center gap-2 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors disabled:opacity-60 dark:hover:bg-white"
                   >
                     {isSubmitting ? (
                       <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -308,8 +512,9 @@ export default function Login() {
                     onClick={() => {
                       setOtpSent(false);
                       setOtp('');
+                      setOtpTouched(false);
                     }}
-                    className="w-full text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                    className="w-full cursor-pointer text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                   >
                     ← Change email
                   </button>

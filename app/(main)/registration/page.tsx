@@ -1,59 +1,178 @@
 'use client';
 
 import { useCallback, useState, type ChangeEvent, type FormEvent } from 'react';
-// import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { Building2, User, Phone, Mail, MessageSquare, AlertCircle } from 'lucide-react';
+import { AlertCircle, Upload, X } from 'lucide-react';
+import Captcha from '@/src/components/Captcha';
+
+const ADVISOR_NAMES = [
+  'Manish',
+  'Raghvendra',
+  'Arwaz',
+  'Dhiraj',
+  'Aryan',
+  'Khushi',
+  'Javed',
+  'Peeyush',
+  'Prateek',
+  'knowledge',
+  'Khushbu',
+  'Alok Gupta',
+  'Shivam Yadav',
+  'Luv Kumar',
+  'Ananya pal',
+  'Manish Goyal',
+  'Suhan',
+  'Sachin',
+  'Shekhar',
+  'Muskan',
+  'Wasi',
+  'Shubham',
+];
+
+const PROJECTS = [
+  { value: 'shyam-aangan-phase-1', label: 'Shyam Aangan Phase 1' },
+  { value: 'shyam-aangan-farm-house', label: 'Shyam Aangan Farm House' },
+];
+
+const PROPERTY_SIZES = [
+  { value: '50-100', label: '50 to 100 (Sq.Yrd)' },
+  { value: '100-200', label: '100 to 200 (Sq.Yrd)' },
+  { value: '200-400', label: '200 to 400 (Sq.Yrd)' },
+  { value: '400-700', label: '400 to 700 (Sq.Yrd)' },
+  { value: '700-1000', label: '700 to 1000 (Sq.Yrd)' },
+  { value: '1000-1500', label: '1000 to 1500 (Sq.Yrd)' },
+  { value: '1500-2000', label: '1500 to 2000 (Sq.Yrd)' },
+];
+
+const PROPERTY_TYPES = [
+  { value: 'residential-plot', label: 'Residential Plot' },
+  { value: 'commercial-shop', label: 'Commercial shop' },
+  { value: 'luxury-farm-house', label: 'Luxury Farm House' },
+];
+
+const PLOT_PREFERENCES = [
+  { value: 'main-road', label: 'Main Road' },
+  { value: 'park', label: 'Park' },
+  { value: 'corner', label: 'Corner' },
+  { value: 'none', label: 'None' },
+];
+
+const PAYMENT_PLANS = [
+  { value: '3-months', label: '3 Months' },
+  { value: '6-months', label: '6 Months' },
+  { value: '12-months', label: '12 Months' },
+  { value: '18-months', label: '18 Months' },
+  { value: '24-months', label: '24 Months' },
+];
+
+const PAYMENT_MODES = [
+  { value: 'online', label: 'Online' },
+  { value: 'cash', label: 'Cash' },
+  { value: 'net-banking', label: 'Net Banking' },
+];
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  mobileNo: string;
+  email: string;
+  soWoDo: string;
+  dob: string;
+  aadharNumber: string;
+  panNumber: string;
+  state: string;
+  city: string;
+  address: string;
+  advisorName: string;
+  project: string;
+  propertySize: string;
+  propertyType: string;
+  plotPreference: string;
+  paymentPlan: string;
+  paymentMode: string;
+  schemeAmount: string;
+}
+
+const INITIAL_FORM: FormData = {
+  firstName: '',
+  lastName: '',
+  mobileNo: '',
+  email: '',
+  soWoDo: '',
+  dob: '',
+  aadharNumber: '',
+  panNumber: '',
+  state: '',
+  city: '',
+  address: '',
+  advisorName: '',
+  project: '',
+  propertySize: '',
+  propertyType: '',
+  plotPreference: '',
+  paymentPlan: '',
+  paymentMode: '',
+  schemeAmount: '',
+};
 
 const GRADIENT_STYLE = {
   backgroundImage:
     'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)',
   backgroundSize: '40px 40px',
 };
-const DIGIT_REGEX = /\d/g;
 
 export default function Registration() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    propertyInterest: '',
-    message: '',
-  });
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState('');
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [panCardFile, setPanCardFile] = useState<File | null>(null);
+  const [captchaValid, setCaptchaValid] = useState(false);
+  const [captchaError, setCaptchaError] = useState('');
 
   const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    else if (formData.name.length < 2) newErrors.name = 'Name must be at least 2 characters';
-    else if (!/^[a-zA-Z\s]+$/.test(formData.name))
-      newErrors.name = 'Name can only contain letters and spaces';
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.mobileNo.trim()) newErrors.mobileNo = 'Mobile number is required';
+    else if (!/^\d{10}$/.test(formData.mobileNo.replace(/\s/g, '')))
+      newErrors.mobileNo = 'Enter a valid 10-digit mobile number';
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email) newErrors.email = 'Email is required';
-    else if (!emailRegex.test(formData.email))
-      newErrors.email = 'Please enter a valid email address';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+      newErrors.email = 'Enter a valid email address';
 
-    const phoneRegex = /^\+?[\d\s-]{10,15}$/;
-    const digitCount = (formData.phone.match(DIGIT_REGEX) || []).length;
-    if (!formData.phone) newErrors.phone = 'Phone number is required';
-    else if (!phoneRegex.test(formData.phone) || digitCount < 10 || digitCount > 15) {
-      newErrors.phone = 'Please enter a valid phone number (10-15 digits)';
-    }
+    if (!formData.soWoDo.trim()) newErrors.soWoDo = 'This field is required';
+    if (!formData.dob) newErrors.dob = 'Date is required';
+    if (!formData.aadharNumber.trim()) newErrors.aadharNumber = 'Aadhar number is required';
+    else if (!/^\d{12}$/.test(formData.aadharNumber.replace(/\s/g, '')))
+      newErrors.aadharNumber = 'Enter a valid 12-digit Aadhar number';
 
-    if (!formData.propertyInterest)
-      newErrors.propertyInterest = 'Please select a property interest';
+    if (!formData.state.trim()) newErrors.state = 'State is required';
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.address.trim()) newErrors.address = 'Address is required';
+    if (!formData.advisorName) newErrors.advisorName = 'Please select an advisor';
+    if (!formData.project) newErrors.project = 'Please select a project';
+    if (!formData.propertySize) newErrors.propertySize = 'Please select property size';
+    if (!formData.propertyType) newErrors.propertyType = 'Please select property type';
+    if (!formData.plotPreference) newErrors.plotPreference = 'Please select plot preference';
+    if (!formData.paymentPlan) newErrors.paymentPlan = 'Please select payment plan';
+    if (!formData.paymentMode) newErrors.paymentMode = 'Please select payment mode';
+    if (!formData.schemeAmount.trim()) newErrors.schemeAmount = 'Scheme amount is required';
 
-    if (formData.message && formData.message.length > 500) {
-      newErrors.message = 'Message cannot exceed 500 characters';
+    if (!captchaValid) {
+      newErrors.captcha = 'Please solve the verification';
+      setCaptchaError('Please solve the verification');
+    } else {
+      setCaptchaError('');
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData]);
+  }, [formData, captchaValid]);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -66,7 +185,26 @@ export default function Registration() {
     [errors]
   );
 
-  const [submitError, setSubmitError] = useState('');
+  const handleFileChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>, type: 'photo' | 'panCard') => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors((prev) => ({ ...prev, [type]: 'File size must be under 5MB' }));
+        return;
+      }
+      if (type === 'photo') setPhotoFile(file);
+      else setPanCardFile(file);
+      setErrors((prev) => ({ ...prev, [type]: '' }));
+    },
+    []
+  );
+
+  const removeFile = useCallback((type: 'photo' | 'panCard') => {
+    if (type === 'photo') setPhotoFile(null);
+    else setPanCardFile(null);
+  }, []);
+
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
@@ -75,17 +213,12 @@ export default function Registration() {
       setIsSubmitting(true);
       setSubmitError('');
       try {
-        const res = await fetch('/api/registration', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            property_interest: formData.propertyInterest,
-            message: formData.message || null,
-          }),
-        });
+        const body = new FormData();
+        Object.entries(formData).forEach(([key, value]) => body.append(key, value));
+        if (photoFile) body.append('photo', photoFile);
+        if (panCardFile) body.append('panCard', panCardFile);
+
+        const res = await fetch('/api/registration', { method: 'POST', body });
         if (!res.ok) throw new Error('Submission failed');
         router.push('/thank-you');
       } catch {
@@ -94,252 +227,260 @@ export default function Registration() {
         setIsSubmitting(false);
       }
     },
-    [validateForm, formData, router]
+    [validateForm, formData, photoFile, panCardFile, router]
   );
+
+  const inputClass = (field: string) =>
+    `w-full border bg-gray-50/50 py-3 pr-4 pl-4 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${
+      errors[field]
+        ? 'border-red-500 focus:border-red-500'
+        : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'
+    }`;
+
+  const labelClass = 'text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase';
+
+  const renderError = (field: string) =>
+    errors[field] ? (
+      <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
+        <AlertCircle size={12} /> {errors[field]}
+      </p>
+    ) : null;
+
+  const renderSelect = (
+    name: string,
+    label: string,
+    options: { value: string; label: string }[] | string[],
+    placeholder: string
+  ) => (
+    <div className="space-y-2">
+      <label htmlFor={name} className={labelClass}>
+        {label} *
+      </label>
+      <select
+        name={name}
+        id={name}
+        value={formData[name as keyof FormData]}
+        onChange={handleChange}
+        className={`appearance-none ${inputClass(name)}`}
+      >
+        <option value="">{placeholder}</option>
+        {options.map((opt) =>
+          typeof opt === 'string' ? (
+            <option key={opt} value={opt.toLowerCase().replace(/\s+/g, '-')}>
+              {opt}
+            </option>
+          ) : (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          )
+        )}
+      </select>
+      {renderError(name)}
+    </div>
+  );
+
+  const renderInput = (
+    name: string,
+    label: string,
+    type: string = 'text',
+    placeholder: string = ''
+  ) => (
+    <div className="space-y-2">
+      <label htmlFor={name} className={labelClass}>
+        {label} *
+      </label>
+      <input
+        type={type}
+        id={name}
+        name={name}
+        value={formData[name as keyof FormData]}
+        onChange={handleChange}
+        className={inputClass(name)}
+        placeholder={placeholder}
+      />
+      {renderError(name)}
+    </div>
+  );
+
+  const renderFileUpload = (type: 'photo' | 'panCard', label: string) => {
+    const file = type === 'photo' ? photoFile : panCardFile;
+    return (
+      <div className="space-y-2">
+        <label className={labelClass}>{label}</label>
+        {file ? (
+          <div className="flex items-center gap-2 rounded border border-gray-200 bg-gray-50/50 px-4 py-3 dark:border-gray-700 dark:bg-gray-900">
+            <span className="flex-1 truncate text-sm">{file.name}</span>
+            <button
+              type="button"
+              onClick={() => removeFile(type)}
+              className="text-gray-400 hover:text-red-500"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        ) : (
+          <label className="hover:border-brand-gold hover:text-brand-gold flex cursor-pointer items-center gap-2 rounded border border-dashed border-gray-300 bg-gray-50/50 px-4 py-6 text-sm text-gray-400 transition-colors dark:border-gray-700 dark:bg-gray-900">
+            <Upload size={16} />
+            <span>Choose file</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFileChange(e, type)}
+              className="hidden"
+            />
+          </label>
+        )}
+        {renderError(type)}
+      </div>
+    );
+  };
 
   return (
     <div className="bg-brand-bg min-h-screen pt-32 pb-24 dark:bg-gray-900">
       <div className="container mx-auto px-4">
-        <div className="mx-auto flex max-w-5xl flex-col border border-gray-200 bg-white shadow-2xl md:flex-row dark:border-gray-700 dark:bg-gray-800">
-          <div className="bg-brand-navy relative flex flex-col justify-between overflow-hidden p-12 text-white md:w-5/12 lg:p-16">
-            <div
-              className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-10"
-              style={GRADIENT_STYLE}
-            ></div>
-
-            <div className="relative z-10 block">
-              <h4 className="text-brand-gold mb-4 text-[10px] font-bold tracking-[0.3em] uppercase">
-                Invest With Us
-              </h4>
-              <h2 className="mb-6 font-serif text-4xl leading-tight">
-                Register
-                <br />
-                Interest
-              </h2>
-              <p className="mb-10 text-sm leading-relaxed text-gray-300">
-                Take the first step towards your dream property. Fill out the form and our property
-                agents will get back to you with exclusive options.
-              </p>
-
-              <ul className="space-y-6">
-                <li className="flex items-center gap-4 text-sm font-medium tracking-wide">
-                  <div className="border-brand-gold text-brand-gold flex h-6 w-6 items-center justify-center border text-xs">
-                    ✓
-                  </div>
-                  Early bird pricing
-                </li>
-                <li className="flex items-center gap-4 text-sm font-medium tracking-wide">
-                  <div className="border-brand-gold text-brand-gold flex h-6 w-6 items-center justify-center border text-xs">
-                    ✓
-                  </div>
-                  Priority site visits
-                </li>
-                <li className="flex items-center gap-4 text-sm font-medium tracking-wide">
-                  <div className="border-brand-gold text-brand-gold flex h-6 w-6 items-center justify-center border text-xs">
-                    ✓
-                  </div>
-                  Exclusive project updates
-                </li>
-              </ul>
-            </div>
-
-            <div className="relative z-10 mt-16 border-t border-white/10 pt-8">
-              <p className="font-serif text-sm text-gray-300 italic">
-                "Investing with SVI Infra was the best decision for my family's future."
-              </p>
-              <p className="text-brand-gold mt-4 text-[10px] font-bold tracking-widest uppercase">
-                - Recent Buyer
-              </p>
-            </div>
+        <div className="mx-auto max-w-5xl">
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <h1 className="text-brand-navy mb-2 font-serif text-3xl dark:text-white">
+              fill the booking form
+            </h1>
+            <p className="text-sm text-gray-500">
+              Please fill out the form below to register with SVI Infra Solutions Pvt. Ltd
+            </p>
           </div>
 
-          <div className="p-12 md:w-7/12 lg:p-16">
-            <h3 className="text-brand-navy mb-8 font-serif text-2xl dark:text-gray-100">
-              Your Details
-            </h3>
-
-            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+          {/* Form */}
+          <form
+            onSubmit={handleSubmit}
+            className="border border-gray-200 bg-white p-8 shadow-2xl md:p-12 dark:border-gray-700 dark:bg-gray-800"
+            noValidate
+          >
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {renderInput('firstName', 'First Name', 'text', 'Enter first name')}
               <div className="space-y-2">
-                <label
-                  htmlFor="reg-name"
-                  className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase"
-                >
-                  Full Name
+                <label htmlFor="lastName" className={labelClass}>
+                  Last Name
                 </label>
-                <div className="relative">
-                  <div className="text-brand-gold pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <User size={16} />
-                  </div>
-                  <input
-                    type="text"
-                    id="reg-name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={`w-full border bg-gray-50/50 py-3 pr-4 pl-12 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${errors.name ? 'border-red-500 focus:border-red-500' : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'}`}
-                    placeholder="John Doe"
-                  />
-                </div>
-                {errors.name && (
-                  <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
-                    <AlertCircle size={12} /> {errors.name}
-                  </p>
-                )}
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className={inputClass('lastName')}
+                  placeholder="Enter last name"
+                />
               </div>
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="reg-email"
-                    className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase"
-                  >
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <div className="text-brand-gold pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                      <Mail size={16} />
-                    </div>
-                    <input
-                      type="email"
-                      id="reg-email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className={`w-full border bg-gray-50/50 py-3 pr-4 pl-12 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${errors.email ? 'border-red-500 focus:border-red-500' : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'}`}
-                      placeholder="john@example.com"
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
-                      <AlertCircle size={12} /> {errors.email}
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <label
-                    htmlFor="reg-phone"
-                    className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase"
-                  >
-                    Phone Number
-                  </label>
-                  <div className="relative">
-                    <div className="text-brand-gold pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                      <Phone size={16} />
-                    </div>
-                    <input
-                      type="tel"
-                      id="reg-phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className={`w-full border bg-gray-50/50 py-3 pr-4 pl-12 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${errors.phone ? 'border-red-500 focus:border-red-500' : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'}`}
-                      placeholder="+91"
-                    />
-                  </div>
-                  {errors.phone && (
-                    <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
-                      <AlertCircle size={12} /> {errors.phone}
-                    </p>
-                  )}
-                </div>
-              </div>
+              {renderInput('mobileNo', 'Mobile No', 'tel', 'Enter mobile number')}
+              {renderInput('email', 'Email', 'email', 'Enter email address')}
 
+              {renderInput('soWoDo', 'S/O, W/O, D/O', 'text', 'Enter relation')}
+              {renderInput('dob', 'Date', 'date')}
+
+              {renderFileUpload('photo', 'Photo Upload')}
+              {renderFileUpload('panCard', 'PAN Card Upload')}
+
+              {renderInput('aadharNumber', 'Aadhar Number', 'text', 'Enter 12-digit Aadhar')}
               <div className="space-y-2">
-                <label
-                  htmlFor="reg-propertyInterest"
-                  className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase"
-                >
-                  Property Interest
+                <label htmlFor="panNumber" className={labelClass}>
+                  PAN Number
                 </label>
-                <div className="relative">
-                  <div className="text-brand-gold pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <Building2 size={16} />
-                  </div>
-                  <select
-                    name="propertyInterest"
-                    id="reg-propertyInterest"
-                    value={formData.propertyInterest}
-                    onChange={handleChange}
-                    className={`w-full appearance-none rounded-none border bg-gray-50/50 py-3 pr-4 pl-12 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${errors.propertyInterest ? 'border-red-500 focus:border-red-500' : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'}`}
-                  >
-                    <option value="" disabled>
-                      Select an option
-                    </option>
-                    <optgroup label="Current Projects">
-                      <option value="shivani-vatika">Shivani Vatika — Nayla</option>
-                      <option value="shyam-aangan">Shyam Aangan — Basri Khurd near Jaipur</option>
-                    </optgroup>
-                    <optgroup label="Completed Projects">
-                      <option value="shree-shyam-residency">Shree Shyam Residency — Jaipur</option>
-                      <option value="shivani-city">Shivani City — Manpura Machedi</option>
-                      <option value="shivani-residency">Shivani Residency — Dobadi</option>
-                    </optgroup>
-                    <option value="general">General Inquiry</option>
-                  </select>
-                </div>
-                {errors.propertyInterest && (
-                  <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
-                    <AlertCircle size={12} /> {errors.propertyInterest}
-                  </p>
-                )}
+                <input
+                  type="text"
+                  id="panNumber"
+                  name="panNumber"
+                  value={formData.panNumber}
+                  onChange={handleChange}
+                  className={inputClass('panNumber')}
+                  placeholder="Enter PAN number"
+                />
               </div>
 
-              <div className="space-y-2">
-                <label
-                  htmlFor="reg-message"
-                  className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase"
-                >
-                  Additional Message
-                </label>
-                <div className="relative">
-                  <div className="text-brand-gold pointer-events-none absolute top-4 left-4">
-                    <MessageSquare size={16} />
-                  </div>
-                  <textarea
-                    rows={4}
-                    id="reg-message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    maxLength={500}
-                    className={`w-full resize-none border bg-gray-50/50 py-3 pr-4 pl-12 text-sm transition-colors outline-none focus:ring-0 dark:bg-gray-900 dark:text-white ${errors.message ? 'border-red-500 focus:border-red-500' : 'focus:border-brand-gold dark:focus:border-brand-gold border-gray-200 dark:border-gray-700'}`}
-                    placeholder="Tell us about your requirements... (optional)"
-                  ></textarea>
-                </div>
-                <div className="mt-1 flex items-center justify-between">
-                  {errors.message ? (
-                    <p className="flex items-center gap-1 text-xs text-red-500">
-                      <AlertCircle size={12} /> {errors.message}
-                    </p>
-                  ) : (
-                    <span></span>
-                  )}
-                  <span className="text-[10px] text-gray-400">{formData.message.length}/500</span>
-                </div>
+              {renderInput('state', 'State', 'text', 'Enter state')}
+              {renderInput('city', 'City', 'text', 'Enter city')}
+
+              {renderInput('address', 'Address', 'text', 'Enter full address')}
+              {renderSelect('advisorName', 'Advisor Name', ADVISOR_NAMES, 'Select advisor')}
+
+              {renderSelect('project', 'Select Projects', PROJECTS, 'Select project')}
+              {renderSelect('propertySize', 'Property Size', PROPERTY_SIZES, 'Select size')}
+
+              {renderSelect('propertyType', 'Property Type', PROPERTY_TYPES, 'Select type')}
+              {renderSelect(
+                'plotPreference',
+                'Plot Preference',
+                PLOT_PREFERENCES,
+                'Select preference'
+              )}
+
+              {renderSelect('paymentPlan', 'Payment Plan', PAYMENT_PLANS, 'Select plan')}
+              {renderSelect('paymentMode', 'Payment Mode', PAYMENT_MODES, 'Select mode')}
+
+              <div className="md:col-span-2">
+                {renderInput('schemeAmount', 'Scheme Amount', 'text', 'Enter scheme amount')}
               </div>
 
-              <div className="pt-6">
-                {submitError && (
-                  <p className="mb-4 flex items-center gap-1 text-xs text-red-500">
-                    <AlertCircle size={12} /> {submitError}
-                  </p>
-                )}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-brand-navy hover:bg-brand-gold text-brand-gold hover:text-brand-navy border-brand-navy flex w-full items-center justify-center gap-2 border py-4 text-xs font-bold tracking-widest uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-600 dark:bg-gray-700"
-                >
-                  {isSubmitting ? (
-                    <div className="h-4 w-4 animate-spin border-2 border-current border-t-transparent"></div>
-                  ) : (
-                    'Submit Registration'
-                  )}
-                </button>
+              <div className="md:col-span-2">
+                <Captcha onValidate={setCaptchaValid} error={captchaError} />
               </div>
-              <p className="mt-6 text-center text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                By submitting, you agree to our terms and privacy policy.
-              </p>
-            </form>
+            </div>
+
+            {/* Submit */}
+            <div className="mt-8">
+              {submitError && (
+                <p className="mb-4 flex items-center gap-1 text-xs text-red-500">
+                  <AlertCircle size={12} /> {submitError}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-brand-navy hover:bg-brand-gold text-brand-gold hover:text-brand-navy border-brand-navy flex w-full items-center justify-center gap-2 border py-4 text-xs font-bold tracking-widest uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-600 dark:bg-gray-700"
+              >
+                {isSubmitting ? (
+                  <div className="h-4 w-4 animate-spin border-2 border-current border-t-transparent"></div>
+                ) : (
+                  'Submit Registration'
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* Notes */}
+          <div className="mt-6 space-y-2 text-center">
+            <p className="text-[11px] text-gray-500">
+              Note: Please fill all the details properly and upload the correct documents, otherwise
+              application can be rejected without notice.
+            </p>
+            <p className="text-[11px] text-gray-500">
+              Registration amount of 2100 and 5100 will be refunded to Applicants whose name will
+              not be picked in the draw.
+            </p>
+          </div>
+
+          {/* CTA Section */}
+          <div className="bg-brand-navy mt-16 p-12 text-center text-white">
+            <h2 className="mb-4 font-serif text-3xl">Ready to Find Your Dream Home?</h2>
+            <p className="mb-8 text-sm text-gray-300">
+              Let our expert team help you navigate the real estate market and find the perfect
+              property for you.
+            </p>
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <a
+                href="/registration"
+                className="bg-brand-gold text-brand-navy hover:bg-brand-gold/90 px-8 py-3 text-xs font-bold tracking-widest uppercase transition-colors"
+              >
+                Registration Now
+              </a>
+              <a
+                href="/contact-us"
+                className="border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-navy border px-8 py-3 text-xs font-bold tracking-widest uppercase transition-colors"
+              >
+                Contact Us
+              </a>
+            </div>
           </div>
         </div>
       </div>
