@@ -2,32 +2,33 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error('Missing RESEND_API_KEY environment variable');
+  return new Resend(apiKey);
+}
 
-// GET /api/admin/email - Fetch sent emails from Resend
 export async function GET(request: NextRequest) {
   try {
     const admin = await verifyAdmin(request);
     if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const resend = getResend();
     const url = new URL(request.url);
     const action = url.searchParams.get('action');
     const emailId = url.searchParams.get('id');
     const limit = parseInt(url.searchParams.get('limit') || '50');
 
     if (action === 'domains') {
-      // List verified domains
       const domains = await resend.domains.list();
       return NextResponse.json({ domains: domains.data });
     }
 
     if (action === 'email' && emailId) {
-      // Fetch single email details
       const email = await resend.emails.get(emailId);
       return NextResponse.json({ email: email.data });
     }
 
-    // List all sent emails
     const emails = await resend.emails.list({ limit });
     return NextResponse.json({
       emails: emails.data?.data || [],
@@ -45,6 +46,7 @@ export async function POST(request: NextRequest) {
     const admin = await verifyAdmin(request);
     if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const resend = getResend();
     const body = await request.json();
     const { action } = body;
 
