@@ -12,6 +12,7 @@ import {
   RefreshCw,
   X,
   CreditCard,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import html2canvas from 'html2canvas-pro';
@@ -49,6 +50,7 @@ export default function ReceiptRecordsPage() {
   const [deleteTarget, setDeleteTarget] = useState<SavedReceipt | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
 
   const fetchReceipts = () => {
     if (!token) return;
@@ -167,6 +169,58 @@ export default function ReceiptRecordsPage() {
     } finally {
       document.body.removeChild(clone);
       setPdfLoading(false);
+    }
+  };
+
+  const handleDownloadImage = async () => {
+    const element = document.getElementById('modalReceiptPreview');
+    if (!element) return;
+
+    setImageLoading(true);
+    const clone = element.cloneNode(true) as HTMLElement;
+
+    clone.style.backgroundColor = 'white';
+    clone.style.color = 'black';
+    clone.style.width = '210mm';
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    clone.style.padding = '32px';
+    clone.style.boxSizing = 'border-box';
+
+    const images = clone.querySelectorAll('img');
+    const imagePromises = Array.from(images).map((img) => {
+      return new Promise<void>((resolve) => {
+        if (img.complete) resolve();
+        else {
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        }
+      });
+    });
+
+    document.body.appendChild(clone);
+
+    try {
+      await Promise.all(imagePromises);
+      const canvas = await html2canvas(clone, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        imageTimeout: 15000,
+        windowWidth: 794,
+        windowHeight: clone.scrollHeight,
+      });
+
+      const link = document.createElement('a');
+      link.download = `Receipt_${selectedReceipt?.form_data?.receiptNo || 'Record'}.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+    } finally {
+      document.body.removeChild(clone);
+      setImageLoading(false);
     }
   };
 
@@ -429,7 +483,7 @@ export default function ReceiptRecordsPage() {
                 <button
                   onClick={handleDownloadPDF}
                   disabled={pdfLoading}
-                  className="bg-brand-gold hover:bg-brand-gold-light text-brand-navy flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold uppercase shadow-md transition-all"
+                  className="bg-brand-gold hover:bg-brand-gold-light text-brand-navy flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold uppercase shadow-md transition-all disabled:opacity-50"
                 >
                   {pdfLoading ? (
                     <RefreshCw className="h-3.5 w-3.5 animate-spin" />
@@ -437,6 +491,18 @@ export default function ReceiptRecordsPage() {
                     <Download className="h-3.5 w-3.5" />
                   )}
                   Download PDF
+                </button>
+                <button
+                  onClick={handleDownloadImage}
+                  disabled={imageLoading}
+                  className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white uppercase shadow-md transition-all hover:bg-emerald-700 disabled:opacity-50"
+                >
+                  {imageLoading ? (
+                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <ImageIcon className="h-3.5 w-3.5" />
+                  )}
+                  Save as PNG
                 </button>
                 <button
                   onClick={() => setSelectedReceipt(null)}
@@ -616,7 +682,7 @@ export default function ReceiptRecordsPage() {
                     <img
                       src="/signature.png"
                       alt="Signature"
-                      className="absolute bottom-10 left-1/2 h-28 w-auto -translate-x-1/2 opacity-100 mix-blend-multiply brightness-75 contrast-125"
+                      className="absolute bottom-10 left-1/2 h-28 w-auto -translate-x-1/2 opacity-95 mix-blend-multiply"
                       onError={(e) => (e.currentTarget.style.display = 'none')}
                     />
                     <div className="relative z-10 w-56 border-t-2 border-black pt-2">

@@ -30,6 +30,7 @@ interface AdminSidebarProps {
 
 const documentItems = [
   { name: 'Allotment Letter', path: '/admin/allotment-letter', icon: FileText },
+  { name: 'Allotment Records', path: '/admin/allotment-records', icon: ClipboardList },
   { name: 'Payment Receipt', path: '/admin/payment-receipt', icon: Receipt },
   { name: 'Receipt Records', path: '/admin/payment-receipts', icon: ClipboardList },
   { name: 'Payment Plan', path: '/admin/payment-plan', icon: Calculator },
