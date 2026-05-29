@@ -11,6 +11,7 @@ import { FileText, RefreshCw } from 'lucide-react';
 
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/src/lib/supabase/client';
 
@@ -56,46 +57,46 @@ export default function AllotmentLetterPage() {
   }, []);
 
   useEffect(() => {
+    if (!token) return;
+
     async function loadAdvisors() {
       try {
-        const { data: settingData } = await supabase
-          .from('portal_settings')
-          .select('value')
-          .eq('key', 'active_advisors')
-          .maybeSingle();
+        // 1. Fetch active_advisors setting from our authenticated admin API
+        const settingsRes = await fetch('/api/admin/settings?key=active_advisors', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!settingsRes.ok) throw new Error('Failed to fetch advisor settings');
+        const settingsJson = await settingsRes.json();
 
         let advisorIds: string[] = [];
-        if (settingData?.value?.ids && Array.isArray(settingData.value.ids)) {
-          advisorIds = settingData.value.ids;
+        if (settingsJson?.value?.ids && Array.isArray(settingsJson.value.ids)) {
+          advisorIds = settingsJson.value.ids;
         }
 
-        let query = supabase
-          .from('profiles')
-          .select('full_name, phone, email')
-          .order('full_name', { ascending: true });
+        // 2. Fetch all profiles using our authenticated admin API (to bypass RLS)
+        const usersRes = await fetch('/api/admin/users?limit=100', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!usersRes.ok) throw new Error('Failed to fetch profiles');
+        const usersJson = await usersRes.json();
+        const allProfiles: any[] = usersJson.users || [];
 
-        if (advisorIds.length > 0) {
-          query = query.in('id', advisorIds);
-        }
+        // 3. Filter profiles by active advisor IDs
+        const filteredProfiles = allProfiles.filter((p) => advisorIds.includes(p.id));
 
-        const { data: profiles, error } = await query;
-        if (error) throw error;
-
-        if (profiles) {
-          setAdvisors(
-            profiles.map((p) => ({
-              full_name: p.full_name,
-              phone: p.phone || '',
-              email: p.email || '',
-            }))
-          );
-        }
+        setAdvisors(
+          filteredProfiles.map((p) => ({
+            full_name: p.full_name || '',
+            phone: p.phone || '',
+            email: p.email || '',
+          }))
+        );
       } catch (err) {
         console.error('Error loading advisors:', err);
       }
     }
     loadAdvisors();
-  }, []);
+  }, [token]);
 
   const handleAdvisorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const name = e.target.value;
@@ -540,6 +541,54 @@ export default function AllotmentLetterPage() {
                     { value: 'custom', label: 'Other / Custom...' },
                   ]}
                 />
+              )}
+
+              {!isCustomAdvisor && advisors.length === 0 && (
+                <div className="border-brand-gold/25 bg-brand-gold/5 animate-in fade-in slide-in-from-top-2 col-span-2 overflow-hidden rounded-xl border p-4.5 backdrop-blur-md transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-brand-gold/15 text-brand-gold flex h-5 w-5 shrink-0 items-center justify-center rounded-md">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="16" x2="12" y2="12" />
+                        <line x1="12" y1="8" x2="12.01" y2="8" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-brand-gold text-[10px] font-bold tracking-widest uppercase">
+                        Admin Advisory Tip
+                      </p>
+                      <p className="mt-1.5 text-xs leading-relaxed text-gray-600 dark:text-gray-400">
+                        The advisor list is currently empty. To populate this list dynamically,
+                        navigate to the{' '}
+                        <Link
+                          href="/admin/registrations"
+                          className="text-brand-gold hover:text-brand-gold-light font-bold underline transition-colors"
+                        >
+                          Registrations Config Page
+                        </Link>{' '}
+                        and click{' '}
+                        <strong className="text-gray-800 dark:text-gray-200">
+                          Manage Advisors
+                        </strong>{' '}
+                        to check dynamic active accounts. Alternatively, select{' '}
+                        <strong className="text-gray-800 dark:text-gray-200">
+                          Other / Custom...
+                        </strong>{' '}
+                        above to input details manually.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               )}
               <FormField
                 label="Advisor Number"
