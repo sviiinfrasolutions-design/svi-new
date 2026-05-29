@@ -15,7 +15,7 @@ function generateChallenge() {
 }
 
 export default function Captcha({ onValidate, error }: CaptchaProps) {
-  const [challenge, setChallenge] = useState(generateChallenge);
+  const [challenge, setChallenge] = useState<{ a: number; b: number; answer: number } | null>(null);
   const [input, setInput] = useState('');
 
   const refresh = useCallback(() => {
@@ -24,10 +24,16 @@ export default function Captcha({ onValidate, error }: CaptchaProps) {
     onValidate(false);
   }, [onValidate]);
 
+  // Generate challenge only on client mount to prevent hydration mismatch
   useEffect(() => {
+    setChallenge(generateChallenge());
+  }, []);
+
+  useEffect(() => {
+    if (!challenge) return;
     const isValid = input !== '' && parseInt(input, 10) === challenge.answer;
     onValidate(isValid);
-  }, [input, challenge.answer, onValidate]);
+  }, [input, challenge, onValidate]);
 
   return (
     <div className="space-y-2">
@@ -35,12 +41,18 @@ export default function Captcha({ onValidate, error }: CaptchaProps) {
         Verification *
       </label>
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 rounded border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm font-semibold select-none dark:border-gray-700 dark:bg-gray-900">
-          <span>{challenge.a}</span>
-          <span className="text-gray-400">+</span>
-          <span>{challenge.b}</span>
-          <span className="text-gray-400">=</span>
-          <span className="text-gray-400">?</span>
+        <div className="flex min-h-[46px] min-w-[90px] items-center justify-center gap-2 rounded border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm font-semibold select-none dark:border-gray-700 dark:bg-gray-900">
+          {challenge ? (
+            <>
+              <span>{challenge.a}</span>
+              <span className="text-gray-400">+</span>
+              <span>{challenge.b}</span>
+              <span className="text-gray-400">=</span>
+              <span className="text-gray-400">?</span>
+            </>
+          ) : (
+            <span className="text-xs text-gray-400">...</span>
+          )}
         </div>
         <input
           type="number"
@@ -53,12 +65,14 @@ export default function Captcha({ onValidate, error }: CaptchaProps) {
           }`}
           placeholder="?"
           required
+          disabled={!challenge}
         />
         <button
           type="button"
           onClick={refresh}
           className="hover:border-brand-gold hover:text-brand-gold flex h-10 w-10 items-center justify-center rounded border border-gray-200 text-gray-400 transition-colors dark:border-gray-700"
           aria-label="Refresh captcha"
+          disabled={!challenge}
         >
           <RefreshCw size={16} />
         </button>

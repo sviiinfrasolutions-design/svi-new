@@ -7,6 +7,7 @@ import type { Metadata, Viewport } from 'next';
 
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { ThemeScript } from '@/src/components/ThemeProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -206,14 +207,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preload" as="image" href="/images/hero2.png" />
         <link rel="preload" as="image" href="/images/hero3.png" />
         <link rel="manifest" href="/manifest.json" />
-        <script
-          id="theme-init"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=document.documentElement,e=localStorage.getItem('svi-theme-v1');if(e==='dark'||e==='light')t.classList.add(e);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)t.classList.add('dark');else t.classList.add('light')}catch(e){}})();`,
-          }}
-        />
       </head>
       <body className={`${inter.variable} ${playfair.variable}`}>
+        <ThemeScript />
         {children}
         <Analytics />
         <SpeedInsights />

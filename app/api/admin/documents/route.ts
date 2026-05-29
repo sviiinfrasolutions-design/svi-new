@@ -41,8 +41,10 @@ export async function POST(request: NextRequest) {
 
   const { document_type, user_id, form_data, pdf_url, image_url, status, metadata } = body;
 
+  const resolvedUserId = user_id || admin.id;
+
   const validTypes = ['allotment_letter', 'payment_receipt', 'payment_plan', 'offer_letter', 'bba'];
-  if (!document_type || !user_id) {
+  if (!document_type || !resolvedUserId) {
     return NextResponse.json({ error: 'document_type and user_id are required' }, { status: 400 });
   }
   if (!validTypes.includes(document_type)) {
@@ -56,7 +58,7 @@ export async function POST(request: NextRequest) {
     .from('documents')
     .insert({
       document_type,
-      user_id,
+      user_id: resolvedUserId,
       created_by: admin.id,
       form_data,
       pdf_url,

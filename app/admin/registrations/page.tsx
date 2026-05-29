@@ -5,12 +5,15 @@ import {
   ArrowDown,
   ArrowUp,
   CheckCircle2,
-  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Download,
   Eye,
   FileText,
   Filter,
   RefreshCw,
   Search,
+  Trash2,
   Users,
   X,
 } from 'lucide-react';
@@ -24,6 +27,35 @@ const GRID_STYLE = {
     'radial-gradient(circle at 1px 1px, rgba(201, 168, 76, 0.05) 1px, transparent 0)',
   backgroundSize: '24px 24px',
 };
+
+const STATUS_OPTIONS = [
+  {
+    value: 'pending',
+    label: 'Pending',
+    color:
+      'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-500/30',
+  },
+  {
+    value: 'contacted',
+    label: 'Contacted',
+    color:
+      'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-500/30',
+  },
+  {
+    value: 'approved',
+    label: 'Approved',
+    color:
+      'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-500/30',
+  },
+  {
+    value: 'rejected',
+    label: 'Rejected',
+    color:
+      'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-500/30',
+  },
+];
+
+const STATUS_MAP = Object.fromEntries(STATUS_OPTIONS.map((s) => [s.value, s]));
 
 interface Registration {
   id: string;
@@ -50,6 +82,7 @@ interface Registration {
   scheme_amount: string | null;
   property_interest: string | null;
   message: string | null;
+  status: string;
   created_at: string;
 }
 
@@ -73,6 +106,7 @@ interface Filters {
   paymentMode: string;
   dateFrom: string;
   dateTo: string;
+  status: string;
 }
 
 const SORT_OPTIONS = [
@@ -82,6 +116,7 @@ const SORT_OPTIONS = [
   { value: 'advisor_name', label: 'Advisor' },
   { value: 'property_type', label: 'Property Type' },
   { value: 'scheme_amount', label: 'Scheme Amount' },
+  { value: 'status', label: 'Status' },
 ];
 
 function FilterDropdown({
@@ -118,7 +153,88 @@ function FilterDropdown({
   );
 }
 
-function DetailModal({ reg, onClose }: { reg: Registration; onClose: () => void }) {
+function StatusBadge({ status }: { status: string }) {
+  const config = STATUS_MAP[status] || STATUS_MAP.pending;
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase ${config.color}`}
+    >
+      {config.label}
+    </span>
+  );
+}
+
+function DeleteConfirmModal({
+  reg,
+  onConfirm,
+  onCancel,
+  loading,
+}: {
+  reg: Registration;
+  onConfirm: () => void;
+  onCancel: () => void;
+  loading: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-md dark:bg-black/85">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="dark:border-brand-gold/20 relative w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:bg-[#0e0e14]"
+      >
+        <div className="via-brand-gold/50 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
+        <div className="p-6">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+            <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
+          </div>
+          <h3 className="text-brand-navy mb-2 font-serif text-lg font-semibold dark:text-white">
+            Delete Registration
+          </h3>
+          <p className="mb-1 text-sm text-gray-600 dark:text-gray-400">
+            Are you sure you want to delete this registration?
+          </p>
+          <p className="mb-6 text-sm font-semibold text-gray-900 dark:text-white">
+            {reg.name} {reg.last_name || ''} ({reg.email})
+          </p>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={onCancel}
+              disabled={loading}
+              className="rounded-lg border border-gray-200 bg-gray-100 px-4 py-2 text-xs font-bold text-gray-700 uppercase hover:bg-gray-200 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={loading}
+              className="flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2 text-xs font-bold text-white uppercase hover:bg-red-700 disabled:opacity-60"
+            >
+              {loading ? (
+                <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Trash2 className="h-3.5 w-3.5" />
+              )}
+              Delete
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function DetailModal({
+  reg,
+  onClose,
+  onStatusChange,
+  onDelete,
+}: {
+  reg: Registration;
+  onClose: () => void;
+  onStatusChange: (id: string, status: string) => void;
+  onDelete: (reg: Registration) => void;
+}) {
   const field = (label: string, value: string | null | undefined) =>
     value ? (
       <div>
@@ -139,17 +255,40 @@ function DetailModal({ reg, onClose }: { reg: Registration; onClose: () => void 
 
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5 dark:border-white/8">
           <div>
-            <h2 className="text-brand-navy font-serif text-lg font-semibold dark:text-white">
-              {reg.name} {reg.last_name || ''}
-            </h2>
+            <div className="mb-1 flex items-center gap-3">
+              <h2 className="text-brand-navy font-serif text-lg font-semibold dark:text-white">
+                {reg.name} {reg.last_name || ''}
+              </h2>
+              <StatusBadge status={reg.status} />
+            </div>
             <p className="text-xs text-gray-500">{reg.email}</p>
           </div>
-          <button
-            onClick={onClose}
-            className="hover:text-brand-gold cursor-pointer text-gray-500 transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <select
+              value={reg.status}
+              onChange={(e) => onStatusChange(reg.id, e.target.value)}
+              className="focus:border-brand-gold appearance-none rounded border border-gray-200 bg-white px-2 py-1 text-[10px] font-bold text-gray-700 uppercase outline-none dark:border-white/10 dark:bg-[#111118] dark:text-gray-300"
+            >
+              {STATUS_OPTIONS.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => onDelete(reg)}
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+              title="Delete registration"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+            <button
+              onClick={onClose}
+              className="hover:text-brand-gold cursor-pointer text-gray-500 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         <div className="space-y-6 p-6">
@@ -274,12 +413,10 @@ function AdvisorSettingsModal({
   const [saveLoading, setSaveLoading] = useState(false);
   const [search, setSearch] = useState('');
 
-  // Fetch all profiles and currently active advisors
   useEffect(() => {
     async function loadData() {
       try {
-        // Fetch active advisors setting
-        const { data: settingData, error: settingError } = await supabase
+        const { data: settingData } = await supabase
           .from('portal_settings')
           .select('value')
           .eq('key', 'active_advisors')
@@ -291,7 +428,6 @@ function AdvisorSettingsModal({
         }
         setSelectedIds(initialSelected);
 
-        // Fetch all profiles
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
           .select('id, full_name, email, role')
@@ -366,7 +502,6 @@ function AdvisorSettingsModal({
       >
         <div className="via-brand-gold/50 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
 
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5 dark:border-white/8">
           <div className="flex items-center gap-3">
             <div className="bg-brand-gold/10 border-brand-gold/20 flex h-8 w-8 items-center justify-center rounded-lg border">
@@ -389,7 +524,6 @@ function AdvisorSettingsModal({
           </button>
         </div>
 
-        {/* Search */}
         <div className="border-b border-gray-100 p-4 dark:border-white/8">
           <div className="relative">
             <Search className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
@@ -403,7 +537,6 @@ function AdvisorSettingsModal({
           </div>
         </div>
 
-        {/* User list */}
         <div className="flex-1 space-y-3 overflow-y-auto p-6">
           {loading ? (
             <div className="flex items-center justify-center py-12 text-gray-500">
@@ -438,7 +571,7 @@ function AdvisorSettingsModal({
                     <input
                       type="checkbox"
                       checked={isChecked}
-                      onChange={() => {}} // toggled by parent div onClick
+                      onChange={() => {}}
                       className="accent-brand-gold focus:ring-brand-gold h-4 w-4 rounded border-gray-300"
                     />
                   </div>
@@ -448,7 +581,6 @@ function AdvisorSettingsModal({
           )}
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4 dark:border-white/8">
           <div className="flex gap-2">
             <button
@@ -495,7 +627,11 @@ export default function AdminRegistrations() {
   const [token, setToken] = useState('');
   const [search, setSearch] = useState('');
   const [selectedReg, setSelectedReg] = useState<Registration | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Registration | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [showAdvisorSettings, setShowAdvisorSettings] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
 
@@ -503,6 +639,7 @@ export default function AdminRegistrations() {
     setToast({ type, msg });
     setTimeout(() => setToast(null), 4000);
   }, []);
+
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -516,6 +653,7 @@ export default function AdminRegistrations() {
     paymentMode: '',
     dateFrom: '',
     dateTo: '',
+    status: '',
   });
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     projects: [],
@@ -552,9 +690,9 @@ export default function AdminRegistrations() {
   }, []);
 
   const fetchRegistrations = useCallback(
-    async (tkn: string, q: string = '') => {
+    async (tkn: string, q: string = '', p: number = 1) => {
       setLoading(true);
-      const params = new URLSearchParams({ limit: '50' });
+      const params = new URLSearchParams({ limit: '50', page: String(p) });
       if (q) params.set('search', q);
       params.set('sortBy', sortBy);
       params.set('sortOrder', sortOrder);
@@ -565,6 +703,7 @@ export default function AdminRegistrations() {
       if (filters.plotPreference) params.set('plotPreference', filters.plotPreference);
       if (filters.paymentPlan) params.set('paymentPlan', filters.paymentPlan);
       if (filters.paymentMode) params.set('paymentMode', filters.paymentMode);
+      if (filters.status) params.set('status', filters.status);
       if (filters.dateFrom) params.set('dateFrom', filters.dateFrom);
       if (filters.dateTo) params.set('dateTo', filters.dateTo);
 
@@ -575,6 +714,8 @@ export default function AdminRegistrations() {
         const json = await res.json();
         setRegistrations(json.registrations);
         setTotal(json.total);
+        setHasMore(json.hasMore);
+        setPage(json.page);
       }
       setLoading(false);
     },
@@ -608,7 +749,7 @@ export default function AdminRegistrations() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchRegistrations(token, search);
+    fetchRegistrations(token, search, 1);
   };
 
   const updateFilter = (key: keyof Filters, value: string) => {
@@ -626,13 +767,141 @@ export default function AdminRegistrations() {
       paymentMode: '',
       dateFrom: '',
       dateTo: '',
+      status: '',
     });
+  };
+
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    try {
+      const res = await fetch('/api/admin/registrations', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+      if (!res.ok) throw new Error('Failed to update status');
+      showToast('success', `Status updated to ${newStatus}`);
+      fetchRegistrations(token, search, page);
+      if (selectedReg?.id === id) {
+        setSelectedReg((prev) => (prev ? { ...prev, status: newStatus } : null));
+      }
+    } catch {
+      showToast('error', 'Failed to update status');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/admin/registrations?id=${deleteTarget.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to delete');
+      showToast('success', 'Registration deleted');
+      setDeleteTarget(null);
+      setSelectedReg(null);
+      fetchRegistrations(token, search, page);
+    } catch {
+      showToast('error', 'Failed to delete registration');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleExportCSV = async () => {
+    const params = new URLSearchParams({ limit: '1000' });
+    if (search) params.set('search', search);
+    if (filters.project) params.set('project', filters.project);
+    if (filters.advisor) params.set('advisor', filters.advisor);
+    if (filters.propertyType) params.set('propertyType', filters.propertyType);
+    if (filters.propertySize) params.set('propertySize', filters.propertySize);
+    if (filters.plotPreference) params.set('plotPreference', filters.plotPreference);
+    if (filters.paymentPlan) params.set('paymentPlan', filters.paymentPlan);
+    if (filters.paymentMode) params.set('paymentMode', filters.paymentMode);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.dateFrom) params.set('dateFrom', filters.dateFrom);
+    if (filters.dateTo) params.set('dateTo', filters.dateTo);
+
+    const res = await fetch(`/api/admin/registrations?${params}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return;
+
+    const json = await res.json();
+    const regs: Registration[] = json.registrations || [];
+
+    const headers = [
+      'Name',
+      'Last Name',
+      'Email',
+      'Phone',
+      'S/O W/O D/O',
+      'DOB',
+      'Aadhar',
+      'PAN',
+      'State',
+      'City',
+      'Address',
+      'Advisor',
+      'Project',
+      'Property Size',
+      'Property Type',
+      'Plot Preference',
+      'Payment Plan',
+      'Payment Mode',
+      'Scheme Amount',
+      'Status',
+      'Date',
+    ];
+
+    const rows = regs.map((r) => [
+      r.name,
+      r.last_name || '',
+      r.email,
+      r.phone,
+      r.so_wo_do || '',
+      r.preferred_date || '',
+      r.aadhar_number || '',
+      r.pan_number || '',
+      r.state || '',
+      r.city || '',
+      r.address || '',
+      r.advisor_name || '',
+      r.project || '',
+      r.property_size || '',
+      r.property_type || '',
+      r.plot_preference || '',
+      r.payment_plan || '',
+      r.payment_mode || '',
+      r.scheme_amount || '',
+      r.status,
+      new Date(r.created_at).toLocaleDateString('en-IN'),
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `registrations-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('success', `Exported ${regs.length} registrations`);
   };
 
   // Refetch when filters/sort change
   useEffect(() => {
-    if (token) fetchRegistrations(token, search);
+    if (token) fetchRegistrations(token, search, 1);
   }, [filters, sortBy, sortOrder]);
+
+  const startItem = total === 0 ? 0 : (page - 1) * 50 + 1;
+  const endItem = Math.min(page * 50, total);
 
   return (
     <div className="relative w-full font-sans">
@@ -697,7 +966,7 @@ export default function AdminRegistrations() {
                 type="button"
                 onClick={() => {
                   setSearch('');
-                  fetchRegistrations(token);
+                  fetchRegistrations(token, '', 1);
                 }}
                 className="hover:text-brand-gold absolute top-1/2 right-3.5 -translate-y-1/2 cursor-pointer text-gray-500"
               >
@@ -750,7 +1019,14 @@ export default function AdminRegistrations() {
           </button>
 
           <button
-            onClick={() => fetchRegistrations(token, search)}
+            onClick={handleExportCSV}
+            className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-5 py-3 text-xs font-bold tracking-widest text-gray-700 uppercase transition-all hover:bg-gray-50 dark:border-white/10 dark:bg-[#0e0e14]/85 dark:text-gray-300 dark:hover:bg-white/5"
+          >
+            <Download className="h-3.5 w-3.5" /> Export
+          </button>
+
+          <button
+            onClick={() => fetchRegistrations(token, search, page)}
             className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-5 py-3 text-xs font-bold tracking-widest text-gray-700 uppercase transition-all hover:bg-gray-50 dark:border-white/10 dark:bg-[#0e0e14]/85 dark:text-gray-300 dark:hover:bg-white/5"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
@@ -790,6 +1066,25 @@ export default function AdminRegistrations() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  {/* Status filter */}
+                  <div className="min-w-0 flex-1">
+                    <label className="text-[9px] font-bold tracking-widest text-gray-400 uppercase">
+                      Status
+                    </label>
+                    <select
+                      value={filters.status}
+                      onChange={(e) => updateFilter('status', e.target.value)}
+                      className="focus:border-brand-gold mt-1 w-full appearance-none truncate rounded border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 outline-none dark:border-white/10 dark:bg-[#0e0e14] dark:text-gray-300"
+                    >
+                      <option value="">All</option>
+                      {STATUS_OPTIONS.map((s) => (
+                        <option key={s.value} value={s.value}>
+                          {s.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   <FilterDropdown
                     label="Project"
                     value={filters.project}
@@ -859,6 +1154,14 @@ export default function AdminRegistrations() {
                 {/* Active filter chips */}
                 {activeFilterCount > 0 && (
                   <div className="mt-4 flex flex-wrap gap-2">
+                    {filters.status && (
+                      <span className="bg-brand-gold/10 text-brand-gold flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-semibold">
+                        Status: {STATUS_MAP[filters.status]?.label || filters.status}
+                        <button onClick={() => updateFilter('status', '')}>
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
                     {filters.project && (
                       <span className="bg-brand-gold/10 text-brand-gold flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-semibold">
                         Project: {filters.project}
@@ -959,16 +1262,23 @@ export default function AdminRegistrations() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="dark:border-brand-gold/15 border-b border-gray-200 bg-gray-50/50 dark:bg-white/2">
-                    {['Name', 'Email', 'Phone', 'Project', 'Advisor', 'Date', 'Actions'].map(
-                      (h) => (
-                        <th
-                          key={h}
-                          className="px-6 py-4 text-left text-[9px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400"
-                        >
-                          {h}
-                        </th>
-                      )
-                    )}
+                    {[
+                      'Name',
+                      'Email',
+                      'Phone',
+                      'Project',
+                      'Advisor',
+                      'Status',
+                      'Date',
+                      'Actions',
+                    ].map((h) => (
+                      <th
+                        key={h}
+                        className="px-6 py-4 text-left text-[9px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400"
+                      >
+                        {h}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -1000,6 +1310,20 @@ export default function AdminRegistrations() {
                       <td className="px-6 py-4.5 text-gray-700 dark:text-gray-300">
                         {reg.advisor_name || '—'}
                       </td>
+                      <td className="px-6 py-4.5">
+                        <select
+                          value={reg.status}
+                          onChange={(e) => handleStatusChange(reg.id, e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="focus:border-brand-gold appearance-none rounded border border-transparent bg-transparent px-1 py-0.5 text-[10px] font-bold uppercase outline-none hover:border-gray-200 dark:hover:border-white/10"
+                        >
+                          {STATUS_OPTIONS.map((s) => (
+                            <option key={s.value} value={s.value}>
+                              {s.label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
                       <td className="px-6 py-4.5 text-xs whitespace-nowrap text-gray-500">
                         {new Date(reg.created_at).toLocaleDateString('en-IN', {
                           day: '2-digit',
@@ -1008,12 +1332,21 @@ export default function AdminRegistrations() {
                         })}
                       </td>
                       <td className="px-6 py-4.5">
-                        <button
-                          onClick={() => setSelectedReg(reg)}
-                          className="border-brand-gold/20 bg-brand-gold/10 text-brand-gold hover:bg-brand-gold/20 flex cursor-pointer items-center gap-1.5 rounded border px-3 py-1.5 text-[9px] font-bold tracking-wider uppercase opacity-0 transition-all group-hover:opacity-100"
-                        >
-                          <Eye className="h-3 w-3" /> View
-                        </button>
+                        <div className="flex items-center gap-1 opacity-0 transition-all group-hover:opacity-100">
+                          <button
+                            onClick={() => setSelectedReg(reg)}
+                            className="border-brand-gold/20 bg-brand-gold/10 text-brand-gold hover:bg-brand-gold/20 flex cursor-pointer items-center gap-1.5 rounded border px-3 py-1.5 text-[9px] font-bold tracking-wider uppercase"
+                          >
+                            <Eye className="h-3 w-3" /> View
+                          </button>
+                          <button
+                            onClick={() => setDeleteTarget(reg)}
+                            className="flex cursor-pointer items-center justify-center rounded p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </motion.tr>
                   ))}
@@ -1021,11 +1354,62 @@ export default function AdminRegistrations() {
               </table>
             </div>
           )}
+
+          {/* Pagination */}
+          {!loading && total > 0 && (
+            <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4 dark:border-white/8">
+              <p className="text-xs text-gray-500">
+                Showing{' '}
+                <span className="font-semibold text-gray-700 dark:text-gray-300">{startItem}</span>
+                {' - '}
+                <span className="font-semibold text-gray-700 dark:text-gray-300">{endItem}</span>
+                {' of '}
+                <span className="font-semibold text-gray-700 dark:text-gray-300">{total}</span>
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => fetchRegistrations(token, search, page - 1)}
+                  disabled={page <= 1}
+                  className="hover:border-brand-gold hover:text-brand-gold flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <span className="min-w-[2rem] text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  {page}
+                </span>
+                <button
+                  onClick={() => fetchRegistrations(token, search, page + 1)}
+                  disabled={!hasMore}
+                  className="hover:border-brand-gold hover:text-brand-gold flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       <AnimatePresence>
-        {selectedReg && <DetailModal reg={selectedReg} onClose={() => setSelectedReg(null)} />}
+        {selectedReg && (
+          <DetailModal
+            reg={selectedReg}
+            onClose={() => setSelectedReg(null)}
+            onStatusChange={handleStatusChange}
+            onDelete={(r) => {
+              setSelectedReg(null);
+              setDeleteTarget(r);
+            }}
+          />
+        )}
+        {deleteTarget && (
+          <DeleteConfirmModal
+            reg={deleteTarget}
+            onConfirm={handleDelete}
+            onCancel={() => setDeleteTarget(null)}
+            loading={deleteLoading}
+          />
+        )}
         {showAdvisorSettings && (
           <AdvisorSettingsModal
             onClose={() => setShowAdvisorSettings(false)}
@@ -1035,23 +1419,23 @@ export default function AdminRegistrations() {
         )}
       </AnimatePresence>
 
-      {/* Floating dynamic status toast */}
+      {/* Toast */}
       <AnimatePresence>
         {toast && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className={`fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-xl border px-5 py-3.5 font-sans text-sm font-semibold shadow-2xl transition-all duration-300 ${
+            className={`fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-xl border px-5 py-3.5 text-sm font-semibold shadow-2xl ${
               toast.type === 'success'
                 ? 'border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-950/95 dark:text-emerald-300'
-                : 'border-red-200 bg-red-50 font-sans text-red-600 dark:border-red-500/30 dark:bg-red-950/95 dark:text-red-300'
+                : 'border-red-200 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-950/95 dark:text-red-300'
             }`}
           >
             {toast.type === 'success' ? (
-              <CheckCircle2 className="h-4.5 w-4.5 font-sans text-emerald-400" />
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
             ) : (
-              <AlertCircle className="h-4.5 w-4.5 font-sans text-red-400" />
+              <AlertCircle className="h-4 w-4 text-red-400" />
             )}
             <span>{toast.msg}</span>
           </motion.div>

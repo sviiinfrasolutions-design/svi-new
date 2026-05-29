@@ -129,24 +129,80 @@ export default function Registration() {
   const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.mobileNo.trim()) newErrors.mobileNo = 'Mobile number is required';
-    else if (!/^\d{10}$/.test(formData.mobileNo.replace(/\s/g, '')))
-      newErrors.mobileNo = 'Enter a valid 10-digit mobile number';
+    // First Name
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    } else if (formData.firstName.trim().length < 2) {
+      newErrors.firstName = 'First name must be at least 2 characters long';
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.firstName)) {
+      newErrors.firstName = 'First name should only contain letters';
+    }
 
-    if (!formData.email) newErrors.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      newErrors.email = 'Enter a valid email address';
+    // Mobile Number (Indian standards: 10 digits starting with 6-9)
+    if (!formData.mobileNo.trim()) {
+      newErrors.mobileNo = 'Mobile number is required';
+    } else {
+      const cleanMobile = formData.mobileNo.replace(/\s/g, '');
+      if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
+        newErrors.mobileNo = 'Please enter a valid 10-digit Indian mobile number (starts with 6-9)';
+      }
+    }
 
-    if (!formData.soWoDo.trim()) newErrors.soWoDo = 'This field is required';
-    if (!formData.dob) newErrors.dob = 'Date is required';
-    if (!formData.aadharNumber.trim()) newErrors.aadharNumber = 'Aadhar number is required';
-    else if (!/^\d{12}$/.test(formData.aadharNumber.replace(/\s/g, '')))
-      newErrors.aadharNumber = 'Enter a valid 12-digit Aadhar number';
+    // Email
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email.trim())) {
+      newErrors.email = 'Please enter a valid email address';
+    }
 
+    // S/O, W/O, D/O Relation
+    if (!formData.soWoDo.trim()) {
+      newErrors.soWoDo = 'Relation name (S/O, W/O, D/O) is required';
+    }
+
+    // Date of Birth (Must be 18+ years old)
+    if (!formData.dob) {
+      newErrors.dob = 'Date of birth is required';
+    } else {
+      const birthDate = new Date(formData.dob);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      if (birthDate > today) {
+        newErrors.dob = 'Date of birth cannot be in the future';
+      } else if (age < 18) {
+        newErrors.dob = 'You must be at least 18 years old to register';
+      } else if (age > 100) {
+        newErrors.dob = 'Please select a valid date of birth';
+      }
+    }
+
+    // Aadhar Number (12 digits, does not start with 0 or 1)
+    if (!formData.aadharNumber.trim()) {
+      newErrors.aadharNumber = 'Aadhar number is required';
+    } else {
+      const cleanAadhar = formData.aadharNumber.replace(/\s/g, '');
+      if (!/^[2-9]\d{11}$/.test(cleanAadhar)) {
+        newErrors.aadharNumber =
+          'Please enter a valid 12-digit Indian Aadhar number (starts with 2-9)';
+      }
+    }
+
+    // PAN Number (Optional, but if entered, must be valid)
+    if (formData.panNumber.trim()) {
+      if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(formData.panNumber.trim())) {
+        newErrors.panNumber = 'Please enter a valid PAN number format (e.g., ABCDE1234F)';
+      }
+    }
+
+    // Address & Location fields
     if (!formData.state.trim()) newErrors.state = 'State is required';
     if (!formData.city.trim()) newErrors.city = 'City is required';
-    if (!formData.address.trim()) newErrors.address = 'Address is required';
+    if (!formData.address.trim()) newErrors.address = 'Full address is required';
     if (!formData.advisorName) newErrors.advisorName = 'Please select an advisor';
     if (!formData.project) newErrors.project = 'Please select a project';
     if (!formData.propertySize) newErrors.propertySize = 'Please select property size';
@@ -154,7 +210,16 @@ export default function Registration() {
     if (!formData.plotPreference) newErrors.plotPreference = 'Please select plot preference';
     if (!formData.paymentPlan) newErrors.paymentPlan = 'Please select payment plan';
     if (!formData.paymentMode) newErrors.paymentMode = 'Please select payment mode';
-    if (!formData.schemeAmount.trim()) newErrors.schemeAmount = 'Scheme amount is required';
+
+    // Scheme Amount
+    if (!formData.schemeAmount.trim()) {
+      newErrors.schemeAmount = 'Scheme amount is required';
+    } else {
+      const amount = Number(formData.schemeAmount);
+      if (isNaN(amount) || amount <= 0) {
+        newErrors.schemeAmount = 'Scheme amount must be a positive number';
+      }
+    }
 
     if (!captchaValid) {
       newErrors.captcha = 'Please solve the verification';
@@ -182,10 +247,26 @@ export default function Registration() {
     (e: ChangeEvent<HTMLInputElement>, type: 'photo' | 'panCard') => {
       const file = e.target.files?.[0];
       if (!file) return;
+
+      // File Size limit: 5MB
       if (file.size > 5 * 1024 * 1024) {
         setErrors((prev) => ({ ...prev, [type]: 'File size must be under 5MB' }));
         return;
       }
+
+      // File Type validation
+      const allowedTypes = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/webp',
+        'application/pdf',
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        setErrors((prev) => ({ ...prev, [type]: 'Only JPG, PNG, WEBP, or PDF files are allowed' }));
+        return;
+      }
+
       if (type === 'photo') setPhotoFile(file);
       else setPanCardFile(file);
       setErrors((prev) => ({ ...prev, [type]: '' }));
@@ -335,10 +416,10 @@ export default function Registration() {
         <div className="mx-auto max-w-5xl">
           {/* Header */}
           <div className="mb-8 text-center">
-            <h1 className="text-brand-navy mb-2 font-serif text-3xl dark:text-white">
+            <h1 className="text-brand-navy mb-4 font-serif text-4xl font-medium tracking-wide capitalize md:text-5xl lg:text-6xl dark:text-white">
               fill the booking form
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="mx-auto max-w-2xl text-base leading-relaxed text-gray-500 md:text-lg">
               Please fill out the form below to register with SVI Infra Solutions Pvt. Ltd
             </p>
           </div>

@@ -72,3 +72,19 @@ export const useTheme = () => {
   if (context === undefined) throw new Error('useTheme must be used within a ThemeProvider');
   return context;
 };
+
+import { useServerInsertedHTML } from 'next/navigation';
+
+export function ThemeScript() {
+  useServerInsertedHTML(() => {
+    return (
+      <script
+        id="theme-init"
+        dangerouslySetInnerHTML={{
+          __html: `(function(){try{var t=document.documentElement,e=localStorage.getItem('svi-theme-v1');if(e==='dark'||e==='light')t.classList.add(e);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)t.classList.add('dark');else t.classList.add('light')}catch(e){}})();`,
+        }}
+      />
+    );
+  });
+  return null;
+}
