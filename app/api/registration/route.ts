@@ -183,3 +183,46 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ success: true, id: data.id });
 }
+
+// GET /api/registration — retrieve active advisor names
+export async function GET(request: NextRequest) {
+  try {
+    const { data: settingData, error: settingError } = await supabaseAdmin
+      .from('portal_settings')
+      .select('value')
+      .eq('key', 'active_advisors')
+      .single();
+
+    if (
+      settingError ||
+      !settingData?.value ||
+      typeof settingData.value !== 'object' ||
+      !('ids' in settingData.value) ||
+      !Array.isArray(settingData.value.ids) ||
+      settingData.value.ids.length === 0
+    ) {
+      return NextResponse.json({ advisors: [] });
+    }
+
+    const advisorIds: string[] = settingData.value.ids;
+
+    const { data: profiles, error: profilesError } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name')
+      .in('id', advisorIds);
+
+    if (profilesError) {
+      console.error('Error fetching advisor profiles:', profilesError.message);
+      return NextResponse.json({ error: 'Failed to fetch advisors' }, { status: 500 });
+    }
+
+    const advisorNames = (profiles || [])
+      .map((p) => p.full_name)
+      .sort((a, b) => a.localeCompare(b));
+
+    return NextResponse.json({ advisors: advisorNames });
+  } catch (err: any) {
+    console.error('GET registration error:', err);
+    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+  }
+}

@@ -1,34 +1,9 @@
 'use client';
 
-import { useCallback, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, Upload, X } from 'lucide-react';
 import Captcha from '@/src/components/Captcha';
-
-const ADVISOR_NAMES = [
-  'Manish',
-  'Raghvendra',
-  'Arwaz',
-  'Dhiraj',
-  'Aryan',
-  'Khushi',
-  'Javed',
-  'Peeyush',
-  'Prateek',
-  'knowledge',
-  'Khushbu',
-  'Alok Gupta',
-  'Shivam Yadav',
-  'Luv Kumar',
-  'Ananya pal',
-  'Manish Goyal',
-  'Suhan',
-  'Sachin',
-  'Shekhar',
-  'Muskan',
-  'Wasi',
-  'Shubham',
-];
 
 const PROJECTS = [
   { value: 'shyam-aangan-phase-1', label: 'Shyam Aangan Phase 1' },
@@ -132,6 +107,24 @@ export default function Registration() {
   const [panCardFile, setPanCardFile] = useState<File | null>(null);
   const [captchaValid, setCaptchaValid] = useState(false);
   const [captchaError, setCaptchaError] = useState('');
+  const [advisors, setAdvisors] = useState<string[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/registration')
+      .then((res) => res.json())
+      .then((data) => {
+        if (active && data.advisors) {
+          setAdvisors(data.advisors);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch advisors list:', err);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {};
@@ -402,7 +395,7 @@ export default function Registration() {
               {renderInput('city', 'City', 'text', 'Enter city')}
 
               {renderInput('address', 'Address', 'text', 'Enter full address')}
-              {renderSelect('advisorName', 'Advisor Name', ADVISOR_NAMES, 'Select advisor')}
+              {renderSelect('advisorName', 'Advisor Name', advisors, 'Select advisor')}
 
               {renderSelect('project', 'Select Projects', PROJECTS, 'Select project')}
               {renderSelect('propertySize', 'Property Size', PROPERTY_SIZES, 'Select size')}
