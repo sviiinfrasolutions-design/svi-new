@@ -107,7 +107,7 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
   const getTypeIcon = (notification: Notification) => {
     const isEmail = notification.metadata?.subType === 'email';
     if (isEmail) {
-      return <Mail className="h-4 w-4 text-brand-gold" />;
+      return <Mail className="text-brand-gold h-4 w-4" />;
     }
 
     switch (notification.type) {
@@ -246,7 +246,7 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                   <div className="divide-y divide-gray-100 dark:divide-white/5">
                     {notifications.map((notification) => {
                       const isEmail = notification.metadata?.subType === 'email';
-                      
+
                       return (
                         <motion.div
                           key={notification.id}
@@ -255,8 +255,8 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                           className={`group relative px-4 py-3 transition-colors ${
                             isEmail
                               ? !notification.is_read
-                                ? 'bg-amber-500/10 border-l-2 border-brand-gold dark:bg-brand-gold/15'
-                                : 'hover:bg-amber-500/5 dark:hover:bg-brand-gold/5 border-l-2 border-brand-gold/40'
+                                ? 'border-brand-gold dark:bg-brand-gold/15 border-l-2 bg-amber-500/10'
+                                : 'dark:hover:bg-brand-gold/5 border-brand-gold/40 border-l-2 hover:bg-amber-500/5'
                               : !notification.is_read
                                 ? 'bg-brand-gold/5 dark:bg-brand-gold/10'
                                 : 'hover:bg-gray-50 dark:hover:bg-white/5'
@@ -270,7 +270,7 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                             <div className="min-w-0 flex-1 pr-8">
                               <div className="flex items-start justify-between gap-2">
                                 <p
-                                  className={`text-sm leading-tight font-semibold flex items-center gap-1.5 ${
+                                  className={`flex items-center gap-1.5 text-sm leading-tight font-semibold ${
                                     !notification.is_read
                                       ? 'text-gray-900 dark:text-white'
                                       : 'text-gray-700 dark:text-gray-300'
@@ -278,46 +278,46 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                                 >
                                   <span className="truncate">{notification.title}</span>
                                   {isEmail && (
-                                    <span className="bg-brand-gold/15 text-brand-gold border-brand-gold/20 inline-flex items-center rounded border px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase scale-90">
+                                    <span className="bg-brand-gold/15 text-brand-gold border-brand-gold/20 inline-flex scale-90 items-center rounded border px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase">
                                       Email
                                     </span>
                                   )}
                                 </p>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteNotification(notification.id);
-                                }}
-                                className="cursor-pointer text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-500"
-                                aria-label="Delete notification"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </button>
-                            </div>
-                            <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-gray-600 dark:text-gray-400">
-                              {notification.message}
-                            </p>
-                            <div className="mt-2.5 flex items-center gap-2">
-                              <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                                {formatTime(notification.created_at)}
-                              </span>
-                              {!notification.is_read && (
-                                <span className="bg-brand-gold h-2 w-2 rounded-full"></span>
-                              )}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteNotification(notification.id);
+                                  }}
+                                  className="cursor-pointer text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-500"
+                                  aria-label="Delete notification"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                              <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-gray-600 dark:text-gray-400">
+                                {notification.message}
+                              </p>
+                              <div className="mt-2.5 flex items-center gap-2">
+                                <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                                  {formatTime(notification.created_at)}
+                                </span>
+                                {!notification.is_read && (
+                                  <span className="bg-brand-gold h-2 w-2 rounded-full"></span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Click to mark as read */}
-                        {!notification.is_read && (
-                          <div
-                            className="absolute inset-0 cursor-pointer"
-                            onClick={() => markAsRead(notification.id)}
-                          />
-                        )}
-                      </motion.div>
-                    );
-                  })}
+                          {/* Click to mark as read */}
+                          {!notification.is_read && (
+                            <div
+                              className="absolute inset-0 cursor-pointer"
+                              onClick={() => markAsRead(notification.id)}
+                            />
+                          )}
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

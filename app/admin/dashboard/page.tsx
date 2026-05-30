@@ -1251,7 +1251,7 @@ export default function AdminDashboard() {
                       {/* User Profile */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3.5">
-                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-600 dark:bg-white/10 dark:text-gray-300 border border-gray-200 dark:border-white/10">
+                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-sm font-semibold text-gray-600 dark:border-white/10 dark:bg-white/10 dark:text-gray-300">
                             {u.full_name?.charAt(0).toUpperCase() || 'U'}
                           </div>
                           <div className="flex flex-col">

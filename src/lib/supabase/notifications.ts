@@ -140,7 +140,13 @@ export const NotificationHelper = {
       message: `Failed to deliver registration email to ${recipient} (Submission ID: ${submissionId}). Error: ${error}`,
       type: 'error',
       action_url: `/admin/email`,
-      metadata: { event: 'email_dispatch_failed', recipient, error, submissionId, subType: 'email' },
+      metadata: {
+        event: 'email_dispatch_failed',
+        recipient,
+        error,
+        submissionId,
+        subType: 'email',
+      },
     });
   },
 

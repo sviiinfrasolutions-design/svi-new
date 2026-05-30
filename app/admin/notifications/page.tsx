@@ -724,7 +724,7 @@ export default function AdminNotifications() {
             <AnimatePresence mode="popLayout">
               {notifications.map((notification, index) => {
                 const isEmail = (notification as any).metadata?.subType === 'email';
-                
+
                 const config = isEmail
                   ? {
                       icon: Mail,
@@ -733,7 +733,7 @@ export default function AdminNotifications() {
                       border: 'border-l-brand-gold',
                     }
                   : TYPE_CONFIG[notification.type];
-                  
+
                 const IconComponent = config.icon;
 
                 return (
@@ -747,7 +747,7 @@ export default function AdminNotifications() {
                     className={`group relative flex items-start gap-3 rounded-lg border-l-4 p-4 transition-all md:p-5 ${
                       notification.is_read
                         ? isEmail
-                          ? 'border-brand-gold/40 bg-amber-500/[0.02] dark:bg-brand-gold/5 dark:hover:bg-brand-gold/10 hover:bg-amber-500/[0.04]'
+                          ? 'border-brand-gold/40 dark:bg-brand-gold/5 dark:hover:bg-brand-gold/10 bg-amber-500/[0.02] hover:bg-amber-500/[0.04]'
                           : 'border-gray-200 bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-[#0e0e14] dark:hover:bg-white/[0.03]'
                         : `${config.border} ${config.bg} shadow-sm`
                     } ${selectedIds.has(notification.id) ? 'ring-brand-gold/50 ring-2' : ''}`}
