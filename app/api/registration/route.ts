@@ -103,40 +103,110 @@ export async function POST(request: NextRequest) {
     panCardFileUrl = result?.url ?? null;
   }
 
-  // Insert into database
-  const { data, error } = await supabaseAdmin
-    .from('registrations')
-    .insert({
-      name: firstName,
-      last_name: lastName || null,
-      email,
-      phone: mobileNo,
-      so_wo_do: soWoDo,
-      preferred_date: dob || null,
-      aadhar_number: aadharNumber,
-      pan_number: panNumber || null,
-      photo_url: photoUrl,
-      pan_card_file_url: panCardFileUrl,
-      state,
-      city,
-      address,
-      advisor_name: advisorName,
-      project,
-      property_size: propertySize,
-      property_type: propertyType,
-      plot_preference: plotPreference,
-      payment_plan: paymentPlan,
-      payment_mode: paymentMode,
-      scheme_amount: schemeAmount,
-      property_interest: project, // backward compat
-    })
-    .select()
-    .single();
+  // Insert into database with automatic, collision-safe submission ID generation
+  let data: any = null;
+  let success = false;
+  let attempts = 0;
+  const maxAttempts = 3;
 
-  if (error) {
-    console.error('Registration submission error:', error.message);
-    return NextResponse.json({ error: 'Failed to submit registration' }, { status: 500 });
+  while (attempts < maxAttempts && !success) {
+    attempts++;
+
+    // 1. Retrieve the highest currently assigned submission ID to avoid duplication
+    const { data: existing, error: fetchError } = await supabaseAdmin
+      .from('registrations')
+      .select('submission_id')
+      .not('submission_id', 'is', null)
+      .order('submission_id', { ascending: false })
+      .limit(1);
+
+    if (fetchError) {
+      console.error(
+        `[Attempt ${attempts}] Database fetch error during ID generation:`,
+        fetchError.message
+      );
+      return NextResponse.json(
+        { error: 'Database connection failure during ID generation' },
+        { status: 500 }
+      );
+    }
+
+    let nextId = 'SVI2200';
+    if (existing && existing.length > 0 && existing[0].submission_id) {
+      const highestId = existing[0].submission_id;
+      const match = highestId.match(/^SVI(\d+)$/);
+      if (match) {
+        const numericPart = parseInt(match[1], 10);
+        const nextNumeric = numericPart + 1;
+        const paddingLength = Math.max(4, match[1].length);
+        nextId = `SVI${String(nextNumeric).padStart(paddingLength, '0')}`;
+      } else {
+        console.warn(
+          `Highest submission ID has unexpected format: ${highestId}. Sequence continues from next index.`
+        );
+      }
+    }
+
+    // 2. Attach the generated submission_id and insert the user registration record
+    const { data: insertedData, error: insertError } = await supabaseAdmin
+      .from('registrations')
+      .insert({
+        name: firstName,
+        last_name: lastName || null,
+        email,
+        phone: mobileNo,
+        so_wo_do: soWoDo,
+        preferred_date: dob || null,
+        aadhar_number: aadharNumber,
+        pan_number: panNumber || null,
+        photo_url: photoUrl,
+        pan_card_file_url: panCardFileUrl,
+        state,
+        city,
+        address,
+        advisor_name: advisorName,
+        project,
+        property_size: propertySize,
+        property_type: propertyType,
+        plot_preference: plotPreference,
+        payment_plan: paymentPlan,
+        payment_mode: paymentMode,
+        scheme_amount: schemeAmount,
+        property_interest: project, // backward compat
+        submission_id: nextId,
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      // Check for unique key violation (PostgreSQL code 23505) and retry
+      if (insertError.code === '23505') {
+        console.warn(
+          `[Registration Concurrency] Submission ID collision detected on ID ${nextId}. Retrying... (Attempt ${attempts}/${maxAttempts})`
+        );
+        continue;
+      }
+
+      console.error('Registration insertion error:', insertError.message);
+      return NextResponse.json({ error: 'Failed to submit registration' }, { status: 500 });
+    }
+
+    data = insertedData;
+    success = true;
   }
+
+  if (!success) {
+    console.error(`Failed to assign a unique submission ID after ${maxAttempts} attempts.`);
+    return NextResponse.json(
+      { error: 'Concurrent registration conflict. Please try again.' },
+      { status: 500 }
+    );
+  }
+
+  // Log successfully generated submission ID along with timestamp for auditing
+  console.log(
+    `[Registration Audit] Generated submission ID: ${data.submission_id} for user: ${data.name} ${data.last_name || ''} at timestamp: ${data.created_at || new Date().toISOString()}`
+  );
 
   // Send email notification (non-blocking)
   try {
@@ -144,8 +214,28 @@ export async function POST(request: NextRequest) {
     if (resendApiKey) {
       const { Resend } = await import('resend');
       const resend = new Resend(resendApiKey);
-      const adminEmail = process.env.ADMIN_EMAIL || 'admin@sviinfra.com';
 
+      // Fetch dynamic email settings from database
+      let adminEmail = process.env.ADMIN_EMAIL || 'admin@sviinfra.com';
+      let sendUserCopy = false;
+
+      try {
+        const { data: emailSetting } = await supabaseAdmin
+          .from('portal_settings')
+          .select('value')
+          .eq('key', 'email_settings')
+          .single();
+
+        if (emailSetting?.value && typeof emailSetting.value === 'object') {
+          const val = emailSetting.value as any;
+          if (val.admin_email) adminEmail = val.admin_email;
+          if (val.send_user_copy !== undefined) sendUserCopy = !!val.send_user_copy;
+        }
+      } catch (settingsErr) {
+        console.warn('Failed to load email settings from DB, using fallback:', settingsErr);
+      }
+
+      // 1. Send admin notification email
       await resend.emails.send({
         from: 'SVI Infra <noreply@sviiinfrasolutions.com>',
         to: adminEmail,
@@ -176,12 +266,48 @@ export async function POST(request: NextRequest) {
           ${panCardFileUrl ? `<p><a href="${panCardFileUrl}">View PAN Card</a></p>` : ''}
         `,
       });
+
+      // 2. If user copy is enabled, dispatch a styled copy/confirmation email to the applicant
+      if (sendUserCopy && email) {
+        await resend.emails.send({
+          from: 'SVI Infra <noreply@sviiinfrasolutions.com>',
+          to: email,
+          subject: `Registration Received: ${firstName} ${lastName || ''} - Submission ${data.submission_id}`,
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px; background-color: #ffffff;">
+              <h2 style="color: #c9a84c; font-family: serif; border-bottom: 2px solid #f0d080; padding-bottom: 10px;">Registration Acknowledgment</h2>
+              <p>Dear <strong>${escapeHtml(firstName)} ${escapeHtml(lastName || '')}</strong>,</p>
+              <p>Thank you for registering with SVI Infra Solutions. We are pleased to acknowledge receipt of your property registration inquiry details.</p>
+              
+              <div style="background-color: #f9f9f9; color: #333333; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c9a84c;">
+                <h3 style="margin-top: 0; color: #111; font-size: 14px;">Submission Details</h3>
+                <p style="margin: 5px 0; font-size: 13px;"><strong>Submission ID:</strong> ${data.submission_id}</p>
+                <p style="margin: 5px 0; font-size: 13px;"><strong>Project Name:</strong> ${escapeHtml(project)}</p>
+                <p style="margin: 5px 0; font-size: 13px;"><strong>Property Details:</strong> ${escapeHtml(propertyType)} (${escapeHtml(propertySize)})</p>
+                <p style="margin: 5px 0; font-size: 13px;"><strong>Advisor:</strong> ${escapeHtml(advisorName)}</p>
+                <p style="margin: 5px 0; font-size: 13px;"><strong>Payment Plan:</strong> ${escapeHtml(paymentPlan)}</p>
+                <p style="margin: 5px 0; font-size: 13px;"><strong>Scheme Registration Amount:</strong> INR ${escapeHtml(schemeAmount)}</p>
+              </div>
+              
+              <p>Our dedicated property advisor will review your preferences and get in touch with you shortly to assist with the next steps.</p>
+              <p>If you have any questions or require modifications to your submission, feel free to contact us at <a href="mailto:${adminEmail}" style="color: #c9a84c; text-decoration: none;">${adminEmail}</a>.</p>
+              
+              <br>
+              <hr style="border: none; border-top: 1px solid #eaeaea;" />
+              <p style="font-size: 11px; color: #888; text-align: center; margin-top: 15px;">
+                This is an automated administrative notification. Please do not reply directly to this message.<br>
+                <strong>SVI Infra Solutions Pvt. Ltd.</strong>
+              </p>
+            </div>
+          `,
+        });
+      }
     }
   } catch (emailErr) {
     console.error('Email notification failed:', emailErr);
   }
 
-  return NextResponse.json({ success: true, id: data.id });
+  return NextResponse.json({ success: true, id: data.id, submissionId: data.submission_id });
 }
 
 // GET /api/registration — retrieve active advisor names

@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
   // Whitelist sort columns
   const allowedSort = new Set([
     'created_at',
+    'submission_id',
     'name',
     'project',
     'advisor_name',
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
   // Text search
   if (search) {
     query = query.or(
-      `name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%,aadhar_number.ilike.%${search}%,advisor_name.ilike.%${search}%,project.ilike.%${search}%`
+      `submission_id.ilike.%${search}%,name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%,aadhar_number.ilike.%${search}%,advisor_name.ilike.%${search}%,project.ilike.%${search}%`
     );
   }
 

@@ -59,6 +59,7 @@ const STATUS_MAP = Object.fromEntries(STATUS_OPTIONS.map((s) => [s.value, s]));
 
 interface Registration {
   id: string;
+  submission_id: string | null;
   name: string;
   last_name: string | null;
   email: string;
@@ -111,6 +112,7 @@ interface Filters {
 
 const SORT_OPTIONS = [
   { value: 'created_at', label: 'Date' },
+  { value: 'submission_id', label: 'Submission ID' },
   { value: 'name', label: 'Name' },
   { value: 'project', label: 'Project' },
   { value: 'advisor_name', label: 'Advisor' },
@@ -261,7 +263,14 @@ function DetailModal({
               </h2>
               <StatusBadge status={reg.status} />
             </div>
-            <p className="text-xs text-gray-500">{reg.email}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-xs text-gray-500">{reg.email}</p>
+              {reg.submission_id && (
+                <span className="bg-brand-gold/10 text-brand-gold inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider">
+                  {reg.submission_id}
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <select
@@ -297,6 +306,7 @@ function DetailModal({
               Personal Details
             </h3>
             <div className="grid grid-cols-2 gap-4">
+              {field('Submission ID', reg.submission_id)}
               {field('First Name', reg.name)}
               {field('Last Name', reg.last_name)}
               {field('Mobile', reg.phone)}
@@ -835,6 +845,7 @@ export default function AdminRegistrations() {
     const regs: Registration[] = json.registrations || [];
 
     const headers = [
+      'Submission ID',
       'Name',
       'Last Name',
       'Email',
@@ -859,6 +870,7 @@ export default function AdminRegistrations() {
     ];
 
     const rows = regs.map((r) => [
+      r.submission_id || '',
       r.name,
       r.last_name || '',
       r.email,
@@ -958,7 +970,7 @@ export default function AdminRegistrations() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, email, phone, aadhar, advisor or project..."
+              placeholder="Search by submission ID, name, email, phone, aadhar, advisor or project..."
               className="focus:border-brand-gold focus:ring-brand-gold/15 w-full rounded-lg border border-gray-200 bg-white py-3 pr-10 pl-10 text-sm text-gray-900 placeholder-gray-400 transition-all focus:ring-2 focus:outline-none dark:border-white/10 dark:bg-[#0e0e14]/85 dark:text-white dark:placeholder-gray-600"
             />
             {search && (
@@ -1263,6 +1275,7 @@ export default function AdminRegistrations() {
                 <thead>
                   <tr className="dark:border-brand-gold/15 border-b border-gray-200 bg-gray-50/50 dark:bg-white/2">
                     {[
+                      'Submission ID',
                       'Name',
                       'Email',
                       'Phone',
@@ -1290,6 +1303,15 @@ export default function AdminRegistrations() {
                       transition={{ delay: i * 0.02, duration: 0.4 }}
                       className="group border-b border-gray-100 transition-colors hover:bg-gray-50 dark:border-white/5 dark:hover:bg-[#111118]/60"
                     >
+                      <td className="px-6 py-4.5">
+                        {reg.submission_id ? (
+                          <span className="bg-brand-gold/10 text-brand-gold inline-flex items-center rounded-md px-2 py-0.5 font-mono text-xs font-bold tracking-wider">
+                            {reg.submission_id}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
+                      </td>
                       <td className="px-6 py-4.5">
                         <div className="font-semibold tracking-wide text-gray-900 dark:text-white">
                           {reg.name} {reg.last_name || ''}
