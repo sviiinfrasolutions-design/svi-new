@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 function generateTicketId(): string {
   const digits = Math.floor(100000 + Math.random() * 900000);
@@ -92,8 +93,12 @@ async function sendGrievanceResponse(
       const { Resend } = await import('resend');
       const resend = new Resend(resendApiKey);
 
-      // Fetch dynamic admin email setting from database
+      // Fetch dynamic email settings from database
       let adminEmail = process.env.ADMIN_EMAIL || 'admin@sviinfra.com';
+      let notifyOnGrievance = true;
+      let senderName = 'SVI Infra';
+      let senderEmail = 'noreply@sviiinfrasolutions.com';
+
       try {
         const { data: emailSetting } = await supabaseAdmin
           .from('portal_settings')
@@ -104,6 +109,9 @@ async function sendGrievanceResponse(
         if (emailSetting?.value && typeof emailSetting.value === 'object') {
           const val = emailSetting.value as any;
           if (val.admin_email) adminEmail = val.admin_email;
+          if (val.notify_on_grievance !== undefined) notifyOnGrievance = !!val.notify_on_grievance;
+          if (val.sender_name) senderName = val.sender_name;
+          if (val.sender_email) senderEmail = val.sender_email;
         }
       } catch (settingsErr) {
         console.warn(
@@ -112,43 +120,69 @@ async function sendGrievanceResponse(
         );
       }
 
-      await resend.emails.send({
-        from: 'SVI Infra <noreply@sviiinfrasolutions.com>',
-        to: adminEmail,
-        subject: `[SYSTEM-AUTO] New Grievance #${ticketId}: ${data.subject}`,
-        headers: {
-          'X-Auto-Response': 'true',
-          'X-System-Generated': 'true',
-          'X-SVI-Event': 'grievance_submission',
-        },
-        tags: [
-          { name: 'category', value: 'system_automation' },
-          { name: 'event', value: 'grievance_submission' },
-        ],
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px; background-color: #ffffff;">
-            <div style="text-align: right; margin-bottom: 15px;">
-              <span style="background-color: #c9a84c; color: #ffffff; font-size: 9px; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; font-family: sans-serif;">
-                ✨ System Automated Notification
-              </span>
+      // Trigger email send only if notify_on_grievance setting is enabled
+      if (notifyOnGrievance) {
+        const mailSubject = `[SYSTEM-AUTO] New Grievance #${ticketId}: ${data.subject}`;
+        await resend.emails.send({
+          from: `${senderName} <${senderEmail}>`,
+          to: adminEmail,
+          subject: mailSubject,
+          headers: {
+            'X-Auto-Response': 'true',
+            'X-System-Generated': 'true',
+            'X-SVI-Event': 'grievance_submission',
+          },
+          tags: [
+            { name: 'category', value: 'system_automation' },
+            { name: 'event', value: 'grievance_submission' },
+          ],
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px; background-color: #ffffff;">
+              <div style="text-align: right; margin-bottom: 15px;">
+                <span style="background-color: #c9a84c; color: #ffffff; font-size: 9px; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; font-family: sans-serif;">
+                  ✨ System Automated Notification
+                </span>
+              </div>
+              <h2>New Grievance Submitted</h2>
+              <p><strong>Ticket ID:</strong> ${ticketId}</p>
+              <table style="border-collapse:collapse;width:100%">
+                <tr><td style="padding:8px;font-weight:bold">Name:</td><td style="padding:8px">${data.name}</td></tr>
+                <tr><td style="padding:8px;font-weight:bold">Email:</td><td style="padding:8px">${data.email}</td></tr>
+                <tr><td style="padding:8px;font-weight:bold">Phone:</td><td style="padding:8px">${data.phone}</td></tr>
+                <tr><td style="padding:8px;font-weight:bold">Category:</td><td style="padding:8px">${data.category}</td></tr>
+                <tr><td style="padding:8px;font-weight:bold">Subject:</td><td style="padding:8px">${data.subject}</td></tr>
+              </table>
+              <p style="margin-top:16px"><strong>Description:</strong></p>
+              <p>${data.description.replace(/\n/g, '<br>')}</p>
             </div>
-            <h2>New Grievance Submitted</h2>
-            <p><strong>Ticket ID:</strong> ${ticketId}</p>
-            <table style="border-collapse:collapse;width:100%">
-              <tr><td style="padding:8px;font-weight:bold">Name:</td><td style="padding:8px">${data.name}</td></tr>
-              <tr><td style="padding:8px;font-weight:bold">Email:</td><td style="padding:8px">${data.email}</td></tr>
-              <tr><td style="padding:8px;font-weight:bold">Phone:</td><td style="padding:8px">${data.phone}</td></tr>
-              <tr><td style="padding:8px;font-weight:bold">Category:</td><td style="padding:8px">${data.category}</td></tr>
-              <tr><td style="padding:8px;font-weight:bold">Subject:</td><td style="padding:8px">${data.subject}</td></tr>
-            </table>
-            <p style="margin-top:16px"><strong>Description:</strong></p>
-            <p>${data.description.replace(/\n/g, '<br>')}</p>
-          </div>
-        `,
-      });
+          `,
+        });
+
+        // Trigger dynamic admin notification center alert
+        try {
+          await NotificationHelper.emailDispatched(adminEmail, mailSubject, ticketId);
+        } catch (notifErr) {
+          console.error('Failed to log email dispatched system alert:', notifErr);
+        }
+      } else {
+        console.log(
+          '[Email Audit] Grievance alerts are disabled in settings. Skipping email dispatch.'
+        );
+      }
     }
-  } catch (emailError) {
+  } catch (emailError: any) {
     console.error('Grievance email notification failed:', emailError);
+    // Log failure alert in notification center
+    try {
+      const adminEmail = process.env.ADMIN_EMAIL || 'admin@sviinfra.com';
+      await NotificationHelper.emailDispatchFailed(
+        adminEmail,
+        emailError.message || String(emailError),
+        ticketId
+      );
+    } catch (notifErr) {
+      console.error('Failed to log email dispatch failure system alert:', notifErr);
+    }
   }
 
   return NextResponse.json(

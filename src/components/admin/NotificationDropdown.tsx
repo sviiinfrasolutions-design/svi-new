@@ -278,7 +278,7 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                                 >
                                   <span className="truncate">{notification.title}</span>
                                   {isEmail && (
-                                    <span className="bg-brand-gold/15 text-brand-gold border-brand-gold/20 inline-flex scale-90 items-center rounded border px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase">
+                                    <span className="bg-brand-gold/15 text-brand-gold border-brand-gold/20 inline-flex scale-90 animate-pulse items-center rounded border px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase">
                                       Email
                                     </span>
                                   )}
@@ -297,6 +297,16 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                               <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                                 {notification.message}
                               </p>
+                              {isEmail && notification.metadata?.subject && (
+                                <div className="dark:bg-brand-gold/5 border-brand-gold/10 mt-1.5 flex flex-col gap-0.5 rounded-md border bg-amber-500/5 p-2 text-[10px] leading-tight text-gray-500 dark:text-gray-400">
+                                  <span className="text-brand-gold truncate font-semibold">
+                                    📧 Subject: {notification.metadata.subject}
+                                  </span>
+                                  <span className="truncate">
+                                    To: {notification.metadata.recipient}
+                                  </span>
+                                </div>
+                              )}
                               <div className="mt-2.5 flex items-center gap-2">
                                 <span className="text-[11px] text-gray-400 dark:text-gray-500">
                                   {formatTime(notification.created_at)}

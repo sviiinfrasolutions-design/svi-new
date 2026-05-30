@@ -782,7 +782,7 @@ export default function AdminNotifications() {
                           >
                             <span className="truncate">{notification.title}</span>
                             {isEmail && (
-                              <span className="bg-brand-gold/15 text-brand-gold border-brand-gold/20 inline-flex items-center rounded border px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase">
+                              <span className="bg-brand-gold/15 text-brand-gold border-brand-gold/20 inline-flex animate-pulse items-center rounded border px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase">
                                 Automated Email
                               </span>
                             )}
@@ -796,6 +796,22 @@ export default function AdminNotifications() {
                           >
                             {notification.message}
                           </p>
+                          {isEmail && (notification as any).metadata?.subject && (
+                            <div className="dark:bg-brand-gold/[0.03] border-brand-gold/10 mt-3 flex max-w-xl flex-col gap-1 rounded-lg border bg-amber-500/[0.03] p-3 text-xs text-gray-500 dark:text-gray-400">
+                              <span className="text-brand-gold font-semibold">
+                                📧 Subject:{' '}
+                                <span className="font-normal text-gray-700 dark:text-gray-300">
+                                  {(notification as any).metadata.subject}
+                                </span>
+                              </span>
+                              <span>
+                                👤 Recipient:{' '}
+                                <span className="font-mono font-medium text-gray-700 dark:text-gray-300">
+                                  {(notification as any).metadata.recipient}
+                                </span>
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Timestamp */}

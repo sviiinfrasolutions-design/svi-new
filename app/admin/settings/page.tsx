@@ -85,7 +85,14 @@ export default function AdminSettings() {
 
   const [emailSettings, setEmailSettings] = useState({
     admin_email: 'hr.sviinfrasolutions@gmail.com',
-    send_user_copy: false,
+    send_user_copy: true,
+    sender_name: 'SVI Infra',
+    sender_email: 'noreply@sviiinfrasolutions.com',
+    notify_on_registration: true,
+    notify_on_contact: true,
+    notify_on_grievance: true,
+    bcc_advisor: true,
+    retry_attempts: 3,
   });
 
   // Password Update States
@@ -181,7 +188,23 @@ export default function AdminSettings() {
           if (json.value && Object.keys(json.value).length > 0) {
             setEmailSettings({
               admin_email: json.value.admin_email || 'hr.sviinfrasolutions@gmail.com',
-              send_user_copy: !!json.value.send_user_copy,
+              send_user_copy:
+                json.value.send_user_copy !== undefined ? !!json.value.send_user_copy : true,
+              sender_name: json.value.sender_name || 'SVI Infra',
+              sender_email: json.value.sender_email || 'noreply@sviiinfrasolutions.com',
+              notify_on_registration:
+                json.value.notify_on_registration !== undefined
+                  ? !!json.value.notify_on_registration
+                  : true,
+              notify_on_contact:
+                json.value.notify_on_contact !== undefined ? !!json.value.notify_on_contact : true,
+              notify_on_grievance:
+                json.value.notify_on_grievance !== undefined
+                  ? !!json.value.notify_on_grievance
+                  : true,
+              bcc_advisor: json.value.bcc_advisor !== undefined ? !!json.value.bcc_advisor : true,
+              retry_attempts:
+                typeof json.value.retry_attempts === 'number' ? json.value.retry_attempts : 3,
             });
           }
         }

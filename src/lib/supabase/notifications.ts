@@ -121,30 +121,48 @@ export const NotificationHelper = {
   /**
    * Email automated dispatch notification
    */
-  emailDispatched: async (recipient: string, subject: string, submissionId: string) => {
+  emailDispatched: async (recipient: string, subject: string, referenceId: string) => {
+    let eventName = 'automated notification email';
+    if (subject.includes('Registration')) {
+      eventName = 'automated registration email';
+    } else if (subject.includes('Contact Form')) {
+      eventName = 'automated contact form alert';
+    } else if (subject.includes('Grievance')) {
+      eventName = 'automated grievance alert';
+    }
+
     return createNotificationForAllAdmins({
       title: 'Automated Email Sent',
-      message: `System successfully sent automated registration email to ${recipient} (Submission ID: ${submissionId}).`,
+      message: `System successfully dispatched ${eventName} to ${recipient} (Reference ID: ${referenceId}).`,
       type: 'success',
       action_url: `/admin/email`,
-      metadata: { event: 'email_dispatched', recipient, subject, submissionId, subType: 'email' },
+      metadata: { event: 'email_dispatched', recipient, subject, referenceId, subType: 'email' },
     });
   },
 
   /**
    * Email automated dispatch failure
    */
-  emailDispatchFailed: async (recipient: string, error: string, submissionId: string) => {
+  emailDispatchFailed: async (recipient: string, error: string, referenceId: string) => {
+    let eventName = 'email';
+    if (referenceId.startsWith('SVI-')) {
+      eventName = 'grievance alert email';
+    } else if (referenceId.startsWith('SVI2')) {
+      eventName = 'registration copy email';
+    } else {
+      eventName = 'contact copy email';
+    }
+
     return createNotificationForAllAdmins({
       title: 'Automated Email Failed',
-      message: `Failed to deliver registration email to ${recipient} (Submission ID: ${submissionId}). Error: ${error}`,
+      message: `Failed to deliver automated ${eventName} to ${recipient} (Reference: ${referenceId}). Error: ${error}`,
       type: 'error',
       action_url: `/admin/email`,
       metadata: {
         event: 'email_dispatch_failed',
         recipient,
         error,
-        submissionId,
+        referenceId,
         subType: 'email',
       },
     });

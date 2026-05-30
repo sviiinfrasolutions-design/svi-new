@@ -292,6 +292,13 @@ export async function POST(request: NextRequest) {
 
       // Fetch dynamic email settings from database
       let adminEmail = process.env.ADMIN_EMAIL || 'admin@sviinfra.com';
+      let sendUserCopy = true;
+      let bccAdvisor = true;
+      let notifyOnRegistration = true;
+      let senderName = 'SVI Infra';
+      let senderEmail = 'noreply@sviiinfrasolutions.com';
+      let retryAttempts = 3;
+
       try {
         const { data: emailSetting } = await supabaseAdmin
           .from('portal_settings')
@@ -302,9 +309,31 @@ export async function POST(request: NextRequest) {
         if (emailSetting?.value && typeof emailSetting.value === 'object') {
           const val = emailSetting.value as any;
           if (val.admin_email) adminEmail = val.admin_email;
+          if (val.send_user_copy !== undefined) sendUserCopy = !!val.send_user_copy;
+          if (val.bcc_advisor !== undefined) bccAdvisor = !!val.bcc_advisor;
+          if (val.notify_on_registration !== undefined)
+            notifyOnRegistration = !!val.notify_on_registration;
+          if (val.sender_name) senderName = val.sender_name;
+          if (val.sender_email) senderEmail = val.sender_email;
+          if (typeof val.retry_attempts === 'number') retryAttempts = val.retry_attempts;
         }
       } catch (settingsErr) {
         console.warn('Failed to load email settings from DB, using fallback:', settingsErr);
+      }
+
+      // Exit early if registration alerts are globally disabled
+      if (!notifyOnRegistration) {
+        console.log(
+          '[Email Audit] Property registration alerts are disabled in settings. Skipping email dispatch.'
+        );
+        emailStatus.sent = false;
+        emailStatus.error = 'Disabled in settings';
+        return NextResponse.json({
+          success: true,
+          id: data.id,
+          submissionId: data.submission_id,
+          emailStatus,
+        });
       }
 
       // Fetch dynamic advisor profile to retrieve advisor email/real_email
@@ -331,29 +360,32 @@ export async function POST(request: NextRequest) {
       // Multi-recipient distribution list construction
       const bccList: string[] = [];
 
-      // Add admin to distribution list if valid
-      if (isValidEmail(adminEmail)) {
-        bccList.push(adminEmail);
-      } else {
-        console.warn(`[Email Audit] Admin email is invalid: ${adminEmail}`);
-      }
-
-      // Add advisor to distribution list if valid
-      if (advisorEmail && isValidEmail(advisorEmail)) {
-        bccList.push(advisorEmail);
-      } else if (advisorEmail) {
-        console.warn(`[Email Audit] Advisor email is invalid: ${advisorEmail}`);
-      }
-
-      // Primary Recipient: Applicant (default) or fallback to Admin if applicant email is invalid/missing
+      // Determine Primary Recipient and BCC lists based on user settings
       let isFallbackRoute = false;
 
-      if (!isValidEmail(email)) {
-        console.warn(
-          `[Email Audit] Applicant email is missing or invalid: ${email}. Routing primary delivery to Admin instead.`
-        );
+      if (sendUserCopy) {
+        primaryRecipient = email;
+        if (!isValidEmail(email)) {
+          console.warn(
+            `[Email Audit] Applicant email is missing or invalid: ${email}. Routing primary delivery to Admin instead.`
+          );
+          primaryRecipient = adminEmail;
+          isFallbackRoute = true;
+        } else {
+          // If sending to applicant, add admin to BCC
+          if (isValidEmail(adminEmail)) {
+            bccList.push(adminEmail);
+          }
+        }
+      } else {
+        // Not sending copy to applicant: primary recipient is directly admin
         primaryRecipient = adminEmail;
         isFallbackRoute = true;
+      }
+
+      // Add advisor to BCC (only if bcc_advisor toggle is enabled)
+      if (bccAdvisor && advisorEmail && isValidEmail(advisorEmail)) {
+        bccList.push(advisorEmail);
       }
 
       // Generate customized HTML content containing all registration details
@@ -425,7 +457,7 @@ export async function POST(request: NextRequest) {
 
       // Single-recipient check: If there's no BCC list and we are falling back, or sending normally
       const emailPayload: any = {
-        from: 'SVI Infra <noreply@sviiinfrasolutions.com>',
+        from: `${senderName} <${senderEmail}>`,
         to: primaryRecipient,
         subject: `[SYSTEM-AUTO] Property Registration Received: ${firstName} ${lastName || ''} - Submission ${data.submission_id}`,
         html: emailHtmlContent,
@@ -452,7 +484,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Dispatch using backoff retry handler
-      await sendEmailWithRetry(resend, emailPayload);
+      await sendEmailWithRetry(resend, emailPayload, retryAttempts);
       emailStatus.sent = true;
 
       // Dynamic System Notification Alert
