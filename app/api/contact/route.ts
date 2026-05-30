@@ -59,17 +59,33 @@ export async function POST(request: NextRequest) {
       await resend.emails.send({
         from: 'SVI Infra <noreply@sviiinfrasolutions.com>',
         to: adminEmail,
-        subject: `New Contact Form: ${subject}`,
+        subject: `[SYSTEM-AUTO] New Contact Form: ${subject}`,
+        headers: {
+          'X-Auto-Response': 'true',
+          'X-System-Generated': 'true',
+          'X-SVI-Event': 'contact_form',
+        },
+        tags: [
+          { name: 'category', value: 'system_automation' },
+          { name: 'event', value: 'contact_form' },
+        ],
         html: `
-          <h2>New Contact Form Submission</h2>
-          <table style="border-collapse:collapse;width:100%">
-            <tr><td style="padding:8px;font-weight:bold">Name:</td><td style="padding:8px">${name}</td></tr>
-            <tr><td style="padding:8px;font-weight:bold">Email:</td><td style="padding:8px">${email}</td></tr>
-            <tr><td style="padding:8px;font-weight:bold">Phone:</td><td style="padding:8px">${phone}</td></tr>
-            <tr><td style="padding:8px;font-weight:bold">Subject:</td><td style="padding:8px">${subject}</td></tr>
-          </table>
-          <p style="margin-top:16px"><strong>Message:</strong></p>
-          <p>${message.replace(/\n/g, '<br>')}</p>
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px; background-color: #ffffff;">
+            <div style="text-align: right; margin-bottom: 15px;">
+              <span style="background-color: #c9a84c; color: #ffffff; font-size: 9px; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; font-family: sans-serif;">
+                ✨ System Automated Notification
+              </span>
+            </div>
+            <h2>New Contact Form Submission</h2>
+            <table style="border-collapse:collapse;width:100%">
+              <tr><td style="padding:8px;font-weight:bold">Name:</td><td style="padding:8px">${name}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold">Email:</td><td style="padding:8px">${email}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold">Phone:</td><td style="padding:8px">${phone}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold">Subject:</td><td style="padding:8px">${subject}</td></tr>
+            </table>
+            <p style="margin-top:16px"><strong>Message:</strong></p>
+            <p>${message.replace(/\n/g, '<br>')}</p>
+          </div>
         `,
       });
     }

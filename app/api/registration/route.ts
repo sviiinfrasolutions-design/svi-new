@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 const STORAGE_BUCKET = 'registration-docs';
 
@@ -322,6 +323,11 @@ export async function POST(request: NextRequest) {
       // Generate customized HTML content containing all registration details
       const emailHtmlContent = `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px; background-color: #ffffff;">
+          <div style="text-align: right; margin-bottom: 15px;">
+            <span style="background-color: #c9a84c; color: #ffffff; font-size: 9px; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; font-family: sans-serif;">
+              ✨ System Automated Notification
+            </span>
+          </div>
           <h2 style="color: #c9a84c; font-family: serif; border-bottom: 2px solid #f0d080; padding-bottom: 10px; margin-bottom: 20px;">
             ${isFallbackRoute ? 'Administrative Record: Property Registration' : 'Registration Acknowledgment'}
           </h2>
@@ -385,8 +391,17 @@ export async function POST(request: NextRequest) {
       const emailPayload: any = {
         from: 'SVI Infra <noreply@sviiinfrasolutions.com>',
         to: primaryRecipient,
-        subject: `Property Registration Received: ${firstName} ${lastName || ''} - Submission ${data.submission_id}`,
+        subject: `[SYSTEM-AUTO] Property Registration Received: ${firstName} ${lastName || ''} - Submission ${data.submission_id}`,
         html: emailHtmlContent,
+        headers: {
+          'X-Auto-Response': 'true',
+          'X-System-Generated': 'true',
+          'X-SVI-Event': 'property_registration',
+        },
+        tags: [
+          { name: 'category', value: 'system_automation' },
+          { name: 'event', value: 'property_registration' },
+        ],
       };
 
       // Add BCC list if populated
@@ -403,6 +418,17 @@ export async function POST(request: NextRequest) {
       // Dispatch using backoff retry handler
       await sendEmailWithRetry(resend, emailPayload);
       emailStatus.sent = true;
+
+      // Dynamic System Notification Alert
+      try {
+        await NotificationHelper.emailDispatched(
+          primaryRecipient,
+          emailPayload.subject,
+          data.submission_id
+        );
+      } catch (notifErr) {
+        console.error('Failed to log email dispatched system alert:', notifErr);
+      }
     }
   } catch (emailErr: any) {
     console.error(
@@ -410,6 +436,17 @@ export async function POST(request: NextRequest) {
       emailErr
     );
     emailStatus.error = emailErr.message || String(emailErr);
+
+    // Dynamic System Notification Failure Alert
+    try {
+      await NotificationHelper.emailDispatchFailed(
+        primaryRecipient,
+        emailStatus.error || 'Unknown Outage',
+        data.submission_id
+      );
+    } catch (notifErr) {
+      console.error('Failed to log email dispatch failure system alert:', notifErr);
+    }
   }
 
   return NextResponse.json({

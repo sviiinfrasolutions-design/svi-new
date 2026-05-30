@@ -149,4 +149,126 @@ export const EMAIL_TEMPLATES = [
 </body>
 </html>`,
   },
+  {
+    id: 'registration_acknowledgment',
+    name: 'Property Registration Acknowledgment',
+    subject: 'Property Registration Received: {{firstName}} - Submission {{submissionId}}',
+    category: 'Onboarding',
+    icon: FileText,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Registration Received</title></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <tr><td style="background:linear-gradient(135deg,#1a2744,#2d4080);padding:40px;text-align:center;">
+          <h1 style="color:#D4AF37;font-size:28px;margin:0;font-family:Georgia,serif;">SVI Infra Solutions</h1>
+          <p style="color:rgba(255,255,255,0.7);margin:8px 0 0;font-size:13px;letter-spacing:2px;">REGISTRATION RECEIVED</p>
+        </td></tr>
+        <tr><td style="padding:40px;">
+          <h2 style="color:#1a2744;font-size:22px;margin:0 0 16px;">Dear {{firstName}} {{lastName}},</h2>
+          <p style="color:#555;line-height:1.7;margin:0 0 24px;">Thank you for registering with SVI Infra Solutions. We are pleased to acknowledge receipt of your property registration inquiry details.</p>
+          
+          <div style="background-color:#f9f9f9;color:#333333;padding:20px;border-radius:8px;margin:24px 0;border-left:4px solid #D4AF37;">
+            <h3 style="margin-top:0;color:#1a2744;font-size:15px;border-bottom:1px solid #eee;padding-bottom:8px;">Submission Details</h3>
+            <table width="100%" style="border-collapse:collapse;font-size:13px;line-height:2.0;">
+              <tr><td style="font-weight:bold;width:40%;">Submission ID:</td><td>{{submissionId}}</td></tr>
+              <tr><td style="font-weight:bold;">Project Name:</td><td>{{project}}</td></tr>
+              <tr><td style="font-weight:bold;">Property Type & Size:</td><td>{{propertyType}} ({{propertySize}})</td></tr>
+              <tr><td style="font-weight:bold;">Assigned Advisor:</td><td>{{advisorName}}</td></tr>
+              <tr><td style="font-weight:bold;">Payment Plan:</td><td>{{paymentPlan}}</td></tr>
+              <tr><td style="font-weight:bold;">Registration Amount:</td><td>INR {{schemeAmount}}</td></tr>
+            </table>
+          </div>
+
+          <p style="color:#555;line-height:1.7;">Our property experts are reviewing your preferences and will contact you shortly.</p>
+          <p style="color:#555;line-height:1.7;">If you have any questions or require modifications to your submission, feel free to contact support at <a href="mailto:{{adminEmail}}" style="color:#D4AF37;text-decoration:none;">{{adminEmail}}</a>.</p>
+        </td></tr>
+        <tr><td style="background:#f9f9f9;padding:24px;text-align:center;border-top:1px solid #eee;">
+          <p style="color:#999;font-size:12px;margin:0;">© 2025 SVI Infra Solutions · All rights reserved</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  },
+  {
+    id: 'contact_notification',
+    name: 'Contact Form Notification (Admin)',
+    subject: 'New Contact Form: {{subject}}',
+    category: 'Admin Notifications',
+    icon: FileText,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Contact Form Alert</title></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <tr><td style="background:#1a2744;padding:30px;text-align:center;">
+          <h1 style="color:#D4AF37;font-size:24px;margin:0;font-family:Georgia,serif;">New Contact Submission</h1>
+        </td></tr>
+        <tr><td style="padding:35px;">
+          <table width="100%" style="border-collapse:collapse;font-size:14px;line-height:2.0;margin-bottom:20px;">
+            <tr style="background:#f9f9f9;"><td style="padding:10px;font-weight:bold;width:30%;">Name:</td><td style="padding:10px;">{{name}}</td></tr>
+            <tr><td style="padding:10px;font-weight:bold;">Email:</td><td style="padding:10px;">{{email}}</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:10px;font-weight:bold;">Phone:</td><td style="padding:10px;">{{phone}}</td></tr>
+            <tr><td style="padding:10px;font-weight:bold;">Subject:</td><td style="padding:10px;">{{subject}}</td></tr>
+          </table>
+          <p style="font-weight:bold;margin:20px 0 10px;color:#1a2744;">Submitted Message:</p>
+          <div style="background:#f5f5f5;padding:15px;border-radius:6px;font-style:italic;color:#555;">
+            {{message}}
+          </div>
+        </td></tr>
+        <tr><td style="background:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee;">
+          <p style="color:#999;font-size:11px;margin:0;">SVI Infra Automated System Notification</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  },
+  {
+    id: 'grievance_acknowledgment',
+    name: 'Grievance Acknowledgment (Admin)',
+    subject: 'New Grievance #{{ticketId}}: {{subject}}',
+    category: 'Support Alerts',
+    icon: Clock,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Grievance Submitted</title></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <tr><td style="background:linear-gradient(135deg,#c9a84c,#b08f36);padding:30px;text-align:center;">
+          <h1 style="color:#ffffff;font-size:24px;margin:0;font-family:Georgia,serif;">Grievance Logged</h1>
+          <p style="color:rgba(255,255,255,0.9);margin:5px 0 0;font-size:12px;">Ticket ID: {{ticketId}}</p>
+        </td></tr>
+        <tr><td style="padding:35px;">
+          <h2 style="color:#1a2744;font-size:18px;margin:0 0 15px;">Dear Admin / Support Team,</h2>
+          <p style="color:#555;line-height:1.7;">A new client grievance ticket has been logged into the portal.</p>
+          <table width="100%" style="border-collapse:collapse;font-size:13px;line-height:2.0;margin:20px 0;">
+            <tr style="background:#f9f9f9;"><td style="padding:8px;font-weight:bold;width:30%;">Client Name:</td><td style="padding:8px;">{{name}}</td></tr>
+            <tr><td style="padding:8px;font-weight:bold;">Email / Phone:</td><td style="padding:8px;">{{email}} / {{phone}}</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:8px;font-weight:bold;">Category:</td><td style="padding:8px;">{{category}}</td></tr>
+            <tr><td style="padding:8px;font-weight:bold;">Subject:</td><td style="padding:8px;">{{subject}}</td></tr>
+          </table>
+          <p style="font-weight:bold;margin-top:20px;color:#1a2744;">Issue Description:</p>
+          <div style="background:#f5f5f5;padding:15px;border-radius:6px;color:#555;font-style:italic;">
+            {{description}}
+          </div>
+        </td></tr>
+        <tr><td style="background:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee;">
+          <p style="color:#999;font-size:11px;margin:0;">SVI Infra Automated Support Desk</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  },
 ];

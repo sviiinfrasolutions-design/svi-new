@@ -115,19 +115,35 @@ async function sendGrievanceResponse(
       await resend.emails.send({
         from: 'SVI Infra <noreply@sviiinfrasolutions.com>',
         to: adminEmail,
-        subject: `New Grievance #${ticketId}: ${data.subject}`,
+        subject: `[SYSTEM-AUTO] New Grievance #${ticketId}: ${data.subject}`,
+        headers: {
+          'X-Auto-Response': 'true',
+          'X-System-Generated': 'true',
+          'X-SVI-Event': 'grievance_submission',
+        },
+        tags: [
+          { name: 'category', value: 'system_automation' },
+          { name: 'event', value: 'grievance_submission' },
+        ],
         html: `
-          <h2>New Grievance Submitted</h2>
-          <p><strong>Ticket ID:</strong> ${ticketId}</p>
-          <table style="border-collapse:collapse;width:100%">
-            <tr><td style="padding:8px;font-weight:bold">Name:</td><td style="padding:8px">${data.name}</td></tr>
-            <tr><td style="padding:8px;font-weight:bold">Email:</td><td style="padding:8px">${data.email}</td></tr>
-            <tr><td style="padding:8px;font-weight:bold">Phone:</td><td style="padding:8px">${data.phone}</td></tr>
-            <tr><td style="padding:8px;font-weight:bold">Category:</td><td style="padding:8px">${data.category}</td></tr>
-            <tr><td style="padding:8px;font-weight:bold">Subject:</td><td style="padding:8px">${data.subject}</td></tr>
-          </table>
-          <p style="margin-top:16px"><strong>Description:</strong></p>
-          <p>${data.description.replace(/\n/g, '<br>')}</p>
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px; background-color: #ffffff;">
+            <div style="text-align: right; margin-bottom: 15px;">
+              <span style="background-color: #c9a84c; color: #ffffff; font-size: 9px; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; font-family: sans-serif;">
+                ✨ System Automated Notification
+              </span>
+            </div>
+            <h2>New Grievance Submitted</h2>
+            <p><strong>Ticket ID:</strong> ${ticketId}</p>
+            <table style="border-collapse:collapse;width:100%">
+              <tr><td style="padding:8px;font-weight:bold">Name:</td><td style="padding:8px">${data.name}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold">Email:</td><td style="padding:8px">${data.email}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold">Phone:</td><td style="padding:8px">${data.phone}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold">Category:</td><td style="padding:8px">${data.category}</td></tr>
+              <tr><td style="padding:8px;font-weight:bold">Subject:</td><td style="padding:8px">${data.subject}</td></tr>
+            </table>
+            <p style="margin-top:16px"><strong>Description:</strong></p>
+            <p>${data.description.replace(/\n/g, '<br>')}</p>
+          </div>
         `,
       });
     }

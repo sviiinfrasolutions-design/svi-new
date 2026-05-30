@@ -119,6 +119,32 @@ export const NotificationHelper = {
   },
 
   /**
+   * Email automated dispatch notification
+   */
+  emailDispatched: async (recipient: string, subject: string, submissionId: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Automated Email Sent',
+      message: `System successfully sent automated registration email to ${recipient} (Submission ID: ${submissionId}).`,
+      type: 'success',
+      action_url: `/admin/email`,
+      metadata: { event: 'email_dispatched', recipient, subject, submissionId, subType: 'email' },
+    });
+  },
+
+  /**
+   * Email automated dispatch failure
+   */
+  emailDispatchFailed: async (recipient: string, error: string, submissionId: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Automated Email Failed',
+      message: `Failed to deliver registration email to ${recipient} (Submission ID: ${submissionId}). Error: ${error}`,
+      type: 'error',
+      action_url: `/admin/email`,
+      metadata: { event: 'email_dispatch_failed', recipient, error, submissionId, subType: 'email' },
+    });
+  },
+
+  /**
    * Document created notification
    */
   documentCreated: async (documentType: string, userName: string, userId: string) => {

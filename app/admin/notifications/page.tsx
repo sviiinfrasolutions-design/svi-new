@@ -723,7 +723,17 @@ export default function AdminNotifications() {
           <div className="space-y-2">
             <AnimatePresence mode="popLayout">
               {notifications.map((notification, index) => {
-                const config = TYPE_CONFIG[notification.type];
+                const isEmail = (notification as any).metadata?.subType === 'email';
+                
+                const config = isEmail
+                  ? {
+                      icon: Mail,
+                      bg: 'bg-amber-500/10 dark:bg-brand-gold/15',
+                      text: 'text-brand-gold',
+                      border: 'border-l-brand-gold',
+                    }
+                  : TYPE_CONFIG[notification.type];
+                  
                 const IconComponent = config.icon;
 
                 return (
@@ -736,7 +746,9 @@ export default function AdminNotifications() {
                     transition={{ duration: 0.25, delay: index * 0.02 }}
                     className={`group relative flex items-start gap-3 rounded-lg border-l-4 p-4 transition-all md:p-5 ${
                       notification.is_read
-                        ? 'border-gray-200 bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-[#0e0e14] dark:hover:bg-white/[0.03]'
+                        ? isEmail
+                          ? 'border-brand-gold/40 bg-amber-500/[0.02] dark:bg-brand-gold/5 dark:hover:bg-brand-gold/10 hover:bg-amber-500/[0.04]'
+                          : 'border-gray-200 bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-[#0e0e14] dark:hover:bg-white/[0.03]'
                         : `${config.border} ${config.bg} shadow-sm`
                     } ${selectedIds.has(notification.id) ? 'ring-brand-gold/50 ring-2' : ''}`}
                   >
@@ -762,13 +774,18 @@ export default function AdminNotifications() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0 flex-1">
                           <h4
-                            className={`truncate text-sm font-semibold ${
+                            className={`flex items-center gap-2 text-sm font-semibold ${
                               notification.is_read
                                 ? 'text-gray-500 dark:text-gray-400'
                                 : 'text-gray-900 dark:text-white'
                             }`}
                           >
-                            {notification.title}
+                            <span className="truncate">{notification.title}</span>
+                            {isEmail && (
+                              <span className="bg-brand-gold/15 text-brand-gold border-brand-gold/20 inline-flex items-center rounded border px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase">
+                                Automated Email
+                              </span>
+                            )}
                           </h4>
                           <p
                             className={`mt-1 text-sm leading-relaxed ${

@@ -63,11 +63,11 @@ const renderPropertyInterestTags = (
   });
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1.5">
       {items.map((item, idx) => (
         <span
           key={idx}
-          className="bg-brand-gold/10 border-brand-gold/20 text-brand-gold hover:bg-brand-gold/20 hover:border-brand-gold/40 inline-flex items-center rounded-lg border px-3 py-1.5 text-[11px] font-bold tracking-wide shadow-[0_0_15px_rgba(201,168,76,0.15)] transition-all hover:scale-105"
+          className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-medium text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300"
         >
           {item}
         </span>
@@ -79,16 +79,16 @@ const renderPropertyInterestTags = (
 function Badge({ role }: { role: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[9px] font-bold tracking-widest uppercase shadow-sm ${
+      className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[9px] font-bold tracking-widest uppercase ${
         role === 'admin'
-          ? 'from-brand-gold/20 to-brand-gold/5 text-brand-gold border-brand-gold/30 border bg-gradient-to-r'
-          : 'border border-gray-200 bg-gradient-to-r from-gray-100 to-gray-50 text-gray-600 dark:border-white/10 dark:from-white/10 dark:to-white/5 dark:text-gray-300'
+          ? 'bg-brand-gold/10 text-brand-gold border-brand-gold/20 border'
+          : 'border border-gray-200 bg-gray-50 text-gray-500 dark:border-white/10 dark:bg-white/5 dark:text-gray-400'
       }`}
     >
       {role === 'admin' ? (
         <Shield className="text-brand-gold h-3 w-3" />
       ) : (
-        <Users className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+        <Users className="h-3 w-3 text-gray-400 dark:text-gray-500" />
       )}
       {role === 'admin' ? 'Admin' : 'User'}
     </span>
@@ -1243,35 +1243,31 @@ export default function AdminDashboard() {
                   {filtered.map((u, i) => (
                     <motion.tr
                       key={u.id}
-                      initial={{ opacity: 0, scale: 0.98, y: 10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{ delay: i * 0.03, duration: 0.4, ease: 'easeOut' }}
-                      className="group hover:from-brand-gold/5 dark:hover:from-brand-gold/10 relative transition-all duration-300 hover:bg-gradient-to-r hover:to-transparent dark:hover:to-transparent"
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.02, duration: 0.3, ease: 'easeOut' }}
+                      className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-white/5"
                     >
                       {/* User Profile */}
-                      <td className="relative px-6 py-5">
-                        <div className="bg-brand-gold absolute top-0 bottom-0 left-0 w-[3px] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                        <div className="flex items-center gap-4">
-                          <div className="from-brand-gold shadow-brand-gold/20 relative flex h-12 w-12 flex-shrink-0 transform items-center justify-center rounded-xl bg-gradient-to-br via-yellow-600 to-amber-700 font-bold text-white shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
-                            <span className="text-lg">
-                              {u.full_name?.charAt(0).toUpperCase() || 'U'}
-                            </span>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3.5">
+                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-600 dark:bg-white/10 dark:text-gray-300 border border-gray-200 dark:border-white/10">
+                            {u.full_name?.charAt(0).toUpperCase() || 'U'}
                           </div>
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2">
-                              <span className="group-hover:text-brand-gold font-serif text-base font-bold text-gray-900 transition-colors duration-300 dark:text-white">
+                              <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                 {u.full_name}
                               </span>
                               <Badge role={u.role} />
                             </div>
-                            <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-                              <Mail className="text-brand-gold/70 h-3 w-3" />
+                            <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                               {u.email}
                             </div>
                             {u.notes && (
-                              <div className="mt-1 flex items-start gap-1.5 text-[11px] text-gray-400 dark:text-gray-500">
+                              <div className="mt-1.5 flex items-start gap-1.5 text-[11px] text-gray-400 dark:text-gray-500">
                                 <FileText className="mt-0.5 h-3 w-3 flex-shrink-0" />
-                                <span className="max-w-[220px] truncate" title={u.notes}>
+                                <span className="max-w-[200px] truncate" title={u.notes}>
                                   {u.notes}
                                 </span>
                               </div>
@@ -1281,13 +1277,11 @@ export default function AdminDashboard() {
                       </td>
 
                       {/* Contact Info */}
-                      <td className="px-6 py-5">
-                        <div className="flex flex-col gap-2">
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1.5 text-sm text-gray-700 dark:text-gray-300">
                           {u.phone ? (
-                            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                              <div className="flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 bg-gray-100 shadow-sm dark:border-white/10 dark:bg-white/5">
-                                <Phone className="text-brand-gold h-3 w-3" />
-                              </div>
+                            <div className="flex items-center gap-2">
+                              <Phone className="h-3.5 w-3.5 text-gray-400" />
                               {u.phone}
                             </div>
                           ) : (
@@ -1295,10 +1289,8 @@ export default function AdminDashboard() {
                           )}
                           {u.real_email ? (
                             <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                              <div className="flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 bg-gray-100 shadow-sm dark:border-white/10 dark:bg-white/5">
-                                <Mail className="h-3 w-3 text-gray-400" />
-                              </div>
-                              <span className="max-w-[150px] truncate" title={u.real_email}>
+                              <Mail className="h-3.5 w-3.5 text-gray-400" />
+                              <span className="max-w-[160px] truncate" title={u.real_email}>
                                 {u.real_email}
                               </span>
                             </div>
@@ -1307,53 +1299,42 @@ export default function AdminDashboard() {
                       </td>
 
                       {/* Property Interests */}
-                      <td className="w-[300px] px-6 py-5">
+                      <td className="w-[300px] px-6 py-4">
                         {u.property_interest ? (
                           renderPropertyInterestTags(u.property_interest, properties)
                         ) : (
-                          <div className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-[11px] font-medium text-gray-400 dark:border-white/10 dark:text-gray-600">
-                            No interests
-                          </div>
+                          <span className="text-xs text-gray-400 dark:text-gray-600">—</span>
                         )}
                       </td>
 
                       {/* Joined Date */}
-                      <td className="px-6 py-5">
-                        <div className="inline-flex items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-600 shadow-sm dark:border-white/5 dark:bg-[#111118] dark:text-gray-400">
-                          {new Date(u.created_at).toLocaleDateString('en-IN', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </div>
+                      <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-400">
+                        {new Date(u.created_at).toLocaleDateString('en-IN', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
                       </td>
 
                       {/* Actions */}
-                      <td className="relative w-[120px] px-6 py-5 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                      <td className="w-[120px] px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setEditTarget(u)}
-                            className="group/btn hover:border-brand-gold hover:bg-brand-gold hover:text-brand-navy hover:shadow-brand-gold/20 dark:hover:border-brand-gold dark:hover:bg-brand-gold dark:hover:text-brand-navy relative flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 shadow-sm transition-all hover:shadow-lg dark:border-white/10 dark:bg-[#111118] dark:text-gray-400"
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/10 dark:hover:text-gray-300"
                             title="Edit User Profile"
                           >
-                            <Pencil className="h-4 w-4 transform transition-transform group-hover/btn:scale-110" />
+                            <Pencil className="h-4 w-4" />
                           </button>
                           {u.id !== currentAdminId && (
                             <button
                               onClick={() => setDeleteTarget(u)}
-                              className="group/btn relative flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 shadow-sm transition-all hover:border-red-500 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/20 dark:border-white/10 dark:bg-[#111118] dark:text-gray-400 dark:hover:border-red-500 dark:hover:bg-red-500 dark:hover:text-white"
+                              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400"
                               title="Delete User"
                             >
-                              <Trash2 className="h-4 w-4 transform transition-transform group-hover/btn:scale-110" />
+                              <Trash2 className="h-4 w-4" />
                             </button>
                           )}
-                        </div>
-                        <div className="pointer-events-none absolute top-1/2 right-8 flex -translate-y-1/2 justify-end opacity-100 transition-opacity duration-300 group-hover:opacity-0">
-                          <span className="flex gap-1.5">
-                            <span className="h-1.5 w-1.5 rounded-full bg-gray-300 dark:bg-gray-600"></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-gray-300 dark:bg-gray-600"></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-gray-300 dark:bg-gray-600"></span>
-                          </span>
                         </div>
                       </td>
                     </motion.tr>

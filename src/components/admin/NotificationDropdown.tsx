@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Check, FileText, Info, Trash2, Users, X, ArrowRight } from 'lucide-react';
+import { Bell, Check, FileText, Info, Trash2, Users, X, ArrowRight, Mail } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 
@@ -15,6 +15,7 @@ interface Notification {
   is_read: boolean;
   action_url?: string;
   created_at: string;
+  metadata?: Record<string, any>;
 }
 
 interface NotificationDropdownProps {
@@ -103,8 +104,13 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
   };
 
   // Get icon based on notification type
-  const getTypeIcon = (type: string) => {
-    switch (type) {
+  const getTypeIcon = (notification: Notification) => {
+    const isEmail = notification.metadata?.subType === 'email';
+    if (isEmail) {
+      return <Mail className="h-4 w-4 text-brand-gold" />;
+    }
+
+    switch (notification.type) {
       case 'success':
         return <Check className="h-4 w-4 text-emerald-500" />;
       case 'warning':
@@ -238,33 +244,45 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-100 dark:divide-white/5">
-                    {notifications.map((notification) => (
-                      <motion.div
-                        key={notification.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className={`group relative px-4 py-3 transition-colors ${
-                          !notification.is_read
-                            ? 'bg-brand-gold/5 dark:bg-brand-gold/10'
-                            : 'hover:bg-gray-50 dark:hover:bg-white/5'
-                        }`}
-                      >
-                        <div className="flex gap-3">
-                          {/* Icon */}
-                          <div className="mt-1 flex-shrink-0">{getTypeIcon(notification.type)}</div>
+                    {notifications.map((notification) => {
+                      const isEmail = notification.metadata?.subType === 'email';
+                      
+                      return (
+                        <motion.div
+                          key={notification.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className={`group relative px-4 py-3 transition-colors ${
+                            isEmail
+                              ? !notification.is_read
+                                ? 'bg-amber-500/10 border-l-2 border-brand-gold dark:bg-brand-gold/15'
+                                : 'hover:bg-amber-500/5 dark:hover:bg-brand-gold/5 border-l-2 border-brand-gold/40'
+                              : !notification.is_read
+                                ? 'bg-brand-gold/5 dark:bg-brand-gold/10'
+                                : 'hover:bg-gray-50 dark:hover:bg-white/5'
+                          }`}
+                        >
+                          <div className="flex gap-3">
+                            {/* Icon */}
+                            <div className="mt-1 flex-shrink-0">{getTypeIcon(notification)}</div>
 
-                          {/* Content */}
-                          <div className="min-w-0 flex-1 pr-8">
-                            <div className="flex items-start justify-between gap-2">
-                              <p
-                                className={`text-sm leading-tight font-semibold ${
-                                  !notification.is_read
-                                    ? 'text-gray-900 dark:text-white'
-                                    : 'text-gray-700 dark:text-gray-300'
-                                }`}
-                              >
-                                {notification.title}
-                              </p>
+                            {/* Content */}
+                            <div className="min-w-0 flex-1 pr-8">
+                              <div className="flex items-start justify-between gap-2">
+                                <p
+                                  className={`text-sm leading-tight font-semibold flex items-center gap-1.5 ${
+                                    !notification.is_read
+                                      ? 'text-gray-900 dark:text-white'
+                                      : 'text-gray-700 dark:text-gray-300'
+                                  }`}
+                                >
+                                  <span className="truncate">{notification.title}</span>
+                                  {isEmail && (
+                                    <span className="bg-brand-gold/15 text-brand-gold border-brand-gold/20 inline-flex items-center rounded border px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase scale-90">
+                                      Email
+                                    </span>
+                                  )}
+                                </p>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -298,7 +316,8 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                           />
                         )}
                       </motion.div>
-                    ))}
+                    );
+                  })}
                   </div>
                 )}
               </div>
