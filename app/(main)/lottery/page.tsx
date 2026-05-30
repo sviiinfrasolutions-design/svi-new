@@ -17,19 +17,19 @@ export default function LotteryPage() {
   return (
     <main className="flex min-h-screen flex-col">
       {/* Hero banner */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#0a0a0f] to-[#10101a] pt-32 pb-0 md:pt-40">
+      <section className="relative overflow-hidden bg-gradient-to-b from-white to-slate-50 pt-32 pb-0 transition-colors duration-500 md:pt-40 dark:from-[#0a0a0f] dark:to-[#10101a]">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.03]"
           style={{
             backgroundImage: 'radial-gradient(#c9a84c 1px, transparent 1px)',
             backgroundSize: '24px 24px',
           }}
         />
         <div className="relative z-10 container mx-auto px-4 text-center">
-          <span className="bg-brand-gold/10 text-brand-gold border-brand-gold/30 mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[10px] font-bold tracking-[0.25em] uppercase backdrop-blur-sm">
+          <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-4 py-1.5 text-[10px] font-bold tracking-[0.25em] text-[#B38728] uppercase backdrop-blur-sm dark:text-[#D4AF37]">
             ✦ Official Lucky Draw Portal
           </span>
-          <h1 className="mb-6 font-serif text-4xl font-bold text-white md:text-6xl">
+          <h1 className="mb-6 font-serif text-4xl font-bold text-slate-900 transition-colors duration-500 md:text-6xl dark:text-white">
             SVI Infra{' '}
             <span
               className="italic"
@@ -43,7 +43,7 @@ export default function LotteryPage() {
               Mega Giveaway
             </span>
           </h1>
-          <p className="mx-auto mb-0 max-w-xl text-sm leading-relaxed text-gray-400 md:text-base">
+          <p className="mx-auto mb-0 max-w-xl text-sm leading-relaxed text-slate-600 transition-colors duration-500 md:text-base dark:text-slate-400">
             Exclusive residential plot and luxury villa lucky drawings for registered SVI investors
             and buyers. All draws are provably fair, audited, and processed via cryptographically
             secure database procedures.
