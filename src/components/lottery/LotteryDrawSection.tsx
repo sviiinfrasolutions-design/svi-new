@@ -14,6 +14,7 @@ import {
   Trophy,
   Star,
   Play,
+  Clock,
 } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase/client';
 import confetti from 'canvas-confetti';
@@ -47,13 +48,55 @@ export default function LotteryDrawSection() {
   const [historicalWinners, setHistoricalWinners] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  // Countdown state
+  const [scheduledAt, setScheduledAt] = useState<Date | null>(null);
+  const [countdownStr, setCountdownStr] = useState<string | null>(null);
+
   const shuffleContainerRef = useRef<HTMLDivElement>(null);
   const shuffleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetchActiveLottery();
     fetchPastWinners();
+    fetchScheduleCountdown();
+    // Poll every 30 seconds for schedule updates
+    const pollInterval = setInterval(fetchScheduleCountdown, 30_000);
+    return () => clearInterval(pollInterval);
   }, []);
+
+  // Tick the countdown every second
+  useEffect(() => {
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+    if (!scheduledAt) { setCountdownStr(null); return; }
+    const tick = () => {
+      const diff = scheduledAt.getTime() - Date.now();
+      if (diff <= 0) { setCountdownStr(null); setScheduledAt(null); return; }
+      const totalSec = Math.floor(diff / 1000);
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      const pad = (n: number) => String(n).padStart(2, '0');
+      setCountdownStr(h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`);
+    };
+    tick();
+    countdownIntervalRef.current = setInterval(tick, 1_000);
+    return () => { if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current); };
+  }, [scheduledAt]);
+
+  const fetchScheduleCountdown = async () => {
+    try {
+      const res = await fetch('/api/lottery/schedule');
+      const json = await res.json();
+      if (json.scheduled?.scheduled_at) {
+        setScheduledAt(new Date(json.scheduled.scheduled_at));
+      } else {
+        setScheduledAt(null);
+      }
+    } catch {
+      // ignore — non-critical
+    }
+  };
 
   const fetchActiveLottery = async () => {
     try {
@@ -317,6 +360,67 @@ export default function LotteryDrawSection() {
       <div className="pointer-events-none absolute -top-[500px] left-1/2 h-[1000px] w-[1000px] -translate-x-1/2 rounded-full bg-gradient-to-b from-[#D4AF37]/10 to-transparent blur-3xl dark:from-[#D4AF37]/5" />
 
       <div className="relative z-10 container mx-auto max-w-7xl px-4">
+
+        {/* ── Live Countdown Banner ─────────────────────────────────────────── */}
+        <AnimatePresence>
+          {countdownStr && scheduledAt && (
+            <motion.div
+              key="countdown-banner"
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.4 }}
+              className="mb-10 overflow-hidden rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-r from-[#0a0a0f] via-[#1a1a2e] to-[#0a0a0f] p-px shadow-[0_0_40px_rgba(201,168,76,0.15)]"
+            >
+              <div className="flex flex-col items-center gap-4 rounded-2xl bg-gradient-to-r from-[#0e0e18] via-[#14142a] to-[#0e0e18] px-8 py-6 sm:flex-row sm:justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#D4AF37]/20 text-[#D4AF37]">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold tracking-widest text-[#D4AF37] uppercase">
+                      ✦ Live Draw Countdown
+                    </div>
+                    <div className="mt-0.5 text-sm text-slate-300">
+                      Draw scheduled for{' '}
+                      <span className="font-semibold text-white">
+                        {scheduledAt.toLocaleString('en-IN', {
+                          timeZone: 'Asia/Kolkata',
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        })}{' '}
+                        IST
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {/* Countdown digits */}
+                <div className="flex items-center gap-2">
+                  {countdownStr.split(':').map((seg, i) => (
+                    <React.Fragment key={i}>
+                      {i > 0 && (
+                        <span className="text-2xl font-bold text-[#D4AF37]/60">:</span>
+                      )}
+                      <div className="flex min-w-[3rem] flex-col items-center justify-center rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/5 px-3 py-2">
+                        <span className="font-mono text-3xl font-bold tabular-nums text-white">
+                          {seg}
+                        </span>
+                        <span className="mt-0.5 text-[9px] tracking-widest text-slate-400 uppercase">
+                          {i === 0 && countdownStr.split(':').length === 3
+                            ? 'hrs'
+                            : i === (countdownStr.split(':').length === 3 ? 1 : 0)
+                            ? 'min'
+                            : 'sec'}
+                        </span>
+                      </div>
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="mx-auto mb-16 max-w-4xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 10 }}

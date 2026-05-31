@@ -67,7 +67,7 @@ export default function Leadership() {
   };
 
   return (
-    <div className="page-transition min-h-screen bg-gray-50 pt-20 pb-16 dark:bg-[#0C0C0C]">
+    <div className="page-transition min-h-screen bg-gray-50 pt-20 pb-16 dark:bg-gray-900">
       {/* Person Schema - Leadership Team */}
       <script
         type="application/ld+json"

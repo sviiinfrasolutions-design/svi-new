@@ -3,5 +3,16 @@
   "buildCommand": "next build",
   "outputDirectory": ".next",
   "installCommand": "npm install",
-  "devCommand": "next dev --port 3000"
+  "devCommand": "next dev --port 3000",
+  "crons": [
+    {
+      "path": "/api/cron/lottery",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/campaigns",
+      "schedule": "* * * * *"
+    }
+  ]
 }
+

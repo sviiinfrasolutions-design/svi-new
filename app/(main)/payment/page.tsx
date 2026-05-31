@@ -47,7 +47,7 @@ export default function Payment() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-20 dark:bg-[#0C0C0C]">
+    <div className="min-h-screen bg-gray-50 pt-24 pb-20 dark:bg-gray-900">
       <section className="container mx-auto max-w-4xl px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
