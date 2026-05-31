@@ -15,35 +15,17 @@ export const metadata: Metadata = {
 
 export default function LotteryPage() {
   return (
-    <main className="flex min-h-screen flex-col">
-      {/* Hero banner */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-white to-slate-50 pt-32 pb-0 transition-colors duration-500 md:pt-40 dark:from-[#0a0a0f] dark:to-[#10101a]">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.03]"
-          style={{
-            backgroundImage: 'radial-gradient(#c9a84c 1px, transparent 1px)',
-            backgroundSize: '24px 24px',
-          }}
-        />
-        <div className="relative z-10 container mx-auto px-4 text-center">
-          <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-4 py-1.5 text-[10px] font-bold tracking-[0.25em] text-[#B38728] uppercase backdrop-blur-sm dark:text-[#D4AF37]">
-            ✦ Official Lucky Draw Portal
-          </span>
-          <h1 className="mb-6 font-serif text-4xl font-bold text-slate-900 transition-colors duration-500 md:text-6xl dark:text-white">
-            SVI Infra{' '}
-            <span
-              className="italic"
-              style={{
-                backgroundImage:
-                  'linear-gradient(135deg, #c9a84c, #f0d080, #b08f36, #dec070, #c9a84c)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              Mega Giveaway
-            </span>
+    <div className="bg-brand-bg min-h-screen pt-20 pb-16 dark:bg-gray-900">
+      <section className="bg-brand-bg border-b border-gray-200 py-14 text-center md:py-20 dark:border-gray-700 dark:bg-gray-800">
+        <div className="container mx-auto px-4">
+          <p className="mb-4 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-500">
+            Official Lucky Draw Portal
+          </p>
+          <h1 className="text-brand-navy mb-6 font-serif text-3xl sm:text-4xl md:text-6xl dark:text-gray-100">
+            SVI Infra <span className="text-brand-gold">Mega Giveaway</span>
           </h1>
-          <p className="mx-auto mb-0 max-w-xl text-sm leading-relaxed text-slate-600 transition-colors duration-500 md:text-base dark:text-slate-400">
+          <div className="bg-brand-gold animate-hero-divider mx-auto mb-6 h-px w-16"></div>
+          <p className="mx-auto max-w-2xl text-base leading-relaxed text-gray-500 md:text-lg dark:text-gray-400">
             Exclusive residential plot and luxury villa lucky drawings for registered SVI investors
             and buyers. All draws are provably fair, audited, and processed via cryptographically
             secure database procedures.
@@ -51,8 +33,7 @@ export default function LotteryPage() {
         </div>
       </section>
 
-      {/* Full draw section */}
       <LotteryClientSection />
-    </main>
+    </div>
   );
 }

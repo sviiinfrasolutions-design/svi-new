@@ -21,6 +21,7 @@ import {
   CheckCheck,
   Eye,
   EyeOff,
+  User,
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 
@@ -798,14 +799,16 @@ export default function AdminNotifications() {
                           </p>
                           {isEmail && (notification as any).metadata?.subject && (
                             <div className="dark:bg-brand-gold/[0.03] border-brand-gold/10 mt-3 flex max-w-xl flex-col gap-1 rounded-lg border bg-amber-500/[0.03] p-3 text-xs text-gray-500 dark:text-gray-400">
-                              <span className="text-brand-gold font-semibold">
-                                📧 Subject:{' '}
+                              <span className="text-brand-gold inline-flex items-center gap-2 font-semibold">
+                                <Mail className="h-3.5 w-3.5" />
+                                Subject:
                                 <span className="font-normal text-gray-700 dark:text-gray-300">
                                   {(notification as any).metadata.subject}
                                 </span>
                               </span>
-                              <span>
-                                👤 Recipient:{' '}
+                              <span className="inline-flex items-center gap-2">
+                                <User className="h-3.5 w-3.5 text-gray-400" />
+                                Recipient:
                                 <span className="font-mono font-medium text-gray-700 dark:text-gray-300">
                                   {(notification as any).metadata.recipient}
                                 </span>

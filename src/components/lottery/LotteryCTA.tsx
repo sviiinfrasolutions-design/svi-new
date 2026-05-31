@@ -227,8 +227,9 @@ export default function LotteryCTA() {
                     transition={{ duration: 1.5, repeat: Infinity }}
                     className="bg-brand-gold/10 border-brand-gold/30 rounded-2xl border px-8 py-4 text-center"
                   >
-                    <div className="text-brand-gold text-lg font-black tracking-widest uppercase">
-                      🎰 Drawing Now!
+                    <div className="text-brand-gold inline-flex items-center gap-2 text-lg font-black tracking-widest uppercase">
+                      <Trophy className="h-4 w-4" />
+                      Drawing Now
                     </div>
                     <div className="mt-1 text-xs text-gray-500">Live reveal in progress</div>
                   </motion.div>

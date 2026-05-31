@@ -40,30 +40,29 @@ export default function Grievance() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-20 dark:bg-gray-900">
-      <section className="container mx-auto max-w-3xl px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12 text-center"
-        >
-          <div className="bg-brand-navy text-brand-gold mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full">
+    <div className="bg-brand-bg min-h-screen pt-20 pb-20 dark:bg-gray-900">
+      <section className="bg-brand-bg border-b border-gray-200 py-14 text-center md:py-20 dark:border-gray-700 dark:bg-gray-800">
+        <div className="container mx-auto px-4">
+          <div className="bg-brand-navy text-brand-gold dark:border-brand-gold/30 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full shadow-md dark:border">
             <MessageSquareWarning size={32} />
           </div>
-          <h1 className="text-brand-navy mb-4 font-serif text-4xl dark:text-white">
+          <h1 className="text-brand-navy animate-hero-h1 mb-6 font-serif text-3xl leading-tight sm:text-4xl md:text-6xl dark:text-gray-100">
             Raise a Grievance
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <div className="bg-brand-gold animate-hero-divider mx-auto mb-6 h-px w-16"></div>
+          <p className="animate-hero-subtitle mx-auto max-w-2xl text-base leading-relaxed text-gray-500 md:text-lg dark:text-gray-400">
             We are committed to resolving your issues promptly. Please provide details of your
             grievance or support request below.
           </p>
-        </motion.div>
+        </div>
+      </section>
 
+      <section className="container mx-auto max-w-3xl px-4 py-16">
         {submitted ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="border border-gray-200 bg-white p-12 text-center shadow-xl dark:border-gray-700 dark:bg-gray-900"
+            className="rounded-lg border border-gray-200 bg-white p-10 text-center shadow-sm md:p-12 dark:border-gray-700 dark:bg-gray-800"
           >
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
               <FileText size={40} />
@@ -88,7 +87,7 @@ export default function Grievance() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="border border-gray-200 bg-white p-8 shadow-xl md:p-12 dark:border-gray-700 dark:bg-gray-900"
+            className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm md:p-12 dark:border-gray-700 dark:bg-gray-800"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -196,7 +195,7 @@ export default function Grievance() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy hover:bg-brand-gold hover:text-brand-navy flex w-full items-center justify-center gap-2 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors dark:hover:bg-white"
+                className="bg-brand-navy hover:bg-brand-gold text-brand-gold hover:text-brand-navy border-brand-navy flex w-full items-center justify-center gap-2 border py-4 text-xs font-bold tracking-widest uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isSubmitting ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent"></span>

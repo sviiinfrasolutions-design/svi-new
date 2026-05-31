@@ -299,11 +299,13 @@ export default function NotificationDropdown({ userId }: NotificationDropdownPro
                               </p>
                               {isEmail && notification.metadata?.subject && (
                                 <div className="dark:bg-brand-gold/5 border-brand-gold/10 mt-1.5 flex flex-col gap-0.5 rounded-md border bg-amber-500/5 p-2 text-[10px] leading-tight text-gray-500 dark:text-gray-400">
-                                  <span className="text-brand-gold truncate font-semibold">
-                                    📧 Subject: {notification.metadata.subject}
+                                  <span className="text-brand-gold inline-flex items-center gap-1.5 truncate font-semibold">
+                                    <Mail className="h-3 w-3" />
+                                    Subject: {notification.metadata.subject}
                                   </span>
-                                  <span className="truncate">
-                                    To: {notification.metadata.recipient}
+                                  <span className="inline-flex items-center gap-1.5 truncate">
+                                    <Users className="h-3 w-3 text-gray-400" />
+                                    Recipient: {notification.metadata.recipient}
                                   </span>
                                 </div>
                               )}

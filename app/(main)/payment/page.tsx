@@ -47,22 +47,21 @@ export default function Payment() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-20 dark:bg-gray-900">
-      <section className="container mx-auto max-w-4xl px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12 text-center"
-        >
-          <h1 className="text-brand-navy mb-4 font-serif text-4xl dark:text-white">
+    <div className="bg-brand-bg min-h-screen pt-20 pb-20 dark:bg-gray-900">
+      <section className="bg-brand-bg border-b border-gray-200 py-14 text-center md:py-20 dark:border-gray-700 dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <h1 className="text-brand-navy animate-hero-h1 mb-6 font-serif text-3xl leading-tight sm:text-4xl md:text-6xl dark:text-gray-100">
             Secure Online Payment
           </h1>
-          <p className="mx-auto max-w-2xl text-gray-600 dark:text-gray-400">
+          <div className="bg-brand-gold animate-hero-divider mx-auto mb-6 h-px w-16"></div>
+          <p className="animate-hero-subtitle mx-auto max-w-2xl text-base leading-relaxed text-gray-500 md:text-lg dark:text-gray-400">
             Pay your booking amount or installment securely through our integrated payment portal.
             All transactions are encrypted.
           </p>
-        </motion.div>
+        </div>
+      </section>
 
+      <section className="container mx-auto max-w-4xl px-4 py-16">
         <div className="flex flex-col overflow-hidden border border-gray-200 bg-white shadow-xl md:flex-row dark:border-gray-700 dark:bg-gray-900">
           <div className="bg-brand-navy flex flex-col justify-between p-8 text-white md:w-1/3">
             <div>

@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   Clock,
   FileSpreadsheet,
+  FileText,
   AlertCircle,
   Globe,
   Users,
@@ -248,7 +249,7 @@ export default function AdminLotteryPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Failed to schedule draw');
       setSuccessMessage(
-        `✅ Draw scheduled for ${new Date(scheduledAtUTC).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST.`
+        `Draw scheduled for ${new Date(scheduledAtUTC).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST.`
       );
       setExistingSchedule(json.schedule);
     } catch (err: any) {
@@ -270,7 +271,7 @@ export default function AdminLotteryPage() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Failed to cancel schedule');
-      setSuccessMessage('🗑️ Scheduled draw has been cancelled.');
+      setSuccessMessage('Scheduled draw has been cancelled.');
       setExistingSchedule(null);
       setScheduleInputIST('');
     } catch (err: any) {
@@ -311,8 +312,8 @@ export default function AdminLotteryPage() {
       setLotteryVisible(newValue);
       setSuccessMessage(
         newValue
-          ? '✅ Lottery page is now VISIBLE on the public site and navbar.'
-          : '🔒 Lottery page is now HIDDEN from the public site and navbar.'
+          ? 'Lottery page is now VISIBLE on the public site and navbar.'
+          : 'Lottery page is now HIDDEN from the public site and navbar.'
       );
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to update lottery visibility.');
@@ -1035,7 +1036,7 @@ export default function AdminLotteryPage() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Failed to send emails');
-      setSuccessMessage(`✅ Email sent to ${emails.length} participant(s).`);
+      setSuccessMessage(`Email sent to ${emails.length} participant(s).`);
       setEmailModalLottery(null);
     } catch (err: any) {
       setErrorMessage(err.message);
@@ -1891,12 +1892,12 @@ export default function AdminLotteryPage() {
                           className="focus:border-brand-gold/50 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 focus:outline-none dark:border-white/10 dark:bg-black/40 dark:text-gray-300"
                         >
                           <option value="">— Select a preset to auto-fill fields —</option>
-                          <option value="villa">🏡 SVI Grand Villa Lucky Draw</option>
-                          <option value="plot">🌳 Premium Residential Plot Giveaway</option>
-                          <option value="apartment">🏢 Luxury High-Rise Apartment Draw</option>
-                          <option value="commercial">🏬 Commercial Space Premium Lottery</option>
-                          <option value="loyalty">⭐ Investor Loyalty Reward Draw</option>
-                          <option value="festival">🎉 Festival Special Lucky Draw</option>
+                          <option value="villa">SVI Grand Villa Lucky Draw</option>
+                          <option value="plot">Premium Residential Plot Giveaway</option>
+                          <option value="apartment">Luxury High-Rise Apartment Draw</option>
+                          <option value="commercial">Commercial Space Premium Lottery</option>
+                          <option value="loyalty">Investor Loyalty Reward Draw</option>
+                          <option value="festival">Festival Special Lucky Draw</option>
                         </select>
                         <p className="mt-2 text-[10px] text-slate-400 dark:text-gray-500">
                           Selecting a preset fills the title and description. You can then edit
@@ -2239,42 +2240,54 @@ export default function AdminLotteryPage() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="flex w-full max-w-2xl flex-col rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-white/10 dark:bg-[#0e0e14]"
+              className="flex w-full max-w-2xl flex-col rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-[#0C0C0C]"
               style={{ maxHeight: '90vh' }}
             >
               {/* Header */}
-              <div className="flex items-start justify-between border-b border-slate-100 p-6 dark:border-white/10">
+              <div className="flex items-start justify-between border-b border-gray-200 p-6 dark:border-gray-700">
                 <div>
-                  <h3 className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-brand-navy font-serif text-2xl font-bold dark:text-gray-100">
                     Edit Campaign
                   </h3>
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     Full control — details, status, winner & participants.
                   </p>
                 </div>
                 <button
                   onClick={() => setEditingLottery(null)}
-                  className="cursor-pointer rounded-xl border border-slate-200 p-2 text-slate-400 transition-colors hover:text-slate-700 dark:border-white/10 dark:hover:text-white"
+                  className="hover:text-brand-navy cursor-pointer rounded-md border border-gray-200 p-2 text-gray-400 transition-colors dark:border-gray-700 dark:hover:text-gray-100"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
               {/* Tabs */}
-              <div className="flex border-b border-slate-100 dark:border-white/10">
+              <div className="flex border-b border-gray-200 dark:border-gray-700">
                 {(['details', 'winner', 'participants'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setEditTab(tab)}
                     className={`flex-1 cursor-pointer py-3 text-xs font-bold tracking-wider uppercase transition-colors ${
                       editTab === tab
-                        ? 'border-b-2 border-violet-500 text-violet-600 dark:text-violet-400'
-                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-gray-300'
+                        ? 'border-brand-gold text-brand-navy dark:text-brand-gold border-b-2'
+                        : 'hover:text-brand-navy text-gray-400 dark:hover:text-gray-200'
                     }`}
                   >
-                    {tab === 'details' && '📋 Details'}
-                    {tab === 'winner' && '🏆 Winner'}
-                    {tab === 'participants' && `👥 Participants (${editParticipants.length})`}
+                    {tab === 'details' && (
+                      <span className="inline-flex items-center justify-center gap-2">
+                        <FileText className="h-3.5 w-3.5" /> Details
+                      </span>
+                    )}
+                    {tab === 'winner' && (
+                      <span className="inline-flex items-center justify-center gap-2">
+                        <Trophy className="h-3.5 w-3.5" /> Winner
+                      </span>
+                    )}
+                    {tab === 'participants' && (
+                      <span className="inline-flex items-center justify-center gap-2">
+                        <Users className="h-3.5 w-3.5" /> Participants ({editParticipants.length})
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -2285,39 +2298,39 @@ export default function AdminLotteryPage() {
                 {editTab === 'details' && (
                   <div className="space-y-4">
                     <div>
-                      <label className="mb-1.5 block text-xs font-bold tracking-wider text-slate-600 uppercase dark:text-gray-400">
+                      <label className="mb-1.5 block text-xs font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                         Campaign Title *
                       </label>
                       <input
                         type="text"
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition focus:border-violet-400 focus:outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+                        className="focus:border-brand-gold w-full rounded-md border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 transition-colors focus:outline-none dark:border-gray-700 dark:bg-[#0C0C0C] dark:text-white"
                       />
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-xs font-bold tracking-wider text-slate-600 uppercase dark:text-gray-400">
+                      <label className="mb-1.5 block text-xs font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                         Description
                       </label>
                       <textarea
                         value={editDescription}
                         onChange={(e) => setEditDescription(e.target.value)}
                         rows={4}
-                        className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 transition focus:border-violet-400 focus:outline-none dark:border-white/10 dark:bg-white/5 dark:text-gray-300"
+                        className="focus:border-brand-gold w-full resize-none rounded-md border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-700 transition-colors focus:outline-none dark:border-gray-700 dark:bg-[#0C0C0C] dark:text-gray-300"
                       />
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-xs font-bold tracking-wider text-slate-600 uppercase dark:text-gray-400">
+                      <label className="mb-1.5 block text-xs font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                         Status
                       </label>
                       <select
                         value={editStatus}
                         onChange={(e) => setEditStatus(e.target.value as any)}
-                        className="w-full cursor-pointer rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition focus:border-violet-400 focus:outline-none dark:border-white/10 dark:bg-white/5 dark:text-white"
+                        className="focus:border-brand-gold w-full cursor-pointer rounded-md border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 transition-colors focus:outline-none dark:border-gray-700 dark:bg-[#0C0C0C] dark:text-white"
                       >
-                        <option value="active">🟢 Active</option>
-                        <option value="inactive">⚪ Inactive</option>
-                        <option value="completed">✅ Completed</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="completed">Completed</option>
                       </select>
                     </div>
                   </div>
@@ -2326,7 +2339,7 @@ export default function AdminLotteryPage() {
                 {/* ── WINNER TAB ───────────────────────────────────────── */}
                 {editTab === 'winner' && (
                   <div className="space-y-5">
-                    <div className="rounded-2xl border border-amber-200/60 bg-amber-50/50 p-3 text-xs text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+                    <div className="border-brand-gold/30 bg-brand-gold/10 dark:border-brand-gold/30 dark:bg-brand-gold/10 rounded-lg border p-3 text-xs text-gray-600 dark:text-gray-300">
                       Manually set or override the winner details. Leave Name blank to remove any
                       existing winner record.
                     </div>
@@ -2365,13 +2378,13 @@ export default function AdminLotteryPage() {
                           value={val}
                           onChange={(e) => set(e.target.value)}
                           placeholder={ph}
-                          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition focus:border-amber-400 focus:outline-none dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-gray-500"
+                          className="focus:border-brand-gold w-full rounded-md border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 transition-colors focus:outline-none dark:border-gray-700 dark:bg-[#0C0C0C] dark:text-white dark:placeholder-gray-500"
                         />
                       </div>
                     ))}
                     {editWinnerName.trim() && (
                       <div className="mt-2 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-500/20 dark:bg-amber-500/10">
-                        <span className="text-2xl">🏆</span>
+                        <Trophy className="text-brand-gold h-6 w-6" />
                         <div>
                           <p className="text-sm font-bold text-amber-800 dark:text-amber-300">
                             {editWinnerName}
@@ -2384,9 +2397,10 @@ export default function AdminLotteryPage() {
                     )}
 
                     <div className="border-t border-slate-200/70 pt-4 dark:border-white/10">
-                      <p className="mb-3 text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-gray-400">
-                        🏆 Current Winners
-                      </p>
+                      <div className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-gray-400">
+                        <Trophy className="text-brand-gold h-3.5 w-3.5" />
+                        Current Winners
+                      </div>
                       {editParticipants.filter((p) => p.is_winner).length === 0 ? (
                         <p className="text-xs text-slate-400">No winners marked yet.</p>
                       ) : (
@@ -2525,7 +2539,7 @@ export default function AdminLotteryPage() {
                       <button
                         onClick={handleAddParticipant}
                         disabled={addPartSaving || !addPartName.trim() || !addPartTicket.trim()}
-                        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-600 py-2.5 text-xs font-bold text-white transition hover:bg-violet-700 disabled:opacity-40"
+                        className="bg-brand-navy text-brand-gold hover:bg-brand-gold hover:text-brand-navy mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md py-2.5 text-xs font-bold transition-colors disabled:opacity-40"
                       >
                         {addPartSaving ? (
                           <RefreshCw className="h-3.5 w-3.5 animate-spin" />
@@ -2570,7 +2584,9 @@ export default function AdminLotteryPage() {
                             >
                               <div className="flex items-center justify-between px-3 py-2.5">
                                 <div className="flex min-w-0 items-center gap-2">
-                                  {p.is_winner && <span className="text-sm">🏆</span>}
+                                  {p.is_winner && (
+                                    <Trophy className="text-brand-gold h-3.5 w-3.5" />
+                                  )}
                                   <div className="min-w-0">
                                     <p className="truncate text-xs font-bold text-slate-900 dark:text-white">
                                       {p.name}
@@ -2677,17 +2693,17 @@ export default function AdminLotteryPage() {
 
               {/* Footer — save & cancel (only shown on details/winner tabs) */}
               {editTab !== 'participants' && (
-                <div className="flex gap-3 border-t border-slate-100 p-6 dark:border-white/10">
+                <div className="flex gap-3 border-t border-gray-200 p-6 dark:border-gray-700">
                   <button
                     onClick={() => setEditingLottery(null)}
-                    className="flex-1 cursor-pointer rounded-xl border border-slate-200 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
+                    className="hover:border-brand-gold hover:text-brand-navy flex-1 cursor-pointer rounded-md border border-gray-200 py-3 text-sm font-bold text-gray-600 transition-colors dark:border-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleEditSave}
                     disabled={editSaving || !editTitle.trim()}
-                    className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-600 py-3 text-sm font-bold text-white transition hover:bg-violet-700 disabled:opacity-50"
+                    className="bg-brand-navy text-brand-gold hover:bg-brand-gold hover:text-brand-navy flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md py-3 text-sm font-bold transition-colors disabled:opacity-50"
                   >
                     {editSaving ? (
                       <RefreshCw className="h-4 w-4 animate-spin" />
@@ -2699,8 +2715,8 @@ export default function AdminLotteryPage() {
                 </div>
               )}
               {editTab === 'participants' && (
-                <div className="border-t border-slate-100 p-4 text-center dark:border-white/10">
-                  <p className="text-xs text-slate-400">
+                <div className="border-t border-gray-200 p-4 text-center dark:border-gray-700">
+                  <p className="text-xs text-gray-400">
                     Changes to participants are saved immediately above.
                   </p>
                 </div>
@@ -2889,7 +2905,7 @@ export default function AdminLotteryPage() {
                             </td>
                             <td className="px-6 py-3 text-center">
                               {p.is_winner ? (
-                                <span className="text-brand-gold text-lg">🏆</span>
+                                <Trophy className="text-brand-gold inline h-4 w-4" />
                               ) : (
                                 <span className="text-slate-300 dark:text-white/20">—</span>
                               )}
@@ -2952,33 +2968,40 @@ export default function AdminLotteryPage() {
                 <div className="flex flex-wrap gap-2">
                   {[
                     {
-                      label: '📢 Announcement',
+                      label: 'Announcement',
+                      icon: BellRing,
                       subject: `Draw Announcement — ${emailModalLottery.title}`,
                       body: `Dear Participant,\n\nWe are excited to announce that the lucky draw for "${emailModalLottery.title}" is now live!\n\nBest of luck to all our valued participants.\n\n— SVI Infra Solutions Team`,
                     },
                     {
-                      label: '⏰ Reminder',
+                      label: 'Reminder',
+                      icon: Clock,
                       subject: `Reminder: Draw Coming Up — ${emailModalLottery.title}`,
                       body: `Dear Participant,\n\nThis is a friendly reminder that the lucky draw for "${emailModalLottery.title}" is happening very soon.\n\nStay tuned for the live draw!\n\n— SVI Infra Solutions Team`,
                     },
                     {
-                      label: '🏆 Winner Notice',
+                      label: 'Winner Notice',
+                      icon: Trophy,
                       subject: `Winner Declared — ${emailModalLottery.title}`,
                       body: `Dear Participant,\n\nThe lucky draw for "${emailModalLottery.title}" has concluded. Please check the official website to view the winner details.\n\nThank you for participating!\n\n— SVI Infra Solutions Team`,
                     },
-                  ].map((t) => (
-                    <button
-                      key={t.label}
-                      type="button"
-                      onClick={() => {
-                        setEmailSubject(t.subject);
-                        setEmailBody(t.body);
-                      }}
-                      className="cursor-pointer rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] font-bold text-amber-600 transition-all hover:bg-amber-500 hover:text-white dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500 dark:hover:text-white"
-                    >
-                      {t.label}
-                    </button>
-                  ))}
+                  ].map((t) => {
+                    const Icon = t.icon;
+                    return (
+                      <button
+                        key={t.label}
+                        type="button"
+                        onClick={() => {
+                          setEmailSubject(t.subject);
+                          setEmailBody(t.body);
+                        }}
+                        className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] font-bold text-amber-600 transition-all hover:bg-amber-500 hover:text-white dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500 dark:hover:text-white"
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        {t.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

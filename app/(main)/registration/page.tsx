@@ -458,19 +458,21 @@ export default function Registration() {
   };
 
   return (
-    <div className="bg-brand-bg min-h-screen pt-32 pb-24 dark:bg-gray-900">
-      <div className="container mx-auto px-4">
-        <div className="mx-auto max-w-5xl">
-          {/* Header */}
-          <div className="mb-8 text-center">
-            <h1 className="text-brand-navy mb-4 font-serif text-4xl font-medium tracking-wide capitalize md:text-5xl lg:text-6xl dark:text-white">
-              fill the booking form
-            </h1>
-            <p className="mx-auto max-w-2xl text-base leading-relaxed text-gray-500 md:text-lg">
-              Please fill out the form below to register with SVI Infra Solutions Pvt. Ltd
-            </p>
-          </div>
+    <div className="bg-brand-bg min-h-screen pt-20 pb-24 dark:bg-gray-900">
+      <section className="bg-brand-bg border-b border-gray-200 py-14 text-center md:py-20 dark:border-gray-700 dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <h1 className="text-brand-navy animate-hero-h1 mb-6 font-serif text-3xl leading-tight sm:text-4xl md:text-6xl dark:text-gray-100">
+            Online Registration
+          </h1>
+          <div className="bg-brand-gold animate-hero-divider mx-auto mb-6 h-px w-16"></div>
+          <p className="animate-hero-subtitle mx-auto max-w-2xl text-base leading-relaxed text-gray-500 md:text-lg dark:text-gray-400">
+            Please fill out the form below to register with SVI Infra Solutions Pvt. Ltd.
+          </p>
+        </div>
+      </section>
 
+      <div className="container mx-auto px-4 py-16">
+        <div className="mx-auto max-w-5xl">
           {/* Form */}
           <form
             onSubmit={handleSubmit}
@@ -590,13 +592,13 @@ export default function Registration() {
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
-                href="/registration"
+                href="/projects/current"
                 className="bg-brand-gold text-brand-navy hover:bg-brand-gold/90 px-8 py-3 text-xs font-bold tracking-widest uppercase transition-colors"
               >
-                Registration Now
+                View Projects
               </a>
               <a
-                href="/contact-us"
+                href="/contact"
                 className="border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-navy border px-8 py-3 text-xs font-bold tracking-widest uppercase transition-colors"
               >
                 Contact Us
