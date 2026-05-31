@@ -1034,6 +1034,7 @@ export default function AdminLotteryPage() {
         <AnimatePresence>
           {errorMessage && (
             <motion.div
+              key="error-banner"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
@@ -1051,6 +1052,7 @@ export default function AdminLotteryPage() {
           )}
           {successMessage && (
             <motion.div
+              key="success-banner"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}

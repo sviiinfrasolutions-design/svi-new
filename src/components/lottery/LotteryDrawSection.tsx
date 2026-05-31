@@ -68,10 +68,17 @@ export default function LotteryDrawSection() {
   // Tick the countdown every second
   useEffect(() => {
     if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-    if (!scheduledAt) { setCountdownStr(null); return; }
+    if (!scheduledAt) {
+      setCountdownStr(null);
+      return;
+    }
     const tick = () => {
       const diff = scheduledAt.getTime() - Date.now();
-      if (diff <= 0) { setCountdownStr(null); setScheduledAt(null); return; }
+      if (diff <= 0) {
+        setCountdownStr(null);
+        setScheduledAt(null);
+        return;
+      }
       const totalSec = Math.floor(diff / 1000);
       const h = Math.floor(totalSec / 3600);
       const m = Math.floor((totalSec % 3600) / 60);
@@ -81,7 +88,9 @@ export default function LotteryDrawSection() {
     };
     tick();
     countdownIntervalRef.current = setInterval(tick, 1_000);
-    return () => { if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current); };
+    return () => {
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+    };
   }, [scheduledAt]);
 
   const fetchScheduleCountdown = async () => {
@@ -360,7 +369,6 @@ export default function LotteryDrawSection() {
       <div className="pointer-events-none absolute -top-[500px] left-1/2 h-[1000px] w-[1000px] -translate-x-1/2 rounded-full bg-gradient-to-b from-[#D4AF37]/10 to-transparent blur-3xl dark:from-[#D4AF37]/5" />
 
       <div className="relative z-10 container mx-auto max-w-7xl px-4">
-
         {/* ── Live Countdown Banner ─────────────────────────────────────────── */}
         <AnimatePresence>
           {countdownStr && scheduledAt && (
@@ -398,19 +406,17 @@ export default function LotteryDrawSection() {
                 <div className="flex items-center gap-2">
                   {countdownStr.split(':').map((seg, i) => (
                     <React.Fragment key={i}>
-                      {i > 0 && (
-                        <span className="text-2xl font-bold text-[#D4AF37]/60">:</span>
-                      )}
+                      {i > 0 && <span className="text-2xl font-bold text-[#D4AF37]/60">:</span>}
                       <div className="flex min-w-[3rem] flex-col items-center justify-center rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/5 px-3 py-2">
-                        <span className="font-mono text-3xl font-bold tabular-nums text-white">
+                        <span className="font-mono text-3xl font-bold text-white tabular-nums">
                           {seg}
                         </span>
                         <span className="mt-0.5 text-[9px] tracking-widest text-slate-400 uppercase">
                           {i === 0 && countdownStr.split(':').length === 3
                             ? 'hrs'
                             : i === (countdownStr.split(':').length === 3 ? 1 : 0)
-                            ? 'min'
-                            : 'sec'}
+                              ? 'min'
+                              : 'sec'}
                         </span>
                       </div>
                     </React.Fragment>
@@ -502,9 +508,6 @@ export default function LotteryDrawSection() {
                     <span className="flex items-center gap-2 text-lg font-light text-slate-900 dark:text-white">
                       <ShieldCheck className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />{' '}
                       Secure
-                    </span>
-                    <span className="mt-1 text-[10px] tracking-widest text-slate-400 uppercase dark:text-slate-500">
-                      Database Verified
                     </span>
                   </div>
                 </div>
