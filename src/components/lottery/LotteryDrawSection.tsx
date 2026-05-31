@@ -1020,17 +1020,42 @@ export default function LotteryDrawSection() {
               transition={{ delay: 0.1 }}
               className="relative flex flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl backdrop-blur-xl transition-colors duration-500 dark:border-[#D4AF37]/10 dark:bg-gradient-to-b dark:from-[#0B1120] dark:to-[#0d1526] dark:shadow-[0_0_40px_rgba(212,175,55,0.04)]"
             >
-              <h3 className="mb-8 flex items-center gap-3 font-serif text-2xl text-slate-900 dark:text-white">
-                <Award className="h-6 w-6 text-[#D4AF37]" />
-                Total Clients of{' '}
-                {new Date().toLocaleDateString('en-IN', {
-                  month: 'long',
-                  year: 'numeric',
-                  day: 'numeric',
-                })}
-              </h3>
+              {/* Header */}
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="flex items-center gap-3 font-serif text-2xl text-slate-900 dark:text-white">
+                  <Award className="h-6 w-6 text-[#D4AF37]" />
+                  Total Clients
+                </h3>
+                <span className="rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/10 px-3 py-1 text-[10px] font-bold tracking-widest text-[#B38728] uppercase dark:text-[#D4AF37]">
+                  {historicalWinners.length}
+                </span>
+              </div>
 
-              <div className="custom-scrollbar flex-1 space-y-3 overflow-y-auto pr-2">
+              {/* Scroll up arrow */}
+              {historicalWinners.length > 10 && visibleCount > 10 && (
+                <div className="mb-3 text-center">
+                  <button
+                    onClick={() => setVisibleCount(10)}
+                    className="group/scroll mx-auto flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 text-[10px] font-medium tracking-wider text-slate-500 transition-all hover:border-[#D4AF37]/30 hover:text-[#B38728] dark:border-white/10 dark:bg-white/5 dark:text-slate-400 dark:hover:text-[#D4AF37]"
+                  >
+                    <svg
+                      className="h-3 w-3"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="18 15 12 9 6 15" />
+                    </svg>
+                    Scroll to Top
+                  </button>
+                </div>
+              )}
+
+              {/* Scrollable list */}
+              <div className="custom-scrollbar max-h-[480px] space-y-3 overflow-y-auto pr-2">
                 {historicalWinners.slice(0, visibleCount).map((hw, idx) => {
                   const isWinner = hw.is_winner;
                   return (
@@ -1096,25 +1121,56 @@ export default function LotteryDrawSection() {
                     </div>
                   </div>
                 )}
-
-                {/* Show More / Show Less button */}
-                {historicalWinners.length > 10 && (
-                  <div className="pt-2 text-center">
-                    <button
-                      onClick={() =>
-                        setVisibleCount((prev) =>
-                          prev >= historicalWinners.length ? 10 : historicalWinners.length
-                        )
-                      }
-                      className="cursor-pointer text-[10px] font-semibold tracking-widest text-[#B38728] uppercase transition-colors hover:text-[#D4AF37] dark:text-[#D4AF37] dark:hover:text-[#E5C158]"
-                    >
-                      {visibleCount >= historicalWinners.length
-                        ? '− Show Less'
-                        : `+ Show More (${historicalWinners.length - visibleCount} remaining)`}
-                    </button>
-                  </div>
-                )}
               </div>
+
+              {/* Show More / Show Less — fixed at bottom */}
+              {historicalWinners.length > 10 && (
+                <div className="mt-4 border-t border-slate-100 pt-4 text-center dark:border-white/5">
+                  <button
+                    onClick={() =>
+                      setVisibleCount((prev) =>
+                        prev >= historicalWinners.length
+                          ? 10
+                          : Math.min(prev + 10, historicalWinners.length)
+                      )
+                    }
+                    className="group/btn inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5 px-5 py-2 text-[10px] font-semibold tracking-widest text-[#B38728] uppercase transition-all hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] dark:border-[#D4AF37]/15 dark:bg-[#D4AF37]/8 dark:text-[#D4AF37] dark:hover:border-[#D4AF37]/30 dark:hover:bg-[#D4AF37]/15"
+                  >
+                    {visibleCount >= historicalWinners.length ? (
+                      <>
+                        <svg
+                          className="h-3 w-3"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="18 15 12 9 6 15" />
+                        </svg>
+                        Show Less
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          className="h-3 w-3"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                        Show More ({Math.min(10, historicalWinners.length - visibleCount)} of{' '}
+                        {historicalWinners.length - visibleCount} remaining)
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </motion.div>
           </div>
         </div>
@@ -1326,28 +1382,30 @@ export default function LotteryDrawSection() {
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
+          width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(100, 100, 100, 0.05);
-          border-radius: 4px;
+          background: rgba(100, 100, 100, 0.06);
+          border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(212, 175, 55, 0.2);
-          border-radius: 4px;
+          background: linear-gradient(180deg, rgba(212, 175, 55, 0.3), rgba(178, 134, 34, 0.3));
+          border-radius: 10px;
+          border: 1px solid rgba(212, 175, 55, 0.1);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(212, 175, 55, 0.35);
+          background: linear-gradient(180deg, rgba(212, 175, 55, 0.5), rgba(178, 134, 34, 0.5));
         }
         @media (prefers-color-scheme: dark) {
           .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.03);
           }
           .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(212, 175, 55, 0.15);
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.2), rgba(178, 134, 34, 0.2));
+            border: 1px solid rgba(212, 175, 55, 0.08);
           }
           .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(212, 175, 55, 0.3);
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.4), rgba(178, 134, 34, 0.4));
           }
         }
       `}</style>
