@@ -2,7 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { FileText, Globe, Hash, Inbox, Mail, PenLine, Settings, ExternalLink } from 'lucide-react';
+import {
+  FileText,
+  Globe,
+  Hash,
+  Inbox,
+  Mail,
+  PenLine,
+  Settings,
+  ExternalLink,
+  Megaphone,
+} from 'lucide-react';
 import { supabase } from '@/src/lib/supabase/client';
 
 import { Tab } from '@/src/components/admin/email/types';
@@ -12,6 +22,7 @@ import { SentTab } from '@/src/components/admin/email/SentTab';
 import { TemplatesTab } from '@/src/components/admin/email/TemplatesTab';
 import { DomainsTab } from '@/src/components/admin/email/DomainsTab';
 import { SettingsTab } from '@/src/components/admin/email/SettingsTab';
+import { CampaignsTab } from '@/src/components/admin/email/CampaignsTab';
 
 export default function AdminEmailPage() {
   const [activeTab, setActiveTab] = useState<Tab>('compose');
@@ -26,6 +37,7 @@ export default function AdminEmailPage() {
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: 'compose', label: 'Compose', icon: PenLine },
     { id: 'sent', label: 'Sent', icon: Inbox },
+    { id: 'campaigns', label: 'Campaigns', icon: Megaphone },
     { id: 'templates', label: 'Templates', icon: FileText },
     { id: 'domains', label: 'Domains', icon: Globe },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -97,6 +109,7 @@ export default function AdminEmailPage() {
         >
           {activeTab === 'compose' && <ComposeTab adminEmail={adminEmail} />}
           {activeTab === 'sent' && <SentTab />}
+          {activeTab === 'campaigns' && <CampaignsTab />}
           {activeTab === 'templates' && <TemplatesTab />}
           {activeTab === 'domains' && <DomainsTab />}
           {activeTab === 'settings' && <SettingsTab adminEmail={adminEmail} />}

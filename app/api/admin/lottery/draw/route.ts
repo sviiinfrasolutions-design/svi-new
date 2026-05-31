@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { lotteryId } = body;
+  const { lotteryId, winnerId } = body;
   if (!lotteryId) {
     return NextResponse.json({ error: 'lotteryId is required' }, { status: 400 });
   }
@@ -54,9 +54,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Select winner cryptographically securely using native crypto.randomInt
-    const randomIndex = crypto.randomInt(0, candidates.length);
-    const winner = candidates[randomIndex];
+    // 3. Select winner (either predetermined or cryptographically secure random index)
+    let winner;
+    if (winnerId) {
+      const selectedWinner = candidates.find((c) => c.id === winnerId);
+      if (!selectedWinner) {
+        return NextResponse.json(
+          { error: 'Selected predetermined winner is not a participant in this lottery' },
+          { status: 400 }
+        );
+      }
+      winner = selectedWinner;
+    } else {
+      const randomIndex = crypto.randomInt(0, candidates.length);
+      winner = candidates[randomIndex];
+    }
 
     // 4. Update participant to is_winner = true
     const { error: winnerError } = await supabaseAdmin

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Megaphone,
   Plus,
@@ -14,11 +14,10 @@ import {
   AlertCircle,
   CheckCircle2,
   X,
-  ChevronRight,
   Play,
   Eye,
 } from 'lucide-react';
-import { supabase } from '@/src/lib/supabase/client';
+import { getToken } from './helpers';
 
 interface Campaign {
   id: string;
@@ -35,7 +34,7 @@ interface Campaign {
   created_at: string;
 }
 
-export default function CampaignsPage() {
+export function CampaignsTab() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,10 +62,15 @@ export default function CampaignsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load campaigns
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/admin/campaigns');
+      const token = await getToken();
+      const res = await fetch('/api/admin/campaigns', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       if (data.campaigns) {
         setCampaigns(data.campaigns);
@@ -76,11 +80,11 @@ export default function CampaignsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCampaigns();
-  }, []);
+  }, [fetchCampaigns]);
 
   // Time conversion helper UTC <-> IST (UTC+5:30)
   const toISTString = (utcString: string | null): string => {
@@ -117,9 +121,13 @@ export default function CampaignsPage() {
     setIsPreviewMode(false);
 
     if (campaign) {
-      // Fetch full campaign details including body_html
       try {
-        const res = await fetch(`/api/admin/campaigns/${campaign.id}`);
+        const token = await getToken();
+        const res = await fetch(`/api/admin/campaigns/${campaign.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await res.json();
         if (data.campaign) {
           const full = data.campaign;
@@ -200,6 +208,7 @@ export default function CampaignsPage() {
     };
 
     try {
+      const token = await getToken();
       const url = editingCampaign
         ? `/api/admin/campaigns/${editingCampaign.id}`
         : '/api/admin/campaigns';
@@ -207,7 +216,10 @@ export default function CampaignsPage() {
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(payload),
       });
 
@@ -235,7 +247,13 @@ export default function CampaignsPage() {
       return;
 
     try {
-      const res = await fetch(`/api/admin/campaigns/${id}/send`, { method: 'POST' });
+      const token = await getToken();
+      const res = await fetch(`/api/admin/campaigns/${id}/send`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       if (!res.ok) {
         alert('Failed to send: ' + data.error);
@@ -253,7 +271,13 @@ export default function CampaignsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete/cancel this campaign?')) return;
     try {
-      const res = await fetch(`/api/admin/campaigns/${id}`, { method: 'DELETE' });
+      const token = await getToken();
+      const res = await fetch(`/api/admin/campaigns/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (res.ok) {
         fetchCampaigns();
       } else {
@@ -304,29 +328,9 @@ export default function CampaignsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-            <Megaphone className="text-brand-gold h-8 w-8" />
-            Email Campaigns
-          </h1>
-          <p className="mt-1 text-gray-500 dark:text-gray-400">
-            Create, manage, and schedule promotional and automated marketing campaigns.
-          </p>
-        </div>
-        <button
-          onClick={() => openModal()}
-          className="from-brand-gold inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r to-[#b08f36] px-4 py-2.5 font-semibold text-white shadow-md transition-all hover:brightness-110"
-        >
-          <Plus className="h-5 w-5" />
-          Create Campaign
-        </button>
-      </div>
-
-      {/* Filters Bar */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm md:flex-row dark:border-white/5 dark:bg-[#0e0e14]/90">
+    <div className="space-y-6 font-sans">
+      {/* Search & Actions Bar */}
+      <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:flex-row md:items-center dark:border-gray-700 dark:bg-[#0e0e14]">
         <div className="relative flex-1">
           <Search className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
@@ -334,24 +338,31 @@ export default function CampaignsPage() {
             placeholder="Search campaigns..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="focus:ring-brand-gold/30 w-full rounded-xl border border-gray-200 bg-transparent py-2.5 pr-4 pl-10 text-sm focus:ring-2 focus:outline-none dark:border-white/10"
+            className="focus:border-brand-gold/50 dark:focus:border-brand-gold/50 w-full rounded-xl border border-gray-200 bg-transparent py-2.5 pr-4 pl-10 text-sm focus:outline-none dark:border-gray-700"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {['all', 'draft', 'scheduled', 'sent', 'cancelled'].map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
               className={`cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold capitalize transition-all ${
                 statusFilter === status
-                  ? 'bg-brand-gold text-brand-navy dark:bg-brand-gold dark:text-brand-navy'
-                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10'
+                  ? 'bg-brand-gold text-brand-navy font-bold'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
               }`}
             >
               {status}
             </button>
           ))}
         </div>
+        <button
+          onClick={() => openModal()}
+          className="bg-brand-gold text-brand-navy inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold shadow-md transition-all hover:brightness-110"
+        >
+          <Plus className="h-5 w-5" />
+          Create Campaign
+        </button>
       </div>
 
       {/* Grid List */}
@@ -360,7 +371,7 @@ export default function CampaignsPage() {
           <div className="border-brand-gold h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
         </div>
       ) : filteredCampaigns.length === 0 ? (
-        <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center shadow-sm dark:border-white/5 dark:bg-[#0e0e14]/90">
+        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm dark:border-gray-700 dark:bg-[#0e0e14]">
           <Mail className="mx-auto mb-4 h-12 w-12 text-gray-300 dark:text-gray-700" />
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">No campaigns found</h3>
           <p className="mx-auto mt-1 max-w-sm text-sm text-gray-500 dark:text-gray-400">
@@ -372,19 +383,19 @@ export default function CampaignsPage() {
           {filteredCampaigns.map((c) => (
             <div
               key={c.id}
-              className="flex flex-col justify-between space-y-4 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-[#0e0e14]/90"
+              className="flex flex-col justify-between space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-[#0e0e14]"
             >
               {/* Header block */}
               <div className="space-y-2">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <h3 className="line-clamp-1 text-lg font-bold text-gray-900 dark:text-white">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 space-y-1">
+                    <h3 className="truncate text-lg font-bold text-gray-900 dark:text-white">
                       {c.title}
                     </h3>
                     <p className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
                       <Mail className="text-brand-gold h-3.5 w-3.5" />
                       Subject:{' '}
-                      <span className="line-clamp-1 font-medium text-gray-700 dark:text-gray-300">
+                      <span className="truncate font-medium text-gray-700 dark:text-gray-300">
                         {c.subject}
                       </span>
                     </p>
@@ -393,7 +404,7 @@ export default function CampaignsPage() {
                 </div>
 
                 {/* Meta properties */}
-                <div className="mt-2 grid grid-cols-2 gap-3 rounded-xl bg-gray-50 p-3.5 text-xs dark:bg-white/5">
+                <div className="mt-2 grid grid-cols-2 gap-3 rounded-xl bg-gray-50 p-3.5 text-xs dark:bg-gray-800/40">
                   <div>
                     <span className="mb-0.5 block text-gray-400">Recipients</span>
                     <span className="font-semibold text-gray-900 capitalize dark:text-white">
@@ -410,7 +421,7 @@ export default function CampaignsPage() {
               </div>
 
               {/* Schedule Info */}
-              <div className="space-y-2 border-t border-gray-100 pt-4 text-xs dark:border-white/5">
+              <div className="space-y-2 border-t border-gray-100 pt-4 text-xs dark:border-gray-700/50">
                 {c.scheduled_at && (
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-1.5 text-gray-400">
@@ -436,13 +447,13 @@ export default function CampaignsPage() {
               </div>
 
               {/* Footer Buttons */}
-              <div className="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-white/5">
+              <div className="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700/50">
                 <div className="flex items-center gap-2">
                   {c.status !== 'sent' && c.status !== 'cancelled' && (
                     <>
                       <button
                         onClick={() => openModal(c)}
-                        className="cursor-pointer rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"
+                        className="cursor-pointer rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
                         title="Edit Campaign"
                       >
                         <Edit3 className="h-4 w-4" />
@@ -483,7 +494,7 @@ export default function CampaignsPage() {
           {/* Modal Content */}
           <div className="relative flex h-full w-full max-w-2xl flex-col justify-between bg-white shadow-2xl transition-transform duration-300 dark:bg-[#0e0e14]">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-6 py-5 dark:border-white/5 dark:bg-white/5">
+            <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-6 py-5 dark:border-gray-700 dark:bg-gray-800/20">
               <div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   {editingCampaign ? 'Edit Campaign' : 'Create Campaign'}
@@ -494,7 +505,7 @@ export default function CampaignsPage() {
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="cursor-pointer rounded-full p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10"
+                className="cursor-pointer rounded-full p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -519,7 +530,7 @@ export default function CampaignsPage() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. Summer Property Launch Alert"
-                    className="focus:ring-brand-gold/30 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:ring-2 focus:outline-none dark:border-white/10"
+                    className="focus:border-brand-gold/50 dark:focus:border-brand-gold/50 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:outline-none dark:border-gray-700"
                   />
                 </div>
                 <div>
@@ -531,13 +542,13 @@ export default function CampaignsPage() {
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     placeholder="e.g. 🎉 Exclusive pre-launch booking now open at premium rates!"
-                    className="focus:ring-brand-gold/30 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:ring-2 focus:outline-none dark:border-white/10"
+                    className="focus:border-brand-gold/50 dark:focus:border-brand-gold/50 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:outline-none dark:border-gray-700"
                   />
                 </div>
               </div>
 
               {/* Recipient Targeting */}
-              <div className="space-y-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
+              <div className="space-y-3 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/20">
                 <label className="block text-xs font-bold tracking-wider text-gray-400 uppercase">
                   Target Recipients
                 </label>
@@ -584,7 +595,7 @@ export default function CampaignsPage() {
                       onChange={(e) => setCustomEmailsInput(e.target.value)}
                       placeholder="e.g. client1@gmail.com, client2@outlook.com"
                       rows={2}
-                      className="w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2 text-xs focus:outline-none dark:border-white/10"
+                      className="focus:border-brand-gold/50 dark:focus:border-brand-gold/50 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2 text-xs focus:outline-none dark:border-gray-700"
                     />
                     <p className="text-[10px] text-gray-400">Comma-separated email addresses.</p>
                   </div>
@@ -602,7 +613,7 @@ export default function CampaignsPage() {
                     type="datetime-local"
                     value={scheduledAtInput}
                     onChange={(e) => setScheduledAtInput(e.target.value)}
-                    className="focus:ring-brand-gold/30 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:ring-2 focus:outline-none dark:border-white/10"
+                    className="focus:border-brand-gold/50 dark:focus:border-brand-gold/50 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:outline-none dark:border-gray-700"
                   />
                   <p className="text-[10px] text-gray-400">Leave blank to save as Draft.</p>
                 </div>
@@ -616,7 +627,7 @@ export default function CampaignsPage() {
                     type="datetime-local"
                     value={reminderAtInput}
                     onChange={(e) => setReminderAtInput(e.target.value)}
-                    className="focus:ring-brand-gold/30 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:ring-2 focus:outline-none dark:border-white/10"
+                    className="focus:border-brand-gold/50 dark:focus:border-brand-gold/50 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:outline-none dark:border-gray-700"
                   />
                   <p className="text-[10px] text-gray-400">
                     Optional automatic reminder email follow-up.
@@ -634,7 +645,7 @@ export default function CampaignsPage() {
                     value={reminderSubject}
                     onChange={(e) => setReminderSubject(e.target.value)}
                     placeholder="e.g. ⏰ Last chance: pre-launch offer ends today!"
-                    className="focus:ring-brand-gold/30 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:ring-2 focus:outline-none dark:border-white/10"
+                    className="focus:border-brand-gold/50 dark:focus:border-brand-gold/50 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:outline-none dark:border-gray-700"
                   />
                 </div>
               )}
@@ -648,7 +659,7 @@ export default function CampaignsPage() {
                   <button
                     type="button"
                     onClick={() => setIsPreviewMode(!isPreviewMode)}
-                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-200 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
+                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                   >
                     <Eye className="h-3.5 w-3.5" />
                     {isPreviewMode ? 'Edit Mode' : 'Live Preview'}
@@ -656,7 +667,7 @@ export default function CampaignsPage() {
                 </div>
 
                 {isPreviewMode ? (
-                  <div className="min-h-[300px] overflow-auto rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10">
+                  <div className="min-h-[300px] overflow-auto rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-[#0e0e14]">
                     <div dangerouslySetInnerHTML={{ __html: bodyHtml }} />
                   </div>
                 ) : (
@@ -665,18 +676,18 @@ export default function CampaignsPage() {
                     value={bodyHtml}
                     onChange={(e) => setBodyHtml(e.target.value)}
                     placeholder="Provide HTML formatted code for premium responsive rendering."
-                    className="focus:ring-brand-gold/30 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-3 font-mono text-xs focus:ring-2 focus:outline-none dark:border-white/10"
+                    className="focus:border-brand-gold/50 dark:focus:border-brand-gold/50 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-3 font-mono text-xs focus:outline-none dark:border-gray-700"
                   />
                 )}
               </div>
             </form>
 
             {/* Footer Actions */}
-            <div className="flex justify-end gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4 dark:border-white/5 dark:bg-white/5">
+            <div className="flex justify-end gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-800/20">
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="cursor-pointer rounded-xl bg-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-300 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
+                className="cursor-pointer rounded-xl bg-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
               >
                 Close
               </button>
@@ -684,7 +695,7 @@ export default function CampaignsPage() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="from-brand-gold inline-flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r to-[#b08f36] px-5 py-2 text-xs font-bold text-white shadow-md transition-all hover:brightness-110"
+                className="bg-brand-gold text-brand-navy inline-flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2 text-xs font-bold shadow-md transition-all hover:brightness-110"
               >
                 <Send className="h-4 w-4" />
                 {isSubmitting

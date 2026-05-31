@@ -41,4 +41,4 @@ export interface DnsRecord {
   priority?: number;
 }
 
-export type Tab = 'compose' | 'sent' | 'templates' | 'domains' | 'settings';
+export type Tab = 'compose' | 'sent' | 'templates' | 'domains' | 'settings' | 'campaigns';
