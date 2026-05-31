@@ -48,6 +48,8 @@ export default function LotteryDrawSection() {
   const [revealedWinners, setRevealedWinners] = useState<Participant[]>([]);
   const [currentRevealIndex, setCurrentRevealIndex] = useState(-1);
   const [drawWinnerCount, setDrawWinnerCount] = useState(0);
+  const [activeWinnerIndex, setActiveWinnerIndex] = useState(0);
+  const [winnerSwipeDir, setWinnerSwipeDir] = useState(1);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [historicalWinners, setHistoricalWinners] = useState<any[]>([]);
   const [visibleCount, setVisibleCount] = useState(10);
@@ -61,6 +63,7 @@ export default function LotteryDrawSection() {
   const shuffleTimerRef = useRef<NodeJS.Timeout | null>(null);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const revealTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const carouselTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetchActiveLottery();
@@ -97,10 +100,27 @@ export default function LotteryDrawSection() {
     };
   }, [scheduledAt]);
 
+  // Auto-rotate winners carousel
+  useEffect(() => {
+    if (carouselTimerRef.current) clearInterval(carouselTimerRef.current);
+    if (winners.length <= 1) return;
+
+    carouselTimerRef.current = setInterval(() => {
+      setWinnerSwipeDir(1);
+      setActiveWinnerIndex((prev) => (prev + 1) % winners.length);
+      triggerMiniConfetti();
+    }, 3500);
+
+    return () => {
+      if (carouselTimerRef.current) clearInterval(carouselTimerRef.current);
+    };
+  }, [winners.length]);
+
   useEffect(() => {
     return () => {
       if (shuffleTimerRef.current) clearTimeout(shuffleTimerRef.current);
       if (revealTimerRef.current) clearTimeout(revealTimerRef.current);
+      if (carouselTimerRef.current) clearInterval(carouselTimerRef.current);
     };
   }, []);
 
@@ -300,6 +320,37 @@ export default function LotteryDrawSection() {
         zIndex: 200,
       });
     }, 150);
+  }, []);
+
+  const triggerMiniConfetti = useCallback(() => {
+    confetti({
+      particleCount: 30,
+      spread: 70,
+      startVelocity: 25,
+      origin: { x: 0.5, y: 0.45 },
+      colors: ['#D4AF37', '#F3E5AB', '#FFD700', '#FFFFFF'],
+      zIndex: 200,
+    });
+    setTimeout(() => {
+      confetti({
+        particleCount: 15,
+        angle: 60,
+        spread: 40,
+        startVelocity: 20,
+        origin: { x: 0.1, y: 0.5 },
+        colors: ['#D4AF37', '#FFD700'],
+        zIndex: 200,
+      });
+      confetti({
+        particleCount: 15,
+        angle: 120,
+        spread: 40,
+        startVelocity: 20,
+        origin: { x: 0.9, y: 0.5 },
+        colors: ['#D4AF37', '#FFD700'],
+        zIndex: 200,
+      });
+    }, 100);
   }, []);
 
   const triggerGrandFinale = useCallback(() => {
@@ -586,7 +637,7 @@ export default function LotteryDrawSection() {
                     </div>
                     <div>
                       <h3 className="font-serif text-2xl text-slate-900 dark:text-white">
-                        Grand Prize Draw
+                        Grand Draw Lucky Winners
                       </h3>
                       <div className="mt-1 flex items-center gap-1.5 text-[11px] font-medium tracking-widest text-[#B38728] uppercase dark:text-[#D4AF37]">
                         <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
@@ -675,55 +726,238 @@ export default function LotteryDrawSection() {
                         </span>
                       </motion.div>
 
-                      {/* Winners grid — staggered reveal */}
-                      <div
-                        className={`grid gap-5 ${
-                          winners.length === 1
-                            ? 'mx-auto max-w-md grid-cols-1'
-                            : winners.length === 2
-                              ? 'mx-auto max-w-2xl grid-cols-1 sm:grid-cols-2'
-                              : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                        }`}
-                      >
-                        {winners.map((w, idx) => (
-                          <motion.div
-                            key={w.id}
-                            initial={{ opacity: 0, scale: 0.8, y: 30 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            transition={{
-                              type: 'spring',
-                              stiffness: 180,
-                              damping: 20,
-                              delay: 0.4 + idx * 0.15,
-                            }}
-                            className="group/card relative overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-white to-slate-50 p-6 text-center shadow-lg transition-all hover:shadow-xl hover:shadow-[#D4AF37]/10 dark:border-[#D4AF37]/15 dark:from-[#D4AF37]/5 dark:to-transparent dark:hover:border-[#D4AF37]/30"
-                          >
-                            {/* Card glow */}
-                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 to-transparent opacity-0 transition-opacity group-hover/card:opacity-100 dark:from-[#D4AF37]/10" />
+                      {/* Winner Carousel — auto-swiping spotlight */}
+                      <div className="relative mx-auto w-full max-w-lg">
+                        {/* Glow background behind active card */}
+                        <div className="pointer-events-none absolute inset-0 -m-4 rounded-3xl bg-[#D4AF37]/5 blur-2xl dark:bg-[#D4AF37]/8" />
 
-                            {/* Winner number badge */}
-                            {winners.length > 1 && (
-                              <div className="relative mb-3 inline-flex items-center gap-1.5 rounded-full bg-[#D4AF37]/10 px-3 py-1 text-[9px] font-bold tracking-widest text-[#B38728] uppercase dark:bg-[#D4AF37]/15 dark:text-[#D4AF37]">
+                        {/* Carousel container */}
+                        <div className="relative overflow-hidden rounded-2xl">
+                          <AnimatePresence mode="wait">
+                            <motion.div
+                              key={winners[activeWinnerIndex].id}
+                              initial={{
+                                opacity: 0,
+                                x: winnerSwipeDir > 0 ? 120 : -120,
+                                scale: 0.9,
+                                rotateY: winnerSwipeDir > 0 ? 8 : -8,
+                              }}
+                              animate={{
+                                opacity: 1,
+                                x: 0,
+                                scale: 1,
+                                rotateY: 0,
+                              }}
+                              exit={{
+                                opacity: 0,
+                                x: winnerSwipeDir > 0 ? -120 : 120,
+                                scale: 0.9,
+                                rotateY: winnerSwipeDir > 0 ? -8 : 8,
+                              }}
+                              transition={{
+                                type: 'spring',
+                                stiffness: 200,
+                                damping: 25,
+                                mass: 0.8,
+                              }}
+                              className="group/card relative overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-white via-white to-slate-50 p-8 text-center shadow-xl shadow-[#D4AF37]/5 transition-all dark:border-[#D4AF37]/20 dark:from-[#D4AF37]/8 dark:via-[#D4AF37]/4 dark:to-transparent dark:shadow-[#D4AF37]/10"
+                            >
+                              {/* Animated sparkle particles */}
+                              <motion.div
+                                animate={{
+                                  opacity: [0, 1, 0],
+                                  scale: [0.5, 1.2, 0.5],
+                                }}
+                                transition={{
+                                  repeat: Infinity,
+                                  duration: 2,
+                                  delay: 0,
+                                }}
+                                className="pointer-events-none absolute top-6 left-8 text-[#D4AF37]"
+                              >
+                                <Sparkles className="h-4 w-4" />
+                              </motion.div>
+                              <motion.div
+                                animate={{
+                                  opacity: [0, 1, 0],
+                                  scale: [0.5, 1.2, 0.5],
+                                }}
+                                transition={{
+                                  repeat: Infinity,
+                                  duration: 2,
+                                  delay: 0.7,
+                                }}
+                                className="pointer-events-none absolute top-10 right-10 text-[#D4AF37]/60"
+                              >
+                                <Sparkles className="h-3 w-3" />
+                              </motion.div>
+                              <motion.div
+                                animate={{
+                                  opacity: [0, 1, 0],
+                                  scale: [0.5, 1.2, 0.5],
+                                }}
+                                transition={{
+                                  repeat: Infinity,
+                                  duration: 2,
+                                  delay: 1.3,
+                                }}
+                                className="pointer-events-none absolute bottom-8 left-12 text-[#D4AF37]/50"
+                              >
+                                <Star className="h-3 w-3 fill-[#D4AF37]" />
+                              </motion.div>
+                              <motion.div
+                                animate={{
+                                  opacity: [0, 1, 0],
+                                  scale: [0.5, 1.2, 0.5],
+                                }}
+                                transition={{
+                                  repeat: Infinity,
+                                  duration: 2,
+                                  delay: 0.4,
+                                }}
+                                className="pointer-events-none absolute right-8 bottom-12 text-[#D4AF37]/40"
+                              >
                                 <Star className="h-2.5 w-2.5 fill-[#D4AF37]" />
-                                Winner #{idx + 1}
-                              </div>
-                            )}
+                              </motion.div>
 
-                            {/* Winner name */}
-                            <h4 className="relative font-serif text-2xl text-slate-900 md:text-3xl dark:text-white">
-                              {w.name}
-                            </h4>
+                              {/* Gradient overlay on hover */}
+                              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 to-transparent opacity-0 transition-opacity group-hover/card:opacity-100 dark:from-[#D4AF37]/10" />
 
-                            {/* Ticket number */}
-                            <div className="relative mt-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 font-mono text-xs text-slate-600 dark:border-[#D4AF37]/15 dark:bg-[#D4AF37]/5 dark:text-[#D4AF37]">
-                              <Ticket className="h-3 w-3 text-[#B38728] dark:text-[#D4AF37]" />
-                              {w.ticket_number}
-                            </div>
+                              {/* Winner number badge with pulse */}
+                              {winners.length > 1 && (
+                                <motion.div
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{
+                                    type: 'spring',
+                                    stiffness: 300,
+                                    damping: 15,
+                                    delay: 0.2,
+                                  }}
+                                  className="relative mb-4 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#D4AF37]/15 to-[#D4AF37]/5 px-4 py-1.5 text-[10px] font-bold tracking-widest text-[#B38728] uppercase dark:from-[#D4AF37]/20 dark:to-[#D4AF37]/10 dark:text-[#D4AF37]"
+                                >
+                                  <motion.div
+                                    animate={{ scale: [1, 1.3, 1] }}
+                                    transition={{ repeat: Infinity, duration: 2 }}
+                                    className="h-1.5 w-1.5 rounded-full bg-[#D4AF37]"
+                                  />
+                                  Winner #{activeWinnerIndex + 1} of {winners.length}
+                                </motion.div>
+                              )}
 
-                            {/* Decorative corner */}
-                            <div className="absolute top-0 right-0 h-16 w-16 bg-gradient-to-bl from-[#D4AF37]/10 to-transparent" />
-                          </motion.div>
-                        ))}
+                              {/* Trophy with entrance */}
+                              <motion.div
+                                initial={{ scale: 0, rotate: -30 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{
+                                  type: 'spring',
+                                  stiffness: 200,
+                                  damping: 12,
+                                  delay: 0.1,
+                                }}
+                                className="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#D4AF37]/10 text-[#D4AF37]"
+                              >
+                                <Crown className="h-7 w-7" />
+                              </motion.div>
+
+                              {/* Winner name with dramatic entrance */}
+                              <motion.h4
+                                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                transition={{
+                                  type: 'spring',
+                                  stiffness: 200,
+                                  damping: 18,
+                                  delay: 0.15,
+                                }}
+                                className="relative font-serif text-4xl text-slate-900 md:text-5xl dark:text-white"
+                              >
+                                {winners[activeWinnerIndex].name}
+                              </motion.h4>
+
+                              {/* Ticket with slide-up */}
+                              <motion.div
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
+                                className="relative mt-4 inline-flex items-center gap-3 rounded-full border border-[#D4AF37]/25 bg-gradient-to-r from-[#D4AF37]/10 to-[#D4AF37]/5 px-6 py-2.5"
+                              >
+                                <Ticket className="h-4 w-4 text-[#D4AF37]" />
+                                <span className="font-mono text-lg tracking-widest text-[#B38728] dark:text-[#D4AF37]">
+                                  {winners[activeWinnerIndex].ticket_number}
+                                </span>
+                              </motion.div>
+
+                              {/* Decorative corners */}
+                              <div className="pointer-events-none absolute top-0 right-0 h-20 w-20 bg-gradient-to-bl from-[#D4AF37]/10 to-transparent" />
+                              <div className="pointer-events-none absolute bottom-0 left-0 h-20 w-20 bg-gradient-to-tr from-[#D4AF37]/5 to-transparent" />
+                            </motion.div>
+                          </AnimatePresence>
+                        </div>
+
+                        {/* Pagination dots — clickable */}
+                        {winners.length > 1 && (
+                          <div className="relative mt-6 flex items-center justify-center gap-2.5">
+                            {winners.map((_, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => {
+                                  setWinnerSwipeDir(idx > activeWinnerIndex ? 1 : -1);
+                                  setActiveWinnerIndex(idx);
+                                  if (carouselTimerRef.current) {
+                                    clearInterval(carouselTimerRef.current);
+                                  }
+                                  // Restart auto-rotation
+                                  carouselTimerRef.current = setInterval(() => {
+                                    setWinnerSwipeDir(1);
+                                    setActiveWinnerIndex((prev) => (prev + 1) % winners.length);
+                                    triggerMiniConfetti();
+                                  }, 3500);
+                                }}
+                                className={`cursor-pointer rounded-full transition-all duration-300 ${
+                                  idx === activeWinnerIndex
+                                    ? 'h-2.5 w-8 bg-[#D4AF37] shadow-lg shadow-[#D4AF37]/30'
+                                    : 'h-2.5 w-2.5 bg-slate-300 hover:bg-[#D4AF37]/50 dark:bg-slate-600 dark:hover:bg-[#D4AF37]/40'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Progress bar for auto-rotation */}
+                        {winners.length > 1 && (
+                          <div className="relative mt-3 h-0.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                            <motion.div
+                              key={activeWinnerIndex}
+                              initial={{ width: '0%' }}
+                              animate={{ width: '100%' }}
+                              transition={{ duration: 3.5, ease: 'linear' }}
+                              className="h-full rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B38728]"
+                            />
+                          </div>
+                        )}
+
+                        {/* All winners mini strip below */}
+                        {winners.length > 1 && (
+                          <div className="relative mt-6 flex flex-wrap items-center justify-center gap-2">
+                            {winners.map((w, idx) => (
+                              <button
+                                key={w.id}
+                                onClick={() => {
+                                  setWinnerSwipeDir(idx > activeWinnerIndex ? 1 : -1);
+                                  setActiveWinnerIndex(idx);
+                                }}
+                                className={`cursor-pointer rounded-full border px-3 py-1 text-[10px] font-medium tracking-wide transition-all ${
+                                  idx === activeWinnerIndex
+                                    ? 'border-[#D4AF37]/40 bg-[#D4AF37]/15 text-[#B38728] dark:text-[#D4AF37]'
+                                    : 'border-slate-200 bg-slate-50 text-slate-500 hover:border-[#D4AF37]/20 hover:text-[#B38728] dark:border-white/10 dark:bg-white/5 dark:text-slate-400 dark:hover:text-[#D4AF37]'
+                                }`}
+                              >
+                                {w.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </motion.div>
                   ) : participants.length === 0 ? (

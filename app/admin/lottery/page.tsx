@@ -138,6 +138,13 @@ export default function AdminLotteryPage() {
   const [addPartEmail, setAddPartEmail] = useState('');
   const [addPartTicket, setAddPartTicket] = useState('');
   const [addPartSaving, setAddPartSaving] = useState(false);
+  // Edit existing participant inline
+  const [editParticipantId, setEditParticipantId] = useState<string | null>(null);
+  const [editPartName, setEditPartName] = useState('');
+  const [editPartPhone, setEditPartPhone] = useState('');
+  const [editPartEmail, setEditPartEmail] = useState('');
+  const [editPartTicket, setEditPartTicket] = useState('');
+  const [editPartSaving, setEditPartSaving] = useState(false);
 
   // ── Delete Confirm ───────────────────────────────────────────────────────
   const [deletingLotteryId, setDeletingLotteryId] = useState<string | null>(null);
@@ -793,6 +800,11 @@ export default function AdminLotteryPage() {
     setEditWinnerEmail(l.winner?.email || '');
     setEditTab('details');
     setEditPartsSearch('');
+    setEditParticipantId(null);
+    setEditPartName('');
+    setEditPartTicket('');
+    setEditPartPhone('');
+    setEditPartEmail('');
     // Load participants
     setEditPartsLoading(true);
     const { data } = await supabase
@@ -856,6 +868,59 @@ export default function AdminLotteryPage() {
       setErrorMessage(err.message);
     } finally {
       setAddPartSaving(false);
+    }
+  };
+
+  const handleStartEditParticipant = (participant: any) => {
+    setEditParticipantId(participant.id);
+    setEditPartName(participant.name || '');
+    setEditPartTicket(participant.ticket_number || '');
+    setEditPartPhone(participant.phone || '');
+    setEditPartEmail(participant.email || '');
+  };
+
+  const handleCancelEditParticipant = () => {
+    setEditParticipantId(null);
+    setEditPartName('');
+    setEditPartTicket('');
+    setEditPartPhone('');
+    setEditPartEmail('');
+  };
+
+  const handleSaveEditParticipant = async () => {
+    if (!editingLottery || !editParticipantId) return;
+    if (!editPartName.trim() || !editPartTicket.trim()) return;
+    setEditPartSaving(true);
+    try {
+      const { error } = await supabase
+        .from('lottery_participants')
+        .update({
+          name: editPartName.trim(),
+          ticket_number: editPartTicket.trim(),
+          phone: editPartPhone.trim() || null,
+          email: editPartEmail.trim() || null,
+        })
+        .eq('id', editParticipantId);
+      if (error) throw error;
+      setEditParticipants((prev) =>
+        prev.map((p) =>
+          p.id === editParticipantId
+            ? {
+                ...p,
+                name: editPartName.trim(),
+                ticket_number: editPartTicket.trim(),
+                phone: editPartPhone.trim() || null,
+                email: editPartEmail.trim() || null,
+              }
+            : p
+        )
+      );
+      setSuccessMessage('Participant updated.');
+      handleCancelEditParticipant();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to update participant.');
+    } finally {
+      setEditPartSaving(false);
     }
   };
 
@@ -2260,7 +2325,7 @@ export default function AdminLotteryPage() {
 
                 {/* ── WINNER TAB ───────────────────────────────────────── */}
                 {editTab === 'winner' && (
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     <div className="rounded-2xl border border-amber-200/60 bg-amber-50/50 p-3 text-xs text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
                       Manually set or override the winner details. Leave Name blank to remove any
                       existing winner record.
@@ -2317,6 +2382,105 @@ export default function AdminLotteryPage() {
                         </div>
                       </div>
                     )}
+
+                    <div className="border-t border-slate-200/70 pt-4 dark:border-white/10">
+                      <p className="mb-3 text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-gray-400">
+                        🏆 Current Winners
+                      </p>
+                      {editParticipants.filter((p) => p.is_winner).length === 0 ? (
+                        <p className="text-xs text-slate-400">No winners marked yet.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {editParticipants
+                            .filter((p) => p.is_winner)
+                            .map((p) => (
+                              <div
+                                key={p.id}
+                                className="rounded-xl border border-amber-200 bg-amber-50/70 dark:border-amber-500/20 dark:bg-amber-500/10"
+                              >
+                                <div className="flex items-center justify-between px-3 py-2.5">
+                                  <div className="min-w-0">
+                                    <p className="truncate text-xs font-bold text-amber-800 dark:text-amber-300">
+                                      {p.name}
+                                    </p>
+                                    <p className="text-[10px] text-amber-600/80 dark:text-amber-400">
+                                      #{p.ticket_number}
+                                      {p.email ? ` · ${p.email}` : ''}
+                                    </p>
+                                  </div>
+                                  <div className="flex shrink-0 items-center gap-1 pl-2">
+                                    <button
+                                      onClick={() => handleStartEditParticipant(p)}
+                                      title="Edit winner"
+                                      className="rounded-lg p-1 text-amber-700/70 transition hover:bg-amber-100 hover:text-amber-700 dark:text-amber-300 dark:hover:bg-amber-500/20"
+                                    >
+                                      <Edit2 className="h-3.5 w-3.5" />
+                                    </button>
+                                  </div>
+                                </div>
+                                {editParticipantId === p.id && (
+                                  <div className="border-t border-amber-200/70 px-3 py-3 dark:border-amber-500/20">
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <input
+                                        type="text"
+                                        placeholder="Full Name *"
+                                        value={editPartName}
+                                        onChange={(e) => setEditPartName(e.target.value)}
+                                        className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-slate-900 focus:border-amber-400 focus:outline-none dark:border-amber-500/30 dark:bg-[#0e0e14] dark:text-white dark:placeholder-gray-500"
+                                      />
+                                      <input
+                                        type="text"
+                                        placeholder="Ticket # *"
+                                        value={editPartTicket}
+                                        onChange={(e) => setEditPartTicket(e.target.value)}
+                                        className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-slate-900 focus:border-amber-400 focus:outline-none dark:border-amber-500/30 dark:bg-[#0e0e14] dark:text-white dark:placeholder-gray-500"
+                                      />
+                                      <input
+                                        type="text"
+                                        placeholder="Phone"
+                                        value={editPartPhone}
+                                        onChange={(e) => setEditPartPhone(e.target.value)}
+                                        className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-slate-900 focus:border-amber-400 focus:outline-none dark:border-amber-500/30 dark:bg-[#0e0e14] dark:text-white dark:placeholder-gray-500"
+                                      />
+                                      <input
+                                        type="text"
+                                        placeholder="Email"
+                                        value={editPartEmail}
+                                        onChange={(e) => setEditPartEmail(e.target.value)}
+                                        className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-slate-900 focus:border-amber-400 focus:outline-none dark:border-amber-500/30 dark:bg-[#0e0e14] dark:text-white dark:placeholder-gray-500"
+                                      />
+                                    </div>
+                                    <div className="mt-3 flex items-center gap-2">
+                                      <button
+                                        onClick={handleSaveEditParticipant}
+                                        disabled={
+                                          editPartSaving ||
+                                          !editPartName.trim() ||
+                                          !editPartTicket.trim()
+                                        }
+                                        className="flex items-center gap-2 rounded-xl bg-amber-500 px-3 py-2 text-[10px] font-bold text-white transition hover:bg-amber-600 disabled:opacity-50"
+                                      >
+                                        {editPartSaving ? (
+                                          <RefreshCw className="h-3 w-3 animate-spin" />
+                                        ) : (
+                                          <CheckCircle2 className="h-3 w-3" />
+                                        )}
+                                        Save
+                                      </button>
+                                      <button
+                                        onClick={handleCancelEditParticipant}
+                                        className="rounded-xl border border-amber-200 px-3 py-2 text-[10px] font-bold text-amber-700 transition hover:bg-amber-50 dark:border-amber-500/30 dark:text-amber-300 dark:hover:bg-amber-500/10"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -2402,35 +2566,102 @@ export default function AdminLotteryPage() {
                           .map((p) => (
                             <div
                               key={p.id}
-                              className={`flex items-center justify-between rounded-xl border px-3 py-2.5 ${p.is_winner ? 'border-amber-300 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10' : 'border-slate-200 bg-white dark:border-white/10 dark:bg-white/5'}`}
+                              className={`rounded-xl border ${p.is_winner ? 'border-amber-300 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10' : 'border-slate-200 bg-white dark:border-white/10 dark:bg-white/5'}`}
                             >
-                              <div className="flex min-w-0 items-center gap-2">
-                                {p.is_winner && <span className="text-sm">🏆</span>}
-                                <div className="min-w-0">
-                                  <p className="truncate text-xs font-bold text-slate-900 dark:text-white">
-                                    {p.name}
-                                  </p>
-                                  <p className="text-[10px] text-slate-400">
-                                    #{p.ticket_number}
-                                    {p.email ? ` · ${p.email}` : ''}
-                                  </p>
+                              <div className="flex items-center justify-between px-3 py-2.5">
+                                <div className="flex min-w-0 items-center gap-2">
+                                  {p.is_winner && <span className="text-sm">🏆</span>}
+                                  <div className="min-w-0">
+                                    <p className="truncate text-xs font-bold text-slate-900 dark:text-white">
+                                      {p.name}
+                                    </p>
+                                    <p className="text-[10px] text-slate-400">
+                                      #{p.ticket_number}
+                                      {p.email ? ` · ${p.email}` : ''}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex shrink-0 items-center gap-1 pl-2">
+                                  <button
+                                    onClick={() => handleStartEditParticipant(p)}
+                                    title="Edit participant"
+                                    className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-white/10 dark:hover:text-gray-200"
+                                  >
+                                    <Edit2 className="h-3.5 w-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleToggleWinner(p.id, p.is_winner)}
+                                    title={p.is_winner ? 'Remove winner flag' : 'Mark as winner'}
+                                    className={`rounded-lg px-2 py-1 text-[10px] font-bold transition ${p.is_winner ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-500/20 dark:text-amber-300' : 'bg-slate-100 text-slate-500 hover:bg-amber-100 hover:text-amber-700 dark:bg-white/10 dark:text-gray-400'}`}
+                                  >
+                                    {p.is_winner ? '★ Winner' : '☆ Win'}
+                                  </button>
+                                  <button
+                                    onClick={() => handleRemoveParticipant(p.id)}
+                                    className="rounded-lg p-1 text-slate-400 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
                                 </div>
                               </div>
-                              <div className="flex shrink-0 items-center gap-1 pl-2">
-                                <button
-                                  onClick={() => handleToggleWinner(p.id, p.is_winner)}
-                                  title={p.is_winner ? 'Remove winner flag' : 'Mark as winner'}
-                                  className={`rounded-lg px-2 py-1 text-[10px] font-bold transition ${p.is_winner ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-500/20 dark:text-amber-300' : 'bg-slate-100 text-slate-500 hover:bg-amber-100 hover:text-amber-700 dark:bg-white/10 dark:text-gray-400'}`}
-                                >
-                                  {p.is_winner ? '★ Winner' : '☆ Win'}
-                                </button>
-                                <button
-                                  onClick={() => handleRemoveParticipant(p.id)}
-                                  className="rounded-lg p-1 text-slate-400 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </button>
-                              </div>
+                              {editParticipantId === p.id && (
+                                <div className="border-t border-slate-200/70 px-3 py-3 dark:border-white/10">
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <input
+                                      type="text"
+                                      placeholder="Full Name *"
+                                      value={editPartName}
+                                      onChange={(e) => setEditPartName(e.target.value)}
+                                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 focus:border-violet-400 focus:outline-none dark:border-white/10 dark:bg-[#0e0e14] dark:text-white dark:placeholder-gray-500"
+                                    />
+                                    <input
+                                      type="text"
+                                      placeholder="Ticket # *"
+                                      value={editPartTicket}
+                                      onChange={(e) => setEditPartTicket(e.target.value)}
+                                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 focus:border-violet-400 focus:outline-none dark:border-white/10 dark:bg-[#0e0e14] dark:text-white dark:placeholder-gray-500"
+                                    />
+                                    <input
+                                      type="text"
+                                      placeholder="Phone"
+                                      value={editPartPhone}
+                                      onChange={(e) => setEditPartPhone(e.target.value)}
+                                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 focus:border-violet-400 focus:outline-none dark:border-white/10 dark:bg-[#0e0e14] dark:text-white dark:placeholder-gray-500"
+                                    />
+                                    <input
+                                      type="text"
+                                      placeholder="Email"
+                                      value={editPartEmail}
+                                      onChange={(e) => setEditPartEmail(e.target.value)}
+                                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 focus:border-violet-400 focus:outline-none dark:border-white/10 dark:bg-[#0e0e14] dark:text-white dark:placeholder-gray-500"
+                                    />
+                                  </div>
+                                  <div className="mt-3 flex items-center gap-2">
+                                    <button
+                                      onClick={handleSaveEditParticipant}
+                                      disabled={
+                                        editPartSaving ||
+                                        !editPartName.trim() ||
+                                        !editPartTicket.trim()
+                                      }
+                                      className="flex items-center gap-2 rounded-xl bg-violet-600 px-3 py-2 text-[10px] font-bold text-white transition hover:bg-violet-700 disabled:opacity-50"
+                                    >
+                                      {editPartSaving ? (
+                                        <RefreshCw className="h-3 w-3 animate-spin" />
+                                      ) : (
+                                        <CheckCircle2 className="h-3 w-3" />
+                                      )}
+                                      Save
+                                    </button>
+                                    <button
+                                      onClick={handleCancelEditParticipant}
+                                      className="rounded-xl border border-slate-200 px-3 py-2 text-[10px] font-bold text-slate-500 transition hover:bg-slate-50 dark:border-white/10 dark:text-gray-400 dark:hover:bg-white/5"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           ))}
                         {editParticipants.length === 0 && (
