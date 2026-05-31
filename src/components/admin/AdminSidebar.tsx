@@ -13,6 +13,7 @@ import {
   LogOut,
   Gift,
   Mail,
+  Megaphone,
   Receipt,
   Settings,
   X,
@@ -45,6 +46,7 @@ const managementItems = [
   { name: 'Properties', path: '/admin/properties', icon: Building2 },
   { name: 'Notifications', path: '/admin/notifications', icon: Bell },
   { name: 'Email Center', path: '/admin/email', icon: Mail },
+  { name: 'Campaigns', path: '/admin/campaigns', icon: Megaphone },
   { name: 'Lottery Manager', path: '/admin/lottery', icon: Gift },
 ];
 
