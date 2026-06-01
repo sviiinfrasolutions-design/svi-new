@@ -149,12 +149,12 @@ export function CampaignsTab() {
       setTitle('');
       setSubject('');
       setBodyHtml(`<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-  <h2 style="color: #1a1a2e; border-bottom: 2px solid #c9a84c; padding-bottom: 10px;">🌟 Exclusive Update from SVI Infra</h2>
+  <h2 style="color: #1a1a2e; border-bottom: 2px solid #c9a84c; padding-bottom: 10px;">Exclusive Update from SVI Infra</h2>
   <p>Hello,</p>
   <p>We are delighted to bring you our latest updates, investment plans, and property details!</p>
   
   <div style="background: #f8f8ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
-    <h3 style="margin-top: 0; color: #1a1a2e;">🏗️ Current Hot Projects</h3>
+    <h3 style="margin-top: 0; color: #1a1a2e;">Current Hot Projects</h3>
     <p>Discover luxury living and high return investments on our standard pricing premium flats.</p>
   </div>
   
@@ -541,7 +541,7 @@ export function CampaignsTab() {
                     type="text"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    placeholder="e.g. 🎉 Exclusive pre-launch booking now open at premium rates!"
+                    placeholder="e.g. Exclusive pre-launch booking now open at premium rates"
                     className="focus:border-brand-gold/50 dark:focus:border-brand-gold/50 w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm focus:outline-none dark:border-gray-700"
                   />
                 </div>
