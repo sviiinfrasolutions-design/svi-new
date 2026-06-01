@@ -350,3 +350,51 @@
   max-height: 100vh !important;
   overflow-y: auto !important;
 }
+
+/* ─── Custom Scrollbar (gold accent) ─── */
+.scrollbar-gold::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-gold::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-gold::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 76, 0.2);
+  border-radius: 999px;
+}
+.scrollbar-gold::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 168, 76, 0.4);
+}
+.scrollbar-gold {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 168, 76, 0.2) transparent;
+}
+
+/* ─── Noise Texture Overlay ─── */
+.noise-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+  z-index: 0;
+}
+.noise-texture > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Email page surface ─── */
+.email-surface {
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.02) 0%, transparent 40%);
+}
+
+/* ─── Focus ring with gold ─── */
+.focus-gold:focus {
+  border-color: #c9a84c;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+}

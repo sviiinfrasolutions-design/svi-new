@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Copy, ChevronRight, FileText } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Check, Copy, FileText, ArrowRight } from 'lucide-react';
 import { EMAIL_TEMPLATES } from './constants';
 
 export function TemplatesTab() {
@@ -15,64 +16,97 @@ export function TemplatesTab() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const categories = [...new Set(EMAIL_TEMPLATES.map((t) => t.category))];
+
   return (
-    <div className="grid grid-cols-1 gap-6 font-sans lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-0 overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm lg:grid-cols-3 dark:border-gray-700/60 dark:bg-[#0e0e14]">
       {/* Template list */}
-      <div className="space-y-3 lg:col-span-1">
-        {EMAIL_TEMPLATES.map((tpl) => {
-          const TplIcon = tpl.icon;
-          return (
-            <button
-              key={tpl.id}
-              onClick={() => setSelected(tpl)}
-              className={`w-full rounded-xl border p-4 text-left transition-all ${
-                selected?.id === tpl.id
-                  ? 'border-brand-gold/40 bg-brand-gold/5'
-                  : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-[#0e0e14] dark:hover:border-gray-600'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-lg ${selected?.id === tpl.id ? 'bg-brand-gold/15 text-brand-gold' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'}`}
-                >
-                  <TplIcon className="h-5 w-5" />
+      <div
+        className="scrollbar-gold overflow-y-auto border-r border-gray-100 lg:col-span-1 dark:border-gray-800"
+        style={{ maxHeight: 'calc(100vh - 260px)' }}
+      >
+        <div className="p-4">
+          <p className="mb-3 font-mono text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
+            Email Templates
+          </p>
+          {categories.map((cat) => {
+            const catTemplates = EMAIL_TEMPLATES.filter((t) => t.category === cat);
+            return (
+              <div key={cat} className="mb-4">
+                <p className="mb-2 px-2 text-[10px] font-semibold tracking-wider text-gray-400/70 uppercase">
+                  {cat}
+                </p>
+                <div className="space-y-1">
+                  {catTemplates.map((tpl) => {
+                    const TplIcon = tpl.icon;
+                    const isActive = selected?.id === tpl.id;
+                    return (
+                      <motion.button
+                        key={tpl.id}
+                        onClick={() => setSelected(tpl)}
+                        whileHover={{ x: 2 }}
+                        className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all ${
+                          isActive
+                            ? 'bg-brand-gold/5 text-brand-gold'
+                            : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/[0.02]'
+                        }`}
+                      >
+                        <TplIcon
+                          className={`h-4 w-4 shrink-0 ${isActive ? 'text-brand-gold' : 'text-gray-400'}`}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-xs font-medium">{tpl.name}</p>
+                        </div>
+                        {isActive && <ArrowRight className="text-brand-gold h-3 w-3 shrink-0" />}
+                      </motion.button>
+                    );
+                  })}
                 </div>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
-                    {tpl.name}
-                  </p>
-                  <p className="text-xs text-gray-400">{tpl.category}</p>
-                </div>
-                <ChevronRight
-                  className={`ml-auto h-4 w-4 shrink-0 text-gray-400 transition-transform ${selected?.id === tpl.id ? 'text-brand-gold rotate-90' : ''}`}
-                />
               </div>
-            </button>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Template detail */}
-      <div className="lg:col-span-2">
-        {!selected ? (
-          <div className="flex h-full min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 text-center dark:border-gray-700">
-            <FileText className="mb-3 h-8 w-8 text-gray-300" />
-            <p className="font-sans text-sm text-gray-400">Select a template to preview</p>
-          </div>
-        ) : (
-          <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-[#0e0e14]">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-gray-700">
-              <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">{selected.name}</h3>
-                <p className="mt-0.5 text-xs text-gray-400">
-                  Subject:{' '}
-                  <span className="text-gray-600 dark:text-gray-300">{selected.subject}</span>
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
+      <div className="scrollbar-gold lg:col-span-2" style={{ maxHeight: 'calc(100vh - 260px)' }}>
+        <AnimatePresence mode="wait">
+          {!selected ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex h-full min-h-64 flex-col items-center justify-center p-8 text-center"
+            >
+              <FileText className="mb-3 h-8 w-8 text-gray-300 dark:text-gray-700" />
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Select a template to preview
+              </p>
+              <p className="mt-1 text-xs text-gray-400">Choose from the list on the left</p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={selected.id}
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -8 }}
+              transition={{ duration: 0.2 }}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-gray-800">
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                    {selected.name}
+                  </h3>
+                  <p className="mt-0.5 font-mono text-[11px] text-gray-500">
+                    Subject:{' '}
+                    <span className="text-gray-700 dark:text-gray-300">{selected.subject}</span>
+                  </p>
+                </div>
                 <button
                   onClick={copyHtml}
-                  className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 transition-all hover:border-gray-300 dark:border-gray-600 dark:text-gray-400"
+                  className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 transition-all hover:border-gray-300 dark:border-gray-700 dark:text-gray-400 dark:hover:border-gray-600"
                 >
                   {copied ? (
                     <Check className="h-3.5 w-3.5 text-emerald-500" />
@@ -82,33 +116,37 @@ export function TemplatesTab() {
                   {copied ? 'Copied!' : 'Copy HTML'}
                 </button>
               </div>
-            </div>
-            <div className="p-4">
-              <p className="mb-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                Visual Preview
-              </p>
-              <div
-                className="max-h-[500px] overflow-y-auto rounded-lg border border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
-                dangerouslySetInnerHTML={{ __html: selected.html }}
-              />
-            </div>
-            <div className="border-t border-gray-100 px-4 pb-4 dark:border-gray-700">
-              <p className="mt-4 mb-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                Available Variables
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {Array.from(selected.html.matchAll(/\{\{(\w+)\}\}/g)).map(([, v], i) => (
-                  <span
-                    key={i}
-                    className="rounded-md bg-amber-50 px-2 py-0.5 font-mono text-[11px] text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
-                  >
-                    {`{{${v}}}`}
-                  </span>
-                ))}
+
+              {/* Preview */}
+              <div className="p-6">
+                <p className="mb-2 font-mono text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
+                  Preview
+                </p>
+                <div
+                  className="scrollbar-gold max-h-[400px] overflow-y-auto rounded-xl border border-gray-100 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-900/20"
+                  dangerouslySetInnerHTML={{ __html: selected.html }}
+                />
               </div>
-            </div>
-          </div>
-        )}
+
+              {/* Variables */}
+              <div className="border-t border-gray-100 px-6 py-4 dark:border-gray-800">
+                <p className="mb-2 font-mono text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
+                  Variables
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {Array.from(selected.html.matchAll(/\{\{(\w+)\}\}/g)).map(([, v], i) => (
+                    <span
+                      key={i}
+                      className="rounded-md border border-amber-200/60 bg-amber-50 px-2.5 py-1 font-mono text-[11px] text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/5 dark:text-amber-400"
+                    >
+                      {`{{${v}}}`}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

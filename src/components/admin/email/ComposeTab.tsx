@@ -1,19 +1,23 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   AlertTriangle,
   Check,
+  ChevronDown,
   Eye,
+  EyeOff,
   Loader2,
+  Paperclip,
+  FileIcon,
   PenLine,
+  Save,
   Send,
   Trash2,
   X,
-  Paperclip,
-  FileIcon,
-  Save,
+  Search,
+  LayoutTemplate,
 } from 'lucide-react';
 import { EMAIL_TEMPLATES } from './constants';
 import { getToken, saveDraft, loadDraft, clearDraft, fileToBase64 } from './helpers';
@@ -45,21 +49,32 @@ export function ComposeTab({
   const [error, setError] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<EmailAttachment[]>([]);
   const [draftSaved, setDraftSaved] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+  const [templateSearch, setTemplateSearch] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const templateRef = useRef<HTMLDivElement>(null);
 
-  // ─── Load saved draft on mount ────────────────────────────
+  // Close template picker on outside click
   useEffect(() => {
-    const saved = loadDraft();
-    if (saved && saved.to) {
-      setHasDraft(true);
-    }
+    const handler = (e: MouseEvent) => {
+      if (templateRef.current && !templateRef.current.contains(e.target as Node)) {
+        setShowTemplatePicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // ─── Apply forward/reply prefill data ─────────────────────
+  // Load saved draft on mount
+  useEffect(() => {
+    const saved = loadDraft();
+    if (saved && saved.to) setHasDraft(true);
+  }, []);
+
+  // Apply forward/reply prefill
   useEffect(() => {
     if (forwardData) {
       setTo('');
@@ -84,7 +99,7 @@ export function ComposeTab({
     }
   }, [replyData, onClearPrefill]);
 
-  // ─── Auto-save draft every 5 seconds ──────────────────────
+  // Auto-save draft every 5s
   useEffect(() => {
     if (!to && !subject && !html) return;
     const timer = setInterval(() => {
@@ -115,23 +130,19 @@ export function ComposeTab({
     setSubject(tpl.subject);
     setHtml(tpl.html);
     setSelectedTemplate(templateId);
+    setShowTemplatePicker(false);
+    setTemplateSearch('');
   };
 
-  // ─── Attachment handling ──────────────────────────────────
+  // Attachments
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-
     const newAttachments: EmailAttachment[] = [];
     for (const file of Array.from(files)) {
       if (attachments.length + newAttachments.length >= 10) break;
       const base64 = await fileToBase64(file);
-      newAttachments.push({
-        file,
-        name: file.name,
-        size: file.size,
-        base64,
-      });
+      newAttachments.push({ file, name: file.name, size: file.size, base64 });
     }
     setAttachments((prev) => [...prev, ...newAttachments]);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -147,7 +158,7 @@ export function ComposeTab({
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  // ─── Send ─────────────────────────────────────────────────
+  // Send
   const handleSend = async () => {
     if (!to.trim() || !subject.trim() || !html.trim()) {
       setError('Please fill in To, Subject, and Body fields.');
@@ -225,71 +236,313 @@ export function ComposeTab({
     clearDraft();
   };
 
+  const filteredTemplates = EMAIL_TEMPLATES.filter(
+    (t) =>
+      t.name.toLowerCase().includes(templateSearch.toLowerCase()) ||
+      t.category.toLowerCase().includes(templateSearch.toLowerCase())
+  );
+
+  // Group templates by category
+  const templateCategories = [...new Set(EMAIL_TEMPLATES.map((t) => t.category))];
+
   return (
-    <div className="grid grid-cols-1 gap-6 font-sans lg:grid-cols-4">
-      {/* Left: Template picker */}
-      <div className="lg:col-span-1">
-        <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-[#0e0e14]">
-          <p className="mb-3 text-[9px] font-extrabold tracking-widest text-gray-400 uppercase">
-            Quick Templates
-          </p>
-          <div className="space-y-2">
-            {EMAIL_TEMPLATES.map((tpl) => {
-              const TplIcon = tpl.icon;
-              const isActive = selectedTemplate === tpl.id;
-              return (
-                <motion.button
-                  key={tpl.id}
-                  onClick={() => loadTemplate(tpl.id)}
-                  whileHover={{ scale: 1.02, x: 4 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`w-full rounded-lg border px-3 py-2.5 text-left transition-all duration-300 ${
-                    isActive
-                      ? 'border-brand-gold/60 bg-brand-gold/5 text-brand-gold shadow-[0_0_12px_rgba(201,168,76,0.12)]'
-                      : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-white/5'
-                  }`}
+    <div className="mx-auto max-w-[920px]">
+      {/* Draft restore banner */}
+      <AnimatePresence>
+        {hasDraft && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -8, height: 0 }}
+            className="border-brand-gold/20 bg-brand-gold/5 mb-4 flex items-center justify-between rounded-xl border px-5 py-3.5"
+          >
+            <div className="flex items-center gap-3">
+              <Save className="text-brand-gold h-4 w-4" />
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                You have an unsaved draft
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={restoreDraft}
+                className="bg-brand-gold/15 text-brand-gold hover:bg-brand-gold/25 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors"
+              >
+                Restore
+              </button>
+              <button
+                onClick={() => {
+                  clearDraft();
+                  setHasDraft(false);
+                }}
+                className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/5"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Compose Card */}
+      <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm dark:border-gray-700/60 dark:bg-[#0e0e14]">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-gray-800">
+          <div className="flex items-center gap-3">
+            <PenLine className="text-brand-gold h-4 w-4" />
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">New Email</span>
+            {forwardData && (
+              <span className="rounded-md bg-violet-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-violet-700 uppercase dark:bg-violet-500/15 dark:text-violet-400">
+                Forwarding
+              </span>
+            )}
+            {replyData && (
+              <span className="rounded-md bg-blue-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-blue-700 uppercase dark:bg-blue-500/15 dark:text-blue-400">
+                Replying
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <AnimatePresence>
+              {draftSaved && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex items-center gap-1.5 font-mono text-[10px] text-emerald-500"
                 >
-                  <div className="flex items-center gap-2">
-                    <TplIcon
-                      className={`h-3.5 w-3.5 shrink-0 transition-opacity ${isActive ? 'opacity-100' : 'opacity-60'}`}
-                    />
-                    <span className="text-xs font-semibold">{tpl.name}</span>
-                  </div>
-                  <p className="mt-1 text-[10px] text-gray-400">{tpl.category}</p>
-                </motion.button>
-              );
-            })}
+                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  saved
+                </motion.span>
+              )}
+            </AnimatePresence>
+            <button
+              onClick={() => setPreviewMode(!previewMode)}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                previewMode
+                  ? 'bg-brand-gold/10 text-brand-gold'
+                  : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600 dark:hover:bg-white/5 dark:hover:text-gray-400'
+              }`}
+            >
+              {previewMode ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              {previewMode ? 'Edit' : 'Preview'}
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Right: Compose form */}
-      <div className="lg:col-span-3">
-        {/* Draft restore banner */}
-        <AnimatePresence>
-          {hasDraft && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: 'auto' }}
-              exit={{ opacity: 0, y: -8, height: 0 }}
-              className="mb-4 flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-3 text-sm dark:border-blue-800 dark:bg-blue-900/20"
-            >
-              <span className="text-blue-700 dark:text-blue-300">
-                📝 You have an unsaved draft. Restore it?
-              </span>
-              <div className="flex items-center gap-2">
+        {/* Fields */}
+        <div>
+          {/* To */}
+          <div className="flex items-center border-b border-gray-100 px-6 dark:border-gray-800">
+            <label className="w-12 shrink-0 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+              To
+            </label>
+            <input
+              type="text"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              placeholder="recipient@example.com"
+              className="flex-1 bg-transparent py-3.5 text-sm text-gray-900 placeholder-gray-400/60 outline-none dark:text-white"
+            />
+            {!showAdvanced && (
+              <div className="flex items-center gap-1">
                 <button
-                  onClick={restoreDraft}
-                  className="rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-600"
+                  onClick={() => {
+                    setShowAdvanced(true);
+                    setTimeout(() => document.getElementById('cc-input')?.focus(), 100);
+                  }}
+                  className="rounded-md border border-dashed border-gray-300 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-400 transition-all hover:border-blue-400 hover:text-blue-500 dark:border-gray-700 dark:hover:border-blue-500"
                 >
-                  Restore Draft
+                  +CC
                 </button>
                 <button
                   onClick={() => {
-                    clearDraft();
-                    setHasDraft(false);
+                    setShowAdvanced(true);
+                    setTimeout(() => document.getElementById('bcc-input')?.focus(), 100);
                   }}
-                  className="text-blue-400 hover:text-blue-600"
+                  className="rounded-md border border-dashed border-gray-300 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-400 transition-all hover:border-violet-400 hover:text-violet-500 dark:border-gray-700 dark:hover:border-violet-500"
+                >
+                  +BCC
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* CC / BCC / From / Reply-To — expandable */}
+          <AnimatePresence>
+            {showAdvanced && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 140, damping: 20 }}
+                className="overflow-hidden"
+              >
+                {[
+                  {
+                    id: 'cc-input',
+                    label: 'CC',
+                    value: cc,
+                    setter: setCc,
+                    placeholder: 'cc@example.com',
+                  },
+                  {
+                    id: 'bcc-input',
+                    label: 'BCC',
+                    value: bcc,
+                    setter: setBcc,
+                    placeholder: 'bcc@example.com',
+                  },
+                ].map((field) => (
+                  <div
+                    key={field.label}
+                    className="flex items-center border-b border-gray-100 px-6 dark:border-gray-800"
+                  >
+                    <label className="w-12 shrink-0 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                      {field.label}
+                    </label>
+                    <input
+                      id={field.id}
+                      type="text"
+                      value={field.value}
+                      onChange={(e) => field.setter(e.target.value)}
+                      placeholder={field.placeholder}
+                      className="flex-1 bg-transparent py-3 text-sm text-gray-900 placeholder-gray-400/60 outline-none dark:text-white"
+                    />
+                    {field.value && (
+                      <button
+                        onClick={() => field.setter('')}
+                        className="text-gray-400 hover:text-red-400"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                {/* From Name */}
+                <div className="flex items-center border-b border-gray-100 px-6 dark:border-gray-800">
+                  <label className="w-12 shrink-0 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                    From
+                  </label>
+                  <input
+                    type="text"
+                    value={fromName}
+                    onChange={(e) => setFromName(e.target.value)}
+                    placeholder="Sender Name"
+                    className="w-40 bg-transparent py-3 text-sm text-gray-900 placeholder-gray-400/60 outline-none dark:text-white"
+                  />
+                  <span className="font-mono text-xs text-gray-400/70">
+                    {'<noreply@sviiinfrasolutions.com>'}
+                  </span>
+                </div>
+                {/* Reply-To */}
+                <div className="flex items-center border-b border-gray-100 px-6 dark:border-gray-800">
+                  <label className="w-12 shrink-0 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                    Reply
+                  </label>
+                  <input
+                    type="text"
+                    value={replyTo}
+                    onChange={(e) => setReplyTo(e.target.value)}
+                    placeholder={adminEmail || 'reply@example.com'}
+                    className="flex-1 bg-transparent py-3 text-sm text-gray-900 placeholder-gray-400/60 outline-none dark:text-white"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Subject */}
+          <div className="flex items-center border-b border-gray-100 px-6 dark:border-gray-800">
+            <label className="w-12 shrink-0 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+              Subj
+            </label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Email subject..."
+              className="flex-1 bg-transparent py-3.5 text-sm font-semibold text-gray-900 placeholder-gray-400/60 outline-none dark:text-white"
+            />
+          </div>
+
+          {/* Attachments */}
+          <AnimatePresence>
+            {attachments.length > 0 && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden border-b border-gray-100 px-6 py-3 dark:border-gray-800"
+              >
+                <div className="flex flex-wrap gap-2">
+                  {attachments.map((att, i) => (
+                    <motion.div
+                      key={`${att.name}-${i}`}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.8, opacity: 0 }}
+                      className="group flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50/80 py-1.5 pr-2 pl-3 dark:border-gray-700 dark:bg-gray-800/50"
+                    >
+                      <FileIcon className="h-3.5 w-3.5 text-gray-400" />
+                      <span className="max-w-[160px] truncate text-xs text-gray-700 dark:text-gray-300">
+                        {att.name}
+                      </span>
+                      <span className="font-mono text-[10px] text-gray-400">
+                        {formatFileSize(att.size)}
+                      </span>
+                      <button
+                        onClick={() => removeAttachment(i)}
+                        className="ml-0.5 rounded p-0.5 text-gray-400 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Body */}
+          <div className="relative">
+            {previewMode ? (
+              <div className="min-h-[400px] p-6">
+                <div
+                  className="rounded-xl border border-gray-100 bg-gray-50/50 p-6 dark:border-gray-800 dark:bg-gray-900/20"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      html ||
+                      '<p style="color:#999; font-family:sans-serif; font-size: 14px;">No content yet...</p>',
+                  }}
+                />
+              </div>
+            ) : (
+              <textarea
+                value={html}
+                onChange={(e) => setHtml(e.target.value)}
+                placeholder="Write your email HTML here, or pick a template..."
+                rows={18}
+                className="w-full resize-none bg-transparent px-6 py-5 font-mono text-sm leading-relaxed text-gray-900 placeholder-gray-400/50 outline-none dark:text-gray-200"
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Error */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mx-6 mb-4 flex items-center gap-3 rounded-xl border border-red-200/60 bg-red-50/80 px-4 py-3 dark:border-red-800/40 dark:bg-red-900/15">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
+                <span className="text-sm text-red-700 dark:text-red-400">{error}</span>
+                <button
+                  onClick={() => setError(null)}
+                  className="ml-auto text-red-400 hover:text-red-600"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -298,372 +551,18 @@ export function ComposeTab({
           )}
         </AnimatePresence>
 
-        <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-[#0e0e14]">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-gray-700">
-            <div className="flex items-center gap-2">
-              <PenLine className="text-brand-gold h-4 w-4" />
-              <span className="font-semibold text-gray-900 dark:text-white">New Email</span>
-              {/* Prefill badge */}
-              {forwardData && (
-                <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[9px] font-bold text-violet-700 dark:bg-violet-500/15 dark:text-violet-400">
-                  FORWARDING
-                </span>
-              )}
-              {replyData && (
-                <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-[9px] font-bold text-blue-700 dark:bg-blue-500/15 dark:text-blue-400">
-                  REPLYING
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              {/* Draft indicator */}
-              <AnimatePresence>
-                {draftSaved && (
-                  <motion.span
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="flex items-center gap-1 text-[10px] text-emerald-500"
-                  >
-                    <Save className="h-3 w-3" />
-                    Draft saved
-                  </motion.span>
-                )}
-              </AnimatePresence>
-              <button
-                onClick={() => setPreviewMode(!previewMode)}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                  previewMode
-                    ? 'bg-brand-gold/10 text-brand-gold shadow-sm'
-                    : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'
-                }`}
-              >
-                <Eye className="h-3.5 w-3.5" />
-                Preview
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-0">
-            {/* To + CC/BCC chips */}
-            <div
-              className={`relative flex items-start gap-3 border-b border-gray-100 px-6 py-3 transition-all duration-300 dark:border-gray-700 ${
-                focusedField === 'to'
-                  ? 'border-l-brand-gold bg-brand-gold/[0.015] dark:bg-brand-gold/[0.01] border-l-2'
-                  : 'border-l-2 border-l-transparent'
-              }`}
-            >
-              <span className="mt-2 w-10 shrink-0 text-right text-xs font-semibold text-gray-400">
-                To
-              </span>
-              <div className="flex flex-1 items-center gap-2">
-                <input
-                  type="text"
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                  onFocus={() => setFocusedField('to')}
-                  onBlur={() => setFocusedField(null)}
-                  placeholder="recipient@example.com, another@example.com"
-                  className="flex-1 bg-transparent py-1.5 text-sm text-gray-900 placeholder-gray-400 outline-none dark:text-white"
-                />
-                {/* CC/BCC chips */}
-                {!showAdvanced && (
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => {
-                        setShowAdvanced(true);
-                        setTimeout(() => document.getElementById('cc-input')?.focus(), 100);
-                      }}
-                      className="rounded-md border border-dashed border-gray-300 px-2 py-0.5 text-[10px] font-bold text-gray-400 transition-all hover:border-blue-400 hover:text-blue-500 dark:border-gray-600 dark:hover:border-blue-500"
-                    >
-                      +CC
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowAdvanced(true);
-                        setTimeout(() => document.getElementById('bcc-input')?.focus(), 100);
-                      }}
-                      className="rounded-md border border-dashed border-gray-300 px-2 py-0.5 text-[10px] font-bold text-gray-400 transition-all hover:border-violet-400 hover:text-violet-500 dark:border-gray-600 dark:hover:border-violet-500"
-                    >
-                      +BCC
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* CC / BCC / From / Reply-To — expandable */}
-            <AnimatePresence>
-              {showAdvanced && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 140, damping: 20 }}
-                  className="overflow-hidden border-b border-gray-100 dark:border-gray-700"
-                >
-                  {/* CC */}
-                  <div
-                    className={`flex items-center gap-3 border-b border-gray-100/50 px-6 py-3 transition-all duration-300 dark:border-gray-700/50 ${
-                      focusedField === 'cc'
-                        ? 'border-l-brand-gold bg-brand-gold/[0.015] dark:bg-brand-gold/[0.01] border-l-2'
-                        : 'border-l-2 border-l-transparent'
-                    }`}
-                  >
-                    <span className="w-10 shrink-0 text-right text-xs font-semibold text-gray-400">
-                      CC
-                    </span>
-                    <input
-                      id="cc-input"
-                      type="text"
-                      value={cc}
-                      onChange={(e) => setCc(e.target.value)}
-                      onFocus={() => setFocusedField('cc')}
-                      onBlur={() => setFocusedField(null)}
-                      placeholder="cc@example.com"
-                      className="flex-1 bg-transparent py-1.5 text-sm text-gray-900 placeholder-gray-400 outline-none dark:text-white"
-                    />
-                    {cc && (
-                      <button
-                        onClick={() => setCc('')}
-                        className="text-gray-400 hover:text-red-400"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                  {/* BCC */}
-                  <div
-                    className={`flex items-center gap-3 border-b border-gray-100/50 px-6 py-3 transition-all duration-300 dark:border-gray-700/50 ${
-                      focusedField === 'bcc'
-                        ? 'border-l-brand-gold bg-brand-gold/[0.015] dark:bg-brand-gold/[0.01] border-l-2'
-                        : 'border-l-2 border-l-transparent'
-                    }`}
-                  >
-                    <span className="w-10 shrink-0 text-right text-xs font-semibold text-gray-400">
-                      BCC
-                    </span>
-                    <input
-                      id="bcc-input"
-                      type="text"
-                      value={bcc}
-                      onChange={(e) => setBcc(e.target.value)}
-                      onFocus={() => setFocusedField('bcc')}
-                      onBlur={() => setFocusedField(null)}
-                      placeholder="bcc@example.com"
-                      className="flex-1 bg-transparent py-1.5 text-sm text-gray-900 placeholder-gray-400 outline-none dark:text-white"
-                    />
-                    {bcc && (
-                      <button
-                        onClick={() => setBcc('')}
-                        className="text-gray-400 hover:text-red-400"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                  {/* From Name */}
-                  <div
-                    className={`flex items-center gap-3 border-b border-gray-100/50 px-6 py-3 transition-all duration-300 dark:border-gray-700/50 ${
-                      focusedField === 'fromName'
-                        ? 'border-l-brand-gold bg-brand-gold/[0.015] dark:bg-brand-gold/[0.01] border-l-2'
-                        : 'border-l-2 border-l-transparent'
-                    }`}
-                  >
-                    <span className="w-10 shrink-0 text-right text-xs font-semibold text-gray-400">
-                      From
-                    </span>
-                    <input
-                      type="text"
-                      value={fromName}
-                      onChange={(e) => setFromName(e.target.value)}
-                      onFocus={() => setFocusedField('fromName')}
-                      onBlur={() => setFocusedField(null)}
-                      placeholder="Sender Name"
-                      className="w-36 bg-transparent py-1.5 text-sm text-gray-900 placeholder-gray-400 outline-none dark:text-white"
-                    />
-                    <span className="text-xs text-gray-400">
-                      {'<noreply@sviiinfrasolutions.com>'}
-                    </span>
-                  </div>
-                  {/* Reply-To */}
-                  <div
-                    className={`flex items-center gap-3 px-6 py-3 transition-all duration-300 ${
-                      focusedField === 'replyTo'
-                        ? 'border-l-brand-gold bg-brand-gold/[0.015] dark:bg-brand-gold/[0.01] border-l-2'
-                        : 'border-l-2 border-l-transparent'
-                    }`}
-                  >
-                    <span className="w-10 shrink-0 text-right text-xs font-semibold text-gray-400">
-                      Reply
-                    </span>
-                    <input
-                      type="text"
-                      value={replyTo}
-                      onChange={(e) => setReplyTo(e.target.value)}
-                      onFocus={() => setFocusedField('replyTo')}
-                      onBlur={() => setFocusedField(null)}
-                      placeholder={adminEmail || 'reply@example.com'}
-                      className="flex-1 bg-transparent py-1.5 text-sm text-gray-900 placeholder-gray-400 outline-none dark:text-white"
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Subject */}
-            <div
-              className={`flex items-center gap-3 border-b border-gray-100 px-6 py-3 transition-all duration-300 dark:border-gray-700 ${
-                focusedField === 'subject'
-                  ? 'border-l-brand-gold bg-brand-gold/[0.015] dark:bg-brand-gold/[0.01] border-l-2'
-                  : 'border-l-2 border-l-transparent'
-              }`}
-            >
-              <span className="w-10 shrink-0 text-right text-xs font-semibold text-gray-400">
-                Subj
-              </span>
-              <input
-                type="text"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                onFocus={() => setFocusedField('subject')}
-                onBlur={() => setFocusedField(null)}
-                placeholder="Email subject..."
-                className="flex-1 bg-transparent py-1.5 text-sm font-semibold text-gray-900 placeholder-gray-400 outline-none dark:text-white"
-              />
-            </div>
-
-            {/* Attachments bar */}
-            <AnimatePresence>
-              {attachments.length > 0 && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden border-b border-gray-100 px-6 py-3 dark:border-gray-700"
-                >
-                  <p className="mb-2 text-[9px] font-extrabold tracking-widest text-gray-400 uppercase">
-                    Attachments ({attachments.length}/10)
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {attachments.map((att, i) => (
-                      <motion.div
-                        key={`${att.name}-${i}`}
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.8, opacity: 0 }}
-                        className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 dark:border-gray-700 dark:bg-gray-800"
-                      >
-                        <FileIcon className="h-3.5 w-3.5 text-gray-400" />
-                        <span className="max-w-[140px] truncate text-xs text-gray-700 dark:text-gray-300">
-                          {att.name}
-                        </span>
-                        <span className="text-[10px] text-gray-400">
-                          {formatFileSize(att.size)}
-                        </span>
-                        <button
-                          onClick={() => removeAttachment(i)}
-                          className="text-gray-400 hover:text-red-500"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Body */}
-            <div
-              className={`p-4 transition-all duration-300 ${
-                focusedField === 'body'
-                  ? 'border-l-brand-gold bg-brand-gold/[0.01] dark:bg-brand-gold/[0.005] border-l-2'
-                  : 'border-l-2 border-l-transparent'
-              }`}
-            >
-              {previewMode ? (
-                <div
-                  className="min-h-80 rounded-lg border border-gray-100 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-900/30"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      html || '<p style="color:#999; font-family:sans-serif">No content yet…</p>',
-                  }}
-                />
-              ) : (
-                <textarea
-                  value={html}
-                  onChange={(e) => setHtml(e.target.value)}
-                  onFocus={() => setFocusedField('body')}
-                  onBlur={() => setFocusedField(null)}
-                  placeholder="Write your email HTML here, or choose a template from the left…"
-                  rows={16}
-                  className="w-full resize-none bg-transparent font-mono text-sm text-gray-900 placeholder-gray-400 outline-none dark:text-gray-200"
-                />
-              )}
-            </div>
-          </div>
-
-          {/* Error */}
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="mx-6 mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50/80 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
-              >
-                <AlertTriangle className="h-4 w-4 shrink-0" />
-                {error}
-                <button onClick={() => setError(null)} className="ml-auto">
-                  <X className="h-4 w-4" />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Footer */}
-          <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              <motion.button
-                whileHover={{ scale: 1.05, x: -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={discardAll}
-                className="flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-red-500"
-              >
-                <Trash2 className="h-4 w-4" />
-                Discard
-              </motion.button>
-
-              {/* Attach button */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-blue-500"
-              >
-                <Paperclip className="h-4 w-4" />
-                Attach
-              </motion.button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                onChange={handleFileSelect}
-                className="hidden"
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.jpeg,.png,.gif,.zip,.rar"
-              />
-            </div>
-
+        {/* Footer toolbar */}
+        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4 dark:border-gray-800">
+          <div className="flex items-center gap-1">
+            {/* Send */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleSend}
               disabled={sending || sent}
-              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold tracking-wide shadow-md transition-all duration-300 hover:shadow-lg disabled:opacity-70 ${
+              className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold tracking-wide shadow-sm transition-all duration-300 disabled:opacity-70 ${
                 sent
-                  ? 'bg-emerald-500 text-white'
+                  ? 'bg-emerald-500 text-white shadow-emerald-500/20'
                   : 'bg-brand-gold text-brand-navy glow-gold hover:opacity-95'
               }`}
             >
@@ -674,8 +573,142 @@ export function ComposeTab({
               ) : (
                 <Send className="h-4 w-4" />
               )}
-              {sent ? 'Sent!' : sending ? 'Sending…' : 'Send Email'}
+              {sent ? 'Sent!' : sending ? 'Sending...' : 'Send'}
             </motion.button>
+          </div>
+
+          <div className="flex items-center gap-1">
+            {/* Template picker */}
+            <div ref={templateRef} className="relative">
+              <button
+                onClick={() => setShowTemplatePicker(!showTemplatePicker)}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all ${
+                  selectedTemplate
+                    ? 'text-brand-gold bg-brand-gold/5'
+                    : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600 dark:hover:bg-white/5'
+                }`}
+              >
+                <LayoutTemplate className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">
+                  {selectedTemplate
+                    ? EMAIL_TEMPLATES.find((t) => t.id === selectedTemplate)?.name || 'Template'
+                    : 'Templates'}
+                </span>
+                <ChevronDown
+                  className={`h-3 w-3 transition-transform ${showTemplatePicker ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              <AnimatePresence>
+                {showTemplatePicker && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 bottom-full z-50 mb-2 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-[#0e0e14]"
+                  >
+                    {/* Search */}
+                    <div className="border-b border-gray-100 p-3 dark:border-gray-800">
+                      <div className="relative">
+                        <Search className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="text"
+                          value={templateSearch}
+                          onChange={(e) => setTemplateSearch(e.target.value)}
+                          placeholder="Search templates..."
+                          autoFocus
+                          className="focus:border-brand-gold focus:ring-brand-gold/20 w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pr-3 pl-9 text-xs text-gray-900 placeholder-gray-400 outline-none focus:ring-1 dark:border-gray-700 dark:bg-gray-800/50 dark:text-white dark:placeholder-gray-500"
+                        />
+                      </div>
+                    </div>
+                    {/* List */}
+                    <div className="scrollbar-gold max-h-72 overflow-y-auto">
+                      {templateCategories.map((cat) => {
+                        const catTemplates = filteredTemplates.filter((t) => t.category === cat);
+                        if (catTemplates.length === 0) return null;
+                        return (
+                          <div key={cat}>
+                            <div className="bg-gray-50/80 px-4 py-2 dark:bg-gray-800/30">
+                              <span className="font-mono text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
+                                {cat}
+                              </span>
+                            </div>
+                            {catTemplates.map((tpl) => {
+                              const TplIcon = tpl.icon;
+                              const isActive = selectedTemplate === tpl.id;
+                              return (
+                                <button
+                                  key={tpl.id}
+                                  onClick={() => loadTemplate(tpl.id)}
+                                  className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                                    isActive
+                                      ? 'bg-brand-gold/5'
+                                      : 'hover:bg-gray-50 dark:hover:bg-white/[0.02]'
+                                  }`}
+                                >
+                                  <TplIcon
+                                    className={`h-3.5 w-3.5 shrink-0 ${
+                                      isActive ? 'text-brand-gold' : 'text-gray-400'
+                                    }`}
+                                  />
+                                  <div className="min-w-0 flex-1">
+                                    <p
+                                      className={`truncate text-xs font-medium ${
+                                        isActive
+                                          ? 'text-brand-gold'
+                                          : 'text-gray-700 dark:text-gray-300'
+                                      }`}
+                                    >
+                                      {tpl.name}
+                                    </p>
+                                    <p className="truncate text-[10px] text-gray-400">
+                                      {tpl.subject}
+                                    </p>
+                                  </div>
+                                  {isActive && <Check className="text-brand-gold h-3.5 w-3.5" />}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        );
+                      })}
+                      {filteredTemplates.length === 0 && (
+                        <div className="px-4 py-8 text-center text-xs text-gray-400">
+                          No templates match your search
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Attach */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-400 transition-all hover:bg-gray-50 hover:text-gray-600 dark:hover:bg-white/5"
+            >
+              <Paperclip className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Attach</span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.jpeg,.png,.gif,.zip,.rar"
+            />
+
+            {/* Discard */}
+            <button
+              onClick={discardAll}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-400 transition-all hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Discard</span>
+            </button>
           </div>
         </div>
       </div>

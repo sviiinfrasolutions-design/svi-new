@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { ExternalLink, RefreshCw, Loader2, AlertTriangle, Globe } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ExternalLink, RefreshCw, Loader2, AlertTriangle, Globe, Shield } from 'lucide-react';
 import { Domain } from './types';
 import { getDomainStatusColor, getToken } from './helpers';
 
@@ -33,143 +34,139 @@ export function DomainsTab() {
   }, [fetchDomains]);
 
   return (
-    <div className="space-y-6 font-sans">
-      {/* Header card */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-[#0e0e14]">
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="font-sans font-semibold text-gray-900 dark:text-white">
-              Verified Domains
-            </h3>
-            <p className="mt-1 font-sans text-sm text-gray-500">
-              {process.env.NODE_ENV === 'development' &&
-              process.env.NEXT_PUBLIC_SHOW_RESEND !== 'false'
-                ? 'Domains verified in your Resend account for sending emails.'
-                : 'Domains verified in your system account for sending emails.'}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between rounded-xl border border-gray-200/80 bg-white px-6 py-4 dark:border-gray-700/60 dark:bg-[#0e0e14]">
+        <div>
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Verified Domains</h3>
+          <p className="mt-0.5 font-mono text-[10px] tracking-wider text-gray-400 uppercase">
             {process.env.NODE_ENV === 'development' &&
-              process.env.NEXT_PUBLIC_SHOW_RESEND !== 'false' && (
-                <a
-                  href="https://resend.com/domains"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 font-sans text-xs font-medium text-gray-600 transition-all hover:border-gray-300 dark:border-gray-600 dark:text-gray-400"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Resend Dashboard
-                </a>
-              )}
-            <button
-              onClick={fetchDomains}
-              disabled={loading}
-              className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 font-sans text-xs font-medium text-gray-600 transition-all hover:border-gray-300 dark:border-gray-600 dark:text-gray-400"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
-          </div>
+            process.env.NEXT_PUBLIC_SHOW_RESEND !== 'false'
+              ? 'resend · verified sending domains'
+              : 'verified sending domains'}
+          </p>
         </div>
-      </div>
-
-      {loading ? (
-        <div className="flex items-center justify-center py-20 font-sans">
-          <Loader2 className="text-brand-gold h-7 w-7 animate-spin" />
-        </div>
-      ) : error ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center font-sans">
-          <AlertTriangle className="mb-3 h-8 w-8 text-amber-400" />
-          <p className="text-sm text-gray-600 dark:text-gray-400">{error}</p>
-          <button onClick={fetchDomains} className="mt-3 font-sans text-xs text-gray-500 underline">
-            Retry
-          </button>
-        </div>
-      ) : domains.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 py-16 text-center font-sans dark:border-gray-700">
-          <Globe className="mb-3 h-8 w-8 text-gray-300" />
-          <p className="font-sans text-sm font-medium text-gray-500">No domains found</p>
+        <div className="flex items-center gap-2">
           {process.env.NODE_ENV === 'development' &&
-          process.env.NEXT_PUBLIC_SHOW_RESEND !== 'false' ? (
-            <p className="mt-1 font-sans text-xs text-gray-400">
-              Add a domain in your{' '}
+            process.env.NEXT_PUBLIC_SHOW_RESEND !== 'false' && (
               <a
                 href="https://resend.com/domains"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-brand-gold underline"
+                className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 transition-all hover:border-gray-300 dark:border-gray-700 dark:text-gray-400 dark:hover:border-gray-600"
               >
-                Resend Dashboard
+                <ExternalLink className="h-3.5 w-3.5" />
+                Resend
               </a>
-            </p>
-          ) : (
-            <p className="mt-1 font-sans text-xs text-gray-400">
-              Contact your system administrator to add a domain.
-            </p>
-          )}
+            )}
+          <button
+            onClick={fetchDomains}
+            disabled={loading}
+            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-400 transition-all hover:bg-gray-50 hover:text-gray-600 disabled:opacity-50 dark:hover:bg-white/5"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="text-brand-gold h-6 w-6 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <AlertTriangle className="mb-3 h-7 w-7 text-amber-400" />
+          <p className="text-sm text-gray-600 dark:text-gray-400">{error}</p>
+          <button onClick={fetchDomains} className="text-brand-gold mt-3 text-xs underline">
+            Retry
+          </button>
+        </div>
+      ) : domains.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-gray-200 py-16 text-center dark:border-gray-800">
+          <Globe className="mx-auto mb-3 h-8 w-8 text-gray-300 dark:text-gray-700" />
+          <p className="text-sm font-medium text-gray-500">No domains found</p>
+          <p className="mt-1 text-xs text-gray-400">
+            {process.env.NODE_ENV === 'development' &&
+            process.env.NEXT_PUBLIC_SHOW_RESEND !== 'false' ? (
+              <>
+                Add a domain in your{' '}
+                <a
+                  href="https://resend.com/domains"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-gold underline"
+                >
+                  Resend Dashboard
+                </a>
+              </>
+            ) : (
+              'Contact your system administrator to add a domain.'
+            )}
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 font-sans sm:grid-cols-2 lg:grid-cols-3">
-          {domains.map((domain) => {
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {domains.map((domain, i) => {
             const statusStyle = getDomainStatusColor(domain.status);
             return (
-              <div
+              <motion.div
                 key={domain.id}
-                className="rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-[#0e0e14]"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06, duration: 0.3 }}
+                className="rounded-xl border border-gray-200/80 bg-white p-5 dark:border-gray-700/60 dark:bg-[#0e0e14]"
               >
                 <div className="mb-4 flex items-start justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                    <Globe className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+                    <Shield className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   </div>
                   <span
-                    className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${statusStyle.bg} ${statusStyle.text}`}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${statusStyle.bg} ${statusStyle.text}`}
                   >
                     <span className={`h-1.5 w-1.5 rounded-full ${statusStyle.dot}`} />
                     {domain.status}
                   </span>
                 </div>
-                <h4 className="font-sans font-semibold text-gray-900 dark:text-white">
-                  {domain.name}
-                </h4>
-                <p className="mt-0.5 font-sans text-xs text-gray-400">
-                  Region: {domain.region || 'us-east-1'}
-                </p>
-                <p className="mt-0.5 font-sans text-[11px] text-gray-400">
-                  Added: {new Date(domain.created_at).toLocaleDateString('en-IN')}
-                </p>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">{domain.name}</h4>
+                <div className="mt-1 flex items-center gap-3 font-mono text-[10px] text-gray-400">
+                  <span>{domain.region || 'us-east-1'}</span>
+                  <span>{new Date(domain.created_at).toLocaleDateString('en-IN')}</span>
+                </div>
 
                 {/* DNS Records */}
                 {domain.records && domain.records.length > 0 && (
-                  <div className="mt-4">
-                    <p className="mb-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                  <div className="mt-4 space-y-2">
+                    <p className="font-mono text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
                       DNS Records
                     </p>
-                    <div className="space-y-2">
-                      {domain.records.map((rec, i) => {
-                        const recStatus =
-                          rec.status === 'verified'
-                            ? 'text-emerald-600 dark:text-emerald-400'
-                            : 'text-amber-600 dark:text-amber-400';
-                        return (
-                          <div key={i} className="rounded-lg bg-gray-50 p-2.5 dark:bg-gray-800/50">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold text-gray-500 uppercase">
-                                {rec.type} · {rec.record}
-                              </span>
-                              <span className={`text-[10px] font-bold ${recStatus}`}>
-                                {rec.status}
-                              </span>
-                            </div>
-                            <p className="mt-1 font-mono text-[10px] break-all text-gray-500">
-                              {rec.value}
-                            </p>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    {domain.records.map((rec, ri) => (
+                      <div
+                        key={ri}
+                        className="rounded-lg border border-gray-100 bg-gray-50/80 p-3 dark:border-gray-800 dark:bg-gray-800/30"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[10px] font-semibold text-gray-500 uppercase">
+                            {rec.type} · {rec.record}
+                          </span>
+                          <span
+                            className={`font-mono text-[10px] font-bold ${
+                              rec.status === 'verified'
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : 'text-amber-600 dark:text-amber-400'
+                            }`}
+                          >
+                            {rec.status}
+                          </span>
+                        </div>
+                        <p className="mt-1.5 font-mono text-[10px] break-all text-gray-500 dark:text-gray-400">
+                          {rec.value}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 )}
-              </div>
+              </motion.div>
             );
           })}
         </div>

@@ -33,12 +33,12 @@ export function SettingsTab({ adminEmail }: { adminEmail: string }) {
     setTestResult(null);
 
     const testSubject = isDev
-      ? '✅ SVI Admin – Resend Test Email'
-      : '✅ SVI Admin – Connection Test Email';
+      ? 'SVI Admin - Resend Test Email'
+      : 'SVI Admin - Connection Test Email';
 
     const testHtml = isDev
-      ? `<div style="font-family:Arial,sans-serif;padding:32px;background:#f5f5f5;"><div style="background:#fff;border-radius:12px;padding:32px;max-width:480px;margin:auto;"><h2 style="color:#1a2744;margin:0 0 16px;">Resend Test Successful 🎉</h2><p style="color:#555;">This test email confirms that your Resend integration is working correctly.</p><p style="color:#999;font-size:12px;margin-top:24px;">Sent from SVI Infra Admin Panel</p></div></div>`
-      : `<div style="font-family:Arial,sans-serif;padding:32px;background:#f5f5f5;"><div style="background:#fff;border-radius:12px;padding:32px;max-width:480px;margin:auto;"><h2 style="color:#1a2744;margin:0 0 16px;">Connection Test Successful 🎉</h2><p style="color:#555;">This test email confirms that your admin portal email connection is active and working correctly.</p><p style="color:#999;font-size:12px;margin-top:24px;">Sent from SVI Infra Admin Panel</p></div></div>`;
+      ? `<div style="font-family:Arial,sans-serif;padding:32px;background:#f5f5f5;"><div style="background:#fff;border-radius:12px;padding:32px;max-width:480px;margin:auto;"><h2 style="color:#1a2744;margin:0 0 16px;">Resend Test Successful</h2><p style="color:#555;">This test email confirms that your Resend integration is working correctly.</p><p style="color:#999;font-size:12px;margin-top:24px;">Sent from SVI Infra Admin Panel</p></div></div>`
+      : `<div style="font-family:Arial,sans-serif;padding:32px;background:#f5f5f5;"><div style="background:#fff;border-radius:12px;padding:32px;max-width:480px;margin:auto;"><h2 style="color:#1a2744;margin:0 0 16px;">Connection Test Successful</h2><p style="color:#555;">This test email confirms that your admin portal email connection is active and working correctly.</p><p style="color:#999;font-size:12px;margin-top:24px;">Sent from SVI Infra Admin Panel</p></div></div>`;
 
     try {
       const token = await getToken();
@@ -87,58 +87,60 @@ export function SettingsTab({ adminEmail }: { adminEmail: string }) {
   ];
 
   return (
-    <div
-      className={`grid grid-cols-1 gap-6 font-sans ${isDev ? 'lg:grid-cols-2' : 'lg:grid-cols-5'}`}
-    >
+    <div className={`grid grid-cols-1 gap-6 ${isDev ? 'lg:grid-cols-2' : 'lg:grid-cols-5'}`}>
       {/* Config overview */}
-      <div className={`space-y-4 ${isDev ? '' : 'lg:col-span-3'}`}>
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-[#0e0e14]">
-          <h3 className="mb-5 font-sans font-semibold text-gray-900 dark:text-white">
+      <div className={isDev ? '' : 'lg:col-span-3'}>
+        <div className="rounded-xl border border-gray-200/80 bg-white p-6 dark:border-gray-700/60 dark:bg-[#0e0e14]">
+          <h3 className="mb-1 text-sm font-bold text-gray-900 dark:text-white">
             {isDev ? 'Resend Configuration' : 'Connection Configuration'}
           </h3>
-          <div className="space-y-3">
+          <p className="mb-5 font-mono text-[10px] tracking-wider text-gray-400 uppercase">
+            Email service credentials and settings
+          </p>
+          <div className="space-y-2.5">
             {configItems.map((item) => {
               const ItemIcon = item.icon;
-              const statusColor =
-                item.status === 'configured' || item.status === 'active'
-                  ? 'text-emerald-500'
-                  : 'text-amber-500';
+              const isOk = item.status === 'configured' || item.status === 'active';
               return (
                 <div
                   key={item.label}
-                  className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3 dark:bg-gray-800/50"
+                  className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-800/30"
                 >
                   <div className="flex items-center gap-3">
                     <ItemIcon className="h-4 w-4 text-gray-400" />
-                    <span className="font-sans text-sm text-gray-600 dark:text-gray-300">
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                       {item.label}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <code className="text-xs text-gray-700 dark:text-gray-300">{item.value}</code>
-                    <Check className={`h-3.5 w-3.5 ${statusColor}`} />
+                    <code className="font-mono text-xs text-gray-700 dark:text-gray-300">
+                      {item.value}
+                    </code>
+                    <Check
+                      className={`h-3.5 w-3.5 ${isOk ? 'text-emerald-500' : 'text-amber-500'}`}
+                    />
                   </div>
                 </div>
               );
             })}
           </div>
           {isDev && (
-            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800/50 dark:bg-amber-900/10">
-              <p className="font-sans text-xs text-amber-700 dark:text-amber-400">
-                <strong>Note:</strong> API key is stored in <code>.env.local</code> as{' '}
-                <code>RESEND_API_KEY</code>. Update it in your environment for production.
+            <div className="mt-4 rounded-lg border border-amber-200/60 bg-amber-50/80 px-4 py-3 dark:border-amber-500/20 dark:bg-amber-500/5">
+              <p className="text-xs text-amber-700 dark:text-amber-400">
+                API key is stored in <code className="font-mono">.env.local</code> as{' '}
+                <code className="font-mono">RESEND_API_KEY</code>.
               </p>
             </div>
           )}
         </div>
 
-        {/* Quick links - Only visible in Dev */}
+        {/* Quick links */}
         {isDev && (
-          <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-[#0e0e14]">
-            <h3 className="mb-4 font-sans font-semibold text-gray-900 dark:text-white">
+          <div className="mt-4 rounded-xl border border-gray-200/80 bg-white p-6 dark:border-gray-700/60 dark:bg-[#0e0e14]">
+            <h3 className="mb-4 text-sm font-bold text-gray-900 dark:text-white">
               Resend Resources
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {[
                 { label: 'Dashboard', url: 'https://resend.com/overview', icon: BarChart3 },
                 { label: 'Email Logs', url: 'https://resend.com/emails', icon: Inbox },
@@ -153,11 +155,11 @@ export function SettingsTab({ adminEmail }: { adminEmail: string }) {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between rounded-lg px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-white/5"
+                    className="flex items-center justify-between rounded-lg px-3 py-2.5 transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.02]"
                   >
                     <div className="flex items-center gap-3">
                       <LinkIcon className="h-4 w-4 text-gray-400" />
-                      <span className="font-sans text-sm text-gray-700 dark:text-gray-300">
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                         {link.label}
                       </span>
                     </div>
@@ -172,26 +174,22 @@ export function SettingsTab({ adminEmail }: { adminEmail: string }) {
 
       {/* Test email & Limits */}
       <div className={isDev ? 'space-y-4' : 'space-y-4 lg:col-span-2'}>
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-[#0e0e14]">
+        <div className="rounded-xl border border-gray-200/80 bg-white p-6 dark:border-gray-700/60 dark:bg-[#0e0e14]">
           <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-500/10">
-              <Zap className="h-5 w-5 text-blue-500" />
+            <div className="bg-brand-gold/10 flex h-10 w-10 items-center justify-center rounded-xl">
+              <Zap className="text-brand-gold h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-sans font-semibold text-gray-900 dark:text-white">
-                Send Test Email
-              </h3>
-              <p className="font-sans text-xs text-gray-400">
-                {isDev
-                  ? 'Verify your Resend setup is working'
-                  : 'Verify your portal email connection'}
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white">Send Test Email</h3>
+              <p className="font-mono text-[10px] tracking-wider text-gray-400 uppercase">
+                {isDev ? 'verify resend setup' : 'verify email connection'}
               </p>
             </div>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block font-sans text-xs font-medium text-gray-600 dark:text-gray-400">
+              <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400">
                 Send test to
               </label>
               <input
@@ -199,7 +197,7 @@ export function SettingsTab({ adminEmail }: { adminEmail: string }) {
                 value={testTo}
                 onChange={(e) => setTestTo(e.target.value)}
                 placeholder="your@email.com"
-                className="focus:border-brand-gold w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 font-sans text-sm text-gray-900 placeholder-gray-400 transition-colors outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                className="focus-gold w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm outline-none dark:border-gray-700 dark:bg-gray-800/30"
               />
             </div>
 
@@ -209,10 +207,10 @@ export function SettingsTab({ adminEmail }: { adminEmail: string }) {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className={`flex items-start gap-2 rounded-lg border px-4 py-3 font-sans text-sm ${
+                  className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm ${
                     testResult.ok
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/50 dark:bg-emerald-900/15 dark:text-emerald-400'
-                      : 'border-red-200 bg-red-50 text-red-700 dark:border-red-800/50 dark:bg-red-900/15 dark:text-red-400'
+                      ? 'border-emerald-200/60 bg-emerald-50/80 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400'
+                      : 'border-red-200/60 bg-red-50/80 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400'
                   }`}
                 >
                   {testResult.ok ? (
@@ -228,23 +226,23 @@ export function SettingsTab({ adminEmail }: { adminEmail: string }) {
             <button
               onClick={sendTest}
               disabled={sending || !testTo.trim()}
-              className="bg-brand-gold text-brand-navy flex w-full items-center justify-center gap-2 rounded-xl px-5 py-2.5 font-sans text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="bg-brand-gold text-brand-navy glow-gold flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold shadow-sm transition-all hover:opacity-90 disabled:opacity-60"
             >
               {sending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Send className="h-4 w-4" />
               )}
-              {sending ? 'Sending…' : 'Send Test Email'}
+              {sending ? 'Sending...' : 'Send Test Email'}
             </button>
           </div>
         </div>
 
-        {/* Rate limits info - Only visible in Dev */}
+        {/* Rate limits */}
         {isDev && (
-          <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-[#0e0e14]">
-            <h3 className="mb-4 font-sans font-semibold text-gray-900 dark:text-white">
-              Resend Free Plan Limits
+          <div className="rounded-xl border border-gray-200/80 bg-white p-6 dark:border-gray-700/60 dark:bg-[#0e0e14]">
+            <h3 className="mb-4 text-sm font-bold text-gray-900 dark:text-white">
+              Free Plan Limits
             </h3>
             <div className="space-y-3">
               {[
@@ -253,9 +251,11 @@ export function SettingsTab({ adminEmail }: { adminEmail: string }) {
                 { label: 'Domains', value: '1', max: 1, current: 1 },
               ].map((item) => (
                 <div key={item.label}>
-                  <div className="mb-1 flex justify-between font-sans text-xs text-gray-600 dark:text-gray-400">
-                    <span>{item.label}</span>
-                    <span className="font-medium text-gray-900 dark:text-white">{item.value}</span>
+                  <div className="mb-1.5 flex justify-between text-xs">
+                    <span className="text-gray-500">{item.label}</span>
+                    <span className="font-mono font-semibold text-gray-900 dark:text-white">
+                      {item.value}
+                    </span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                     <div
@@ -266,7 +266,7 @@ export function SettingsTab({ adminEmail }: { adminEmail: string }) {
                 </div>
               ))}
             </div>
-            <p className="mt-4 font-sans text-xs text-gray-400">
+            <p className="mt-4 text-xs text-gray-400">
               Upgrade on{' '}
               <a
                 href="https://resend.com/pricing"
