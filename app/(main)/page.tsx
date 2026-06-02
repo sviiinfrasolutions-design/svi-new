@@ -198,7 +198,7 @@ export default function Home() {
         </div>
 
         <motion.div
-          className="z-30 container mx-auto flex flex-col items-center px-14 text-center drop-shadow-2xl sm:px-8 md:px-4"
+          className="z-30 container mx-auto flex flex-col items-center px-5 text-center drop-shadow-2xl sm:px-8 md:px-4"
           style={{ opacity: heroOpacity }}
         >
           <span className="text-brand-gold animate-hero-1 mb-6 inline-block text-[10px] font-semibold tracking-[0.2em] uppercase opacity-80">
@@ -225,7 +225,7 @@ export default function Home() {
             and Noida.
           </p>
 
-          <div className="animate-hero-4 flex flex-col items-center justify-center gap-5 sm:flex-row">
+          <div className="animate-hero-4 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
               <Link
                 href="/projects/current"
@@ -260,7 +260,7 @@ export default function Home() {
       >
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-16 lg:flex-row">
-            <AnimatedSection type="fadeLeft" className="lg:w-1/2">
+            <AnimatedSection type="fadeLeft" className="w-full lg:w-1/2">
               <h4 className="mb-4 text-[10px] font-semibold tracking-[0.2em] text-gray-400 uppercase dark:text-gray-500">
                 Welcome to SVI Infra
               </h4>
@@ -297,7 +297,7 @@ export default function Home() {
               </Link>
             </AnimatedSection>
 
-            <AnimatedSection type="fadeRight" className="relative lg:w-1/2">
+            <AnimatedSection type="fadeRight" className="relative w-full lg:w-1/2">
               <div className="border-brand-gold/15 absolute inset-0 translate-x-5 translate-y-5 border" />
               <div className="img-zoom-container relative shadow-2xl">
                 <Image
@@ -488,7 +488,7 @@ export default function Home() {
           <h2 className="mb-8 font-serif text-3xl text-white md:text-5xl">
             Ready to Find Your Dream Home?
           </h2>
-          <p className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-gray-300">
+          <p className="mx-auto mb-8 max-w-2xl px-2 text-base leading-relaxed text-gray-300 md:mb-12 md:px-0 md:text-lg">
             Join thousands of happy families and investors. Our experts are ready to assist you in
             finding the perfect property match.
           </p>

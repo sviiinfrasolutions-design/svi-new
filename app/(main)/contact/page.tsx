@@ -264,7 +264,7 @@ export default function Contact() {
                   Send a Message
                 </h3>
                 <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                       <label
                         htmlFor="name"
@@ -320,7 +320,7 @@ export default function Contact() {
                       )}
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                       <label
                         htmlFor="phone"

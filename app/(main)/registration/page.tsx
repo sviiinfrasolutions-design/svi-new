@@ -479,7 +479,7 @@ export default function Registration() {
             className="border border-gray-200 bg-white p-8 shadow-2xl md:p-12 dark:border-gray-700 dark:bg-gray-800"
             noValidate
           >
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {renderInput('firstName', 'First Name', 'text', 'Enter first name')}
               <div className="space-y-2">
                 <label htmlFor="lastName" className={labelClass}>
@@ -541,11 +541,11 @@ export default function Registration() {
               {renderSelect('paymentPlan', 'Payment Plan', PAYMENT_PLANS, 'Select plan')}
               {renderSelect('paymentMode', 'Payment Mode', PAYMENT_MODES, 'Select mode')}
 
-              <div className="md:col-span-2">
+              <div className="sm:col-span-2">
                 {renderInput('schemeAmount', 'Scheme Amount', 'text', 'Enter scheme amount')}
               </div>
 
-              <div className="md:col-span-2">
+              <div className="sm:col-span-2">
                 <Captcha onValidate={setCaptchaValid} error={captchaError} />
               </div>
             </div>

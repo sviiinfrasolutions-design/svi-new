@@ -90,7 +90,7 @@ export default function Grievance() {
             className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm md:p-12 dark:border-gray-700 dark:bg-gray-800"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-brand-navy text-xs font-bold tracking-widest uppercase dark:text-gray-300">
                     Client Name
@@ -119,7 +119,7 @@ export default function Grievance() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-brand-navy text-xs font-bold tracking-widest uppercase dark:text-gray-300">
                     Registered Phone
@@ -148,7 +148,7 @@ export default function Grievance() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-brand-navy text-xs font-bold tracking-widest uppercase dark:text-gray-300">
                     Category

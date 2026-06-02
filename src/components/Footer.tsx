@@ -204,20 +204,23 @@ const Footer = memo(function Footer() {
                 Get the latest property updates and exclusive offers in your inbox.
               </p>
             </div>
-            <form onSubmit={handleNewsletterSubmit} className="relative flex w-full md:w-auto">
+            <form
+              onSubmit={handleNewsletterSubmit}
+              className="relative flex w-full flex-col gap-3 sm:flex-row md:w-auto"
+            >
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="text-brand-navy focus:border-brand-gold flex-1 border border-r-0 border-gray-200 bg-gray-50 px-4 py-3 text-sm transition-colors focus:outline-none md:w-64 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                className="text-brand-navy focus:border-brand-gold w-full border border-gray-200 bg-gray-50 px-4 py-3 text-sm transition-colors focus:outline-none sm:flex-1 md:w-64 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                 required
               />
               <motion.button
                 type="submit"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="bg-brand-gold text-brand-navy hover:bg-brand-navy hover:text-brand-gold border-brand-gold relative flex items-center gap-2 overflow-hidden border px-6 py-3 text-xs font-bold tracking-widest uppercase transition-colors"
+                className="bg-brand-gold text-brand-navy hover:bg-brand-navy hover:text-brand-gold border-brand-gold relative flex w-full items-center justify-center gap-2 overflow-hidden border px-6 py-3 text-xs font-bold tracking-widest uppercase transition-colors sm:w-auto"
               >
                 <AnimatePresence mode="wait">
                   {subscribed ? (

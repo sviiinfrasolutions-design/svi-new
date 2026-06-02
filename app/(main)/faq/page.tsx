@@ -217,7 +217,7 @@ export default function FAQ() {
         </div>
       </section>
 
-      <section className="py-24">
+      <section className="py-16 md:py-24">
         <div className="container mx-auto max-w-3xl px-4">
           {Object.entries(groupedFaqs).map(([category, questions], _catIndex) => (
             <div key={category} className="mb-12">

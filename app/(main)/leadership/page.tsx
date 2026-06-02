@@ -107,10 +107,10 @@ export default function Leadership() {
         </div>
       </section>
 
-      <section className="container mx-auto max-w-5xl px-4 py-20 lg:px-8">
+      <section className="container mx-auto max-w-5xl px-4 py-16 md:py-20 lg:px-8">
         <div className="flex flex-col items-center">
           {/* Level 1: Directors */}
-          <div className="relative z-10 grid w-full max-w-3xl grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="relative z-10 grid w-full max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
             {HIERARCHY.directors.map((member, idx) => (
               <motion.div
                 key={idx}
@@ -155,7 +155,7 @@ export default function Leadership() {
               >
                 <ChevronDown className="text-brand-gold my-6 h-8 w-8 animate-bounce opacity-70" />
 
-                <div className="relative z-10 grid w-full max-w-2xl grid-cols-1 gap-8 md:grid-cols-2">
+                <div className="relative z-10 grid w-full max-w-2xl grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
                   {HIERARCHY.areaManagers.map((member, idx) => (
                     <motion.div
                       key={idx}
@@ -254,7 +254,7 @@ export default function Leadership() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="grid w-full max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3"
+                  className="grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6"
                 >
                   {HIERARCHY.staff.map((staff, idx) => (
                     <motion.div
@@ -307,7 +307,7 @@ export default function Leadership() {
         </div>
       </section>
 
-      <section className="border-t border-gray-200 bg-gray-100 py-20 dark:border-gray-700 dark:bg-gray-900">
+      <section className="border-t border-gray-200 bg-gray-100 py-16 md:py-20 dark:border-gray-700 dark:bg-gray-900">
         <div className="container mx-auto max-w-3xl px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

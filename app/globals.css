@@ -334,6 +334,71 @@
   }
 }
 
+/* ─── Responsive Typography for very small screens (320px - 374px) ─── */
+@media (max-width: 374px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  h1 {
+    font-size: 1.65rem;
+    line-height: 1.15;
+  }
+
+  h2 {
+    font-size: 1.35rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+  }
+}
+
+/* ─── Tablet-specific enhancements (768px - 1023px) ─── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* ─── Responsive images — never exceed container ─── */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ─── Responsive tables ─── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* ─── Fix iOS input zoom (font-size < 16px triggers zoom) ─── */
+@media (max-width: 767px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="password"],
+  input[type="search"],
+  input[type="url"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ─── Ensure modals are scrollable on small screens ─── */
+@media (max-width: 639px) {
+  .fixed.inset-0.z-50 {
+    padding: 8px;
+  }
+}
+
 /* Fullscreen scrolling support */
 :fullscreen,
 :-webkit-full-screen,

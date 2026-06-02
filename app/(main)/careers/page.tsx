@@ -87,7 +87,7 @@ export default function Careers() {
             </div>
           </div>
 
-          <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div className="mb-16 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 md:gap-8">
             {FREELANCE_PERKS.map((val, idx) => (
               <motion.div
                 key={idx}
@@ -139,7 +139,7 @@ export default function Careers() {
             </div>
           </div>
 
-          <div className="mb-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="mb-16 grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3">
             {ONSITE_ROLES.map((job, idx) => (
               <motion.div
                 key={idx}

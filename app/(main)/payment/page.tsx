@@ -63,7 +63,7 @@ export default function Payment() {
 
       <section className="container mx-auto max-w-4xl px-4 py-16">
         <div className="flex flex-col overflow-hidden border border-gray-200 bg-white shadow-xl md:flex-row dark:border-gray-700 dark:bg-gray-900">
-          <div className="bg-brand-navy flex flex-col justify-between p-8 text-white md:w-1/3">
+          <div className="bg-brand-navy flex w-full flex-col justify-between p-6 text-white md:w-1/3 md:p-8">
             <div>
               <h3 className="mb-6 font-serif text-xl">Payment Guidelines</h3>
               <ul className="space-y-4 text-sm text-gray-300">
@@ -88,9 +88,9 @@ export default function Payment() {
             </div>
           </div>
 
-          <div className="p-8 md:w-2/3 md:p-12">
+          <div className="w-full p-6 md:w-2/3 md:p-12">
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label
                     htmlFor="pay-name"
@@ -139,7 +139,7 @@ export default function Payment() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label
                     htmlFor="pay-project"

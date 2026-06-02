@@ -16,7 +16,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="bg-white py-24 dark:bg-gray-900">
+      <section className="bg-white py-16 md:py-24 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <h4 className="mb-6 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-500">
@@ -42,7 +42,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="bg-brand-navy relative py-24 text-white dark:bg-gray-900">
+      <section className="bg-brand-navy relative py-16 text-white md:py-24 dark:bg-gray-900">
         <div
           className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-10"
           style={{
@@ -105,20 +105,20 @@ export default function About() {
         </div>
       </section>
 
-      <section className="bg-white py-24 dark:bg-gray-800">
+      <section className="bg-white py-16 md:py-24 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-10 md:flex-row md:gap-16">
-            <div className="md:w-1/2">
+            <div className="w-full md:w-1/2">
               <Image
                 src="/images/house1.png"
                 alt="SVI Infra residential property showcasing quality construction and modern design"
                 width={800}
                 height={600}
-                className="border shadow-2xl dark:border-gray-700 dark:shadow-none"
+                className="w-full border shadow-2xl dark:border-gray-700 dark:shadow-none"
                 quality={85}
               />
             </div>
-            <div className="md:w-1/2">
+            <div className="w-full md:w-1/2">
               <h4 className="mb-6 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-500">
                 Expertise
               </h4>

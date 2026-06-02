@@ -224,7 +224,7 @@ export default function Projects() {
       <section className={`pb-24 ${projects.length > 0 ? 'pt-8' : 'pt-24'}`}>
         <div className="container mx-auto px-4 lg:px-8">
           {projects.length > 0 ? (
-            <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
               {projects.map((project, idx) => (
                 <motion.div
                   key={idx}
