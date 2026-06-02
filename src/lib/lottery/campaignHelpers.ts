@@ -47,8 +47,9 @@ export function buildLotteryCampaignPayload(lottery: LotteryInfo) {
 
 export async function createLotteryCampaign(
   lottery: LotteryInfo,
-  token: string,
+  token: string | null
 ): Promise<boolean> {
+  if (!token) return false;
   try {
     const res = await fetch('/api/admin/campaigns', {
       method: 'POST',
@@ -69,7 +70,7 @@ export async function createLotteryCampaign(
 export async function syncLinkedCampaignTitle(
   supabase: any,
   lotteryId: string,
-  newTitle: string,
+  newTitle: string
 ): Promise<void> {
   try {
     const { data: linkedCampaigns } = await supabase
@@ -87,8 +88,8 @@ export async function syncLinkedCampaignTitle(
             title: lotteryCampaignTitle(newTitle),
             subject: lotteryCampaignSubject(newTitle),
           })
-          .eq('id', c.id),
-      ),
+          .eq('id', c.id)
+      )
     );
   } catch (err) {
     console.error('Failed to sync campaign title:', err);
@@ -98,12 +99,18 @@ export async function syncLinkedCampaignTitle(
 // ── Delete all linked campaigns for a lottery ──────────────────────────────
 
 export async function deleteLinkedCampaigns(
-  supabase: any,
-  lotteryId: string,
-): Promise<void> {
+  token: string | null,
+  lotteryId: string
+): Promise<boolean> {
+  if (!token) return false;
   try {
-    await supabase.from('email_campaigns').delete().eq('lottery_id', lotteryId);
+    const res = await fetch(`/api/admin/campaigns?lottery_id=${lotteryId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.ok;
   } catch (err) {
     console.error('Failed to delete linked campaigns:', err);
+    return false;
   }
 }

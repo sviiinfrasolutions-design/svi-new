@@ -737,7 +737,19 @@ export default function AdminLotteryPage() {
         fetchLotteries();
 
         // Auto-create linked email campaign in EmailCenter
-        createLotteryCampaign(newLottery, token).catch(() => {});
+        createLotteryCampaign(newLottery, token)
+          .then((ok) => {
+            if (!ok) {
+              setErrorMessage(
+                'Lottery created, but linked email campaign failed. Use "Sync to EmailCenter" to retry.'
+              );
+            }
+          })
+          .catch(() => {
+            setErrorMessage(
+              'Lottery created, but linked email campaign failed. Use "Sync to EmailCenter" to retry.'
+            );
+          });
       } catch (error: any) {
         console.error('Error saving lottery:', error);
         setErrorMessage(error.message || 'Failed to save the lottery draw.');
@@ -1024,7 +1036,7 @@ export default function AdminLotteryPage() {
     try {
       await supabase.from('lottery_participants').delete().eq('lottery_id', deletingLotteryId);
       await supabase.from('scheduled_draws').delete().eq('lottery_id', deletingLotteryId);
-      await deleteLinkedCampaigns(supabase, deletingLotteryId);
+      await deleteLinkedCampaigns(token, deletingLotteryId);
       const { error } = await supabase.from('lotteries').delete().eq('id', deletingLotteryId);
       if (error) throw error;
       setSuccessMessage('Campaign deleted permanently.');

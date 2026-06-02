@@ -344,9 +344,9 @@ export function CampaignsTab() {
     const matchesSearch =
       c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.subject.toLowerCase().includes(searchQuery.toLowerCase());
+    if (statusFilter === 'lottery') return matchesSearch && c.lottery_id !== null;
     const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
-    const matchesLottery = statusFilter !== 'lottery' || c.lottery_id !== null;
-    return matchesSearch && matchesStatus && (statusFilter === 'lottery' ? matchesLottery : true);
+    return matchesSearch && matchesStatus;
   });
 
   // Stats

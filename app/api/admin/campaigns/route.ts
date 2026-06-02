@@ -3,6 +3,29 @@ import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
 
 /**
+ * DELETE /api/admin/campaigns?lottery_id=xxx
+ * Delete all campaigns linked to a lottery
+ */
+export async function DELETE(request: NextRequest) {
+  const admin = await verifyAdmin(request);
+  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const lotteryId = new URL(request.url).searchParams.get('lottery_id');
+  if (!lotteryId) {
+    return NextResponse.json({ error: 'lottery_id query param required' }, { status: 400 });
+  }
+
+  const { error } = await supabaseAdmin
+    .from('email_campaigns')
+    .delete()
+    .eq('lottery_id', lotteryId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ success: true });
+}
+
+/**
  * GET /api/admin/campaigns
  * List all campaigns, newest first
  */
