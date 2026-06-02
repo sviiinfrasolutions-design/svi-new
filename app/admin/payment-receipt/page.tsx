@@ -246,9 +246,16 @@ export default function PaymentReceiptPage() {
 
   const handleDownloadPDF = async () => {
     try {
+      const sanitizedName = formData.name
+        .trim()
+        .replace(/[^a-zA-Z0-9\s]/g, '')
+        .replace(/\s+/g, '_');
+      const filename = sanitizedName
+        ? `Payment_Receipt_${sanitizedName}.pdf`
+        : 'Payment_Receipt.pdf';
       await exportToPDF({
         elementId: 'receiptPreview',
-        filename: 'Payment_Receipt.pdf',
+        filename,
       });
 
       // Update document status to completed
@@ -274,9 +281,16 @@ export default function PaymentReceiptPage() {
 
   const handleDownloadImage = async () => {
     try {
+      const sanitizedName = formData.name
+        .trim()
+        .replace(/[^a-zA-Z0-9\s]/g, '')
+        .replace(/\s+/g, '_');
+      const filename = sanitizedName
+        ? `Payment_Receipt_${sanitizedName}.png`
+        : 'Payment_Receipt.png';
       await exportToImage({
         elementId: 'receiptPreview',
-        filename: 'Payment_Receipt.png',
+        filename,
       });
     } catch (error) {
       console.error('Error generating Image:', error);
