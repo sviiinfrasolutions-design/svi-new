@@ -66,7 +66,7 @@ export function RichTextEditor({ value, onChange, placeholder, contentKey }: Ric
       }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Highlight.configure({ multicolor: true }),
-      Link.configure({ 
+      Link.configure({
         openOnClick: false,
         HTMLAttributes: { class: 'text-blue-500 underline' },
       }),
@@ -77,8 +77,7 @@ export function RichTextEditor({ value, onChange, placeholder, contentKey }: Ric
     content: value || '',
     editorProps: {
       attributes: {
-        class:
-          'focus:outline-none min-h-[300px] px-4 py-3 text-sm',
+        class: 'focus:outline-none min-h-[300px] px-4 py-3 text-sm',
         'data-placeholder': placeholder || 'Write your email here...',
       },
     },
@@ -105,7 +104,7 @@ export function RichTextEditor({ value, onChange, placeholder, contentKey }: Ric
     const currentContent = editor.getHTML();
     if (value && value !== currentContent && value !== lastSyncedValue.current) {
       lastSyncedValue.current = value;
-      editor.commands.setContent(value, false);
+      editor.commands.setContent(value, { emitUpdate: false });
     }
   }, [value, editor]);
 

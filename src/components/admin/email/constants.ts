@@ -1,4 +1,20 @@
-import { Check, Clock, FileText, Star, Trophy, Gift } from 'lucide-react';
+import {
+  Check,
+  Clock,
+  FileText,
+  Star,
+  Trophy,
+  Gift,
+  AlertTriangle,
+  Ban,
+  Home,
+  Calendar,
+  IndianRupee,
+  MapPin,
+  FileWarning,
+  BadgeCheck,
+  Receipt,
+} from 'lucide-react';
 
 export const EMAIL_TEMPLATES = [
   {
@@ -417,6 +433,273 @@ export const EMAIL_TEMPLATES = [
         </td></tr>
         <tr><td style="background:#fef9ec;padding:24px;text-align:center;border-top:1px solid #f0d080;">
           <p style="margin:0;font-size:12px;color:#888;">© 2025 SVI Infra Solutions | Official Lucky Draw Portal</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  },
+  {
+    id: 'payment_reminder_overdue',
+    name: 'Second Payment Reminder (Overdue)',
+    subject: 'URGENT: Outstanding Dues for {{property_name}} - Action Required',
+    category: 'Reminders',
+    icon: AlertTriangle,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Overdue Payment Reminder</title></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <tr><td style="background:linear-gradient(135deg,#e65100,#f57c00);padding:40px;text-align:center;">
+          <div style="font-size:36px;margin-bottom:8px;">⚠️</div>
+          <h1 style="color:#ffffff;font-size:26px;margin:0;font-family:Georgia,serif;">Payment Overdue</h1>
+          <p style="color:rgba(255,255,255,0.9);margin:8px 0 0;font-size:13px;letter-spacing:2px;font-weight:bold;">SECOND NOTICE</p>
+        </td></tr>
+        <tr><td style="padding:40px;">
+          <div style="background:#fff3e0;border-left:4px solid #ff9800;padding:16px;border-radius:4px;margin-bottom:24px;">
+            <p style="margin:0;color:#e65100;font-weight:bold;">Past Due Account Warning</p>
+            <p style="margin:4px 0 0;color:#555;font-size:13px;">Your installment for {{property_name}} is now {{days_overdue}} days overdue.</p>
+          </div>
+          <h2 style="color:#1a2744;margin:0 0 16px;">Dear {{name}},</h2>
+          <p style="color:#555;line-height:1.7;margin:0 0 20px;">This is to inform you that your scheduled installment of <strong>₹{{amount}}</strong> for plot/property <strong>{{property_name}}</strong> has not been received, which was due on <strong>{{due_date}}</strong>.</p>
+          <p style="color:#555;line-height:1.7;margin:0 0 24px;">As per our allotment terms, a late payment fee/interest may accrue on outstanding balances. Please find your account summary below:</p>
+          
+          <table width="100%" style="border-collapse:collapse;margin:24px 0;">
+            <tr style="background:#f9f9f9;"><td style="padding:12px 16px;font-weight:bold;color:#1a2744;width:40%;">Principal Due</td><td style="padding:12px 16px;color:#555;">₹{{amount}}</td></tr>
+            <tr><td style="padding:12px 16px;font-weight:bold;color:#1a2744;">Late Fees / Interest</td><td style="padding:12px 16px;color:#e65100;font-weight:bold;">₹{{late_fees}}</td></tr>
+            <tr style="background:#f1f1f1;"><td style="padding:12px 16px;font-weight:bold;color:#1a2744;">Total Outstanding</td><td style="padding:12px 16px;color:#e65100;font-size:16px;font-weight:bold;">₹{{total_due}}</td></tr>
+            <tr><td style="padding:12px 16px;font-weight:bold;color:#1a2744;">Original Due Date</td><td style="padding:12px 16px;color:#555;">{{due_date}}</td></tr>
+          </table>
+          
+          <p style="color:#555;line-height:1.7;margin:0 0 32px;">Please make the payment immediately to restore your account to good standing and avoid further late penalties. Click the button below to complete the payment via our secure portal.</p>
+          
+          <div style="text-align:center;">
+            <a href="{{portal_url}}" style="background:#f57c00;color:#ffffff;padding:14px 36px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block;box-shadow:0 4px 12px rgba(245,124,0,0.2);">Pay Outstanding Now</a>
+          </div>
+          
+          <p style="color:#888;font-size:13px;line-height:1.7;margin:32px 0 0;text-align:center;">If you have already made this payment, please ignore this notice or email your receipt to <a href="mailto:hr.sviinfrasolutions@gmail.com" style="color:#D4AF37;">hr.sviinfrasolutions@gmail.com</a>.</p>
+        </td></tr>
+        <tr><td style="background:#f9f9f9;padding:24px;text-align:center;border-top:1px solid #eee;">
+          <p style="color:#999;font-size:12px;margin:0;">© 2025 SVI Infra Solutions · Customer Care Department</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  },
+  {
+    id: 'warning_letter_1',
+    name: 'First Warning Letter (Notice 1)',
+    subject: 'FORMAL NOTICE: Outstanding Dues & Impending Late Penalty – {{property_name}}',
+    category: 'Warnings',
+    icon: FileWarning,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Formal Warning Letter</title></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <tr><td style="background:linear-gradient(135deg,#c62828,#b71c1c);padding:40px;text-align:center;">
+          <div style="font-size:36px;margin-bottom:8px;">⚠️</div>
+          <h1 style="color:#ffffff;font-size:26px;margin:0;font-family:Georgia,serif;">Formal Notice</h1>
+          <p style="color:rgba(255,255,255,0.9);margin:8px 0 0;font-size:13px;letter-spacing:2px;font-weight:bold;">DEMAND FOR PAYMENT - NOTICE 1</p>
+        </td></tr>
+        <tr><td style="padding:40px;">
+          <h2 style="color:#1a2744;margin:0 0 16px;">Dear {{name}},</h2>
+          <p style="color:#222;line-height:1.7;margin:0 0 16px;font-weight:bold;">Subject: Demand Notice for outstanding dues against Plot/Property booking at {{project_name}}.</p>
+          <p style="color:#555;line-height:1.7;margin:0 0 20px;">We refer to our previous payment reminders regarding the installment due on your allotted plot <strong>{{property_name}}</strong> in project <strong>{{project_name}}</strong>. According to our records, a sum of <strong>₹{{total_due}}</strong> remains unpaid despite multiple notifications.</p>
+          <p style="color:#555;line-height:1.7;margin:0 0 20px;">Please find details of the outstanding balance below:</p>
+          
+          <div style="background:#fdf2f2;border:1px solid #f5c6cb;border-radius:8px;padding:20px;margin-bottom:24px;">
+            <table width="100%" style="border-collapse:collapse;">
+              <tr><td style="padding:8px 0;font-weight:bold;color:#c62828;width:45%;">Allotment ID:</td><td style="padding:8px 0;color:#333;">{{allotment_id}}</td></tr>
+              <tr style="border-top:1px solid #f8d7da;"><td style="padding:8px 0;font-weight:bold;color:#c62828;">Plot / Block Number:</td><td style="padding:8px 0;color:#333;">{{property_name}}</td></tr>
+              <tr style="border-top:1px solid #f8d7da;"><td style="padding:8px 0;font-weight:bold;color:#c62828;">Overdue Amount:</td><td style="padding:8px 0;color:#c62828;font-weight:bold;">₹{{amount}}</td></tr>
+              <tr style="border-top:1px solid #f8d7da;"><td style="padding:8px 0;font-weight:bold;color:#c62828;">Late Interest Accrued:</td><td style="padding:8px 0;color:#c62828;">₹{{late_fees}}</td></tr>
+              <tr style="border-top:1px dashed #f5c6cb;padding-top:8px;"><td style="padding:12px 0 0;font-weight:bold;color:#c62828;font-size:15px;">Total Payable:</td><td style="padding:12px 0 0;color:#c62828;font-weight:bold;font-size:16px;">₹{{total_due}}</td></tr>
+            </table>
+          </div>
+          
+          <p style="color:#555;line-height:1.7;margin:0 0 24px;"><strong>You are hereby requested to clear this entire outstanding sum on or before {{grace_date}}</strong>. Please be advised that continued failure to pay will result in a formal escalation, which may lead to the termination of the allotment agreement and forfeiture of the booking amount, as per the agreed allotment terms.</p>
+          <p style="color:#555;line-height:1.7;margin:0 0 32px;">Please click below to make payment immediately or contact our billing desk at +91 XXXXX XXXXX to discuss payment options.</p>
+          
+          <div style="text-align:center;">
+            <a href="{{portal_url}}" style="background:#c62828;color:#ffffff;padding:14px 36px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block;box-shadow:0 4px 12px rgba(198,40,40,0.25);">Make Urgent Payment</a>
+          </div>
+        </td></tr>
+        <tr><td style="background:#f9f9f9;padding:24px;text-align:center;border-top:1px solid #eee;">
+          <p style="color:#999;font-size:12px;margin:0;">© 2025 SVI Infra Solutions · Accounts & Legal Department</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  },
+  {
+    id: 'warning_letter_final',
+    name: 'Final Cancellation Warning (Notice 2)',
+    subject: 'FINAL NOTICE: Intended Cancellation of Allotment – {{property_name}}',
+    category: 'Warnings',
+    icon: Ban,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Final Notice Before Cancellation</title></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <tr><td style="background:#212121;padding:40px;text-align:center;border-bottom:4px solid #c62828;">
+          <div style="font-size:42px;margin-bottom:8px;">🛑</div>
+          <h1 style="color:#ffffff;font-size:26px;margin:0;font-family:Georgia,serif;">Final Notice</h1>
+          <p style="color:#c62828;margin:8px 0 0;font-size:13px;letter-spacing:2px;font-weight:bold;">INTENDED CANCELLATION OF ALLOTMENT</p>
+        </td></tr>
+        <tr><td style="padding:40px;">
+          <div style="background:#fff5f5;border-left:4px solid #c62828;padding:16px;border-radius:4px;margin-bottom:24px;">
+            <p style="margin:0;color:#c62828;font-weight:bold;font-size:15px;">CRITICAL NOTICE: Action Required by {{cancellation_date}}</p>
+            <p style="margin:4px 0 0;color:#555;font-size:13px;">This is your final warning before your plot booking is formally cancelled and funds forfeited.</p>
+          </div>
+          <h2 style="color:#1a2744;margin:0 0 16px;">Dear {{name}},</h2>
+          <p style="color:#333;line-height:1.7;margin:0 0 20px;">Despite our multiple notices, including the First Warning Notice dated {{notice_1_date}}, we have not received the outstanding dues of <strong>₹{{total_due}}</strong> towards your booked plot <strong>{{property_name}}</strong> at <strong>{{project_name}}</strong>.</p>
+          <p style="color:#333;line-height:1.7;margin:0 0 20px;">As per Section 12 of the Allotment Terms and Conditions signed by you, you are hereby given a final grace period of <strong>7 working days</strong> from the date of this letter to clear all outstanding dues. The outstanding breakdown is as follows:</p>
+          
+          <table width="100%" style="border-collapse:collapse;margin:24px 0;font-size:14px;">
+            <tr style="background:#f9f9f9;"><td style="padding:12px 16px;font-weight:bold;color:#1a2744;width:50%;">Allotment Reference</td><td style="padding:12px 16px;color:#555;">{{allotment_id}}</td></tr>
+            <tr><td style="padding:12px 16px;font-weight:bold;color:#1a2744;">Plot Details</td><td style="padding:12px 16px;color:#555;">{{property_name}} ({{project_name}})</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:12px 16px;font-weight:bold;color:#1a2744;">Principal Installments Due</td><td style="padding:12px 16px;color:#555;">₹{{amount}}</td></tr>
+            <tr><td style="padding:12px 16px;font-weight:bold;color:#1a2744;">Interest & Penal Charges</td><td style="padding:12px 16px;color:#555;">₹{{late_fees}}</td></tr>
+            <tr style="background:#212121;color:#ffffff;"><td style="padding:12px 16px;font-weight:bold;">Total Amount Due</td><td style="padding:12px 16px;font-weight:bold;color:#ff8a80;font-size:16px;">₹{{total_due}}</td></tr>
+          </table>
+          
+          <p style="color:#333;line-height:1.7;margin:0 0 24px;font-weight:bold;">If the total payable amount of ₹{{total_due}} is not cleared in full on or before {{cancellation_date}}, SVI Infra Solutions will have no option but to:</p>
+          <ol style="color:#555;line-height:1.8;margin:0 0 24px;padding-left:20px;">
+            <li>Formally cancel your booking of Plot {{property_name}}.</li>
+            <li>Forfeit the earnest/booking money as per the terms of the booking application.</li>
+            <li>Re-allot the plot to another buyer on our waitlist without further notice to you.</li>
+          </ol>
+          
+          <p style="color:#333;line-height:1.7;margin:0 0 32px;">Please treat this matter with the highest priority to safeguard your investment. Click below to pay online, or draft a demand draft immediately.</p>
+          
+          <div style="text-align:center;">
+            <a href="{{portal_url}}" style="background:#c62828;color:#ffffff;padding:14px 36px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block;box-shadow:0 4px 12px rgba(198,40,40,0.3);">Secure Payment Portal</a>
+          </div>
+        </td></tr>
+        <tr><td style="background:#f9f9f9;padding:24px;text-align:center;border-top:1px solid #eee;">
+          <p style="color:#999;font-size:12px;margin:0;">© 2025 SVI Infra Solutions · Authorized Signatory</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  },
+  {
+    id: 'demand_letter_milestone',
+    name: 'Milestone Installment Demand Letter',
+    subject: 'DEMAND NOTICE: Milestone Achieved & Installment Due – {{property_name}}',
+    category: 'Transactions',
+    icon: Receipt,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Milestone Demand Letter</title></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <tr><td style="background:linear-gradient(135deg,#1a2744,#2d4080);padding:40px;text-align:center;">
+          <h1 style="color:#D4AF37;font-size:28px;margin:0;font-family:Georgia,serif;">SVI Infra Solutions</h1>
+          <p style="color:rgba(255,255,255,0.7);margin:8px 0 0;font-size:13px;letter-spacing:2px;">CONSTRUCTION MILESTONE DEMAND</p>
+        </td></tr>
+        <tr><td style="padding:40px;">
+          <div style="background:#e8f5e9;border-left:4px solid #4caf50;padding:16px;border-radius:4px;margin-bottom:24px;">
+            <p style="margin:0;color:#2e7d32;font-weight:bold;">🏗️ Milestone Achieved: {{milestone_name}}</p>
+          </div>
+          <h2 style="color:#1a2744;margin:0 0 16px;">Dear {{name}},</h2>
+          <p style="color:#555;line-height:1.7;margin:0 0 20px;">We are pleased to share that construction and development work at your project <strong>{{project_name}}</strong> is progressing at a fast pace. The milestone <strong>{{milestone_name}}</strong> has been successfully completed by our engineering team.</p>
+          <p style="color:#555;line-height:1.7;margin:0 0 20px;">As per the agreed Payment Schedule linked to the construction milestones of your plot/property <strong>{{property_name}}</strong>, the installment corresponding to this stage is now due for payment.</p>
+          
+          <table width="100%" style="border-collapse:collapse;margin:24px 0;">
+            <tr style="background:#f9f9f9;"><td style="padding:12px 16px;font-weight:bold;color:#1a2744;width:40%;">Stage Reached</td><td style="padding:12px 16px;color:#555;">{{milestone_name}}</td></tr>
+            <tr><td style="padding:12px 16px;font-weight:bold;color:#1a2744;">Installment Amount</td><td style="padding:12px 16px;color:#555;">₹{{amount}}</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:12px 16px;font-weight:bold;color:#1a2744;">Taxes (GST/Others)</td><td style="padding:12px 16px;color:#555;">₹{{taxes}}</td></tr>
+            <tr style="background:#f1f1f1;"><td style="padding:12px 16px;font-weight:bold;color:#1a2744;">Total Amount Due</td><td style="padding:12px 16px;color:#1a2744;font-size:16px;font-weight:bold;">₹{{total_due}}</td></tr>
+            <tr><td style="padding:12px 16px;font-weight:bold;color:#1a2744;">Payment Due Date</td><td style="padding:12px 16px;color:#f57c00;font-weight:bold;">{{due_date}}</td></tr>
+          </table>
+          
+          <p style="color:#555;line-height:1.7;margin:0 0 32px;">Please make the payment on or before the due date to ensure smooth and uninterrupted developmental activity of your property. Thank you for partnering with us in building your dream.</p>
+          
+          <div style="text-align:center;">
+            <a href="{{portal_url}}" style="background:#D4AF37;color:#1a2744;padding:14px 36px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block;box-shadow:0 4px 12px rgba(212,175,55,0.2);">Pay Installment</a>
+          </div>
+        </td></tr>
+        <tr><td style="background:#f9f9f9;padding:24px;text-align:center;border-top:1px solid #eee;">
+          <p style="color:#999;font-size:12px;margin:0;">© 2025 SVI Infra Solutions · Relationship Management Team</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  },
+  {
+    id: 'promo_festive',
+    name: 'Festive Plot Booking Offer',
+    subject: '✨ Exclusive Festive Offer: Save up to ₹{{discount}} on Premium Land! ✨',
+    category: 'Marketing',
+    icon: Gift,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Festive Special Offer</title></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <tr><td style="background:linear-gradient(135deg,#1a2744,#c9a84c,#1a2744);padding:50px 40px;text-align:center;">
+          <div style="font-size:42px;margin-bottom:12px;">✨🏡✨</div>
+          <h1 style="color:#ffffff;font-size:30px;margin:0;font-family:Georgia,serif;text-shadow:0 2px 4px rgba(0,0,0,0.3);">Celebrate in Your Own Land</h1>
+          <p style="color:#D4AF37;margin:8px 0 0;font-size:14px;letter-spacing:3px;font-weight:bold;text-transform:uppercase;">EXCLUSIVE FESTIVE BENEFIT</p>
+        </td></tr>
+        <tr><td style="padding:40px;">
+          <h2 style="color:#1a2744;font-size:22px;margin:0 0 16px;text-align:center;">Dear {{name}},</h2>
+          <p style="color:#555;line-height:1.7;margin:0 0 24px;text-align:center;font-size:15px;">This auspicious season, invest in what matters most. Bring prosperity and joy to your family by booking your dream plot with <strong>SVI Infra Solutions</strong>.</p>
+          
+          <div style="background:#fffdf7;border:1px solid #f0d080;border-radius:12px;padding:24px;margin-bottom:32px;">
+            <h3 style="margin:0 0 20px;color:#1a2744;font-size:17px;text-align:center;border-bottom:1px solid #f0d080;padding-bottom:10px;">🌟 Festive Privileges For You 🌟</h3>
+            
+            <table width="100%" style="border-collapse:collapse;font-size:14px;line-height:1.8;">
+              <tr>
+                <td style="padding:10px 0;width:10%;vertical-align:top;font-size:18px;">💰</td>
+                <td style="padding:10px 0;color:#333;"><strong>Special Discount:</strong> Direct reduction of <strong>₹{{discount}}</strong> on plot bookings.</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;vertical-align:top;font-size:18px;">📜</td>
+                <td style="padding:10px 0;color:#333;"><strong>Easy Title:</strong> Immediate registry & mutation assistance.</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;vertical-align:top;font-size:18px;">🏦</td>
+                <td style="padding:10px 0;color:#333;"><strong>Flexible Financing:</strong> High bank loan approval rates & flexible payment plans.</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;vertical-align:top;font-size:18px;">🎁</td>
+                <td style="padding:10px 0;color:#333;"><strong>Festive Gift:</strong> Assured 24k Gold Coin upon successful booking this week!</td>
+              </tr>
+            </table>
+          </div>
+          
+          <p style="color:#555;line-height:1.7;margin:0 0 32px;text-align:center;">This offer is valid only for the next 10 bookings in our premium project <strong>{{project_name}}</strong>. Don't let this golden opportunity slip away!</p>
+          
+          <div style="text-align:center;">
+            <a href="{{portal_url}}" style="background:linear-gradient(135deg,#D4AF37,#b08f36);color:#1a2744;padding:16px 40px;border-radius:30px;text-decoration:none;font-weight:bold;font-size:16px;display:inline-block;box-shadow:0 4px 15px rgba(212,175,55,0.4);letter-spacing:1px;text-transform:uppercase;">Book Site Visit Now</a>
+          </div>
+        </td></tr>
+        <tr><td style="background:#fdfaf2;padding:24px;text-align:center;border-top:1px solid #f0d080;">
+          <p style="color:#b08f36;font-size:13px;margin:0 0 4px;font-weight:bold;">SVI Infra Solutions</p>
+          <p style="color:#999;font-size:11px;margin:0;">Building Trust, Grounding Dreams.</p>
         </td></tr>
       </table>
     </td></tr>
