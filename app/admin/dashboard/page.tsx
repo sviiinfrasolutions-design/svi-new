@@ -1207,9 +1207,62 @@ export default function AdminDashboard() {
           <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[1.5px] bg-gradient-to-r from-transparent to-transparent" />
 
           {loading ? (
-            <div className="flex items-center justify-center py-24 font-sans text-gray-500 transition-colors duration-300 dark:text-gray-400">
-              <RefreshCw className="text-brand-gold mr-3 h-5 w-5 animate-spin" /> Loading user
-              database...
+            <div className="overflow-x-auto">
+              <table className="w-full font-sans text-sm animate-pulse">
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50/80 dark:border-white/5 dark:bg-white/5">
+                    {['User Profile', 'Contact Info', 'Property Interests', 'Joined Date', 'Actions'].map((h, idx) => (
+                      <th
+                        key={h}
+                        className={`px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase ${idx === 4 ? 'text-right' : 'text-left'}`}
+                      >
+                        <div className={`h-3 bg-gray-200 dark:bg-white/5 rounded ${idx === 4 ? 'w-16 ml-auto' : 'w-24'}`} />
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-150 dark:divide-white/5">
+                  {[...Array(6)].map((_, i) => (
+                    <tr key={i}>
+                      {/* User Profile */}
+                      <td className="px-6 py-4.5">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-xl bg-gray-200 dark:bg-white/5 shrink-0" />
+                          <div className="space-y-1.5 flex-1 min-w-0">
+                            <div className="h-4 w-32 bg-gray-200 dark:bg-white/5 rounded" />
+                            <div className="h-3 w-16 bg-gray-200 dark:bg-white/5 rounded" />
+                          </div>
+                        </div>
+                      </td>
+                      {/* Contact Info */}
+                      <td className="px-6 py-4.5">
+                        <div className="space-y-1.5">
+                          <div className="h-3.5 w-40 bg-gray-200 dark:bg-white/5 rounded" />
+                          <div className="h-3 w-28 bg-gray-200 dark:bg-white/5 rounded" />
+                        </div>
+                      </td>
+                      {/* Property Interests */}
+                      <td className="px-6 py-4.5">
+                        <div className="space-y-1.5">
+                          <div className="h-3.5 w-32 bg-gray-200 dark:bg-white/5 rounded" />
+                          <div className="h-3 w-24 bg-gray-200 dark:bg-white/5 rounded" />
+                        </div>
+                      </td>
+                      {/* Joined Date */}
+                      <td className="px-6 py-4.5">
+                        <div className="h-4 w-20 bg-gray-200 dark:bg-white/5 rounded" />
+                      </td>
+                      {/* Actions */}
+                      <td className="px-6 py-4.5 text-right">
+                        <div className="flex items-center justify-end gap-2.5">
+                          <div className="h-8 w-16 bg-gray-200 dark:bg-white/5 rounded-lg" />
+                          <div className="h-8 w-8 bg-gray-200 dark:bg-white/5 rounded-lg" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : filtered.length === 0 ? (
             <div className="py-24 text-center font-sans">
