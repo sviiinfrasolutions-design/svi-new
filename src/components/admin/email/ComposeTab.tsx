@@ -52,9 +52,10 @@ export function ComposeTab({
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
-  const [editorMode, setEditorMode] = useState<'rich' | 'html'>('rich');
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [editorKey, setEditorKey] = useState(0);
+  // Store raw template HTML separately (preserves full email HTML)
+  const [templateHtml, setTemplateHtml] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<EmailAttachment[]>([]);
   const [draftSaved, setDraftSaved] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
@@ -88,6 +89,8 @@ export function ComposeTab({
       setBcc('');
       setSubject(forwardData.subject);
       setHtml(forwardData.html);
+      setTemplateHtml(null); // Clear template
+      setSelectedTemplate(null);
       setShowAdvanced(false);
       setEditorKey((prev) => prev + 1);
       onClearPrefill?.();
@@ -101,6 +104,8 @@ export function ComposeTab({
       setBcc('');
       setSubject(replyData.subject);
       setHtml(replyData.html);
+      setTemplateHtml(null); // Clear template
+      setSelectedTemplate(null);
       setShowAdvanced(true);
       setEditorKey((prev) => prev + 1);
       onClearPrefill?.();
@@ -112,6 +117,8 @@ export function ComposeTab({
     if (templatePrefill) {
       setSubject(templatePrefill.subject);
       setHtml(templatePrefill.html);
+      setTemplateHtml(null); // Clear template
+      setSelectedTemplate(null);
       setEditorKey((prev) => prev + 1);
       onClearPrefill?.();
     }
@@ -146,11 +153,16 @@ export function ComposeTab({
     const tpl = EMAIL_TEMPLATES.find((t) => t.id === templateId);
     if (!tpl) return;
     setSubject(tpl.subject);
-    setHtml(tpl.html);
+    // Store raw template HTML for preview/sending
+    setTemplateHtml(tpl.html);
+    // Clear editor content (template uses stored HTML)
+    setHtml('');
     setSelectedTemplate(templateId);
     setShowTemplatePicker(false);
     setTemplateSearch('');
-    // Force editor re-mount to sync template content
+    // Force preview mode when template is loaded
+    setPreviewMode(true);
+    // Force editor re-mount
     setEditorKey((prev) => prev + 1);
   };
 
@@ -210,7 +222,8 @@ export function ComposeTab({
                 .filter(Boolean)
             : undefined,
           subject,
-          html,
+          // Use template HTML if template is selected, otherwise use editor HTML
+          html: templateHtml || html,
           replyTo: replyTo || undefined,
           from: `${fromName} <noreply@sviiinfrasolutions.com>`,
           attachments:
@@ -253,7 +266,9 @@ export function ComposeTab({
     setBcc('');
     setSubject('');
     setHtml('');
+    setTemplateHtml(null);
     setSelectedTemplate(null);
+    setPreviewMode(false);
     setError(null);
     setAttachments([]);
     clearDraft();
@@ -526,44 +541,61 @@ export function ComposeTab({
             )}
           </AnimatePresence>
 
-          {/* Editor Mode Toggle */}
-          <div className="flex items-center gap-2 border-b border-gray-100 px-6 py-2 dark:border-gray-800">
-            <button
-              onClick={() => setEditorMode('rich')}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                editorMode === 'rich'
-                  ? 'bg-brand-gold/10 text-brand-gold'
-                  : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600 dark:hover:bg-white/5'
-              }`}
-            >
-              Visual Editor
-            </button>
-            <button
-              onClick={() => setEditorMode('html')}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                editorMode === 'html'
-                  ? 'bg-brand-gold/10 text-brand-gold'
-                  : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600 dark:hover:bg-white/5'
-              }`}
-            >
-              HTML Code
-            </button>
-          </div>
+          {/* Template Selected Banner */}
+          {selectedTemplate && templateHtml && (
+            <div className="flex items-center justify-between border-b border-gray-100 bg-blue-50/50 px-6 py-2.5 dark:border-gray-800 dark:bg-blue-900/10">
+              <div className="flex items-center gap-2">
+                <LayoutTemplate className="h-4 w-4 text-blue-500" />
+                <span className="text-xs font-medium text-blue-700 dark:text-blue-400">
+                  Template: {EMAIL_TEMPLATES.find((t) => t.id === selectedTemplate)?.name}
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  setTemplateHtml(null);
+                  setSelectedTemplate(null);
+                  setPreviewMode(false);
+                }}
+                className="text-xs font-medium text-blue-500 hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                Clear & Write Custom
+              </button>
+            </div>
+          )}
 
           {/* Body */}
           <div className="relative">
-            {previewMode ? (
+            {previewMode || (selectedTemplate && templateHtml) ? (
+              /* Preview Mode - Shows rendered email */
               <div className="min-h-[400px] p-6">
                 <div
-                  className="rounded-xl border border-gray-100 bg-gray-50/50 p-6 dark:border-gray-800 dark:bg-gray-900/20"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      html ||
-                      '<p style="color:#999; font-family:sans-serif; font-size: 14px;">No content yet...</p>',
-                  }}
-                />
+                  className="mx-auto overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700"
+                  style={{ maxWidth: '700px' }}
+                >
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        templateHtml ||
+                        html ||
+                        '<div style="padding:40px;text-align:center;color:#999;font-family:sans-serif;">No content yet...<br>Select a template or write your email below.</div>',
+                    }}
+                  />
+                </div>
+                {/* Show edit button for template */}
+                {selectedTemplate && templateHtml && (
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={() => setPreviewMode(!previewMode)}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-4 py-2 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+                    >
+                      {previewMode ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                      {previewMode ? 'Hide Preview' : 'Show Preview'}
+                    </button>
+                  </div>
+                )}
               </div>
-            ) : editorMode === 'rich' ? (
+            ) : (
+              /* Edit Mode - Rich Text Editor */
               <div className="p-4">
                 <RichTextEditor
                   key={editorKey}
@@ -572,14 +604,6 @@ export function ComposeTab({
                   placeholder="Write your email here... Use the toolbar above to format text."
                 />
               </div>
-            ) : (
-              <textarea
-                value={html}
-                onChange={(e) => setHtml(e.target.value)}
-                placeholder="Write your email HTML here..."
-                rows={18}
-                className="w-full resize-none bg-transparent px-6 py-5 font-mono text-sm leading-relaxed text-gray-900 placeholder-gray-400/50 outline-none dark:text-gray-200"
-              />
             )}
           </div>
         </div>
