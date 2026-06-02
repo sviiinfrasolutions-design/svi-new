@@ -1036,10 +1036,13 @@ export default function AdminLotteryPage() {
     try {
       await supabase.from('lottery_participants').delete().eq('lottery_id', deletingLotteryId);
       await supabase.from('scheduled_draws').delete().eq('lottery_id', deletingLotteryId);
-      await deleteLinkedCampaigns(token, deletingLotteryId);
+      const linkedDeleted = await deleteLinkedCampaigns(token, deletingLotteryId);
       const { error } = await supabase.from('lotteries').delete().eq('id', deletingLotteryId);
       if (error) throw error;
-      setSuccessMessage('Campaign deleted permanently.');
+      const linkedMsg = typeof linkedDeleted === 'number' && linkedDeleted > 0
+        ? ` ${linkedDeleted} linked email campaign(s) also removed.`
+        : '';
+      setSuccessMessage(`Lottery deleted permanently.${linkedMsg}`);
       setDeletingLotteryId(null);
       setDeleteConfirmText('');
       fetchLotteries();
