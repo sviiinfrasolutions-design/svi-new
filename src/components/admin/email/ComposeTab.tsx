@@ -550,16 +550,31 @@ export function ComposeTab({
                   Template: {EMAIL_TEMPLATES.find((t) => t.id === selectedTemplate)?.name}
                 </span>
               </div>
-              <button
-                onClick={() => {
-                  setTemplateHtml(null);
-                  setSelectedTemplate(null);
-                  setPreviewMode(false);
-                }}
-                className="text-xs font-medium text-blue-500 hover:text-blue-700 dark:hover:text-blue-300"
-              >
-                ✏️ Write Custom Email
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    // Load template into editor for editing
+                    setHtml(templateHtml);
+                    setTemplateHtml(null);
+                    setPreviewMode(false);
+                    setEditorKey((prev) => prev + 1);
+                  }}
+                  className="flex items-center gap-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                >
+                  <PenLine className="h-3.5 w-3.5" />
+                  Edit Template
+                </button>
+                <button
+                  onClick={() => {
+                    setTemplateHtml(null);
+                    setSelectedTemplate(null);
+                    setPreviewMode(false);
+                  }}
+                  className="text-xs font-medium text-blue-500 hover:text-blue-700 dark:text-blue-300"
+                >
+                  ✏️ Write Custom
+                </button>
+              </div>
             </div>
           )}
 
@@ -585,33 +600,12 @@ export function ComposeTab({
             ) : (
               /* Edit Mode - Rich Text Editor (normal text, no HTML) */
               <div className="p-4">
-                {selectedTemplate && templateHtml ? (
-                  /* Template selected - show message to use preview */
-                  <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 p-8 dark:border-gray-700 dark:bg-gray-900/20">
-                    <LayoutTemplate className="mb-4 h-12 w-12 text-gray-300 dark:text-gray-600" />
-                    <p className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Template Selected
-                    </p>
-                    <p className="mb-4 text-xs text-gray-400 dark:text-gray-500">
-                      Click "Preview" to see how your email will look
-                    </p>
-                    <button
-                      onClick={() => setPreviewMode(true)}
-                      className="bg-brand-gold text-brand-navy flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold shadow-sm hover:opacity-90"
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                      Preview Email
-                    </button>
-                  </div>
-                ) : (
-                  /* Custom email - show rich text editor */
-                  <RichTextEditor
-                    key={editorKey}
-                    value={html}
-                    onChange={setHtml}
-                    placeholder="Write your email here... Use the toolbar above to format text."
-                  />
-                )}
+                <RichTextEditor
+                  key={editorKey}
+                  value={html}
+                  onChange={setHtml}
+                  placeholder="Write your email here... Use the toolbar above to format text."
+                />
               </div>
             )}
           </div>
