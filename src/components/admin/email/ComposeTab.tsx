@@ -22,6 +22,7 @@ import {
 import { toast } from 'sonner';
 import { EMAIL_TEMPLATES } from './constants';
 import { getToken, saveDraft, loadDraft, clearDraft, fileToBase64 } from './helpers';
+import { RichTextEditor } from './RichTextEditor';
 import type { ForwardData, ReplyData, EmailAttachment, TemplatePrefill } from './types';
 
 interface ComposeTabProps {
@@ -51,6 +52,7 @@ export function ComposeTab({
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
+  const [editorMode, setEditorMode] = useState<'rich' | 'html'>('rich');
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<EmailAttachment[]>([]);
   const [draftSaved, setDraftSaved] = useState(false);
@@ -518,6 +520,30 @@ export function ComposeTab({
             )}
           </AnimatePresence>
 
+          {/* Editor Mode Toggle */}
+          <div className="flex items-center gap-2 border-b border-gray-100 px-6 py-2 dark:border-gray-800">
+            <button
+              onClick={() => setEditorMode('rich')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                editorMode === 'rich'
+                  ? 'bg-brand-gold/10 text-brand-gold'
+                  : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600 dark:hover:bg-white/5'
+              }`}
+            >
+              Visual Editor
+            </button>
+            <button
+              onClick={() => setEditorMode('html')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                editorMode === 'html'
+                  ? 'bg-brand-gold/10 text-brand-gold'
+                  : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600 dark:hover:bg-white/5'
+              }`}
+            >
+              HTML Code
+            </button>
+          </div>
+
           {/* Body */}
           <div className="relative">
             {previewMode ? (
@@ -531,11 +557,19 @@ export function ComposeTab({
                   }}
                 />
               </div>
+            ) : editorMode === 'rich' ? (
+              <div className="p-4">
+                <RichTextEditor
+                  value={html}
+                  onChange={setHtml}
+                  placeholder="Write your email here... Use the toolbar above to format text."
+                />
+              </div>
             ) : (
               <textarea
                 value={html}
                 onChange={(e) => setHtml(e.target.value)}
-                placeholder="Write your email HTML here, or pick a template..."
+                placeholder="Write your email HTML here..."
                 rows={18}
                 className="w-full resize-none bg-transparent px-6 py-5 font-mono text-sm leading-relaxed text-gray-900 placeholder-gray-400/50 outline-none dark:text-gray-200"
               />
