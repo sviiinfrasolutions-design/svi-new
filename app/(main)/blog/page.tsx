@@ -56,6 +56,7 @@ export default function Blog() {
                   alt={post.title}
                   fill
                   quality={85}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="transform object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="bg-brand-gold text-brand-navy absolute top-4 left-4 px-3 py-1 text-[10px] font-bold tracking-widest uppercase shadow-sm">
