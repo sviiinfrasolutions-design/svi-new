@@ -872,7 +872,7 @@ export default function LotteryDrawSection() {
                                 }}
                                 className="relative font-serif text-4xl text-slate-900 md:text-5xl dark:text-white"
                               >
-                                {winners[activeWinnerIndex].name}
+                                {winners[activeWinnerIndex]?.name ?? ''}
                               </motion.h4>
 
                               {/* Ticket with slide-up */}
@@ -884,7 +884,7 @@ export default function LotteryDrawSection() {
                               >
                                 <Ticket className="h-4 w-4 text-[#D4AF37]" />
                                 <span className="font-mono text-lg tracking-widest text-[#B38728] dark:text-[#D4AF37]">
-                                  {winners[activeWinnerIndex].ticket_number}
+                                  {winners[activeWinnerIndex]?.ticket_number ?? ''}
                                 </span>
                               </motion.div>
 
@@ -940,7 +940,7 @@ export default function LotteryDrawSection() {
                         {/* All winners mini strip below */}
                         {winners.length > 1 && (
                           <div className="relative mt-6 flex flex-wrap items-center justify-center gap-2">
-                            {winners.map((w, idx) => (
+                            {winners.filter(Boolean).map((w, idx) => (
                               <button
                                 key={w.id}
                                 onClick={() => {
@@ -1261,7 +1261,7 @@ export default function LotteryDrawSection() {
                 {revealedWinners.length > 0 ? (
                   <div className="space-y-6">
                     <AnimatePresence>
-                      {revealedWinners.map((w, idx) => (
+                      {revealedWinners.filter(Boolean).map((w, idx) => (
                         <motion.div
                           key={w.id}
                           initial={{ opacity: 0, scale: 0.5, y: 40 }}
