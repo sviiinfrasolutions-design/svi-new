@@ -150,6 +150,7 @@ export default function Home() {
                 fill
                 priority={idx === 0}
                 quality={85}
+                sizes="100vw"
                 className="object-cover"
               />
             </div>
@@ -427,6 +428,7 @@ export default function Home() {
                       alt={`${project.title} - ${project.type} in ${project.loc} by SVI Infra Solutions`}
                       fill
                       quality={85}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover opacity-90 transition-opacity group-hover:opacity-100"
                     />
                     <div className="text-brand-navy absolute top-4 right-4 z-20 bg-white px-3 py-1 text-[10px] font-semibold tracking-wider uppercase shadow-sm">

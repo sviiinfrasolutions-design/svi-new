@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { useMounted } from '@/src/lib/hooks/useMounted';
 
 interface UserGrowthChartProps {
   data: Array<{
@@ -18,6 +19,8 @@ interface UserGrowthChartProps {
 }
 
 export default function UserGrowthChart({ data }: UserGrowthChartProps) {
+  const mounted = useMounted();
+
   return (
     <div className="rounded-2xl bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-[#0e0e14]/65">
       <div className="mb-6 flex items-center justify-between">
@@ -32,41 +35,50 @@ export default function UserGrowthChart({ data }: UserGrowthChartProps) {
       </div>
 
       <div className="h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="userGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#c9a84c" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#c9a84c" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} vertical={false} />
-            <XAxis
-              dataKey="date"
-              tick={{ fontSize: 11, fill: '#9ca3af' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'rgba(14, 14, 20, 0.95)',
-                border: '1px solid rgba(201, 168, 76, 0.2)',
-                borderRadius: '8px',
-                color: '#fff',
-                fontSize: '12px',
-              }}
-              cursor={{ stroke: '#c9a84c', strokeWidth: 1, strokeDasharray: '3 3' }}
-            />
-            <Area
-              type="monotone"
-              dataKey="users"
-              stroke="#c9a84c"
-              strokeWidth={2}
-              fill="url(#userGradient)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {mounted ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="userGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#c9a84c" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#c9a84c" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#374151"
+                opacity={0.1}
+                vertical={false}
+              />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 11, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'rgba(14, 14, 20, 0.95)',
+                  border: '1px solid rgba(201, 168, 76, 0.2)',
+                  borderRadius: '8px',
+                  color: '#fff',
+                  fontSize: '12px',
+                }}
+                cursor={{ stroke: '#c9a84c', strokeWidth: 1, strokeDasharray: '3 3' }}
+              />
+              <Area
+                type="monotone"
+                dataKey="users"
+                stroke="#c9a84c"
+                strokeWidth={2}
+                fill="url(#userGradient)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full w-full" />
+        )}
       </div>
     </div>
   );
