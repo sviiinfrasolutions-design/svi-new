@@ -1,16 +1,8 @@
 'use client';
 
 import {
-  AlertCircle,
   Building2,
   CheckCircle2,
-  ChevronDown,
-  Eye,
-  EyeOff,
-  FileText,
-  LogOut,
-  Mail,
-  Phone,
   Plus,
   Pencil,
   RefreshCw,
@@ -19,9 +11,13 @@ import {
   Trash2,
   Users,
   X,
+  AlertCircle,
+  Phone,
+  Mail,
+  FileText,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { type FormEvent, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import ActivityTimeline from '@/src/components/admin/ActivityTimeline';
 import DocumentStatsChart from '@/src/components/admin/ChartComponents/DocumentStatsChart';
@@ -30,882 +26,18 @@ import UserGrowthChart from '@/src/components/admin/ChartComponents/UserGrowthCh
 import type { UserProfile } from '@/src/lib/supabase/types';
 import { supabase } from '@/src/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { Badge } from '@/src/components/admin/helpers/Badge';
+import { renderPropertyInterestTags } from '@/src/components/admin/helpers/PropertyInterestTags';
+import { CreateUserModal } from '@/src/components/admin/modals/CreateUserModal';
+import { EditUserModal } from '@/src/components/admin/modals/EditUserModal';
+import { DeleteConfirm } from '@/src/components/admin/modals/DeleteConfirm';
+import { AdvisorSettingsModal } from '@/src/components/admin/modals/AdvisorSettingsModal';
 
 const GRID_STYLE = {
   backgroundImage:
     'radial-gradient(circle at 1px 1px, rgba(201, 168, 76, 0.05) 1px, transparent 0)',
   backgroundSize: '24px 24px',
 };
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-const PROPERTY_LABELS: Record<string, string> = {
-  residential_3bhk: '3BHK Residential',
-  residential_4bhk: '4BHK Residential',
-  residential_plot: 'Residential Plot',
-  commercial: 'Commercial Property',
-  investment: 'Investment / General',
-};
-
-const renderPropertyInterestTags = (
-  interest: string | null,
-  properties: Array<{ name: string; slug: string }> = []
-) => {
-  if (!interest) return null;
-  const items = interest.split(',').map((item) => {
-    const trimmed = item.trim();
-    const found = properties.find((p) => p.slug === trimmed);
-    if (found) return found.name;
-    if (PROPERTY_LABELS[trimmed]) return PROPERTY_LABELS[trimmed];
-    return trimmed
-      .split('-')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  });
-
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {items.map((item, idx) => (
-        <span
-          key={idx}
-          className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-medium text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300"
-        >
-          {item}
-        </span>
-      ))}
-    </div>
-  );
-};
-
-function Badge({ role }: { role: string }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[9px] font-bold tracking-widest uppercase ${
-        role === 'admin'
-          ? 'bg-brand-gold/10 text-brand-gold border-brand-gold/20 border'
-          : 'border border-gray-200 bg-gray-50 text-gray-500 dark:border-white/10 dark:bg-white/5 dark:text-gray-400'
-      }`}
-    >
-      {role === 'admin' ? (
-        <Shield className="text-brand-gold h-3 w-3" />
-      ) : (
-        <Users className="h-3 w-3 text-gray-400 dark:text-gray-500" />
-      )}
-      {role === 'admin' ? 'Admin' : 'User'}
-    </span>
-  );
-}
-
-// ── Create User Modal ────────────────────────────────────────────────────────
-interface CreateUserModalProps {
-  onClose: () => void;
-  onSuccess: () => void;
-  token: string;
-  properties: Array<{ name: string; slug: string }>;
-}
-
-function CreateUserModal({ onClose, onSuccess, token, properties }: CreateUserModalProps) {
-  const [form, setForm] = useState({
-    full_name: '',
-    email: '',
-    real_email: '',
-    password: '',
-    phone: '',
-    property_interest: '',
-    notes: '',
-  });
-
-  const displayProperties =
-    properties.length > 0
-      ? properties
-      : Object.entries(PROPERTY_LABELS).map(([slug, name]) => ({ name, slug }));
-
-  const selectedProperties = form.property_interest ? form.property_interest.split(',') : [];
-
-  const handlePropertyToggle = (slug: string) => {
-    let updated;
-    if (selectedProperties.includes(slug)) {
-      updated = selectedProperties.filter((s) => s !== slug);
-    } else {
-      updated = [...selectedProperties, slug];
-    }
-    setForm((p) => ({ ...p, property_interest: updated.join(',') }));
-  };
-  const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
-    if (error) setError('');
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (
-      !form.email ||
-      !form.password ||
-      !form.full_name ||
-      !form.real_email ||
-      !form.phone ||
-      !form.property_interest ||
-      !form.notes
-    ) {
-      setError(
-        'All fields (Name, SVI Email, Email, Password, Phone, Property Interest, and Notes) are required.'
-      );
-      return;
-    }
-    if (form.password.length < 8) {
-      setError('Password must be at least 8 characters.');
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch('/api/admin/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(form),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Failed to create user');
-      onSuccess();
-      onClose();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const inputCls =
-    'w-full bg-white dark:bg-[#111118] border border-gray-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/15 transition-all font-sans';
-  const labelCls =
-    'text-[10px] uppercase tracking-widest font-bold text-gray-500 dark:text-gray-400 mb-1.5 block transition-colors duration-300';
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-md dark:bg-black/85">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="dark:border-brand-gold/20 relative w-full max-w-lg overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl transition-colors duration-300 dark:bg-[#0e0e14]"
-      >
-        {/* Subtle gold line on top of the modal */}
-        <div className="via-brand-gold/50 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
-
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5 dark:border-white/8">
-          <div className="flex items-center gap-3">
-            <div className="bg-brand-gold/10 border-brand-gold/20 flex h-8 w-8 items-center justify-center rounded-lg border">
-              <Plus className="text-brand-gold h-4 w-4" />
-            </div>
-            <h2 className="text-brand-navy font-serif text-lg font-semibold tracking-tight transition-colors duration-300 dark:text-white">
-              Create User
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="hover:text-brand-gold cursor-pointer text-gray-500 transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Body */}
-        <form onSubmit={handleSubmit} className="space-y-4 p-6 font-sans">
-          {error && (
-            <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
-              <AlertCircle className="h-4 w-4 flex-shrink-0" />
-              {error}
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className={labelCls}>Full Name *</label>
-              <input
-                name="full_name"
-                value={form.full_name}
-                onChange={handleChange}
-                required
-                placeholder="Rajesh Kumar"
-                className={inputCls}
-              />
-            </div>
-
-            <div>
-              <label className={labelCls}>SVI Email Address *</label>
-              <div className="relative">
-                <Mail className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
-                <input
-                  name="email"
-                  type="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="client@sviinfra.com"
-                  className={`${inputCls} pl-9`}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className={labelCls}>Real Email Address *</label>
-              <div className="relative">
-                <Mail className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
-                <input
-                  name="real_email"
-                  type="email"
-                  value={form.real_email}
-                  onChange={handleChange}
-                  required
-                  placeholder="client@example.com"
-                  className={`${inputCls} pl-9`}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className={labelCls}>Password *</label>
-              <div className="relative">
-                <input
-                  name="password"
-                  type={showPass ? 'text' : 'password'}
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="Min 8 chars"
-                  className={`${inputCls} pr-10`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  className="hover:text-brand-gold absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-gray-500"
-                >
-                  {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className={labelCls}>Phone Number *</label>
-              <div className="relative">
-                <Phone className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
-                <input
-                  name="phone"
-                  type="tel"
-                  value={form.phone}
-                  onChange={handleChange}
-                  required
-                  placeholder="+91 98000 00000"
-                  className={`${inputCls} pl-9`}
-                />
-              </div>
-            </div>
-
-            <div className="col-span-2">
-              <label className={labelCls}>Property Interest * (Select Multiple)</label>
-              <div className="grid max-h-36 grid-cols-2 gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50/50 p-3 dark:border-white/10 dark:bg-[#111118]">
-                {displayProperties.map((p) => {
-                  const isChecked = selectedProperties.includes(p.slug);
-                  return (
-                    <label
-                      key={p.slug}
-                      className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-white/5"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => handlePropertyToggle(p.slug)}
-                        className="text-brand-gold focus:ring-brand-gold border-gray-250 h-4 w-4 rounded dark:border-gray-700"
-                      />
-                      <span className="truncate text-xs text-gray-700 dark:text-gray-300">
-                        {p.name}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="col-span-2">
-              <label className={labelCls}>Notes (Internal) *</label>
-              <div className="relative">
-                <FileText className="text-brand-gold absolute top-3 left-3 h-3.5 w-3.5" />
-                <textarea
-                  name="notes"
-                  rows={2}
-                  value={form.notes}
-                  onChange={handleChange}
-                  required
-                  placeholder="Internal notes about this client..."
-                  className={`${inputCls} resize-none pl-9`}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 cursor-pointer rounded-lg border border-gray-200 bg-gray-100 py-3.5 text-xs font-bold tracking-widest text-gray-700 uppercase transition-all hover:bg-gray-200 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="shimmer bg-brand-gold hover:bg-brand-gold-light text-brand-navy glow-gold flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-3.5 text-xs font-bold tracking-widest uppercase shadow-lg transition-all disabled:opacity-60"
-            >
-              {loading ? (
-                <span className="border-brand-navy/45 border-t-brand-navy h-4 w-4 animate-spin rounded-full border-2" />
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" /> Create User
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-      </motion.div>
-    </div>
-  );
-}
-
-// ── Edit User Modal ──────────────────────────────────────────────────────────
-interface EditUserModalProps {
-  user: UserProfile;
-  onClose: () => void;
-  onSuccess: () => void;
-  token: string;
-  properties: Array<{ name: string; slug: string }>;
-}
-
-function EditUserModal({ user, onClose, onSuccess, token, properties }: EditUserModalProps) {
-  const [form, setForm] = useState({
-    full_name: user.full_name || '',
-    real_email: user.real_email || '',
-    phone: user.phone || '',
-    property_interest: user.property_interest || '',
-    notes: user.notes || '',
-    role: user.role || 'client',
-  });
-
-  const displayProperties =
-    properties.length > 0
-      ? properties
-      : Object.entries(PROPERTY_LABELS).map(([slug, name]) => ({ name, slug }));
-
-  const selectedProperties = form.property_interest ? form.property_interest.split(',') : [];
-
-  const handlePropertyToggle = (slug: string) => {
-    let updated;
-    if (selectedProperties.includes(slug)) {
-      updated = selectedProperties.filter((s) => s !== slug);
-    } else {
-      updated = [...selectedProperties, slug];
-    }
-    setForm((p) => ({ ...p, property_interest: updated.join(',') }));
-  };
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
-    if (error) setError('');
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (
-      !form.full_name ||
-      !form.real_email ||
-      !form.phone ||
-      !form.property_interest ||
-      !form.notes
-    ) {
-      setError('All fields (Name, Email, Phone, Property Interest, and Notes) are required.');
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/admin/users/${user.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(form),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Failed to update user');
-      onSuccess();
-      onClose();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const inputCls =
-    'w-full bg-white dark:bg-[#111118] border border-gray-200 dark:border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/15 transition-all font-sans';
-  const labelCls =
-    'text-[10px] uppercase tracking-widest font-bold text-gray-500 dark:text-gray-400 mb-1.5 block transition-colors duration-300';
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-md dark:bg-black/85">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="dark:border-brand-gold/20 relative w-full max-w-lg overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl transition-colors duration-300 dark:bg-[#0e0e14]"
-      >
-        {/* Subtle gold line on top of the modal */}
-        <div className="via-brand-gold/50 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
-
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5 dark:border-white/8">
-          <div className="flex items-center gap-3">
-            <div className="bg-brand-gold/10 border-brand-gold/20 flex h-8 w-8 items-center justify-center rounded-lg border">
-              <Pencil className="text-brand-gold h-4 w-4" />
-            </div>
-            <h2 className="text-brand-navy font-serif text-lg font-semibold tracking-tight transition-colors duration-300 dark:text-white">
-              Edit User Settings
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="hover:text-brand-gold cursor-pointer text-gray-500 transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Body */}
-        <form onSubmit={handleSubmit} className="space-y-4 p-6 font-sans">
-          {error && (
-            <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
-              <AlertCircle className="h-4 w-4 flex-shrink-0" />
-              {error}
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className={labelCls}>Full Name *</label>
-              <input
-                name="full_name"
-                value={form.full_name}
-                onChange={handleChange}
-                required
-                placeholder="Rajesh Kumar"
-                className={inputCls}
-              />
-            </div>
-
-            <div className="col-span-2 sm:col-span-1">
-              <label className={labelCls}>Real Email Address *</label>
-              <div className="relative">
-                <Mail className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
-                <input
-                  name="real_email"
-                  type="email"
-                  value={form.real_email}
-                  onChange={handleChange}
-                  required
-                  placeholder="client@example.com"
-                  className={`${inputCls} pl-9`}
-                />
-              </div>
-            </div>
-
-            <div className="col-span-2 sm:col-span-1">
-              <label className={labelCls}>Phone Number *</label>
-              <div className="relative">
-                <Phone className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
-                <input
-                  name="phone"
-                  type="tel"
-                  value={form.phone}
-                  onChange={handleChange}
-                  required
-                  placeholder="+91 98000 00000"
-                  className={`${inputCls} pl-9`}
-                />
-              </div>
-            </div>
-
-            <div className="col-span-2">
-              <label className={labelCls}>Property Interest * (Select Multiple)</label>
-              <div className="grid max-h-36 grid-cols-2 gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50/50 p-3 dark:border-white/10 dark:bg-[#111118]">
-                {displayProperties.map((p) => {
-                  const isChecked = selectedProperties.includes(p.slug);
-                  return (
-                    <label
-                      key={p.slug}
-                      className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-white/5"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => handlePropertyToggle(p.slug)}
-                        className="text-brand-gold focus:ring-brand-gold border-gray-250 h-4 w-4 rounded dark:border-gray-700"
-                      />
-                      <span className="truncate text-xs text-gray-700 dark:text-gray-300">
-                        {p.name}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="col-span-2 sm:col-span-1">
-              <label className={labelCls}>Access Role</label>
-              <div className="relative">
-                <Shield className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
-                <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-3.5 w-3.5 -translate-y-1/2 text-gray-500" />
-                <select
-                  name="role"
-                  value={form.role}
-                  onChange={handleChange}
-                  className={`${inputCls} appearance-none rounded-none pr-8 pl-9`}
-                >
-                  <option value="client">User</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="col-span-2">
-              <label className={labelCls}>Notes (Internal) *</label>
-              <div className="relative">
-                <FileText className="text-brand-gold absolute top-3 left-3 h-3.5 w-3.5" />
-                <textarea
-                  name="notes"
-                  rows={2}
-                  value={form.notes}
-                  onChange={handleChange}
-                  required
-                  placeholder="Internal notes..."
-                  className={`${inputCls} resize-none pl-9`}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 cursor-pointer rounded-lg border border-gray-200 bg-gray-100 py-3.5 text-xs font-bold tracking-widest text-gray-700 uppercase transition-all hover:bg-gray-200 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="shimmer bg-brand-gold hover:bg-brand-gold-light text-brand-navy glow-gold flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-3.5 text-xs font-bold tracking-widest uppercase shadow-lg transition-all disabled:opacity-60"
-            >
-              {loading ? (
-                <span className="border-brand-navy/45 border-t-brand-navy h-4 w-4 animate-spin rounded-full border-2" />
-              ) : (
-                <>
-                  <Pencil className="h-4 w-4" /> Save Changes
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-      </motion.div>
-    </div>
-  );
-}
-
-// ── Delete Confirm ───────────────────────────────────────────────────────────
-interface DeleteConfirmProps {
-  user: UserProfile;
-  onConfirm: () => void;
-  onClose: () => void;
-  loading: boolean;
-}
-
-function DeleteConfirm({ user, onConfirm, onClose, loading }: DeleteConfirmProps) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-md dark:bg-black/85">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="dark:border-brand-gold/20 relative w-full max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-2xl transition-colors duration-300 dark:bg-[#0e0e14]"
-      >
-        <div className="absolute top-0 right-0 left-0 h-[2px] bg-red-500/50" />
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-red-500/20 bg-red-500/10">
-          <Trash2 className="h-5 w-5 text-red-400" />
-        </div>
-        <h3 className="text-brand-navy mb-2 font-serif text-lg tracking-tight transition-colors duration-300 dark:text-white">
-          Delete User?
-        </h3>
-        <p className="mb-6 font-sans text-sm text-gray-500 transition-colors duration-300 dark:text-gray-400">
-          This will permanently delete{' '}
-          <span className="text-brand-navy font-medium dark:text-white">{user.full_name}</span> and
-          all associated data. This action is irreversible.
-        </p>
-        <div className="flex gap-3 font-sans">
-          <button
-            onClick={onClose}
-            className="flex-1 cursor-pointer rounded-lg border border-gray-200 bg-gray-100 py-3 text-xs font-bold tracking-widest text-gray-700 uppercase transition-all hover:bg-gray-200 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg bg-red-600 py-3 text-xs font-bold tracking-widest text-white uppercase shadow-lg transition-all hover:bg-red-500"
-          >
-            {loading ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            ) : (
-              'Delete'
-            )}
-          </button>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
-
-interface AdvisorProfile {
-  id: string;
-  full_name: string | null;
-  email: string | null;
-  role: string | null;
-}
-
-function AdvisorSettingsModal({
-  onClose,
-  token,
-  showToast,
-}: {
-  onClose: () => void;
-  token: string;
-  showToast: (type: 'success' | 'error', msg: string) => void;
-}) {
-  const [profiles, setProfiles] = useState<AdvisorProfile[]>([]);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [search, setSearch] = useState('');
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const { data: settingData } = await supabase
-          .from('portal_settings')
-          .select('value')
-          .eq('key', 'active_advisors')
-          .maybeSingle();
-
-        let initialSelected: string[] = [];
-        if (settingData?.value?.ids && Array.isArray(settingData.value.ids)) {
-          initialSelected = settingData.value.ids;
-        }
-        setSelectedIds(initialSelected);
-
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, full_name, email, role')
-          .order('full_name', { ascending: true });
-
-        if (profilesError) throw profilesError;
-        setProfiles(profilesData || []);
-      } catch (err: any) {
-        console.error('Failed to load advisor configuration:', err);
-        showToast('error', 'Failed to retrieve advisor configurations.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, [showToast]);
-
-  const handleToggle = (id: string) => {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  };
-
-  const handleSelectAll = () => {
-    setSelectedIds(filteredProfiles.map((p) => p.id));
-  };
-
-  const handleClearAll = () => {
-    setSelectedIds([]);
-  };
-
-  const handleSave = async () => {
-    setSaveLoading(true);
-    try {
-      const res = await fetch('/api/admin/settings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          key: 'active_advisors',
-          value: { ids: selectedIds },
-        }),
-      });
-
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Failed to update dynamic advisor list.');
-
-      showToast('success', 'Public advisor list updated successfully!');
-      onClose();
-    } catch (err: any) {
-      console.error(err);
-      showToast('error', err.message || 'An error occurred while saving.');
-    } finally {
-      setSaveLoading(false);
-    }
-  };
-
-  const filteredProfiles = profiles.filter(
-    (p) =>
-      p.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-      p.email?.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 font-sans backdrop-blur-md dark:bg-black/85">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="dark:border-brand-gold/20 relative flex h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:bg-[#0e0e14]"
-      >
-        <div className="via-brand-gold/50 absolute top-0 right-0 left-0 h-[2px] bg-gradient-to-r from-transparent to-transparent" />
-
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5 dark:border-white/8">
-          <div className="flex items-center gap-3">
-            <div className="bg-brand-gold/10 border-brand-gold/20 flex h-8 w-8 items-center justify-center rounded-lg border">
-              <Users className="text-brand-gold h-4 w-4" />
-            </div>
-            <div>
-              <h2 className="text-brand-navy font-serif text-lg font-semibold dark:text-white">
-                Manage Public Advisors
-              </h2>
-              <p className="text-[10px] text-gray-500">
-                Select accounts to display as advisors in booking.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="hover:text-brand-gold cursor-pointer text-gray-500 transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <div className="border-b border-gray-100 p-4 dark:border-white/8">
-          <div className="relative">
-            <Search className="text-brand-gold absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search users..."
-              className="focus:border-brand-gold focus:ring-brand-gold/15 w-full rounded-lg border border-gray-200 bg-white py-2 pr-4 pl-9 text-xs text-gray-900 placeholder-gray-400 transition-all focus:ring-2 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white dark:placeholder-gray-600"
-            />
-          </div>
-        </div>
-
-        <div className="flex-1 space-y-3 overflow-y-auto p-6">
-          {loading ? (
-            <div className="flex items-center justify-center py-12 text-gray-500">
-              <RefreshCw className="text-brand-gold mr-2 h-4 w-4 animate-spin" />
-              <span>Loading profiles...</span>
-            </div>
-          ) : filteredProfiles.length === 0 ? (
-            <div className="py-12 text-center text-xs text-gray-500">No users found.</div>
-          ) : (
-            filteredProfiles.map((p) => {
-              const isChecked = selectedIds.includes(p.id);
-              return (
-                <div
-                  key={p.id}
-                  onClick={() => handleToggle(p.id)}
-                  className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-all ${
-                    isChecked
-                      ? 'border-brand-gold bg-brand-gold/5 dark:bg-brand-gold/2'
-                      : 'border-gray-100 bg-gray-50/50 hover:bg-gray-50 dark:border-white/5 dark:bg-white/2 dark:hover:bg-white/4'
-                  }`}
-                >
-                  <div className="min-w-0 flex-1 pr-3">
-                    <p className="truncate text-xs font-semibold text-gray-900 dark:text-white">
-                      {p.full_name}
-                    </p>
-                    <p className="truncate text-[10px] text-gray-500">{p.email}</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="rounded bg-gray-100 px-2 py-0.5 text-[8px] font-bold tracking-widest text-gray-500 uppercase dark:bg-white/5 dark:text-gray-400">
-                      {p.role}
-                    </span>
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => {}}
-                      className="accent-brand-gold focus:ring-brand-gold h-4 w-4 rounded border-gray-300"
-                    />
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4 dark:border-white/8">
-          <div className="flex gap-2">
-            <button
-              onClick={handleSelectAll}
-              disabled={loading}
-              className="text-brand-gold hover:text-brand-gold/80 text-[10px] font-bold uppercase transition-colors disabled:opacity-50"
-            >
-              Select All
-            </button>
-            <span className="text-gray-300 dark:text-white/10">|</span>
-            <button
-              onClick={handleClearAll}
-              disabled={loading}
-              className="text-[10px] font-bold text-gray-500 uppercase transition-colors hover:text-gray-700 disabled:opacity-50 dark:hover:text-gray-300"
-            >
-              Clear All
-            </button>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="rounded-lg border border-gray-200 bg-gray-100 px-4 py-2 text-[10px] font-bold text-gray-700 uppercase hover:bg-gray-200 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={saveLoading || loading}
-              className="shimmer bg-brand-gold hover:bg-brand-gold-light text-brand-navy glow-gold flex items-center justify-center gap-1.5 rounded-lg px-5 py-2.5 text-[10px] font-bold tracking-widest uppercase shadow-lg disabled:opacity-60"
-            >
-              {saveLoading ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : 'Save'}
-            </button>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
 
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
@@ -1208,55 +340,63 @@ export default function AdminDashboard() {
 
           {loading ? (
             <div className="overflow-x-auto">
-              <table className="w-full font-sans text-sm animate-pulse">
+              <table className="w-full animate-pulse font-sans text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50/80 dark:border-white/5 dark:bg-white/5">
-                    {['User Profile', 'Contact Info', 'Property Interests', 'Joined Date', 'Actions'].map((h, idx) => (
+                    {[
+                      'User Profile',
+                      'Contact Info',
+                      'Property Interests',
+                      'Joined Date',
+                      'Actions',
+                    ].map((h, idx) => (
                       <th
                         key={h}
                         className={`px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase ${idx === 4 ? 'text-right' : 'text-left'}`}
                       >
-                        <div className={`h-3 bg-gray-200 dark:bg-white/5 rounded ${idx === 4 ? 'w-16 ml-auto' : 'w-24'}`} />
+                        <div
+                          className={`h-3 rounded bg-gray-200 dark:bg-white/5 ${idx === 4 ? 'ml-auto w-16' : 'w-24'}`}
+                        />
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-150 dark:divide-white/5">
+                <tbody className="divide-gray-150 divide-y dark:divide-white/5">
                   {[...Array(6)].map((_, i) => (
                     <tr key={i}>
                       {/* User Profile */}
                       <td className="px-6 py-4.5">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-xl bg-gray-200 dark:bg-white/5 shrink-0" />
-                          <div className="space-y-1.5 flex-1 min-w-0">
-                            <div className="h-4 w-32 bg-gray-200 dark:bg-white/5 rounded" />
-                            <div className="h-3 w-16 bg-gray-200 dark:bg-white/5 rounded" />
+                          <div className="h-10 w-10 shrink-0 rounded-xl bg-gray-200 dark:bg-white/5" />
+                          <div className="min-w-0 flex-1 space-y-1.5">
+                            <div className="h-4 w-32 rounded bg-gray-200 dark:bg-white/5" />
+                            <div className="h-3 w-16 rounded bg-gray-200 dark:bg-white/5" />
                           </div>
                         </div>
                       </td>
                       {/* Contact Info */}
                       <td className="px-6 py-4.5">
                         <div className="space-y-1.5">
-                          <div className="h-3.5 w-40 bg-gray-200 dark:bg-white/5 rounded" />
-                          <div className="h-3 w-28 bg-gray-200 dark:bg-white/5 rounded" />
+                          <div className="h-3.5 w-40 rounded bg-gray-200 dark:bg-white/5" />
+                          <div className="h-3 w-28 rounded bg-gray-200 dark:bg-white/5" />
                         </div>
                       </td>
                       {/* Property Interests */}
                       <td className="px-6 py-4.5">
                         <div className="space-y-1.5">
-                          <div className="h-3.5 w-32 bg-gray-200 dark:bg-white/5 rounded" />
-                          <div className="h-3 w-24 bg-gray-200 dark:bg-white/5 rounded" />
+                          <div className="h-3.5 w-32 rounded bg-gray-200 dark:bg-white/5" />
+                          <div className="h-3 w-24 rounded bg-gray-200 dark:bg-white/5" />
                         </div>
                       </td>
                       {/* Joined Date */}
                       <td className="px-6 py-4.5">
-                        <div className="h-4 w-20 bg-gray-200 dark:bg-white/5 rounded" />
+                        <div className="h-4 w-20 rounded bg-gray-200 dark:bg-white/5" />
                       </td>
                       {/* Actions */}
                       <td className="px-6 py-4.5 text-right">
                         <div className="flex items-center justify-end gap-2.5">
-                          <div className="h-8 w-16 bg-gray-200 dark:bg-white/5 rounded-lg" />
-                          <div className="h-8 w-8 bg-gray-200 dark:bg-white/5 rounded-lg" />
+                          <div className="h-8 w-16 rounded-lg bg-gray-200 dark:bg-white/5" />
+                          <div className="h-8 w-8 rounded-lg bg-gray-200 dark:bg-white/5" />
                         </div>
                       </td>
                     </tr>

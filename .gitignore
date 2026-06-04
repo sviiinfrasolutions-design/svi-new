@@ -37,3 +37,8 @@ public/screenshots/
 supabase/.temp/
 *.tmp
 vitest.config.ts.timestamp-*
+
+
+# Misc
+nul
+refactor.md
