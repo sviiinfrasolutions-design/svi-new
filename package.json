@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "cross-env NEXT_TURBOPACK=0 next dev --port 3000",
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
@@ -67,6 +67,7 @@
     "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.4.21",
     "commitlint": "^21.0.1",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "editorconfig-checker": "^6.1.1",
     "esbuild": "^0.28.0",

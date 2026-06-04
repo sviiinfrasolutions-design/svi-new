@@ -193,7 +193,7 @@ export function ComposeTab({
     setTemplateSearch('');
     // Force preview mode when template is loaded
     setPreviewMode(true);
-    // Force editor re-mount
+    // Force editor re-mount to sync template content
     setEditorKey((prev) => prev + 1);
   };
 
