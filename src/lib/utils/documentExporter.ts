@@ -45,7 +45,7 @@ export async function exportToPDF({
         resolve();
       } else {
         img.onload = () => resolve();
-        img.onerror = () => resolve(); // Resolve even on error to not block
+        img.onerror = () => resolve();
       }
     });
   });
@@ -53,12 +53,10 @@ export async function exportToPDF({
   document.body.appendChild(clone);
 
   try {
-    // Wait for images to load
     await Promise.all(imagePromises);
 
-    // Use high-quality settings for perfect capture
     const canvas = await html2canvas(clone, {
-      scale: scale, // Higher scale for better quality
+      scale: scale,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
@@ -71,7 +69,6 @@ export async function exportToPDF({
       windowHeight: clone.scrollHeight,
     });
 
-    // Create PDF with exact A4 dimensions
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -79,24 +76,45 @@ export async function exportToPDF({
       compress: true,
     });
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+    const pdfWidth = pdf.internal.pageSize.getWidth(); // 210 mm
+    const pdfHeight = pdf.internal.pageSize.getHeight(); // 297 mm
 
-    const imgX = (pdfWidth - imgWidth * ratio) / 2;
-    const imgY = 0;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
 
-    // Use PNG for maximum quality
-    const imgData = canvas.toDataURL('image/png', 1.0);
-    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+    // mm-per-canvas-pixel ratio (keeping full width)
+    const scaleRatio = pdfWidth / canvasWidth;
 
-    // Ensure filename ends with .pdf
+    // How many canvas pixels tall one A4 page is
+    const pageHeightPx = Math.floor(pdfHeight / scaleRatio);
+
+    const totalPages = Math.ceil(canvasHeight / pageHeightPx);
+
+    for (let page = 0; page < totalPages; page++) {
+      if (page > 0) pdf.addPage();
+
+      const srcY = page * pageHeightPx;
+      const srcH = Math.min(pageHeightPx, canvasHeight - srcY);
+
+      // Slice just this page's strip into a temp canvas
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = canvasWidth;
+      pageCanvas.height = srcH;
+
+      const ctx = pageCanvas.getContext('2d');
+      if (!ctx) continue;
+
+      ctx.drawImage(canvas, 0, srcY, canvasWidth, srcH, 0, 0, canvasWidth, srcH);
+
+      const pageImgData = pageCanvas.toDataURL('image/png', 1.0);
+      const imgHeightMM = srcH * scaleRatio;
+
+      pdf.addImage(pageImgData, 'PNG', 0, 0, pdfWidth, imgHeightMM);
+    }
+
     const outputFilename = filename.toLowerCase().endsWith('.pdf') ? filename : `${filename}.pdf`;
     pdf.save(outputFilename);
   } finally {
-    // Clean up cloned element from DOM
     if (clone.parentNode) {
       clone.parentNode.removeChild(clone);
     }
