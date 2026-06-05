@@ -12,7 +12,7 @@ export default function BbaLegalPages({ formData, companyInfo, totalCost }: any)
         <p className="mb-6 text-left text-[11px] font-bold underline">
           Important Instructions to the Allottee(s)
         </p>
-        <p className="mb-3 text-justify text-[13px] leading-tight">
+        <p className="mb-3 text-justify text-[13px] leading-relaxed">
           The Allottee(s) states and confirms that the firm has made the Allottee(s) aware of the
           availability of the Builder Buyers' Agreement (hereinafter defined) at the head office of
           the firm. The Allottee(s) confirms that the Allottee(s) has read and perused the
@@ -21,7 +21,7 @@ export default function BbaLegalPages({ formData, companyInfo, totalCost }: any)
           (including the Firms limitations) and the Allottee(s) is agreeable to perform his
           obligations as per the conditions stipulated in the Agreement.
         </p>
-        <p className="mb-3 text-justify text-[13px] leading-tight">
+        <p className="mb-3 text-justify text-[13px] leading-relaxed">
           Thereafter the Allottee(s) has applied for allotment of a plot/shop in the Said Complex
           and has requested the firm to allot a plot/shop. The Allottee(s) agrees and confirms to
           sign the Agreement in entirety and to abide by the terms and conditions of the Agreement
@@ -36,11 +36,11 @@ export default function BbaLegalPages({ formData, companyInfo, totalCost }: any)
           Non Refundable Amounts. Thereafter the Allottee(s) shall be left with no right, title or
           interest whatsoever in the Said Plot/shop.
         </p>
-        <p className="mb-3 text-justify text-[13px] leading-tight">
+        <p className="mb-3 text-justify text-[13px] leading-relaxed">
           The Allottee(s) further agrees and understands that the firm is not obliged to send any
           notice/reminders in this regard.
         </p>
-        <p className="mb-3 text-justify text-[13px] leading-tight">
+        <p className="mb-3 text-justify text-[13px] leading-relaxed">
           The Agreement shall not be binding on the firm until executed by the firm through it's
           authorized signatory. The firm reserves the right to request information as it may so
           desire concerning the Allottee(s). The firm will not execute any Agreement wherein the
@@ -49,7 +49,7 @@ export default function BbaLegalPages({ formData, companyInfo, totalCost }: any)
           cause or explanation or without assigning any reasons thereof and the decision of the firm
           shall be final and binding on the Allottee(s).
         </p>
-        <p className="mb-3 text-justify text-[13px] leading-tight">
+        <p className="mb-3 text-justify text-[13px] leading-relaxed">
           The Allottee(s) confirms to have read and understood the above instructions and the
           clauses of the Agreement, its annexures, etc. and the Allottee(s) now execute this
           Agreement and undertake to faithfully abide by all the terms and conditions of this
@@ -62,20 +62,20 @@ export default function BbaLegalPages({ formData, companyInfo, totalCost }: any)
         <p className="mb-4 text-left text-[13px] font-bold underline">
           Instructions for execution of the Agreement:
         </p>
-        <p className="mb-3 text-justify text-[13px] leading-tight">
+        <p className="mb-3 text-justify text-[13px] leading-relaxed">
           1) Kindly sign along with joint allottee, if any, on every page of the Agreement including
           all annexures.
         </p>
-        <p className="mb-3 text-justify text-[13px] leading-tight">
-          3) Both of the signed copies of the Agreement with all the annexures in its original form
+        <p className="mb-3 text-justify text-[13px] leading-relaxed">
+          2) Both of the signed copies of the Agreement with all the annexures in its original form
           shall be returned to the firm by registered post (AD)/hand delivery only within the time
           stipulated.
         </p>
-        <p className="mb-3 text-justify text-[13px] leading-tight">
-          4) Kindly sign next to the tentative typical plot/shop plan in Annexures as attached.
+        <p className="mb-3 text-justify text-[13px] leading-relaxed">
+          3) Kindly sign next to the tentative typical plot/shop plan in Annexures as attached.
         </p>
-        <p className="mb-3 text-justify text-[13px] leading-tight">
-          5) Witnesses signatures to be done only on Witness space.
+        <p className="mb-3 text-justify text-[13px] leading-relaxed">
+          4) Witnesses signatures to be done only on Witness space.
         </p>
         <p className="mb-2 text-center text-lg font-bold uppercase">"SHYAM AANGAN"</p>
         <p className="mb-4 text-center text-sm font-bold uppercase">JAIPUR, RAJASTHAN</p>
@@ -543,18 +543,72 @@ export default function BbaLegalPages({ formData, companyInfo, totalCost }: any)
           government and /or authorities or any other government department, the Agreement as
           apportioned by the firm shall be final and bindings on Allottee.
         </p>
-        <p className="mb-4 text-justify text-[13px] leading-relaxed">
-          The Allottee(s) shall make all payments within the stipulated time as mentioned in the
-          schedule of payments as given in Annexure-A annexed to this Agreement and other charges
-          and amounts, as may be demanded by the Firm from time to time, without any reminders from
-          the Firm, through A/c payee cheque(s)/ demand draft(s) in favour of &apos;SVI INFRA
-          SOLUTIONS PVT LTD&apos; or transfer online to:
-        </p>
-        <p className="mb-4 text-justify text-[13px] leading-relaxed">
-          <strong>Account Name:</strong> SVI INFRA SOLUTIONS PVT LTD,{' '}
-          <strong>Account Number:</strong> 0894102000013837, <strong>Bank:</strong> IDBI BANK,{' '}
-          <strong>IFSC CODE:</strong> IBKL0000894
-        </p>
+        <div className="my-6 overflow-hidden rounded-xl border-2 border-amber-500 bg-slate-950 text-white shadow-lg print:rounded-none print:border-black print:bg-white print:text-black print:shadow-none">
+          <div className="flex items-center gap-2 border-b border-amber-500/30 bg-slate-900 px-5 py-3 print:border-black print:bg-transparent print:px-0 print:py-1">
+            <svg
+              className="h-4 w-4 flex-shrink-0 text-amber-500 print:hidden"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+            <span className="text-xs font-black tracking-wider text-amber-400 uppercase print:text-[13px] print:tracking-normal print:text-black">
+              Payment Instructions &amp; Official Bank Account
+            </span>
+          </div>
+
+          <div className="p-5 print:p-0">
+            <p className="mb-4 text-justify text-[13px] leading-relaxed text-slate-300 print:text-black">
+              The Allottee(s) shall make all payments within the stipulated time as mentioned in the
+              schedule of payments as given in Annexure-A annexed to this Agreement and other
+              charges and amounts, as may be demanded by the Firm from time to time, without any
+              reminders from the Firm, through A/c payee cheque(s)/ demand draft(s) in favour of
+              &apos;SVI INFRA SOLUTIONS PVT LTD&apos; or transfer online to:
+            </p>
+
+            <div className="grid grid-cols-2 gap-4 text-[13px] print:grid-cols-2 print:gap-x-8 print:gap-y-2">
+              <div className="rounded-lg border border-slate-800/80 bg-slate-900/60 p-3 print:border-none print:bg-transparent print:p-0">
+                <span className="mb-0.5 block text-[9px] font-bold tracking-widest text-amber-400 uppercase print:text-[10px] print:font-bold print:text-black">
+                  Account Name
+                </span>
+                <strong className="text-sm font-extrabold tracking-wide text-white print:text-black">
+                  SVI INFRA SOLUTIONS PVT LTD
+                </strong>
+              </div>
+              <div className="rounded-lg border border-slate-800/80 bg-slate-900/60 p-3 print:border-none print:bg-transparent print:p-0">
+                <span className="mb-0.5 block text-[9px] font-bold tracking-widest text-amber-400 uppercase print:text-[10px] print:font-bold print:text-black">
+                  Bank Name
+                </span>
+                <strong className="text-sm font-extrabold tracking-wide text-white print:text-black">
+                  IDBI BANK
+                </strong>
+              </div>
+              <div className="rounded-lg border border-slate-800/80 bg-slate-900/60 p-3 print:border-none print:bg-transparent print:p-0">
+                <span className="mb-0.5 block text-[9px] font-bold tracking-widest text-amber-400 uppercase print:text-[10px] print:font-bold print:text-black">
+                  Account Number
+                </span>
+                <strong className="text-base font-black tracking-wider text-white print:text-black">
+                  0894 1020 0001 3837
+                </strong>
+              </div>
+              <div className="rounded-lg border border-slate-800/80 bg-slate-900/60 p-3 print:border-none print:bg-transparent print:p-0">
+                <span className="mb-0.5 block text-[9px] font-bold tracking-widest text-amber-400 uppercase print:text-[10px] print:font-bold print:text-black">
+                  IFSC Code
+                </span>
+                <strong className="text-base font-black tracking-wider text-white print:text-black">
+                  IBKL0000894
+                </strong>
+              </div>
+            </div>
+          </div>
+        </div>
         <p className="mb-4 text-justify text-[13px] leading-relaxed">
           5. The Allottee understands that the project is still at the concept stage and decision
           and developments will to an extent depend on the kind of Allottee response as generated by
@@ -601,7 +655,7 @@ export default function BbaLegalPages({ formData, companyInfo, totalCost }: any)
           any nature whatsoever and the Firm shall be released and discharged of all its obligations
           and liabilities under this Agreement.
         </p>
-        <p className="mb-3 text-justify text-[10px] leading-tight">
+        <p className="mb-4 text-justify text-[13px] leading-relaxed">
           C. The builder will provide basic facilities like internal Roads, Parks, External Boundary
           Walls/Fencing, Street Lights, Security System, etc…..
         </p>
@@ -642,10 +696,7 @@ export default function BbaLegalPages({ formData, companyInfo, totalCost }: any)
           and/or as demanded by the Firm from time to time and also to perform/observe all the other
           obligations of the Allottee(s) under this Agreement. The Firm is not under any obligation
           to send any reminders for the payments to be made by the Allottee(s) as per the schedule
-          of payments and for the payments to be made as per demand by the Firm or other If any
-          delay in due payment then the firm will charge 18% p.a interest on pro-rata basis and if
-          such delay continue for 90 days then allotment will automatically get transfer to Market
-          Payment Plan.
+          of payments and for the payments to be made as per demand by the Firm or otherwise.
         </p>
         <p className="mb-4 text-justify text-[13px] leading-relaxed">
           11. If any delay in due payment, then the firm will charge 18% p.a interest on pro-rata
@@ -776,28 +827,12 @@ export default function BbaLegalPages({ formData, companyInfo, totalCost }: any)
           over to the Maintenance Agency. The Allottee(s) agrees to execute Maintenance Agreement
           (draft given in annexure-B to this Agreement) with the Maintenance Agency or any other
           nominee/agency or other body/association of plot//shop owners as may be appointed by the
-          Firm from time to time for the maintenance and upkeep of the Said Building/ Said Complex
+          Building/Said Complex, the maintenance of the Said Building/Said Complex may be handed
+          over to the Maintenance Agency. The Allottee(s) agrees to execute a Maintenance Agreement
+          (draft given in Annexure-B to this Agreement) with the Maintenance Agency or any other
+          nominee/agency or other body/association of plot/shop owners as may be appointed by the
+          Firm from time to time for the maintenance and upkeep of the Said Building/Said Complex.
           The Allottee(s) further undertakes to abide by the terms and conditions of the Maintenance
-          Agreement and to pay promptly all the demands, bills, charges as may be raised by the
-          Maintenance Agency from time to time. the Firm reserves the right to change, modify,
-          amend, impose additional conditions in the Maintenance Agreement at the time of its final
-          execution. The Maintenance Charges shall become applicable/payable from the date of
-          intimation letter or the date of Conveyance deed whichever is earlier. It is further
-          specifically clarified that the draft Maintenance Agreement, set out in annexure-_B_ to
-          this Agreement is merely an indicative Maintenance Agreement for maintenance and upkeep of
-          the Said Building / Said Complex, however, if at any time, after having taken over the
-          Said Building / Said Complex, the Maintenance Agency, said association of plot//shop
-          owners/ condominium of association decides to modify, alter, add, delete any one or more
-          of the terms and conditions of the Maintenance Agreement that is proposed to be entered
-          into with the Allottee(s),
-        </p>
-      </div>
-      <div style={{ pageBreakBefore: 'always', paddingTop: '2rem' }}>
-        <p className="mb-4 text-justify text-[13px] leading-relaxed">
-          more of the terms and conditions of the Maintenance Agreement, the Allottee(s) shall not
-          have any objection to the same and shall execute the Maintenance Agreement as may be
-          required by the Maintenance Agency or association of plot//shop owners or association of
-          condominium or its nominees or assigns.
         </p>
         <p className="mb-4 text-justify text-[13px] leading-relaxed">
           20. The total Maintenance Charges shall be more elaborately described in the Maintenance
@@ -960,7 +995,7 @@ export default function BbaLegalPages({ formData, companyInfo, totalCost }: any)
           arbitrator who shall be appointed by the Managing Director of the Firm. The Allottee
           hereby confirms that he / she shall have no objection in this appointment. In case of any
           proceeding, reference etc. touching upon the arbitration subject including any award, the
-          territorial jurisdiction of the competent courts of Rajasthan.
+          territorial jurisdiction shall lie with the competent courts of Rajasthan.
         </p>
         <p className="mb-4 text-justify text-[13px] leading-relaxed">
           30. That no Allottee shall have any rights to invoke jurisdiction of Civil Court directly
