@@ -7,12 +7,11 @@
   "crons": [
     {
       "path": "/api/cron/lottery",
-      "schedule": "* * * * *"
+      "schedule": "0 0 * * *"
     },
     {
       "path": "/api/cron/campaigns",
-      "schedule": "* * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
-
