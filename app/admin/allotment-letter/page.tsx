@@ -158,6 +158,7 @@ export default function AllotmentLetterPage() {
     area: '',
     bsp: '',
     plc: '',
+    edc: '',
     paymentPlan: '12',
     bookingDate: '',
     secondPaymentDays: '15',
@@ -181,10 +182,25 @@ export default function AllotmentLetterPage() {
     const area = parseFloat(formData.area) || 0;
     const bsp = parseFloat(formData.bsp) || 0;
     const plc = parseFloat(formData.plc) || 0;
+    const edc = parseFloat(formData.edc) || 0;
 
     const base = area * bsp;
     const plcAmount = base * (plc / 100);
-    return base + plcAmount;
+    return base + plcAmount + edc;
+  };
+
+  // Safely parse YYYY-MM-DD → Date object using local timezone components
+  const parseDate = (dateStr: string) => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  };
+
+  // Format a date to DD-MM-YYYY without timezone shifts
+  const formatDate = (date: Date) => {
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
   };
 
   const totalCost = calculateTotalCost();
@@ -373,6 +389,15 @@ export default function AllotmentLetterPage() {
                 type="number"
                 value={formData.plc}
                 onChange={handleChange}
+              />
+
+              <FormField
+                label="EDC (₹)"
+                name="edc"
+                type="number"
+                value={formData.edc}
+                onChange={handleChange}
+                placeholder="0"
               />
 
               <FormSelect
@@ -612,31 +637,44 @@ export default function AllotmentLetterPage() {
               </div>
             </div>
 
-            <div className="bg-brand-navy/5 dark:bg-brand-gold/5 border-brand-navy/10 dark:border-brand-gold/10 mt-6 flex items-center justify-between rounded-xl border p-4">
-              <div>
-                <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
-                  Total Cost
-                </p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white">
-                  ₹
-                  {totalCost.toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
+            <div className="bg-brand-navy/5 dark:bg-brand-gold/5 border-brand-navy/10 dark:border-brand-gold/10 mt-6 rounded-xl border p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
+                    Total Cost
+                  </p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    ₹
+                    {totalCost.toLocaleString('en-IN', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
+                    Booking Payment ({bookingPercent}%)
+                  </p>
+                  <p className="text-brand-gold text-lg font-bold">
+                    ₹
+                    {initialPayment.toLocaleString('en-IN', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
-                  Booking Payment ({bookingPercent}%)
-                </p>
-                <p className="text-brand-gold text-lg font-bold">
-                  ₹
-                  {initialPayment.toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
+              {(parseFloat(formData.edc) || 0) > 0 && (
+                <div className="mt-2 border-t border-dashed border-gray-200 pt-2 dark:border-white/10">
+                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
+                    Includes EDC: ₹
+                    {parseFloat(formData.edc).toLocaleString('en-IN', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+              )}
             </div>
 
             <button
@@ -732,8 +770,8 @@ export default function AllotmentLetterPage() {
                   <p className="mb-4 font-bold">
                     Dated:{' '}
                     {formData.bookingDate
-                      ? formData.bookingDate.split('-').reverse().join('-')
-                      : new Date().toISOString().split('T')[0].split('-').reverse().join('-')}
+                      ? formatDate(parseDate(formData.bookingDate))
+                      : formatDate(new Date())}
                   </p>
                   <p className="font-bold">To,</p>
                   <p className="font-bold">{formData.clientName || '[Client Name]'}</p>
@@ -799,6 +837,9 @@ export default function AllotmentLetterPage() {
                           PLC (in %)
                         </th>
                         <th className="border border-gray-400 p-2 font-bold whitespace-nowrap">
+                          EDC (₹)
+                        </th>
+                        <th className="border border-gray-400 p-2 font-bold whitespace-nowrap">
                           Total Cost
                         </th>
                       </tr>
@@ -818,6 +859,9 @@ export default function AllotmentLetterPage() {
                         <td className="border border-gray-400 p-2 font-bold">{formData.bsp}</td>
                         <td className="border border-gray-400 p-2 font-bold">
                           {formData.plc || '0'}
+                        </td>
+                        <td className="border border-gray-400 p-2 font-bold">
+                          {formData.edc ? parseFloat(formData.edc).toFixed(2) : '0.00'}
                         </td>
                         <td className="border border-gray-400 p-2 font-bold">
                           {totalCost.toFixed(2)}
@@ -847,9 +891,9 @@ export default function AllotmentLetterPage() {
                         <td className="border border-gray-400 p-2 font-bold">
                           {(() => {
                             if (!formData.bookingDate) return '-';
-                            const d = new Date(formData.bookingDate);
+                            const d = parseDate(formData.bookingDate);
                             d.setDate(d.getDate() + 3);
-                            return d.toISOString().split('T')[0].split('-').reverse().join('-');
+                            return formatDate(d);
                           })()}
                         </td>
                         <td className="border border-gray-400 p-2 font-bold">
@@ -867,9 +911,9 @@ export default function AllotmentLetterPage() {
                           <td className="border border-gray-400 p-2 font-bold">
                             {(() => {
                               if (!formData.bookingDate) return '-';
-                              const d = new Date(formData.bookingDate);
+                              const d = parseDate(formData.bookingDate);
                               d.setDate(d.getDate() + parseInt(formData.secondPaymentDays));
-                              return d.toISOString().split('T')[0].split('-').reverse().join('-');
+                              return formatDate(d);
                             })()}
                           </td>
                           <td className="border border-gray-400 p-2 font-bold">
@@ -899,13 +943,13 @@ export default function AllotmentLetterPage() {
                         return Array.from({ length: emiCount }).map((_, i) => {
                           let emiDate = '-';
                           if (formData.emiStartDate) {
-                            const d = new Date(formData.emiStartDate);
+                            const d = parseDate(formData.emiStartDate);
                             d.setMonth(d.getMonth() + i);
-                            emiDate = d.toISOString().split('T')[0].split('-').reverse().join('-');
+                            emiDate = formatDate(d);
                           } else if (formData.bookingDate) {
-                            const d = new Date(formData.bookingDate);
+                            const d = parseDate(formData.bookingDate);
                             d.setMonth(d.getMonth() + i + 2);
-                            emiDate = d.toISOString().split('T')[0].split('-').reverse().join('-');
+                            emiDate = formatDate(d);
                           }
 
                           return (
@@ -938,9 +982,9 @@ export default function AllotmentLetterPage() {
                     {initialPayment.toFixed(2)}) within the first 3 days (by{' '}
                     {(() => {
                       if (!formData.bookingDate) return '[Date]';
-                      const d = new Date(formData.bookingDate);
+                      const d = parseDate(formData.bookingDate);
                       d.setDate(d.getDate() + 3);
-                      return d.toISOString().split('T')[0].split('-').reverse().join('-');
+                      return formatDate(d);
                     })()}
                     ) to confirm allotment under {formData.projectName}.
                   </p>
@@ -950,9 +994,9 @@ export default function AllotmentLetterPage() {
                       must be paid within {formData.secondPaymentDays} days (by{' '}
                       {(() => {
                         if (!formData.bookingDate) return '[Date]';
-                        const d = new Date(formData.bookingDate);
+                        const d = parseDate(formData.bookingDate);
                         d.setDate(d.getDate() + parseInt(formData.secondPaymentDays));
-                        return d.toISOString().split('T')[0].split('-').reverse().join('-');
+                        return formatDate(d);
                       })()}
                       ).
                     </p>
