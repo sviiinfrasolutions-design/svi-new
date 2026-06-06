@@ -7,7 +7,7 @@ import {
   PreviewContainer,
 } from '@/src/components/admin/DocumentGenerator/Shared';
 import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
-import { FileText, RefreshCw } from 'lucide-react';
+import { FileText, RefreshCw, X } from 'lucide-react';
 
 import { exportToPDF, exportToImage } from '@/src/lib/utils/documentExporter';
 import Link from 'next/link';
@@ -95,6 +95,27 @@ export default function AllotmentLetterPage() {
       }
     }
     loadAdvisors();
+
+    // Load saved allotment records
+    async function loadSavedAllotments() {
+      setLoadingRecords(true);
+      try {
+        const res = await fetch('/api/admin/documents?type=allotment_letter&limit=500', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Failed to fetch records');
+        const json = await res.json();
+        const docs = json.documents || [];
+        // Only include records with form_data that have at least clientName
+        const valid = docs.filter((d: any) => d.form_data?.clientName);
+        setSavedAllotments(valid);
+      } catch (err) {
+        console.error('Error loading allotment records:', err);
+      } finally {
+        setLoadingRecords(false);
+      }
+    }
+    loadSavedAllotments();
   }, [token]);
 
   const handleAdvisorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -178,6 +199,11 @@ export default function AllotmentLetterPage() {
 
   const [preview, setPreview] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
+
+  // Load from saved allotment records
+  const [savedAllotments, setSavedAllotments] = useState<any[]>([]);
+  const [loadingRecords, setLoadingRecords] = useState(false);
+  const [selectedRecordId, setSelectedRecordId] = useState('');
 
   const calculateTotalCost = () => {
     const area = parseFloat(formData.area) || 0;
@@ -295,6 +321,40 @@ export default function AllotmentLetterPage() {
     }
   };
 
+  // Populate form from a saved allotment record
+  const loadFromRecord = (id: string) => {
+    if (!id) return;
+    const record = savedAllotments.find((r) => r.id === id);
+    if (!record?.form_data) return;
+    const fd = record.form_data;
+    setFormData({
+      clientName: fd.clientName || '',
+      salutation: fd.salutation || 'Mr.',
+      address: fd.address || '',
+      ticketId: fd.ticketId || '',
+      projectName: fd.projectName || 'Shyam Aangan',
+      unitNumber: fd.unitNumber || '',
+      area: fd.area || '',
+      bsp: fd.bsp || '',
+      plc: fd.plc || '',
+      edc: fd.edc || '',
+      edcInEmi: fd.edcInEmi || 'false',
+      paymentPlan: fd.paymentPlan || '12',
+      bookingDate: fd.bookingDate || '',
+      secondPaymentDays: fd.secondPaymentDays || '15',
+      advisorName: fd.advisorName || '',
+      advisorNumber: fd.advisorNumber || '',
+      advisorEmail: fd.advisorEmail || '',
+      emiCount: fd.emiCount || '12',
+      emiPercentage: fd.emiPercentage || '',
+      emiStartDate: fd.emiStartDate || '',
+      zeroPercentEmi: fd.zeroPercentEmi || 'false',
+      bookingPaymentPercent: fd.bookingPaymentPercent || '10',
+      showSecondInstalment: fd.showSecondInstalment || 'true',
+    });
+    setSelectedRecordId(id);
+  };
+
   return (
     <div className="mx-auto w-full max-w-7xl font-sans">
       <div className="mb-6 flex items-center justify-between">
@@ -307,6 +367,71 @@ export default function AllotmentLetterPage() {
           </p>
         </div>
       </div>
+
+      {/* Load from saved records */}
+      {savedAllotments.length > 0 && (
+        <div className="mb-6 rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm backdrop-blur-sm dark:border-white/8 dark:bg-[#0e0e14]/40">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+              <FileText className="h-3.5 w-3.5" />
+              Load from Records
+            </div>
+            <div className="relative flex-1" style={{ minWidth: 280 }}>
+              <select
+                value={selectedRecordId}
+                onChange={(e) => loadFromRecord(e.target.value)}
+                className="focus:border-brand-gold focus:ring-brand-gold/50 w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2 pr-8 text-sm text-gray-900 transition-all focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white"
+              >
+                <option value="">
+                  {loadingRecords ? 'Loading records...' : '— Select a saved allotment —'}
+                </option>
+                {savedAllotments.map((r: any) => (
+                  <option key={r.id} value={r.id}>
+                    {r.form_data?.clientName || 'Unnamed'} — {r.form_data?.ticketId || 'No ticket'}{' '}
+                    ({new Date(r.created_at).toLocaleDateString('en-IN')})
+                  </option>
+                ))}
+              </select>
+            </div>
+            {selectedRecordId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedRecordId('');
+                  setFormData({
+                    clientName: '',
+                    salutation: 'Mr.',
+                    address: '',
+                    ticketId: '',
+                    projectName: 'Shyam Aangan',
+                    unitNumber: '',
+                    area: '',
+                    bsp: '',
+                    plc: '',
+                    edc: '',
+                    edcInEmi: 'false',
+                    paymentPlan: '12',
+                    bookingDate: '',
+                    secondPaymentDays: '15',
+                    advisorName: '',
+                    advisorNumber: '',
+                    advisorEmail: '',
+                    emiCount: '12',
+                    emiPercentage: '',
+                    emiStartDate: '',
+                    zeroPercentEmi: 'false',
+                    bookingPaymentPercent: '10',
+                    showSecondInstalment: 'true',
+                  });
+                }}
+                className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-500 transition-all hover:border-gray-300 hover:text-gray-700 dark:border-white/10 dark:text-gray-400 dark:hover:border-white/20"
+              >
+                <X className="h-3.5 w-3.5" /> Clear
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
         {/* Form Section */}
