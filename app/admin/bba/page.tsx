@@ -192,6 +192,8 @@ export default function BbaPage() {
     advisorName: '',
     advisorNumber: '',
     advisorEmail: '',
+    onBookingPaymentRef: '',
+    within15DaysPaymentRef: '',
   });
 
   const [preview, setPreview] = useState(false);
@@ -314,6 +316,8 @@ export default function BbaPage() {
         advisorName: '',
         advisorNumber: '',
         advisorEmail: '',
+        onBookingPaymentRef: '',
+        within15DaysPaymentRef: '',
       });
       return;
     }
@@ -578,6 +582,21 @@ export default function BbaPage() {
                   { value: '15', label: '15 days' },
                   { value: '28', label: '28 days' },
                 ]}
+              />
+
+              <FormField
+                label="Payment Reference No. (On Booking)"
+                name="onBookingPaymentRef"
+                value={formData.onBookingPaymentRef}
+                onChange={handleChange}
+                placeholder="e.g. Txn/Receipt No."
+              />
+              <FormField
+                label="Payment Reference No. (Within 15 Days)"
+                name="within15DaysPaymentRef"
+                value={formData.within15DaysPaymentRef}
+                onChange={handleChange}
+                placeholder="e.g. Txn/Receipt No."
               />
 
               {isCustomAdvisor ? (

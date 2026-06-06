@@ -152,6 +152,7 @@ export default function BbaPreviewContent({ formData, companyInfo }: any) {
                 <th className="border border-gray-400 p-2 font-bold">Particulars</th>
                 <th className="border border-gray-400 p-2 font-bold">%</th>
                 <th className="border border-gray-400 p-2 font-bold">Amount</th>
+                <th className="border border-gray-400 p-2 font-bold">Payment Ref. No.</th>
               </tr>
             </thead>
             <tbody>
@@ -167,6 +168,9 @@ export default function BbaPreviewContent({ formData, companyInfo }: any) {
                     <td className="border border-gray-400 p-2">10%</td>
                     <td className="border border-gray-400 p-2 font-bold">
                       {fmtInr(totalCost * 0.1)}
+                    </td>
+                    <td className="border border-gray-400 p-2">
+                      {formData?.onBookingPaymentRef || '-'}
                     </td>
                   </tr>
                   {/* Row 2 – 20% Within 28 days */}
@@ -184,6 +188,9 @@ export default function BbaPreviewContent({ formData, companyInfo }: any) {
                     <td className="border border-gray-400 p-2">20%</td>
                     <td className="border border-gray-400 p-2 font-bold">
                       {fmtInr(totalCost * 0.2)}
+                    </td>
+                    <td className="border border-gray-400 p-2">
+                      {formData?.within15DaysPaymentRef || '-'}
                     </td>
                   </tr>
                   {/* EMI rows – 70% over N months, 2.9% each */}
@@ -227,6 +234,9 @@ export default function BbaPreviewContent({ formData, companyInfo }: any) {
                     <td className="border border-gray-400 p-2 font-bold">
                       Rs. {(totalCost * 0.05).toFixed(2)}
                     </td>
+                    <td className="border border-gray-400 p-2">
+                      {formData?.onBookingPaymentRef || '-'}
+                    </td>
                   </tr>
                   {/* Second Instalment (5%) */}
                   <tr>
@@ -245,6 +255,9 @@ export default function BbaPreviewContent({ formData, companyInfo }: any) {
                     <td className="border border-gray-400 p-2">5%</td>
                     <td className="border border-gray-400 p-2 font-bold">
                       Rs. {(totalCost * 0.05).toFixed(2)}
+                    </td>
+                    <td className="border border-gray-400 p-2">
+                      {formData?.within15DaysPaymentRef || '-'}
                     </td>
                   </tr>
                   {/* Third Instalment (30%) */}
@@ -265,6 +278,7 @@ export default function BbaPreviewContent({ formData, companyInfo }: any) {
                     <td className="border border-gray-400 p-2 font-bold">
                       Rs. {(totalCost * 0.3).toFixed(2)}
                     </td>
+                    <td className="border border-gray-400 p-2">-</td>
                   </tr>
                   {/* EMIs (Remaining 60%) */}
                   {(() => {
@@ -288,6 +302,7 @@ export default function BbaPreviewContent({ formData, companyInfo }: any) {
                           <td className="border border-gray-400 p-2 font-bold">
                             Rs. {emiAmount.toFixed(2)}
                           </td>
+                          <td className="border border-gray-400 p-2">-</td>
                         </tr>
                       );
                     });
