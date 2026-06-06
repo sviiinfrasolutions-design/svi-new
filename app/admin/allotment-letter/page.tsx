@@ -164,6 +164,10 @@ export default function AllotmentLetterPage() {
     advisorName: '',
     advisorNumber: '',
     advisorEmail: '',
+    // EMI Customization fields
+    emiCount: '12',
+    emiPercentage: '',
+    emiStartDate: '',
   });
 
   const [preview, setPreview] = useState(false);
@@ -180,7 +184,8 @@ export default function AllotmentLetterPage() {
   };
 
   const totalCost = calculateTotalCost();
-  const initialPayment = totalCost * 0.05;
+  const initialPayment = totalCost * 0.1; // 10% booking payment
+  const secondPayment = totalCost * 0.2; // 20% second payment
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -488,6 +493,44 @@ export default function AllotmentLetterPage() {
               />
             </div>
 
+            {/* EMI Customization Section */}
+            <div className="mt-6 border-t border-gray-200 pt-6 dark:border-white/10">
+              <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                EMI Customization
+              </h3>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <FormSelect
+                  label="EMI Count"
+                  name="emiCount"
+                  value={formData.emiCount}
+                  onChange={handleChange}
+                  options={[
+                    { value: '6', label: '6 EMIs' },
+                    { value: '12', label: '12 EMIs' },
+                    { value: '18', label: '18 EMIs' },
+                    { value: '24', label: '24 EMIs' },
+                    { value: '36', label: '36 EMIs' },
+                    { value: 'custom', label: 'Custom...' },
+                  ]}
+                />
+                <FormField
+                  label="EMI Percentage per Installment"
+                  name="emiPercentage"
+                  type="number"
+                  placeholder="e.g., 5"
+                  value={formData.emiPercentage}
+                  onChange={handleChange}
+                />
+                <FormField
+                  label="EMI Start Date"
+                  name="emiStartDate"
+                  type="date"
+                  value={formData.emiStartDate}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
             <div className="bg-brand-navy/5 dark:bg-brand-gold/5 border-brand-navy/10 dark:border-brand-gold/10 mt-6 flex items-center justify-between rounded-xl border p-4">
               <div>
                 <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
@@ -503,7 +546,7 @@ export default function AllotmentLetterPage() {
               </div>
               <div className="text-right">
                 <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
-                  Booking Payment (5%)
+                  Booking Payment (10%)
                 </p>
                 <p className="text-brand-gold text-lg font-bold">
                   ₹
@@ -717,7 +760,7 @@ export default function AllotmentLetterPage() {
                       </tr>
                     </thead>
                     <tbody className="text-xs">
-                      {/* First Instalment (5%) */}
+                      {/* First Instalment (10%) */}
                       <tr>
                         <td className="border border-gray-400 p-2 font-bold">1</td>
                         <td className="border border-gray-400 p-2 font-bold">
@@ -731,59 +774,49 @@ export default function AllotmentLetterPage() {
                         <td className="border border-gray-400 p-2 font-bold">
                           On Booking (First 3 Days)
                         </td>
-                        <td className="border border-gray-400 p-2">5%</td>
+                        <td className="border border-gray-400 p-2">10%</td>
                         <td className="border border-gray-400 p-2 font-bold">
-                          Rs. {(totalCost * 0.05).toFixed(2)}
+                          Rs. {(totalCost * 0.1).toFixed(2)}
                         </td>
                       </tr>
-                      {/* Second Instalment (5%) */}
+                      {/* Second Instalment (20%) */}
                       <tr>
                         <td className="border border-gray-400 p-2 font-bold">2</td>
                         <td className="border border-gray-400 p-2 font-bold">
                           {(() => {
                             if (!formData.bookingDate) return '-';
                             const d = new Date(formData.bookingDate);
-                            d.setDate(d.getDate() + 10);
+                            d.setDate(d.getDate() + parseInt(formData.secondPaymentDays));
                             return d.toISOString().split('T')[0].split('-').reverse().join('-');
                           })()}
                         </td>
                         <td className="border border-gray-400 p-2 font-bold">
-                          Second Instalment (Next 7 Days)
+                          Second Instalment ({formData.secondPaymentDays} Days)
                         </td>
-                        <td className="border border-gray-400 p-2">5%</td>
+                        <td className="border border-gray-400 p-2">20%</td>
                         <td className="border border-gray-400 p-2 font-bold">
-                          Rs. {(totalCost * 0.05).toFixed(2)}
+                          Rs. {(totalCost * 0.2).toFixed(2)}
                         </td>
                       </tr>
-                      {/* Third Instalment (30%) */}
-                      <tr>
-                        <td className="border border-gray-400 p-2 font-bold">3</td>
-                        <td className="border border-gray-400 p-2 font-bold">
-                          {(() => {
-                            if (!formData.bookingDate) return '-';
-                            const d = new Date(formData.bookingDate);
-                            d.setDate(d.getDate() + 25);
-                            return d.toISOString().split('T')[0].split('-').reverse().join('-');
-                          })()}
-                        </td>
-                        <td className="border border-gray-400 p-2 font-bold">
-                          Third Instalment (Next 15 Days)
-                        </td>
-                        <td className="border border-gray-400 p-2">30%</td>
-                        <td className="border border-gray-400 p-2 font-bold">
-                          Rs. {(totalCost * 0.3).toFixed(2)}
-                        </td>
-                      </tr>
-                      {/* EMIs (Remaining 60%) */}
+                      {/* EMIs (Remaining 70%) */}
                       {(() => {
-                        const remainingCost = totalCost * 0.6;
-                        const months = parseInt(formData.paymentPlan || '12');
-                        const emiAmount = remainingCost / months;
-                        const emiPercent = 60 / months;
+                        const remainingPercent = 70;
+                        const emiCount =
+                          formData.emiCount === 'custom'
+                            ? parseInt(formData.paymentPlan || '12')
+                            : parseInt(formData.emiCount || '12');
+                        const emiPercentPerInstallment = formData.emiPercentage
+                          ? parseFloat(formData.emiPercentage)
+                          : remainingPercent / emiCount;
+                        const emiAmount = totalCost * (emiPercentPerInstallment / 100);
 
-                        return Array.from({ length: months }).map((_, i) => {
+                        return Array.from({ length: emiCount }).map((_, i) => {
                           let emiDate = '-';
-                          if (formData.bookingDate) {
+                          if (formData.emiStartDate) {
+                            const d = new Date(formData.emiStartDate);
+                            d.setMonth(d.getMonth() + i);
+                            emiDate = d.toISOString().split('T')[0].split('-').reverse().join('-');
+                          } else if (formData.bookingDate) {
                             const d = new Date(formData.bookingDate);
                             d.setMonth(d.getMonth() + i + 2);
                             emiDate = d.toISOString().split('T')[0].split('-').reverse().join('-');
@@ -791,11 +824,11 @@ export default function AllotmentLetterPage() {
 
                           return (
                             <tr key={i}>
-                              <td className="border border-gray-400 p-2 font-bold">{i + 4}</td>
+                              <td className="border border-gray-400 p-2 font-bold">{i + 3}</td>
                               <td className="border border-gray-400 p-2 font-bold">{emiDate}</td>
                               <td className="border border-gray-400 p-2 font-bold">{i + 1} EMI</td>
                               <td className="border border-gray-400 p-2">
-                                {emiPercent.toFixed(1)}%
+                                {emiPercentPerInstallment.toFixed(1)}%
                               </td>
                               <td className="border border-gray-400 p-2 font-bold">
                                 Rs. {emiAmount.toFixed(2)}
@@ -811,7 +844,7 @@ export default function AllotmentLetterPage() {
                 {/* Terms Box */}
                 <div className="mb-8 rounded-lg border-l-4 border-[#00b0f0] bg-[#f0f8ff] p-4 text-xs text-gray-800 italic">
                   <p className="mb-2">
-                    Please transfer the initial amount of 5% (Rs. {(totalCost * 0.05).toFixed(2)})
+                    Please transfer the initial amount of 10% (Rs. {(totalCost * 0.1).toFixed(2)})
                     within the first 3 days (by{' '}
                     {(() => {
                       if (!formData.bookingDate) return '[Date]';
@@ -822,31 +855,23 @@ export default function AllotmentLetterPage() {
                     ) to confirm allotment under {formData.projectName}.
                   </p>
                   <p className="mb-2">
-                    The second instalment of 5% (Rs. {(totalCost * 0.05).toFixed(2)}) must be paid
-                    in the next 7 days (by{' '}
+                    The second instalment of 20% (Rs. {(totalCost * 0.2).toFixed(2)}) must be paid
+                    within {formData.secondPaymentDays} days (by{' '}
                     {(() => {
                       if (!formData.bookingDate) return '[Date]';
                       const d = new Date(formData.bookingDate);
-                      d.setDate(d.getDate() + 10);
-                      return d.toISOString().split('T')[0].split('-').reverse().join('-');
-                    })()}
-                    ), and the third instalment of 30% (Rs. {(totalCost * 0.3).toFixed(2)}) in the
-                    next 15 days (by{' '}
-                    {(() => {
-                      if (!formData.bookingDate) return '[Date]';
-                      const d = new Date(formData.bookingDate);
-                      d.setDate(d.getDate() + 25);
+                      d.setDate(d.getDate() + parseInt(formData.secondPaymentDays));
                       return d.toISOString().split('T')[0].split('-').reverse().join('-');
                     })()}
                     ).
                   </p>
                   <p className="mb-2">
-                    The remaining 60% will be paid as per the selected payment plan EMIs and is
+                    The remaining 70% will be paid as per the selected payment plan EMIs and is
                     scheduled to complete accordingly.
                   </p>
                   <p className="mb-2">
                     Note: Allotment under {formData.projectName} will only be confirmed upon receipt
-                    of the initial 5% (Rs. {(totalCost * 0.05).toFixed(2)}) by the due date.
+                    of the initial 10% (Rs. {(totalCost * 0.1).toFixed(2)}) by the due date.
                   </p>
                   <p>
                     In the event you fail to make the payments as per the payment plan chosen by

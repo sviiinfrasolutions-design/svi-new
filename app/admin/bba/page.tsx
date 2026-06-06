@@ -209,7 +209,7 @@ export default function BbaPage() {
 
   const totalCost = calculateTotalCost();
   const isShyamAangan = formData.projectName === 'Shyam Aangan';
-  const initialPayment = isShyamAangan ? totalCost * 0.1 : totalCost * 0.05;
+  const initialPayment = totalCost * 0.1;
 
   // dd-mm-yy format (matches PDF: 29-11-25)
   const fmtDate = (dateStr: string, addDays = 0, addMonths = 0) => {
@@ -692,7 +692,7 @@ export default function BbaPage() {
               </div>
               <div className="text-right">
                 <p className="text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
-                  Booking Payment ({isShyamAangan ? '10%' : '5%'})
+                  Booking Payment (10%)
                 </p>
                 <p className="text-brand-gold text-lg font-bold">
                   ₹

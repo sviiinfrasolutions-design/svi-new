@@ -128,12 +128,13 @@ function SidebarContent({
         </Link>
 
         {/* Documents section */}
-        <motion.div
-          animate={{ opacity: collapsed && !isMobile ? 0 : 1 }}
-          className="mt-6 mb-2 px-4 pb-0.5 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase dark:text-gray-500"
+        <div
+          className={`mt-6 mb-2 px-4 pb-0.5 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase transition-opacity duration-300 dark:text-gray-500 ${
+            collapsed && !isMobile ? 'opacity-0' : 'opacity-100'
+          }`}
         >
           Documents
-        </motion.div>
+        </div>
 
         {documentItems.map((item) => {
           const active = pathname === item.path || pathname.startsWith(`${item.path}/`);
@@ -166,12 +167,13 @@ function SidebarContent({
         })}
 
         {/* Management section */}
-        <motion.div
-          animate={{ opacity: collapsed && !isMobile ? 0 : 1 }}
-          className="mt-6 mb-2 px-4 pb-0.5 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase dark:text-gray-500"
+        <div
+          className={`mt-6 mb-2 px-4 pb-0.5 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase transition-opacity duration-300 dark:text-gray-500 ${
+            collapsed && !isMobile ? 'opacity-0' : 'opacity-100'
+          }`}
         >
           Management
-        </motion.div>
+        </div>
 
         {managementItems.map((item) => {
           const active = pathname === item.path || pathname.startsWith(`${item.path}/`);
