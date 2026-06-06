@@ -263,7 +263,7 @@ const AdminSidebar = ({ mobileOpen = false, onMobileClose }: AdminSidebarProps) 
     <>
       {/* Desktop sidebar — hidden on mobile */}
       <motion.aside
-        animate={{ width: collapsed ? 80 : 256 }}
+        animate={{ width: collapsed ? 80 : 224 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="dark:border-brand-gold/15 relative z-40 hidden h-screen flex-col border-r border-gray-200 bg-white/90 backdrop-blur-xl transition-colors duration-300 md:flex dark:bg-[#0e0e14]/90"
       >
@@ -297,7 +297,7 @@ const AdminSidebar = ({ mobileOpen = false, onMobileClose }: AdminSidebarProps) 
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ duration: 0.28, ease: 'easeInOut' }}
-              className="dark:border-brand-gold/15 fixed top-0 left-0 z-50 flex h-screen w-72 flex-col border-r border-gray-200 bg-white/95 backdrop-blur-xl md:hidden dark:bg-[#0e0e14]/95"
+              className="dark:border-brand-gold/15 fixed top-0 left-0 z-50 flex h-screen w-64 flex-col border-r border-gray-200 bg-white/95 backdrop-blur-xl md:hidden dark:bg-[#0e0e14]/95"
             >
               {/* Close button */}
               <button
