@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
 import { Resend } from 'resend';
+import { supabaseAdmin } from '@/src/lib/supabase/admin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 function getResend() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -85,6 +87,18 @@ export async function POST(request: NextRequest) {
 
       if (result.error) {
         return NextResponse.json({ error: result.error.message }, { status: 422 });
+      }
+
+      try {
+        const { data: profileData } = await supabaseAdmin
+          .from('profiles')
+          .select('full_name')
+          .eq('id', admin.id)
+          .single();
+        const adminName = profileData?.full_name || admin.email || 'Admin';
+        await NotificationHelper.emailSent(Array.isArray(to) ? to[0] : to, subject, adminName);
+      } catch (notifErr) {
+        console.error('Failed to create email sent notification:', notifErr);
       }
 
       return NextResponse.json({ success: true, id: result.data?.id });

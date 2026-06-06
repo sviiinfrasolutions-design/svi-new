@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -45,9 +46,13 @@ export async function PUT(request: NextRequest, { params }: Params) {
     .eq('id', id)
     .single();
 
-  if (fetchErr || !existing) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
+  if (fetchErr || !existing)
+    return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
   if (existing.status === 'sent' || existing.status === 'cancelled') {
-    return NextResponse.json({ error: `Cannot edit a ${existing.status} campaign` }, { status: 400 });
+    return NextResponse.json(
+      { error: `Cannot edit a ${existing.status} campaign` },
+      { status: 400 }
+    );
   }
 
   const {
@@ -89,7 +94,21 @@ export async function PUT(request: NextRequest, { params }: Params) {
       description: `Campaign "${existing.title}" updated (${newStatus}).`,
       metadata: { campaignId: id },
     });
-  } catch {}
+  } catch (_err) {
+    // Activity logging is non-critical
+  }
+
+  try {
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name')
+      .eq('id', admin.id)
+      .single();
+    const adminName = profile?.full_name || admin.email || 'Admin';
+    await NotificationHelper.campaignUpdated(existing.title, adminName);
+  } catch (notifErr) {
+    console.error('Failed to create campaign update notification:', notifErr);
+  }
 
   return NextResponse.json({ campaign: updated });
 }
@@ -111,10 +130,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
 
   // Cancel instead of hard-delete if scheduled/sent (keep history)
   if (existing?.status === 'scheduled') {
-    await supabaseAdmin
-      .from('email_campaigns')
-      .update({ status: 'cancelled' })
-      .eq('id', id);
+    await supabaseAdmin.from('email_campaigns').update({ status: 'cancelled' }).eq('id', id);
   } else {
     const { error } = await supabaseAdmin.from('email_campaigns').delete().eq('id', id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -127,7 +143,18 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       description: `Campaign "${existing?.title || id}" deleted/cancelled.`,
       metadata: { campaignId: id },
     });
-  } catch {}
+  } catch (_err) {
+    // Activity logging is non-critical
+  }
+
+  try {
+    await NotificationHelper.campaignDeleted(
+      existing?.title || 'Unknown Campaign',
+      admin.email || 'Admin'
+    );
+  } catch (notifErr) {
+    console.error('Failed to create campaign delete notification:', notifErr);
+  }
 
   return NextResponse.json({ success: true });
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 // GET /api/admin/documents — list documents with optional filters
 export async function GET(request: NextRequest) {
@@ -125,14 +126,34 @@ export async function POST(request: NextRequest) {
   }
 
   // Log activity
-  await supabaseAdmin.from('activity_logs').insert({
-    user_id: admin.id,
-    action_type: 'document_generated',
-    description: `${(document_type ?? 'document').replace(/_/g, ' ')} generated`,
-    target_id: data.id,
-    target_type: 'document',
-    metadata: { user_id },
-  });
+  try {
+    await supabaseAdmin.from('activity_logs').insert({
+      user_id: admin.id,
+      action_type: 'document_generated',
+      description: `${(document_type ?? 'document').replace(/_/g, ' ')} generated`,
+      target_id: data.id,
+      target_type: 'document',
+      metadata: { user_id },
+    });
+  } catch (_err) {
+    // Activity logging is non-critical
+  }
+
+  // Notify all admins
+  try {
+    const { data: profileData } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user_id)
+      .single();
+    await NotificationHelper.documentCreated(
+      document_type,
+      profileData?.full_name || 'User',
+      user_id
+    );
+  } catch (notifErr) {
+    console.error('Failed to create document notification:', notifErr);
+  }
 
   return NextResponse.json({ document: data }, { status: 201 });
 }

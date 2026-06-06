@@ -255,4 +255,243 @@ export const NotificationHelper = {
       metadata: { event: 'team_created', teamName },
     });
   },
+
+  /**
+   * Document updated/downloaded notification
+   */
+  documentUpdated: async (documentType: string, adminName: string, documentId: string) => {
+    const docLabels: Record<string, string> = {
+      allotment_letter: 'Allotment Letter',
+      payment_receipt: 'Payment Receipt',
+      payment_plan: 'Payment Plan',
+      offer_letter: 'Offer Letter',
+      bba: 'BBA Agreement',
+    };
+    return createNotificationForAllAdmins({
+      title: 'Document Updated',
+      message: `${adminName} updated ${docLabels[documentType] || documentType} (ID: ${documentId.slice(0, 8)}...).`,
+      type: 'info',
+      action_url: `/admin/documents`,
+      metadata: { event: 'document_updated', documentType, documentId },
+    });
+  },
+
+  /**
+   * Document deleted notification
+   */
+  documentDeleted: async (documentType: string, adminName: string) => {
+    const docLabels: Record<string, string> = {
+      allotment_letter: 'Allotment Letter',
+      payment_receipt: 'Payment Receipt',
+      payment_plan: 'Payment Plan',
+      offer_letter: 'Offer Letter',
+      bba: 'BBA Agreement',
+    };
+    return createNotificationForAllAdmins({
+      title: 'Document Deleted',
+      message: `${adminName} deleted ${docLabels[documentType] || documentType}.`,
+      type: 'warning',
+      action_url: `/admin/documents`,
+      metadata: { event: 'document_deleted', documentType },
+    });
+  },
+
+  /**
+   * Property created notification
+   */
+  propertyCreated: async (propertyName: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Property Created',
+      message: `${adminName} created a new property: "${propertyName}".`,
+      type: 'success',
+      action_url: `/admin/properties`,
+      metadata: { event: 'property_created', propertyName },
+    });
+  },
+
+  /**
+   * Property updated notification
+   */
+  propertyUpdated: async (propertyName: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Property Updated',
+      message: `${adminName} updated property: "${propertyName}".`,
+      type: 'info',
+      action_url: `/admin/properties`,
+      metadata: { event: 'property_updated', propertyName },
+    });
+  },
+
+  /**
+   * Property deleted notification
+   */
+  propertyDeleted: async (propertyName: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Property Deleted',
+      message: `${adminName} deleted property: "${propertyName}".`,
+      type: 'warning',
+      action_url: `/admin/properties`,
+      metadata: { event: 'property_deleted', propertyName },
+    });
+  },
+
+  /**
+   * Registration status updated notification
+   */
+  registrationStatusUpdated: async (
+    registrationId: string,
+    newStatus: string,
+    adminName: string
+  ) => {
+    return createNotificationForAllAdmins({
+      title: 'Registration Status Updated',
+      message: `${adminName} changed registration ${registrationId.slice(0, 8)}... status to "${newStatus}".`,
+      type: 'info',
+      action_url: `/admin/registrations`,
+      metadata: { event: 'registration_status_updated', registrationId, newStatus },
+    });
+  },
+
+  /**
+   * Registration deleted notification
+   */
+  registrationDeleted: async (registrationId: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Registration Deleted',
+      message: `${adminName} deleted registration ${registrationId.slice(0, 8)}....`,
+      type: 'warning',
+      action_url: `/admin/registrations`,
+      metadata: { event: 'registration_deleted', registrationId },
+    });
+  },
+
+  /**
+   * Lottery draw scheduled notification
+   */
+  lotteryScheduled: async (lotteryTitle: string, scheduledAt: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Lottery Draw Scheduled',
+      message: `${adminName} scheduled draw for "${lotteryTitle}" at ${new Date(scheduledAt).toLocaleString()}.`,
+      type: 'info',
+      action_url: `/admin/lottery`,
+      metadata: { event: 'lottery_scheduled', lotteryTitle, scheduled_at: scheduledAt },
+    });
+  },
+
+  /**
+   * Lottery schedule cancelled notification
+   */
+  lotteryScheduleCancelled: async (lotteryTitle: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Lottery Draw Cancelled',
+      message: `${adminName} cancelled the scheduled draw for "${lotteryTitle}".`,
+      type: 'warning',
+      action_url: `/admin/lottery`,
+      metadata: { event: 'lottery_schedule_cancelled', lotteryTitle },
+    });
+  },
+
+  /**
+   * Lottery draw executed notification
+   */
+  lotteryDrawn: async (lotteryTitle: string, winners: string[], adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Lottery Draw Executed',
+      message: `${adminName} executed lottery draw for "${lotteryTitle}". Winner(s): ${winners.join(', ')}.`,
+      type: 'success',
+      action_url: `/admin/lottery`,
+      metadata: { event: 'lottery_drawn', lotteryTitle, winners },
+    });
+  },
+
+  /**
+   * Campaign created notification
+   */
+  campaignCreated: async (campaignTitle: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Campaign Created',
+      message: `${adminName} created email campaign: "${campaignTitle}".`,
+      type: 'info',
+      action_url: `/admin/email`,
+      metadata: { event: 'campaign_created', campaignTitle },
+    });
+  },
+
+  /**
+   * Campaign updated notification
+   */
+  campaignUpdated: async (campaignTitle: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Campaign Updated',
+      message: `${adminName} updated email campaign: "${campaignTitle}".`,
+      type: 'info',
+      action_url: `/admin/email`,
+      metadata: { event: 'campaign_updated', campaignTitle },
+    });
+  },
+
+  /**
+   * Campaign deleted notification
+   */
+  campaignDeleted: async (campaignTitle: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Campaign Deleted',
+      message: `${adminName} deleted email campaign: "${campaignTitle}".`,
+      type: 'warning',
+      action_url: `/admin/email`,
+      metadata: { event: 'campaign_deleted', campaignTitle },
+    });
+  },
+
+  /**
+   * Campaign sent notification
+   */
+  campaignSent: async (campaignTitle: string, recipientCount: number, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Campaign Sent',
+      message: `${adminName} sent campaign "${campaignTitle}" to ${recipientCount} recipient(s).`,
+      type: 'success',
+      action_url: `/admin/email`,
+      metadata: { event: 'campaign_sent', campaignTitle, recipientCount },
+    });
+  },
+
+  /**
+   * Member added to team notification
+   */
+  memberAddedToTeam: async (teamName: string, memberName: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Member Added to Team',
+      message: `${adminName} added "${memberName}" to team "${teamName}".`,
+      type: 'info',
+      action_url: `/admin/attendance?tab=teams`,
+      metadata: { event: 'member_added_to_team', teamName, memberName },
+    });
+  },
+
+  /**
+   * Member removed from team notification
+   */
+  memberRemovedFromTeam: async (teamName: string, memberName: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Member Removed from Team',
+      message: `${adminName} removed "${memberName}" from team "${teamName}".`,
+      type: 'warning',
+      action_url: `/admin/attendance?tab=teams`,
+      metadata: { event: 'member_removed_from_team', teamName, memberName },
+    });
+  },
+
+  /**
+   * Email sent notification
+   */
+  emailSent: async (to: string, subject: string, adminName: string) => {
+    return createNotificationForAllAdmins({
+      title: 'Email Sent',
+      message: `${adminName} sent email to "${to}" with subject: "${subject}".`,
+      type: 'success',
+      action_url: `/admin/email`,
+      metadata: { event: 'email_sent', to, subject },
+    });
+  },
 };

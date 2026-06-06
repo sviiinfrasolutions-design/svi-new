@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 // GET /api/admin/attendance/teams/[id]/members — list team members
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -87,6 +88,31 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'User is already in this team' }, { status: 409 });
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  try {
+    const { data: teamData } = await supabaseAdmin
+      .from('teams')
+      .select('name')
+      .eq('id', id)
+      .single();
+    const { data: profileData } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name')
+      .eq('id', admin.id)
+      .single();
+    const { data: memberProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name')
+      .eq('id', body.user_id)
+      .single();
+    await NotificationHelper.memberAddedToTeam(
+      teamData?.name || 'Unknown Team',
+      memberProfile?.full_name || 'Unknown Member',
+      profileData?.full_name || admin.email || 'Admin'
+    );
+  } catch (notifErr) {
+    console.error('Failed to create member added notification:', notifErr);
   }
 
   return NextResponse.json({ member }, { status: 201 });

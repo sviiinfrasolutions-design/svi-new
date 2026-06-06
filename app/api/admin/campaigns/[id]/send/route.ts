@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
 import { Resend } from 'resend';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 const FROM_ADDRESS = 'SVI Infra <noreply@sviiinfrasolutions.com>';
 
@@ -15,7 +16,9 @@ async function resolveRecipients(campaign: any): Promise<{ email: string; name: 
       .from('lottery_participants')
       .select('name, email')
       .not('email', 'is', null);
-    return (data || []).filter((p: any) => p.email).map((p: any) => ({ email: p.email, name: p.name }));
+    return (data || [])
+      .filter((p: any) => p.email)
+      .map((p: any) => ({ email: p.email, name: p.name }));
   }
 
   // all_users
@@ -69,9 +72,12 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('id', id)
     .single();
 
-  if (fetchErr || !campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
-  if (campaign.status === 'sent') return NextResponse.json({ error: 'Campaign already sent' }, { status: 400 });
-  if (campaign.status === 'cancelled') return NextResponse.json({ error: 'Campaign is cancelled' }, { status: 400 });
+  if (fetchErr || !campaign)
+    return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
+  if (campaign.status === 'sent')
+    return NextResponse.json({ error: 'Campaign already sent' }, { status: 400 });
+  if (campaign.status === 'cancelled')
+    return NextResponse.json({ error: 'Campaign is cancelled' }, { status: 400 });
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return NextResponse.json({ error: 'Missing RESEND_API_KEY' }, { status: 500 });
@@ -96,7 +102,15 @@ export async function POST(request: NextRequest, { params }: Params) {
       description: `Campaign "${campaign.title}" sent to ${sent} recipients.`,
       metadata: { campaignId: id, recipientCount: sent },
     });
-  } catch {}
+  } catch (_err) {
+    // Activity logging is non-critical
+  }
+
+  try {
+    await NotificationHelper.campaignSent(campaign.title, sent, admin.email || 'Admin');
+  } catch (notifErr) {
+    console.error('Failed to create campaign sent notification:', notifErr);
+  }
 
   return NextResponse.json({ success: true, sent });
 }

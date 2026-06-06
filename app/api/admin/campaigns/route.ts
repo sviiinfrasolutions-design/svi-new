@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 /**
  * DELETE /api/admin/campaigns?lottery_id=xxx
@@ -140,8 +141,20 @@ export async function POST(request: NextRequest) {
       description: `Campaign "${title}" created (${status}).`,
       metadata: { campaignId: campaign.id, status },
     });
-  } catch {
+  } catch (_err) {
     // Audit logging is non-critical; silently ignore failures
+  }
+
+  try {
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name')
+      .eq('id', admin.id)
+      .single();
+    const adminName = profile?.full_name || admin.email || 'Admin';
+    await NotificationHelper.campaignCreated(title, adminName);
+  } catch (notifErr) {
+    console.error('Failed to create campaign creation notification:', notifErr);
   }
 
   return NextResponse.json({ campaign });

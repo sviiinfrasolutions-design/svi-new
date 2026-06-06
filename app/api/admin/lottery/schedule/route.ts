@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 /**
  * GET /api/admin/lottery/schedule?lotteryId=...
@@ -112,6 +113,18 @@ export async function POST(request: NextRequest) {
     console.error('Failed to log scheduling activity:', logErr);
   }
 
+  try {
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name')
+      .eq('id', admin.id)
+      .single();
+    const adminName = profile?.full_name || admin.email || 'Admin';
+    await NotificationHelper.lotteryScheduled(lottery.title, scheduled_at, adminName);
+  } catch (notifErr) {
+    console.error('Failed to create lottery schedule notification:', notifErr);
+  }
+
   return NextResponse.json({ success: true, schedule: newSchedule });
 }
 
@@ -142,7 +155,18 @@ export async function DELETE(request: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Log activity
+  let lotteryTitle = 'Unknown Lottery';
+  try {
+    const { data: lottery } = await supabaseAdmin
+      .from('lotteries')
+      .select('title')
+      .eq('id', lotteryId)
+      .single();
+    lotteryTitle = lottery?.title || 'Unknown Lottery';
+  } catch (_err) {
+    // Silently ignore lookup failure
+  }
+
   try {
     const { data: profile } = await supabaseAdmin
       .from('profiles')
@@ -158,6 +182,12 @@ export async function DELETE(request: NextRequest) {
     });
   } catch (logErr) {
     console.error('Failed to log cancel activity:', logErr);
+  }
+
+  try {
+    await NotificationHelper.lotteryScheduleCancelled(lotteryTitle, admin.email || 'Admin');
+  } catch (notifErr) {
+    console.error('Failed to create lottery cancel notification:', notifErr);
   }
 
   return NextResponse.json({ success: true });

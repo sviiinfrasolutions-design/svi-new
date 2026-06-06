@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 // GET /api/admin/properties - Fetch all properties
 export async function GET(request: NextRequest) {
@@ -95,7 +96,6 @@ export async function POST(request: NextRequest) {
       result = data;
     }
 
-    // Insert Activity Log
     try {
       await supabaseAdmin.from('activity_logs').insert({
         user_id: admin.id,
@@ -105,6 +105,15 @@ export async function POST(request: NextRequest) {
       });
     } catch (logErr) {
       console.error('Failed to log property activity:', logErr);
+    }
+
+    try {
+      const action = id
+        ? NotificationHelper.propertyUpdated(name, adminName)
+        : NotificationHelper.propertyCreated(name, adminName);
+      await action;
+    } catch (notifErr) {
+      console.error('Failed to create property notification:', notifErr);
     }
 
     return NextResponse.json({ success: true, property: result });

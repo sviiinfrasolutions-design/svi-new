@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
+import { NotificationHelper } from '@/src/lib/supabase/notifications';
 
 const VALID_STATUSES = ['pending', 'contacted', 'approved', 'rejected'];
 
@@ -152,6 +153,20 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  try {
+    const { data: profileData } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name')
+      .eq('id', admin.id)
+      .single();
+    const adminName = profileData?.full_name || admin.email || 'Admin';
+    if (newStatus) {
+      await NotificationHelper.registrationStatusUpdated(id, newStatus, adminName);
+    }
+  } catch (notifErr) {
+    console.error('Failed to create registration notification:', notifErr);
+  }
+
   return NextResponse.json({ success: true, registration: data });
 }
 
@@ -173,6 +188,20 @@ export async function DELETE(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  try {
+    const { data: profileData } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name')
+      .eq('id', admin.id)
+      .single();
+    await NotificationHelper.registrationDeleted(
+      id,
+      profileData?.full_name || admin.email || 'Admin'
+    );
+  } catch (notifErr) {
+    console.error('Failed to create registration delete notification:', notifErr);
   }
 
   return NextResponse.json({ success: true });
