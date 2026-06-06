@@ -156,7 +156,7 @@ export function ComposeTab({
                 }),
                 secondInstalmentRow:
                   fd.showSecondInstalment === 'true'
-                    ? `<tr><td style="padding:10px;">2</td><td style="padding:10px;">Second Instalment</td><td style="padding:10px;text-align:right;">20%</td><td style="padding:10px;text-align:right;font-weight:bold;">₹${(totalCost * 0.2).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td></tr>`
+                    ? `<tr><td style="padding:10px;color:#333333;">2</td><td style="padding:10px;color:#333333;">Second Instalment</td><td style="padding:10px;text-align:right;color:#333333;">20%</td><td style="padding:10px;text-align:right;font-weight:bold;color:#333333;">₹${(totalCost * 0.2).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td></tr>`
                     : '',
                 remainingPercent:
                   fd.showSecondInstalment === 'true'

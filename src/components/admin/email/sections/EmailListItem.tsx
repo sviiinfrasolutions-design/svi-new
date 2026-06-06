@@ -67,10 +67,12 @@ export function EmailListItem({
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') onToggleStar(email.id, e);
           }}
-          className="mt-0.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+          className={`mt-0.5 shrink-0 transition-opacity ${
+            isStarred ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}
         >
           <Star
-            className={`h-3.5 w-3.5 ${isStarred ? 'fill-amber-400 text-amber-400 opacity-100' : 'text-gray-300 dark:text-gray-600'}`}
+            className={`h-3.5 w-3.5 ${isStarred ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-gray-600'}`}
           />
         </span>
       </button>

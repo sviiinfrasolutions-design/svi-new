@@ -24,8 +24,15 @@ interface UseParticipantManagementReturn {
   setManualEmail: (v: string) => void;
   setManualTicket: (v: string) => void;
   setParticipants: (p: Participant[]) => void;
-  handleFileUpload: (file: File, onError: (msg: string | null) => void, onSuccess: (msg: string | null) => void) => void;
-  handleManualAdd: (onError: (msg: string | null) => void, onSuccess: (msg: string | null) => void) => void;
+  handleFileUpload: (
+    file: File,
+    onError: (msg: string | null) => void,
+    onSuccess: (msg: string | null) => void
+  ) => void;
+  handleManualAdd: (
+    onError: (msg: string | null) => void,
+    onSuccess: (msg: string | null) => void
+  ) => void;
   removeParticipant: (index: number) => void;
   filteredParticipants: Participant[];
   paginatedParticipants: Participant[];
@@ -47,7 +54,11 @@ export function useParticipantManagement(): UseParticipantManagementReturn {
   const itemsPerPage = 8;
 
   const parseCSVData = useCallback(
-    (text: string, onError: (msg: string | null) => void, onSuccess: (msg: string | null) => void) => {
+    (
+      text: string,
+      onError: (msg: string | null) => void,
+      onSuccess: (msg: string | null) => void
+    ) => {
       try {
         const lines = text.split(/\r?\n/);
         if (lines.length === 0 || !lines[0].trim()) {
@@ -85,7 +96,7 @@ export function useParticipantManagement(): UseParticipantManagementReturn {
           if (!line) continue;
 
           const cols = line
-            .split(/,(?=(?:(?:[^\"]*\"){2})*[^\"]*$)/)
+            .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
             .map((c) => c.trim().replace(/^["']|["']$/g, ''));
 
           const name = cols[nameIdx];
@@ -94,7 +105,9 @@ export function useParticipantManagement(): UseParticipantManagementReturn {
           const phone = phoneIdx !== -1 ? cols[phoneIdx] : undefined;
           const email = emailIdx !== -1 ? cols[emailIdx] : undefined;
           const ticketNumber =
-            ticketIdx !== -1 && cols[ticketIdx] ? cols[ticketIdx] : `SVI-${1000 + parsed.length + 1}`;
+            ticketIdx !== -1 && cols[ticketIdx]
+              ? cols[ticketIdx]
+              : `SVI-${1000 + parsed.length + 1}`;
 
           parsed.push({ name, phone, email, ticketNumber });
         }
@@ -110,7 +123,11 @@ export function useParticipantManagement(): UseParticipantManagementReturn {
   );
 
   const parseExcelData = useCallback(
-    (sheets: any[], onError: (msg: string | null) => void, onSuccess: (msg: string | null) => void) => {
+    (
+      sheets: any[],
+      onError: (msg: string | null) => void,
+      onSuccess: (msg: string | null) => void
+    ) => {
       try {
         if (sheets.length === 0) {
           onError('Spreadsheet is empty.');
@@ -124,7 +141,9 @@ export function useParticipantManagement(): UseParticipantManagementReturn {
         const phoneIdx = headers.findIndex(
           (h: string) => h.includes('phone') || h.includes('mobile') || h.includes('contact')
         );
-        const emailIdx = headers.findIndex((h: string) => h.includes('email') || h.includes('mail'));
+        const emailIdx = headers.findIndex(
+          (h: string) => h.includes('email') || h.includes('mail')
+        );
         const ticketIdx = headers.findIndex(
           (h: string) => h.includes('ticket') || h.includes('token') || h.includes('number')
         );
@@ -164,7 +183,11 @@ export function useParticipantManagement(): UseParticipantManagementReturn {
   );
 
   const handleFileUpload = useCallback(
-    (file: File, onError: (msg: string | null) => void, onSuccess: (msg: string | null) => void) => {
+    (
+      file: File,
+      onError: (msg: string | null) => void,
+      onSuccess: (msg: string | null) => void
+    ) => {
       onError('');
       onSuccess('');
       const reader = new FileReader();
