@@ -25,6 +25,8 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 
 const DEPARTMENTS = ['Sales', 'IT', 'Management'];
 
+const SALES_DESIGNATIONS = ['Telecaller', 'BDM', 'BDE', 'Sales Manager', 'Team Leader'];
+
 const SALARY_SLABS = [
   { target: 120, salary: 17000, offerSlab: '3%' },
   { target: 140, salary: 18000, offerSlab: '3%' },
@@ -142,6 +144,8 @@ export default function OfferLetterPage() {
   const [salaryOpen, setSalaryOpen] = useState(false);
   const [targetOpen, setTargetOpen] = useState(false);
   const [showSlabs, setShowSlabs] = useState(false);
+  const [salesCustomDesignation, setSalesCustomDesignation] = useState('');
+  const [showCustomDesignation, setShowCustomDesignation] = useState(false);
 
   const salaryRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef<HTMLDivElement>(null);
@@ -411,13 +415,45 @@ export default function OfferLetterPage() {
                 required
                 className="md:col-span-2"
               />
-              <FormField
-                label="Designation"
-                name="designation"
-                value={formData.designation}
-                onChange={handleChange}
-                required
-              />
+              {formData.department === 'Sales' ? (
+                <FormSelect
+                  label="Designation"
+                  name="designation"
+                  value={formData.designation}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setShowCustomDesignation(e.target.value === '__custom__');
+                  }}
+                  required
+                  options={[
+                    { value: '', label: '— Select designation —' },
+                    ...SALES_DESIGNATIONS.map((d) => ({ value: d, label: d })),
+                    { value: '__custom__', label: '+ Custom…' },
+                  ]}
+                />
+              ) : (
+                <FormField
+                  label="Designation"
+                  name="designation"
+                  value={formData.designation}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. Software Engineer, Project Manager"
+                />
+              )}
+              {formData.department === 'Sales' && showCustomDesignation && (
+                <FormField
+                  label="Custom Designation"
+                  name="designationCustom"
+                  value={salesCustomDesignation}
+                  onChange={(e) => {
+                    setSalesCustomDesignation(e.target.value);
+                    setFormData({ ...formData, designation: e.target.value });
+                  }}
+                  required
+                  placeholder="e.g. Sales Executive"
+                />
+              )}
               <FormSelect
                 label="Department"
                 name="department"
@@ -425,6 +461,7 @@ export default function OfferLetterPage() {
                 onChange={(e) => {
                   handleChange(e);
                   setShowSalesOptions(e.target.value === 'Sales');
+                  if (e.target.value !== 'Sales') setShowCustomDesignation(false);
                 }}
                 options={[
                   { value: '', label: '— Select department —' },
