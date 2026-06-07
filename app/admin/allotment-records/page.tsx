@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'motion/react';
 import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
 import {
   FileText,
@@ -323,124 +324,136 @@ export default function AllotmentRecordsPage() {
         </div>
       </div>
 
-      {/* Main Database Table Container */}
-      <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:border-white/8 dark:bg-[#0e0e14]/65">
-        <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div className="relative w-full max-w-xs">
-            <Search className="text-brand-gold absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search by client, ticket ID or advisor..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="focus:border-brand-gold w-full rounded-lg border border-gray-200 bg-white py-2 pr-4 pl-9 text-xs text-gray-900 transition-colors focus:outline-none dark:border-white/8 dark:bg-[#0e0e14] dark:text-white"
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <label className="text-[10px] font-bold tracking-widest whitespace-nowrap text-gray-400 uppercase">
-              Project:
-            </label>
-            <select
-              value={projectFilter}
-              onChange={(e) => setProjectFilter(e.target.value)}
-              className="focus:border-brand-gold rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-700 outline-none dark:border-white/10 dark:bg-[#0e0e14]"
+      {/* Toolbar */}
+      <div className="mb-6 flex flex-col gap-3 font-sans sm:flex-row">
+        <div className="relative flex-1">
+          <Search className="text-brand-gold absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search by client, ticket ID or advisor..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="focus:border-brand-gold focus:ring-brand-gold/15 w-full rounded-lg border border-gray-200 bg-white py-3 pr-10 pl-10 text-sm text-gray-900 placeholder-gray-400 transition-all focus:ring-2 focus:outline-none dark:border-white/10 dark:bg-[#0e0e14]/85 dark:text-white dark:placeholder-gray-600"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="hover:text-brand-gold absolute top-1/2 right-3.5 -translate-y-1/2 cursor-pointer text-gray-500"
             >
-              <option value="">All</option>
-              {projects.map((proj) => (
-                <option key={proj} value={proj}>
-                  {proj}
-                </option>
-              ))}
-            </select>
-          </div>
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
+        <div className="flex items-center gap-3">
+          <select
+            value={projectFilter}
+            onChange={(e) => setProjectFilter(e.target.value)}
+            className="focus:border-brand-gold w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-5 py-3 text-xs font-bold tracking-widest text-gray-700 transition-all outline-none hover:bg-gray-50 sm:w-auto dark:border-white/10 dark:bg-[#0e0e14]/85 dark:text-gray-300 dark:hover:bg-white/5"
+          >
+            <option value="">ALL PROJECTS</option>
+            {projects.map((proj) => (
+              <option key={proj} value={proj}>
+                {proj.toUpperCase()}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Records Table glassmorphic container */}
+      <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 shadow-2xl backdrop-blur-xl transition-colors duration-300 dark:border-white/8 dark:bg-[#0e0e14]/65">
+        {/* Subtle gold line on top */}
+        <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[1.5px] bg-gradient-to-r from-transparent to-transparent" />
 
         <div className="overflow-x-auto">
           {loading ? (
-            <table className="w-full border-collapse animate-pulse text-left text-xs">
+            <table className="w-full font-sans text-sm">
               <thead>
-                <tr className="border-b border-gray-100 text-[11px] font-bold tracking-widest text-gray-400 uppercase dark:border-white/8">
-                  <th className="px-4 py-3">
-                    <div className="bg-gray-250 h-3.5 w-16 rounded dark:bg-white/5" />
-                  </th>
-                  <th className="px-4 py-3">
-                    <div className="bg-gray-250 h-3.5 w-24 rounded dark:bg-white/5" />
-                  </th>
-                  <th className="px-4 py-3">
-                    <div className="bg-gray-250 h-3.5 w-20 rounded dark:bg-white/5" />
-                  </th>
-                  <th className="px-4 py-3">
-                    <div className="bg-gray-250 h-3.5 w-16 rounded dark:bg-white/5" />
-                  </th>
-                  <th className="px-4 py-3">
-                    <div className="bg-gray-250 h-3.5 w-12 rounded dark:bg-white/5" />
-                  </th>
-                  <th className="px-4 py-3">
-                    <div className="bg-gray-250 h-3.5 w-16 rounded dark:bg-white/5" />
-                  </th>
-                  <th className="px-4 py-3">
-                    <div className="bg-gray-250 h-3.5 w-20 rounded dark:bg-white/5" />
-                  </th>
-                  <th className="px-4 py-3 text-right">
-                    <div className="bg-gray-250 ml-auto h-3.5 w-24 rounded dark:bg-white/5" />
-                  </th>
+                <tr className="border-b border-gray-200 bg-gray-50/80 backdrop-blur-md transition-colors duration-300 dark:border-white/5 dark:bg-white/5">
+                  {[
+                    'Ticket ID',
+                    'Client Name',
+                    'Project',
+                    'Unit / Plot',
+                    'Area',
+                    'Total Cost',
+                    'Plan',
+                    'Actions',
+                  ].map((h, idx) => (
+                    <th
+                      key={h}
+                      className={`px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400 ${idx === 7 ? 'text-right' : 'text-left'}`}
+                    >
+                      <div
+                        className={`h-3 rounded bg-gray-200 dark:bg-white/5 ${idx === 7 ? 'ml-auto w-16' : 'w-24'}`}
+                      />
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+              <tbody className="divide-gray-150 divide-y dark:divide-white/5">
                 {[...Array(6)].map((_, i) => (
                   <tr key={i}>
-                    {/* Ticket ID */}
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-4.5">
                       <div className="h-4 w-12 rounded bg-gray-200 dark:bg-white/5" />
                     </td>
-                    {/* Client Name */}
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-4.5">
                       <div className="h-4 w-28 rounded bg-gray-200 dark:bg-white/5" />
                     </td>
-                    {/* Project */}
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-4.5">
                       <div className="h-4 w-20 rounded bg-gray-200 dark:bg-white/5" />
                     </td>
-                    {/* Unit/Plot */}
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-4.5">
                       <div className="h-4 w-12 rounded bg-gray-200 dark:bg-white/5" />
                     </td>
-                    {/* Area */}
-                    <td className="px-4 py-4">
-                      <div className="h-4 w-10 rounded bg-gray-200 dark:bg-white/5" />
-                    </td>
-                    {/* Total Cost */}
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-4.5">
                       <div className="h-4 w-16 rounded bg-gray-200 dark:bg-white/5" />
                     </td>
-                    {/* Plan */}
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-4.5">
                       <div className="h-4 w-20 rounded bg-gray-200 dark:bg-white/5" />
                     </td>
-                    {/* Actions */}
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-6 py-4.5">
+                      <div className="h-4 w-16 rounded bg-gray-200 dark:bg-white/5" />
+                    </td>
+                    <td className="px-6 py-4.5 text-right">
                       <div className="ml-auto h-8 w-28 rounded bg-gray-200 dark:bg-white/5" />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          ) : filteredAllotments.length === 0 ? (
+            <div className="py-24 text-center font-sans">
+              <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400 transition-colors duration-300 dark:text-gray-700" />
+              <p className="text-sm font-medium text-gray-500 transition-colors duration-300 dark:text-gray-400">
+                {searchQuery ? 'No matches found.' : 'No allotment records generated yet.'}
+              </p>
+            </div>
           ) : (
-            <table className="w-full border-collapse text-left">
+            <table className="w-full font-sans text-sm">
               <thead>
-                <tr className="border-b border-gray-100 text-[11px] font-bold tracking-widest text-gray-400 uppercase dark:border-white/8">
-                  <th className="px-4 py-3">Ticket ID</th>
-                  <th className="px-4 py-3">Client Name</th>
-                  <th className="px-4 py-3">Project</th>
-                  <th className="px-4 py-3">Unit / Plot</th>
-                  <th className="px-4 py-3">Area</th>
-                  <th className="px-4 py-3">Total Cost</th>
-                  <th className="px-4 py-3">Plan</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                <tr className="border-b border-gray-200 bg-gray-50/80 backdrop-blur-md transition-colors duration-300 dark:border-white/5 dark:bg-white/5">
+                  {[
+                    'Ticket ID',
+                    'Client Name',
+                    'Project',
+                    'Unit / Plot',
+                    'Area',
+                    'Total Cost',
+                    'Plan',
+                    'Actions',
+                  ].map((h, idx) => (
+                    <th
+                      key={h}
+                      className={`px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400 ${idx === 7 ? 'text-right' : 'text-left'}`}
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 text-xs text-gray-700 dark:divide-white/5 dark:text-gray-300">
-                {filteredAllotments.map((record) => {
+              <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                {filteredAllotments.map((record, i) => {
                   const cost = record.form_data ? calculateTotalCost(record.form_data) : 0;
                   const formattedCost = cost.toLocaleString('en-IN', {
                     style: 'currency',
@@ -449,41 +462,53 @@ export default function AllotmentRecordsPage() {
                   });
 
                   return (
-                    <tr key={record.id} className="hover:bg-gray-50/50 dark:hover:bg-white/2">
-                      <td className="text-brand-gold px-4 py-3.5 font-bold">
-                        {record.form_data?.ticketId || 'N/A'}
+                    <motion.tr
+                      key={record.id}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.02, duration: 0.3, ease: 'easeOut' }}
+                      className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-white/5"
+                    >
+                      <td className="px-6 py-4">
+                        <span className="text-brand-gold border-brand-gold/20 bg-brand-gold/10 rounded-full border px-2 py-1 text-xs font-bold">
+                          {record.form_data?.ticketId || 'N/A'}
+                        </span>
                       </td>
-                      <td className="px-4 py-3.5 font-semibold text-gray-900 dark:text-white">
+                      <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                         {record.form_data?.clientName || 'N/A'}
                       </td>
-                      <td className="px-4 py-3.5">{record.form_data?.projectName || 'N/A'}</td>
-                      <td className="px-4 py-3.5 font-medium text-gray-900 dark:text-white">
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
+                        {record.form_data?.projectName || 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                         {record.form_data?.unitNumber || 'N/A'}
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                         {record.form_data?.area ? `${record.form_data.area} Sq. Yds.` : 'N/A'}
                       </td>
-                      <td className="px-4 py-3.5 font-bold text-gray-900 dark:text-white">
+                      <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
                         {formattedCost}
                       </td>
-                      <td className="px-4 py-3.5">
-                        <span className="bg-brand-gold/10 border-brand-gold/20 text-brand-gold rounded border px-2 py-0.5 text-[10px] font-bold">
+                      <td className="px-6 py-4">
+                        <span className="rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
                           {record.form_data?.paymentPlan || '12'} Months
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 text-right">
-                        <div className="flex justify-end gap-2">
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setSelectedAllotment(record)}
-                            className="bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-gold flex items-center justify-center gap-1 rounded-lg px-2.5 py-1.5 font-bold transition-all"
+                            className="hover:text-brand-gold hover:bg-brand-gold/10 dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors"
+                            title="View & Print"
                           >
-                            <Eye className="h-3.5 w-3.5" /> View & Print
+                            <Eye className="h-4 w-4" />
                           </button>
                           <Link
                             href={`/admin/allotment-letter?templateId=${record.id}`}
-                            className="flex items-center justify-center gap-1 rounded-lg bg-blue-500/10 px-2.5 py-1.5 font-bold text-blue-600 transition-all hover:bg-blue-500/20"
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
+                            title="Use as Template"
                           >
-                            <FileText className="h-3.5 w-3.5" /> Use as Template
+                            <FileText className="h-4 w-4" />
                           </Link>
                           <button
                             onClick={() => {
@@ -491,28 +516,23 @@ export default function AllotmentRecordsPage() {
                               window.location.href =
                                 '/admin/email?tab=compose&prefillAllotment=true';
                             }}
-                            className="flex items-center justify-center gap-1 rounded-lg bg-purple-500/10 px-2.5 py-1.5 font-bold text-purple-600 transition-all hover:bg-purple-500/20"
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-500/10 dark:hover:text-purple-400"
+                            title="Email Client"
                           >
-                            <Mail className="h-3.5 w-3.5" /> Email Client
+                            <Mail className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => setDeleteTarget(record)}
-                            className="flex items-center justify-center gap-1 rounded-lg bg-red-500/10 px-2.5 py-1.5 font-bold text-red-500 transition-all hover:bg-red-500/20"
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                            title="Delete"
                           >
-                            <Trash2 className="h-3.5 w-3.5" /> Delete
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
                       </td>
-                    </tr>
+                    </motion.tr>
                   );
                 })}
-                {filteredAllotments.length === 0 && (
-                  <tr>
-                    <td colSpan={8} className="py-12 text-center text-gray-500 dark:text-gray-400">
-                      No matching allotment records found.
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           )}
