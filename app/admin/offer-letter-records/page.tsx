@@ -15,7 +15,10 @@ import {
   Briefcase,
   BadgeCheck,
   Image as ImageIcon,
+  FileText,
+  Mail,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState, useMemo } from 'react';
 import { exportToPDF, exportToImage } from '@/src/lib/utils/documentExporter';
 import OfferLetterPreviewContent from '@/src/components/admin/DocumentGenerator/OfferLetterPreviewContent';
@@ -533,6 +536,23 @@ export default function OfferLetterRecordsPage() {
                             title="View & Print"
                           >
                             <Eye className="h-4 w-4" />
+                          </button>
+                          <Link
+                            href={`/admin/offer-letter?templateId=${record.id}`}
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
+                            title="Use as Template"
+                          >
+                            <FileText className="h-4 w-4" />
+                          </Link>
+                          <button
+                            onClick={() => {
+                              sessionStorage.setItem('emailPrefillRecord', JSON.stringify(record));
+                              window.location.href = '/admin/email?tab=compose&prefillOffer=true';
+                            }}
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-500/10 dark:hover:text-purple-400"
+                            title="Email Client"
+                          >
+                            <Mail className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => setDeleteTarget(record)}

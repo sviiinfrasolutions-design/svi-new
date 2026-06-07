@@ -123,6 +123,23 @@ export default function OfferLetterPage() {
 
   const [preview, setPreview] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
+
+  // Saved offer letters for Load / Use as Template
+  const [savedOffers, setSavedOffers] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!token) return;
+    fetch('/api/admin/documents?type=offer_letter&limit=1000', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
+      .then((json) => setSavedOffers(json.documents || []))
+      .catch((err) => console.error('Error loading offer letters:', err));
+  }, [token]);
+
   const [salaryOpen, setSalaryOpen] = useState(false);
   const [targetOpen, setTargetOpen] = useState(false);
   const [showSlabs, setShowSlabs] = useState(false);
@@ -239,6 +256,55 @@ export default function OfferLetterPage() {
     setPreview(true);
   };
 
+  // Handle loading a saved offer letter (dropdown or templateId URL)
+  const handleLoadOffer = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    if (!id) {
+      setDocumentId(null);
+      setFormData({
+        date: '',
+        name: '',
+        address: '',
+        mobileNo: '',
+        alternativeNo: '',
+        emailId: '',
+        designation: '',
+        department: '',
+        reportingTo: '',
+        appointmentDate: '',
+        location: '',
+        salaryCtc: '',
+        target: '',
+        offerSlab: '',
+        workingHoursStart: '10:30 am',
+        workingHoursEnd: '6:30 pm',
+        workingDays: 'Wednesday to Monday',
+        probationPeriod: '3',
+      });
+      return;
+    }
+    const selected = savedOffers.find((b) => b.id === id);
+    if (selected && selected.form_data) {
+      setDocumentId(selected.id);
+      setFormData((prev) => ({ ...prev, ...selected.form_data }));
+    }
+  };
+
+  // Handle templateId from URL (e.g. from Offer Letter Records "Use as Template")
+  useEffect(() => {
+    if (savedOffers.length > 0 && typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const templateId = searchParams.get('templateId');
+      if (templateId) {
+        const selected = savedOffers.find((b) => b.id === templateId);
+        if (selected && selected.form_data) {
+          setDocumentId(selected.id);
+          setFormData((prev) => ({ ...prev, ...selected.form_data }));
+        }
+      }
+    }
+  }, [savedOffers]);
+
   const handleDownloadPDF = async () => {
     try {
       await exportToPDF({
@@ -298,6 +364,26 @@ export default function OfferLetterPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Load saved offer letter */}
+            {savedOffers.length > 0 && (
+              <div className="mb-2">
+                <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">
+                  Load Saved Offer Letter
+                </label>
+                <select
+                  onChange={handleLoadOffer}
+                  className="focus:border-brand-gold w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 focus:outline-none dark:border-white/10 dark:bg-[#0e0e14] dark:text-gray-200"
+                >
+                  <option value="">— Select a saved offer letter —</option>
+                  {savedOffers.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.form_data?.name || 'Unnamed'} — {b.form_data?.designation || ''} (
+                      {new Date(b.created_at).toLocaleDateString('en-GB')})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 label="Date"

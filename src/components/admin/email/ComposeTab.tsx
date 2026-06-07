@@ -355,6 +355,87 @@ export function ComposeTab({
     }
   }, []);
 
+  // Handle prefill from Offer Letter Records
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('prefillOffer') === 'true') {
+        const stored = sessionStorage.getItem('emailPrefillRecord');
+        if (stored) {
+          try {
+            const record = JSON.parse(stored);
+            const fd = record.form_data;
+
+            const ctc = parseFloat(fd.salaryCtc) || 0;
+            const formattedCtc = ctc.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+
+            const tpl = EMAIL_TEMPLATES.find((t) => t.id === 'offer_letter');
+
+            if (tpl) {
+              let processedSubject = tpl.subject;
+              processedSubject = processedSubject.replace('{{designation}}', fd.designation || '');
+
+              setSubject(processedSubject);
+              setTemplateHtml(tpl.html);
+              setSelectedTemplate('offer_letter');
+
+              const vars: Record<string, string> = {
+                name: fd.name || '',
+                designation: fd.designation || '',
+                department: fd.department || '',
+                reportingTo: fd.reportingTo || '',
+                appointmentDate: fd.appointmentDate
+                  ? new Date(fd.appointmentDate).toLocaleDateString('en-GB')
+                  : '',
+                location: fd.location || '',
+                salaryCtc: formattedCtc,
+                workingHoursStart: fd.workingHoursStart || '10:30 am',
+                workingHoursEnd: fd.workingHoursEnd || '6:30 pm',
+                workingDays: fd.workingDays || 'Wednesday to Monday',
+                probationPeriod: fd.probationPeriod || '3',
+              };
+
+              setTemplateVars(vars);
+              setHtml('');
+              setPreviewMode(true);
+            } else {
+              setSubject(`Offer Letter - ${fd.designation || ''} - ${fd.name || ''}`);
+              setHtml(
+                `
+<div style="font-family:Arial,sans-serif;padding:20px;max-width:600px;margin:0 auto;">
+  <h2 style="color:#1a2744;">Offer Letter</h2>
+  <p><strong>Candidate:</strong> ${fd.name || 'N/A'}</p>
+  <p><strong>Designation:</strong> ${fd.designation || 'N/A'}</p>
+  <p><strong>Department:</strong> ${fd.department || 'N/A'}</p>
+  <p><strong>Location:</strong> ${fd.location || 'N/A'}</p>
+  <p><strong>Monthly CTC:</strong> ₹${formattedCtc}</p>
+  <p><strong>Date of Joining:</strong> ${fd.appointmentDate ? new Date(fd.appointmentDate).toLocaleDateString('en-GB') : 'N/A'}</p>
+  <hr style="border:none;border-top:1px solid #eee;margin:20px 0;" />
+  <p style="color:#666;font-size:13px;">Please find the offer letter attached.</p>
+</div>
+`.trim()
+              );
+              setTemplateHtml(null);
+              setSelectedTemplate(null);
+              setPreviewMode(false);
+            }
+            setEditorKey((prev) => prev + 1);
+
+            if (fd.emailId) {
+              setTo(fd.emailId);
+            }
+
+            sessionStorage.removeItem('emailPrefillRecord');
+            const newUrl = window.location.pathname + '?tab=compose';
+            window.history.replaceState({}, '', newUrl);
+          } catch (e) {
+            console.error('Error prefilling offer letter email:', e);
+          }
+        }
+      }
+    }
+  }, []);
+
   // Auto-save draft every 5s
   useEffect(() => {
     if (!to && !subject && !html) return;

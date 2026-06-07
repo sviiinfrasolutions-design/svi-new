@@ -53,3 +53,10 @@ replace_bba_3.py
 
 # Extracted PDF pages
 /pdf_pages/
+
+# Temp image files
+*.jpeg
+*.png
+*.exe
+*.pdf
+salary*
