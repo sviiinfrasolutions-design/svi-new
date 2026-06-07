@@ -64,6 +64,28 @@ export default function PaymentReceiptPage() {
       .catch((err) => console.error('Error fetching receipts:', err));
   };
 
+  const loadFromRecord = (id: string) => {
+    const record = receipts.find((r: any) => r.id === id);
+    if (record?.form_data) {
+      const fd = record.form_data;
+      setFormData({
+        receiptNo: fd.receiptNo || '',
+        date: fd.date || '',
+        salutation: fd.salutation || 'Mr.',
+        name: fd.name || '',
+        refId: fd.refId || '',
+        amount: fd.amount || '',
+        amountWords: fd.amountWords || '',
+        paymentRef: fd.paymentRef || '',
+        drawnOn: fd.drawnOn || '',
+        plotNo: fd.plotNo || '',
+        plotSize: fd.plotSize || '',
+        account: fd.account || '',
+        paymentMethod: fd.paymentMethod || 'UPI',
+      });
+    }
+  };
+
   useEffect(() => {
     if (!token) return;
     fetch('/api/admin/settings?key=company_info', {
@@ -82,6 +104,17 @@ export default function PaymentReceiptPage() {
 
     fetchReceipts();
   }, [token]);
+
+  // Handle templateId from URL (e.g. from Receipt Records "Use as Template")
+  useEffect(() => {
+    if (receipts.length > 0 && typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const templateId = searchParams.get('templateId');
+      if (templateId) {
+        loadFromRecord(templateId);
+      }
+    }
+  }, [receipts]);
 
   // Function to convert number to words (Indian numbering system)
   const numberToWords = (num: string): string => {
