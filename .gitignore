@@ -19,6 +19,9 @@ dist/
 # IDE/Tool configs
 .refact/
 
+# Pi local state
+.pi/
+
 # OS files
 .DS_Store
 *.log
