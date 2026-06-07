@@ -77,7 +77,7 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
           hasSortChanged={h.hasSortChanged}
           activeFilterCount={h.activeFilterCount}
           loading={h.loading}
-          onRefresh={() => h.fetchEmails(0)}
+          onRefresh={() => h.fetchEmails()}
           onStatusToggle={h.toggleStatus}
           onDatePresetChange={h.setDatePreset}
           onFromFilterChange={h.setFromFilter}
@@ -144,7 +144,7 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
               <AlertTriangle className="mb-3 h-7 w-7 text-red-400" />
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{h.error}</p>
               <button
-                onClick={() => h.fetchEmails(0)}
+                onClick={() => h.fetchEmails()}
                 className="text-brand-gold mt-3 text-xs underline"
               >
                 Retry
@@ -197,7 +197,7 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
             !h.loading && (
               <div className="border-t border-gray-100 p-4 text-center dark:border-gray-800">
                 <button
-                  onClick={() => h.fetchEmails(h.emails.length)}
+                  onClick={() => h.loadMore()}
                   disabled={h.loadingMore}
                   className="text-brand-gold inline-flex items-center gap-2 text-xs font-medium underline transition-opacity hover:opacity-80 disabled:opacity-50"
                 >

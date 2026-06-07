@@ -49,7 +49,8 @@ interface UseSentEmailsReturn {
   hasSortChanged: boolean;
   activeFilterCount: number;
   hasActiveFilters: boolean;
-  fetchEmails: (offset?: number) => Promise<void>;
+  fetchEmails: (after?: string) => Promise<void>;
+  loadMore: () => void;
   fetchDetail: (id: string) => Promise<void>;
   toggleStar: (id: string, e: React.MouseEvent | React.KeyboardEvent) => void;
   handleSort: (field: SortField) => void;
@@ -118,22 +119,35 @@ export function useSentEmails(): UseSentEmailsReturn {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  /* ─── Fetch emails ─── */
-  const fetchEmails = useCallback(async (offset = 0) => {
-    if (offset === 0) setLoading(true);
+  /* ─── Cursor-based pagination ─── */
+  // Resend uses the last email's ID as the 'after' cursor for the next page
+  const [afterCursor, setAfterCursor] = useState<string | null>(null);
+
+  const fetchEmails = useCallback(async (after?: string) => {
+    const isInitial = after === undefined;
+    if (isInitial) setLoading(true);
     else setLoadingMore(true);
     setError(null);
     try {
       const token = await getToken();
-      const res = await fetch(`/api/admin/email?limit=${PAGE_SIZE}&offset=${offset}`, {
+      const params = new URLSearchParams({ limit: String(PAGE_SIZE) });
+      if (!isInitial && after) params.set('after', after);
+      const res = await fetch(`/api/admin/email?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to fetch');
       const newEmails = data.emails || [];
-      if (offset === 0) setEmails(newEmails);
-      else setEmails((prev) => [...prev, ...newEmails]);
-      setHasMore(newEmails.length === PAGE_SIZE);
+      if (isInitial) {
+        setEmails(newEmails);
+      } else {
+        setEmails((prev) => [...prev, ...newEmails]);
+      }
+      // Store the last email's ID as cursor for the next page
+      if (newEmails.length > 0) {
+        setAfterCursor(newEmails[newEmails.length - 1].id);
+      }
+      setHasMore(data.hasMore && newEmails.length > 0);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -145,6 +159,11 @@ export function useSentEmails(): UseSentEmailsReturn {
   useEffect(() => {
     fetchEmails();
   }, [fetchEmails]);
+
+  // Load more using stored cursor (last email ID)
+  const loadMore = useCallback(() => {
+    if (afterCursor) fetchEmails(afterCursor);
+  }, [afterCursor, fetchEmails]);
 
   useEffect(() => {
     localStorage.setItem('svi-starred-emails', JSON.stringify([...starred]));
@@ -367,6 +386,7 @@ export function useSentEmails(): UseSentEmailsReturn {
     activeFilterCount,
     hasActiveFilters,
     fetchEmails,
+    loadMore,
     fetchDetail,
     toggleStar,
     handleSort,

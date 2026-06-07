@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     const action = url.searchParams.get('action');
     const emailId = url.searchParams.get('id');
     const limit = parseInt(url.searchParams.get('limit') || '50');
+    const after = url.searchParams.get('after') || undefined;
 
     if (action === 'domains') {
       const domains = await resend.domains.list();
@@ -31,10 +32,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ email: email.data });
     }
 
-    const emails = await resend.emails.list({ limit });
+    const emails = await resend.emails.list({ limit, after });
+    const responseData = emails.data as any;
     return NextResponse.json({
-      emails: emails.data?.data || [],
-      total: emails.data?.data?.length || 0,
+      emails: responseData?.data || [],
+      hasMore: responseData?.has_more ?? false,
     });
   } catch (error) {
     console.error('Email fetch error:', error);
