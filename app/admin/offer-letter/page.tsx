@@ -7,7 +7,17 @@ import {
   PreviewContainer,
 } from '@/src/components/admin/DocumentGenerator/Shared';
 import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
-import { FileSignature, RefreshCw, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import {
+  FileSignature,
+  RefreshCw,
+  ChevronDown,
+  SlidersHorizontal,
+  CircleDollarSign,
+  Calendar,
+  Trash2,
+  TrendingUp,
+  Plus,
+} from 'lucide-react';
 
 import { exportToPDF, exportToImage } from '@/src/lib/utils/documentExporter';
 import OfferLetterPreviewContent from '@/src/components/admin/DocumentGenerator/OfferLetterPreviewContent';
@@ -30,6 +40,7 @@ const SALARY_SLABS = [
   { target: 600, salary: 50000, offerSlab: '3%' },
 ];
 
+// ─── Suggestion Dropdown ─────────────────────────────────────────
 function SlabSuggestions({
   slabs,
   activeKey,
@@ -572,41 +583,155 @@ export default function OfferLetterPage() {
               {/* ── Sales Compensation Options ── */}
               {showSalesOptions && formData.department === 'Sales' && (
                 <div className="md:col-span-2">
-                  <div className="mt-1 rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-white/10 dark:bg-white/5">
-                    <p className="mb-3 text-xs font-medium text-gray-500 dark:text-gray-400">
-                      Sales Compensation Policy
-                    </p>
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                      <div>
-                        <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
+                  <div className="mt-1 overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-50/80 to-white shadow-sm dark:border-white/10 dark:from-white/5 dark:to-transparent">
+                    {/* Header */}
+                    <div className="border-b border-gray-100 px-5 py-3.5 dark:border-white/10">
+                      <div className="flex items-center gap-2.5">
+                        <div className="bg-brand-gold/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                          <CircleDollarSign className="text-brand-gold h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-gray-900 dark:text-white">
+                            Sales Compensation Policy
+                          </p>
+                          <p className="text-[10px] text-gray-500 dark:text-gray-400">
+                            Configure earnings structure for this role
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-5">
+                      {/* Compensation Type — radio cards */}
+                      <div className="mb-5">
+                        <label className="mb-2 block text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
                           Compensation Type
                         </label>
-                        <select
-                          name="salesCompensationType"
-                          value={formData.salesCompensationType || ''}
-                          onChange={handleChange}
-                          className="focus:border-brand-gold w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white"
-                        >
-                          <option value="">— Select type —</option>
-                          <option value="no_sale_no_salary">No Sale No Salary (Allowance)</option>
-                          <option value="custom_percent">Custom % of Salary</option>
-                        </select>
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                          {/* No Sale No Salary card */}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleChange({
+                                target: {
+                                  name: 'salesCompensationType',
+                                  value:
+                                    formData.salesCompensationType === 'no_sale_no_salary'
+                                      ? ''
+                                      : 'no_sale_no_salary',
+                                },
+                              } as any)
+                            }
+                            className={`group relative overflow-hidden rounded-xl border-2 p-4 text-left transition-all duration-200 ${
+                              formData.salesCompensationType === 'no_sale_no_salary'
+                                ? 'border-brand-gold bg-brand-gold/5 shadow-sm'
+                                : 'border-gray-200 bg-white hover:border-gray-300 dark:border-white/10 dark:bg-[#111118] dark:hover:border-white/20'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div
+                                className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${
+                                  formData.salesCompensationType === 'no_sale_no_salary'
+                                    ? 'border-brand-gold bg-brand-gold'
+                                    : 'border-gray-300 dark:border-white/20'
+                                }`}
+                              >
+                                {formData.salesCompensationType === 'no_sale_no_salary' && (
+                                  <svg
+                                    className="text-brand-navy h-3 w-3"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                  >
+                                    <path d="M5 12l5 5L20 7" />
+                                  </svg>
+                                )}
+                              </div>
+                              <div>
+                                <p
+                                  className={`text-xs font-semibold ${formData.salesCompensationType === 'no_sale_no_salary' ? 'text-brand-navy dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}
+                                >
+                                  No Sale No Salary
+                                </p>
+                                <p className="mt-0.5 text-[10px] text-gray-500 dark:text-gray-400">
+                                  Allowance-based pay during sales period
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+
+                          {/* Custom % card */}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleChange({
+                                target: {
+                                  name: 'salesCompensationType',
+                                  value:
+                                    formData.salesCompensationType === 'custom_percent'
+                                      ? ''
+                                      : 'custom_percent',
+                                },
+                              } as any)
+                            }
+                            className={`group relative overflow-hidden rounded-xl border-2 p-4 text-left transition-all duration-200 ${
+                              formData.salesCompensationType === 'custom_percent'
+                                ? 'border-brand-gold bg-brand-gold/5 shadow-sm'
+                                : 'border-gray-200 bg-white hover:border-gray-300 dark:border-white/10 dark:bg-[#111118] dark:hover:border-white/20'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div
+                                className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${
+                                  formData.salesCompensationType === 'custom_percent'
+                                    ? 'border-brand-gold bg-brand-gold'
+                                    : 'border-gray-300 dark:border-white/20'
+                                }`}
+                              >
+                                {formData.salesCompensationType === 'custom_percent' && (
+                                  <svg
+                                    className="text-brand-navy h-3 w-3"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                  >
+                                    <path d="M5 12l5 5L20 7" />
+                                  </svg>
+                                )}
+                              </div>
+                              <div>
+                                <p
+                                  className={`text-xs font-semibold ${formData.salesCompensationType === 'custom_percent' ? 'text-brand-navy dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}
+                                >
+                                  Custom % of Salary
+                                </p>
+                                <p className="mt-0.5 text-[10px] text-gray-500 dark:text-gray-400">
+                                  Fixed percentage guaranteed during probation
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        </div>
                       </div>
 
+                      {/* ── No Sale No Salary: Duration + Allowance ── */}
                       {formData.salesCompensationType === 'no_sale_no_salary' && (
-                        <>
+                        <div className="grid grid-cols-1 gap-5 border-t border-gray-100 pt-5 md:grid-cols-2 dark:border-white/10">
+                          {/* Duration */}
                           <div>
-                            <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
+                            <label className="mb-2 block text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
                               Duration
                             </label>
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-col gap-2.5">
                               <select
                                 name="noSaleMonths"
                                 value={formData.noSaleMonths || ''}
                                 onChange={handleChange}
-                                className="focus:border-brand-gold w-24 appearance-none rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white"
+                                className="focus:border-brand-gold focus:ring-brand-gold/50 w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white"
                               >
-                                <option value="">—</option>
+                                <option value="">Select months…</option>
                                 {Array.from({ length: 36 }, (_, i) => i + 1).map((m) => (
                                   <option key={m} value={m.toString()}>
                                     {m} {m === 1 ? 'month' : 'months'}
@@ -614,7 +739,8 @@ export default function OfferLetterPage() {
                                 ))}
                               </select>
                               {formData.noSaleMonths && formData.appointmentDate && (
-                                <span className="text-xs text-gray-400">
+                                <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-[10px] font-medium text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
+                                  <Calendar className="h-3 w-3 text-gray-400" />
                                   until{' '}
                                   {(() => {
                                     const d = new Date(formData.appointmentDate);
@@ -626,20 +752,20 @@ export default function OfferLetterPage() {
                                       .reverse()
                                       .join('-');
                                   })()}
-                                </span>
+                                </div>
                               )}
                             </div>
                           </div>
 
-                          {/* Subsistence Allowance — shown only when a value exists (otherwise add-back link) */}
+                          {/* Subsistence Allowance */}
                           <div>
+                            <label className="mb-2 block text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
+                              Subsistence Allowance
+                            </label>
                             {formData.subsistenceAllowance ? (
-                              <>
-                                <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
-                                  Subsistence Allowance (₹/month)
-                                </label>
+                              <div className="space-y-2.5">
                                 <div className="relative">
-                                  <span className="absolute top-1/2 left-3 -translate-y-1/2 text-xs text-gray-400">
+                                  <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-xs font-medium text-gray-500 dark:text-gray-400">
                                     ₹
                                   </span>
                                   <input
@@ -649,79 +775,92 @@ export default function OfferLetterPage() {
                                     onChange={handleChange}
                                     placeholder="10000"
                                     min="0"
-                                    className="focus:border-brand-gold focus:ring-brand-gold/50 w-full rounded-lg border border-gray-200 bg-white py-2.5 pr-16 pl-7 font-sans text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white dark:placeholder-gray-600"
+                                    className="focus:border-brand-gold focus:ring-brand-gold/50 w-full rounded-lg border border-gray-200 bg-white py-2.5 pr-4 pl-7 font-sans text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white dark:placeholder-gray-600"
                                   />
-                                  <div className="absolute top-1/2 right-2 flex -translate-y-1/2 gap-1">
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        setFormData({ ...formData, subsistenceAllowance: '10000' })
-                                      }
-                                      className="hover:text-brand-gold text-[10px] text-gray-400"
-                                      title="Reset to default"
-                                    >
-                                      ↺
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        setFormData({ ...formData, subsistenceAllowance: '' })
-                                      }
-                                      className="text-[10px] text-gray-400 hover:text-red-500"
-                                      title="Remove subsistence allowance"
-                                    >
-                                      ✕
-                                    </button>
-                                  </div>
                                 </div>
-                              </>
-                            ) : (
-                              <div className="pt-5">
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setFormData({ ...formData, subsistenceAllowance: '10000' })
-                                  }
-                                  className="text-brand-gold hover:text-brand-gold-light text-[11px] font-medium underline underline-offset-2 transition-colors"
-                                >
-                                  + Add subsistence allowance
-                                </button>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setFormData({ ...formData, subsistenceAllowance: '10000' })
+                                    }
+                                    className="hover:border-brand-gold hover:text-brand-gold dark:hover:border-brand-gold dark:hover:text-brand-gold inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[10px] font-medium text-gray-600 transition-all dark:border-white/10 dark:bg-[#111118] dark:text-gray-400"
+                                  >
+                                    <RefreshCw className="h-3 w-3" />
+                                    Reset to ₹10,000
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setFormData({ ...formData, subsistenceAllowance: '' })
+                                    }
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[10px] font-medium text-gray-600 transition-all hover:border-red-300 hover:text-red-600 dark:border-white/10 dark:bg-[#111118] dark:text-gray-400 dark:hover:border-red-400 dark:hover:text-red-400"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                    Remove
+                                  </button>
+                                </div>
                               </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setFormData({ ...formData, subsistenceAllowance: '10000' })
+                                }
+                                className="text-brand-gold hover:border-brand-gold hover:bg-brand-gold/5 dark:hover:border-brand-gold dark:hover:bg-brand-gold/10 inline-flex items-center gap-1.5 rounded-lg border-2 border-dashed border-gray-300 bg-white px-4 py-2.5 text-[11px] font-medium transition-all dark:border-white/20 dark:bg-transparent"
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                                Add subsistence allowance
+                              </button>
                             )}
                           </div>
-                        </>
+                        </div>
                       )}
 
+                      {/* ── Custom % of Salary ── */}
                       {formData.salesCompensationType === 'custom_percent' && (
-                        <div>
-                          <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
-                            Guaranteed Salary (%)
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="number"
-                              name="customSalaryPercent"
-                              value={formData.customSalaryPercent || ''}
-                              onChange={handleChange}
-                              placeholder="e.g. 50"
-                              min="0"
-                              max="100"
-                              className="focus:border-brand-gold focus:ring-brand-gold/50 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 pr-10 font-sans text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white dark:placeholder-gray-600"
-                            />
-                            <span className="absolute top-1/2 right-3 -translate-y-1/2 text-xs text-gray-400">
-                              %
-                            </span>
+                        <div className="border-t border-gray-100 pt-5 dark:border-white/10">
+                          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                            <div>
+                              <label className="mb-2 block text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">
+                                Guaranteed Salary (%)
+                              </label>
+                              <div className="relative">
+                                <input
+                                  type="number"
+                                  name="customSalaryPercent"
+                                  value={formData.customSalaryPercent || ''}
+                                  onChange={handleChange}
+                                  placeholder="e.g. 50"
+                                  min="0"
+                                  max="100"
+                                  className="focus:border-brand-gold focus:ring-brand-gold/50 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 pr-10 font-sans text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white dark:placeholder-gray-600"
+                                />
+                                <span className="absolute top-1/2 right-3 -translate-y-1/2 text-xs font-medium text-gray-400">
+                                  %
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-end">
+                              {formData.customSalaryPercent && formData.salaryCtc && (
+                                <div className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                                  <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                  <div>
+                                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400">
+                                      Guaranteed / month
+                                    </p>
+                                    <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
+                                      ₹
+                                      {Math.round(
+                                        (parseFloat(formData.customSalaryPercent) / 100) *
+                                          parseFloat(formData.salaryCtc)
+                                      ).toLocaleString('en-IN')}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          {formData.customSalaryPercent && formData.salaryCtc && (
-                            <p className="mt-1 text-[10px] text-gray-400">
-                              Guaranteed: ₹
-                              {Math.round(
-                                (parseFloat(formData.customSalaryPercent) / 100) *
-                                  parseFloat(formData.salaryCtc)
-                              ).toLocaleString('en-IN')}
-                              /month
-                            </p>
-                          )}
                         </div>
                       )}
                     </div>
