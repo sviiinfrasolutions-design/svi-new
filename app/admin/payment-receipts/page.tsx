@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'motion/react';
 import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
 import {
   Receipt,
@@ -13,8 +14,11 @@ import {
   X,
   CreditCard,
   Image as ImageIcon,
+  FileText,
+  Mail,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useState, useMemo } from 'react';
 import { exportToPDF, exportToImage } from '@/src/lib/utils/documentExporter';
 
 interface SavedReceipt {
@@ -39,12 +43,23 @@ interface SavedReceipt {
   };
 }
 
+const GRID_STYLE = {
+  backgroundImage:
+    'radial-gradient(circle at 1px 1px, rgba(201, 168, 76, 0.05) 1px, transparent 0)',
+  backgroundSize: '24px 24px',
+};
+
 export default function ReceiptRecordsPage() {
   const { token } = useAdminSession();
   const [receipts, setReceipts] = useState<SavedReceipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [methodFilter, setMethodFilter] = useState('');
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({
+    key: 'date',
+    direction: 'desc',
+  });
+  const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [selectedReceipt, setSelectedReceipt] = useState<SavedReceipt | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SavedReceipt | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -156,14 +171,57 @@ export default function ReceiptRecordsPage() {
     }
   };
 
-  const filteredReceipts = receipts.filter((r) => {
-    const query = searchQuery.toLowerCase();
-    const name = (r.form_data?.name || '').toLowerCase();
-    const no = (r.form_data?.receiptNo || '').toLowerCase();
-    const matchesSearch = name.includes(query) || no.includes(query);
-    const matchesMethod = methodFilter ? r.form_data?.paymentMethod === methodFilter : true;
-    return matchesSearch && matchesMethod;
-  });
+  const filteredReceipts = useMemo(() => {
+    return receipts
+      .filter((r) => {
+        const query = searchQuery.toLowerCase();
+        const name = (r.form_data?.name || '').toLowerCase();
+        const no = (r.form_data?.receiptNo || '').toLowerCase();
+        const matchesSearch = name.includes(query) || no.includes(query);
+        const matchesMethod = methodFilter ? r.form_data?.paymentMethod === methodFilter : true;
+
+        let matchesDate = true;
+        if (dateRange.start || dateRange.end) {
+          const recordDate = r.form_data?.date
+            ? new Date(r.form_data.date)
+            : new Date(r.created_at);
+          if (dateRange.start && new Date(dateRange.start) > recordDate) matchesDate = false;
+          if (dateRange.end) {
+            const endD = new Date(dateRange.end);
+            endD.setHours(23, 59, 59, 999);
+            if (endD < recordDate) matchesDate = false;
+          }
+        }
+
+        return matchesSearch && matchesMethod && matchesDate;
+      })
+      .sort((a, b) => {
+        const dir = sortConfig.direction === 'asc' ? 1 : -1;
+        if (sortConfig.key === 'date') {
+          const dateA = a.form_data?.date ? new Date(a.form_data.date) : new Date(a.created_at);
+          const dateB = b.form_data?.date ? new Date(b.form_data.date) : new Date(b.created_at);
+          return (dateA.getTime() - dateB.getTime()) * dir;
+        }
+        if (sortConfig.key === 'name') {
+          const nameA = (a.form_data?.name || '').toLowerCase();
+          const nameB = (b.form_data?.name || '').toLowerCase();
+          return nameA.localeCompare(nameB) * dir;
+        }
+        if (sortConfig.key === 'amount') {
+          const costA = parseFloat(a.form_data?.amount || '0');
+          const costB = parseFloat(b.form_data?.amount || '0');
+          return (costA - costB) * dir;
+        }
+        return 0;
+      });
+  }, [receipts, searchQuery, methodFilter, sortConfig, dateRange]);
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setMethodFilter('');
+    setSortConfig({ key: 'date', direction: 'desc' });
+    setDateRange({ start: '', end: '' });
+  };
 
   return (
     <div className="mx-auto w-full max-w-7xl font-sans">
@@ -246,87 +304,170 @@ export default function ReceiptRecordsPage() {
         </div>
       </div>
 
-      {/* Main Database Table Container */}
-      <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:border-white/8 dark:bg-[#0e0e14]/65">
-        <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      {/* Toolbar */}
+      <div className="mb-6 flex flex-col gap-4">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div className="relative w-full max-w-xs">
             <Search className="text-brand-gold absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search by client name or receipt no..."
+              placeholder="Search by client or receipt no..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="focus:border-brand-gold w-full rounded-lg border border-gray-200 bg-white py-2 pr-4 pl-9 text-xs text-gray-900 transition-colors focus:outline-none dark:border-white/8 dark:bg-[#0e0e14] dark:text-white"
             />
           </div>
-          <div className="flex items-center gap-3">
-            <label className="text-[10px] font-bold tracking-widest whitespace-nowrap text-gray-400 uppercase">
-              Payment Method:
-            </label>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Calendar className="text-brand-gold h-4 w-4" />
+              <input
+                type="date"
+                value={dateRange.start}
+                onChange={(e) => setDateRange((prev) => ({ ...prev, start: e.target.value }))}
+                className="focus:border-brand-gold rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 [color-scheme:light] outline-none dark:border-white/10 dark:bg-[#0e0e14] dark:text-white dark:[color-scheme:dark]"
+              />
+              <span className="text-gray-400">-</span>
+              <input
+                type="date"
+                value={dateRange.end}
+                onChange={(e) => setDateRange((prev) => ({ ...prev, end: e.target.value }))}
+                className="focus:border-brand-gold rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-700 [color-scheme:light] outline-none dark:border-white/10 dark:bg-[#0e0e14] dark:text-white dark:[color-scheme:dark]"
+              />
+            </div>
+
             <select
               value={methodFilter}
               onChange={(e) => setMethodFilter(e.target.value)}
-              className="focus:border-brand-gold rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-700 outline-none dark:border-white/10 dark:bg-[#0e0e14]"
+              className="focus:border-brand-gold rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-700 [color-scheme:light] outline-none dark:border-white/10 dark:bg-[#0e0e14] dark:text-gray-200 dark:[color-scheme:dark]"
             >
-              <option value="">All</option>
+              <option value="">All Methods</option>
               <option value="UPI">UPI</option>
               <option value="Cash">Cash</option>
               <option value="Cheque">Cheque</option>
               <option value="Bank Transfer">Bank Transfer</option>
             </select>
+
+            <select
+              value={`${sortConfig.key}-${sortConfig.direction}`}
+              onChange={(e) => {
+                const [key, direction] = e.target.value.split('-');
+                setSortConfig({ key, direction: direction as 'asc' | 'desc' });
+              }}
+              className="focus:border-brand-gold rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-700 [color-scheme:light] outline-none dark:border-white/10 dark:bg-[#0e0e14] dark:text-gray-200 dark:[color-scheme:dark]"
+            >
+              <option value="date-desc">Newest First</option>
+              <option value="date-asc">Oldest First</option>
+              <option value="name-asc">Client (A-Z)</option>
+              <option value="name-desc">Client (Z-A)</option>
+              <option value="amount-desc">Amount (High-Low)</option>
+              <option value="amount-asc">Amount (Low-High)</option>
+            </select>
           </div>
         </div>
 
+        {(searchQuery || methodFilter || dateRange.start || dateRange.end) && (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-gray-500 dark:text-gray-400">Active Filters:</span>
+            <button
+              onClick={handleClearFilters}
+              className="text-brand-gold hover:text-brand-navy flex items-center gap-1 font-medium transition-colors dark:hover:text-white"
+            >
+              <X className="h-3 w-3" />
+              Clear All
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Main Database Table Container */}
+      <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 shadow-2xl backdrop-blur-xl transition-colors duration-300 dark:border-white/8 dark:bg-[#0e0e14]/65">
+        <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[1.5px] bg-gradient-to-r from-transparent to-transparent" />
+
         <div className="overflow-x-auto">
           {loading ? (
-            <table className="w-full border-collapse text-left text-xs animate-pulse">
+            <table className="w-full font-sans text-sm">
               <thead>
-                <tr className="border-b border-gray-100 text-[11px] font-bold tracking-widest text-gray-400 uppercase dark:border-white/8">
-                  <th className="px-4 py-3"><div className="h-3.5 w-16 bg-gray-250 dark:bg-white/5 rounded" /></th>
-                  <th className="px-4 py-3"><div className="h-3.5 w-24 bg-gray-250 dark:bg-white/5 rounded" /></th>
-                  <th className="px-4 py-3"><div className="h-3.5 w-16 bg-gray-250 dark:bg-white/5 rounded" /></th>
-                  <th className="px-4 py-3"><div className="h-3.5 w-20 bg-gray-250 dark:bg-white/5 rounded" /></th>
-                  <th className="px-4 py-3"><div className="h-3.5 w-16 bg-gray-250 dark:bg-white/5 rounded" /></th>
-                  <th className="px-4 py-3"><div className="h-3.5 w-32 bg-gray-250 dark:bg-white/5 rounded" /></th>
-                  <th className="px-4 py-3 text-right"><div className="h-3.5 w-24 bg-gray-250 dark:bg-white/5 rounded ml-auto" /></th>
+                <tr className="border-b border-gray-200 bg-gray-50/80 backdrop-blur-md transition-colors duration-300 dark:border-white/5 dark:bg-white/5">
+                  {[
+                    'Receipt No',
+                    'Client Name',
+                    'Date',
+                    'Amount',
+                    'Method',
+                    'Plot Info',
+                    'Actions',
+                  ].map((h, idx) => (
+                    <th
+                      key={h}
+                      className={`px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400 ${idx === 6 ? 'text-right' : 'text-left'}`}
+                    >
+                      <div
+                        className={`h-3 rounded bg-gray-200 dark:bg-white/5 ${idx === 6 ? 'ml-auto w-16' : 'w-24'}`}
+                      />
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+              <tbody className="divide-gray-150 divide-y dark:divide-white/5">
                 {[...Array(6)].map((_, i) => (
                   <tr key={i}>
-                    {/* Receipt No */}
-                    <td className="px-4 py-4"><div className="h-4 w-12 bg-gray-200 dark:bg-white/5 rounded" /></td>
-                    {/* Client Name */}
-                    <td className="px-4 py-4"><div className="h-4 w-28 bg-gray-200 dark:bg-white/5 rounded" /></td>
-                    {/* Date */}
-                    <td className="px-4 py-4"><div className="h-3.5 w-16 bg-gray-200 dark:bg-white/5 rounded" /></td>
-                    {/* Amount */}
-                    <td className="px-4 py-4"><div className="h-4 w-20 bg-gray-200 dark:bg-white/5 rounded" /></td>
-                    {/* Method */}
-                    <td className="px-4 py-4"><div className="h-5 w-12 bg-gray-200 dark:bg-white/5 rounded" /></td>
-                    {/* Plot Info */}
-                    <td className="px-4 py-4"><div className="h-4 w-40 bg-gray-200 dark:bg-white/5 rounded" /></td>
-                    {/* Actions */}
-                    <td className="px-4 py-4 text-right"><div className="h-8 w-28 bg-gray-200 dark:bg-white/5 rounded ml-auto" /></td>
+                    <td className="px-6 py-4.5">
+                      <div className="h-4 w-12 rounded bg-gray-200 dark:bg-white/5" />
+                    </td>
+                    <td className="px-6 py-4.5">
+                      <div className="h-4 w-28 rounded bg-gray-200 dark:bg-white/5" />
+                    </td>
+                    <td className="px-6 py-4.5">
+                      <div className="h-4 w-16 rounded bg-gray-200 dark:bg-white/5" />
+                    </td>
+                    <td className="px-6 py-4.5">
+                      <div className="h-4 w-20 rounded bg-gray-200 dark:bg-white/5" />
+                    </td>
+                    <td className="px-6 py-4.5">
+                      <div className="h-4 w-12 rounded bg-gray-200 dark:bg-white/5" />
+                    </td>
+                    <td className="px-6 py-4.5">
+                      <div className="h-4 w-40 rounded bg-gray-200 dark:bg-white/5" />
+                    </td>
+                    <td className="px-6 py-4.5 text-right">
+                      <div className="ml-auto h-8 w-28 rounded bg-gray-200 dark:bg-white/5" />
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          ) : filteredReceipts.length === 0 ? (
+            <div className="py-24 text-center font-sans">
+              <Receipt className="mx-auto mb-4 h-12 w-12 text-gray-400 transition-colors duration-300 dark:text-gray-700" />
+              <p className="text-sm font-medium text-gray-500 transition-colors duration-300 dark:text-gray-400">
+                {searchQuery ? 'No matches found.' : 'No receipt records generated yet.'}
+              </p>
+            </div>
           ) : (
-            <table className="w-full border-collapse text-left">
+            <table className="w-full font-sans text-sm">
               <thead>
-                <tr className="border-b border-gray-100 text-[11px] font-bold tracking-widest text-gray-400 uppercase dark:border-white/8">
-                  <th className="px-4 py-3">Receipt No</th>
-                  <th className="px-4 py-3">Client Name</th>
-                  <th className="px-4 py-3">Date</th>
-                  <th className="px-4 py-3">Amount</th>
-                  <th className="px-4 py-3">Method</th>
-                  <th className="px-4 py-3">Plot Info</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                <tr className="border-b border-gray-200 bg-gray-50/80 backdrop-blur-md transition-colors duration-300 dark:border-white/5 dark:bg-white/5">
+                  {[
+                    'Receipt No',
+                    'Client Name',
+                    'Date',
+                    'Amount',
+                    'Method',
+                    'Plot Info',
+                    'Actions',
+                  ].map((h, idx) => (
+                    <th
+                      key={h}
+                      className={`px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400 ${idx === 6 ? 'text-right' : 'text-left'}`}
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 text-xs text-gray-700 dark:divide-white/5 dark:text-gray-300">
-                {filteredReceipts.map((receipt) => {
+              <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                {filteredReceipts.map((receipt, i) => {
                   const amountVal = parseFloat(receipt.form_data?.amount || '0');
                   const formattedAmount = amountVal.toLocaleString('en-IN', {
                     style: 'currency',
@@ -334,57 +475,77 @@ export default function ReceiptRecordsPage() {
                   });
 
                   return (
-                    <tr key={receipt.id} className="hover:bg-gray-50/50 dark:hover:bg-white/2">
-                      <td className="px-4 py-3.5 font-bold text-red-600 dark:text-red-500">
-                        {receipt.form_data?.receiptNo || 'N/A'}
+                    <motion.tr
+                      key={receipt.id}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.02, duration: 0.3, ease: 'easeOut' }}
+                      className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-white/5"
+                    >
+                      <td className="px-6 py-4">
+                        <span className="text-brand-gold border-brand-gold/20 bg-brand-gold/10 rounded-full border px-2 py-1 text-xs font-bold">
+                          {receipt.form_data?.receiptNo || 'N/A'}
+                        </span>
                       </td>
-                      <td className="px-4 py-3.5 font-semibold text-gray-900 dark:text-white">
+                      <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                         {receipt.form_data?.name || 'N/A'}
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                         {receipt.form_data?.date
                           ? new Date(receipt.form_data.date).toLocaleDateString('en-GB')
                           : 'N/A'}
                       </td>
-                      <td className="px-4 py-3.5 font-bold text-gray-900 dark:text-white">
+                      <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
                         {formattedAmount}
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-6 py-4">
                         <span className="bg-brand-gold/10 border-brand-gold/20 text-brand-gold rounded border px-2 py-0.5 text-[10px] font-bold">
                           {receipt.form_data?.paymentMethod || 'UPI'}
                         </span>
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                         {receipt.form_data?.plotNo
                           ? `Plot ${receipt.form_data.plotNo} (${receipt.form_data.plotSize} Sq. Yds.)`
                           : 'N/A'}
                       </td>
-                      <td className="px-4 py-3.5 text-right">
-                        <div className="flex justify-end gap-2">
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setSelectedReceipt(receipt)}
-                            className="bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-gold flex items-center justify-center gap-1 rounded-lg px-2.5 py-1.5 font-bold transition-all"
+                            className="hover:text-brand-gold hover:bg-brand-gold/10 dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors"
+                            title="View & Print"
                           >
-                            <Eye className="h-3.5 w-3.5" /> View & Print
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <Link
+                            href={`/admin/payment-receipt?templateId=${receipt.id}`}
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
+                            title="Use as Template"
+                          >
+                            <FileText className="h-4 w-4" />
+                          </Link>
+                          <button
+                            onClick={() => {
+                              sessionStorage.setItem('emailPrefillRecord', JSON.stringify(receipt));
+                              window.location.href = '/admin/email?tab=compose&prefillReceipt=true';
+                            }}
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-500/10 dark:hover:text-purple-400"
+                            title="Email Client"
+                          >
+                            <Mail className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => setDeleteTarget(receipt)}
-                            className="flex items-center justify-center gap-1 rounded-lg bg-red-500/10 px-2.5 py-1.5 font-bold text-red-500 transition-all hover:bg-red-500/20"
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                            title="Delete"
                           >
-                            <Trash2 className="h-3.5 w-3.5" /> Delete
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
                       </td>
-                    </tr>
+                    </motion.tr>
                   );
                 })}
-                {filteredReceipts.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="py-12 text-center text-gray-500 dark:text-gray-400">
-                      No matching receipt records found.
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           )}
@@ -392,39 +553,52 @@ export default function ReceiptRecordsPage() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-md dark:bg-black/85">
-          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-white/10 dark:bg-[#0e0e14]">
-            <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">Delete Receipt</h3>
-            <p className="mb-4 text-xs text-gray-600 dark:text-gray-400">
-              Are you sure you want to permanently delete receipt number{' '}
-              <strong className="text-red-500">{deleteTarget.form_data?.receiptNo}</strong>{' '}
-              generated for <strong>{deleteTarget.form_data?.name}</strong>?
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                disabled={deleteLoading}
-                className="rounded-lg border border-gray-200 bg-gray-100 px-4 py-2 text-xs font-bold text-gray-700 uppercase hover:bg-gray-200 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleteLoading}
-                className="flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2 text-xs font-bold text-white uppercase hover:bg-red-700 disabled:opacity-60"
-              >
-                {deleteLoading ? (
-                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Trash2 className="h-3.5 w-3.5" />
-                )}
-                Delete
-              </button>
-            </div>
+      <AnimatePresence>
+        {deleteTarget && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-md dark:bg-black/85">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="dark:border-brand-gold/20 relative w-full max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-2xl transition-colors duration-300 dark:bg-[#0e0e14]"
+            >
+              <div className="absolute top-0 right-0 left-0 h-[2px] bg-red-500/50" />
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-red-500/20 bg-red-500/10">
+                <Trash2 className="h-5 w-5 text-red-400" />
+              </div>
+              <h3 className="text-brand-navy mb-2 font-serif text-lg tracking-tight transition-colors duration-300 dark:text-white">
+                Delete Receipt?
+              </h3>
+              <p className="mb-6 font-sans text-xs text-gray-500 transition-colors duration-300 dark:text-gray-400">
+                Are you sure you want to permanently delete receipt number{' '}
+                <strong className="text-red-500">{deleteTarget.form_data?.receiptNo}</strong>{' '}
+                generated for <strong>{deleteTarget.form_data?.name}</strong>? This action is
+                irreversible.
+              </p>
+              <div className="flex gap-3 font-sans">
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={deleteLoading}
+                  className="flex-1 cursor-pointer rounded-lg border border-gray-200 bg-gray-100 py-3 text-xs font-bold tracking-widest text-gray-700 uppercase transition-all hover:bg-gray-200 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleteLoading}
+                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg bg-red-600 py-3 text-xs font-bold tracking-widest text-white uppercase shadow-lg transition-all hover:bg-red-500"
+                >
+                  {deleteLoading ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  ) : (
+                    'Delete'
+                  )}
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* View & Re-download overlay Modal */}
       {selectedReceipt && (
@@ -637,7 +811,7 @@ export default function ReceiptRecordsPage() {
                     {parseFloat(selectedReceipt.form_data?.amount || '0').toLocaleString('en-IN', {
                       minimumFractionDigits: 2,
                     })}
-                    /-
+                    {'/-'}
                   </div>
                   <div className="relative text-center">
                     <img
