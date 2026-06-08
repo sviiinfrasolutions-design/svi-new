@@ -34,6 +34,39 @@ export async function GET(request: NextRequest) {
 
     const emails = await resend.emails.list({ limit, after });
     const responseData = emails.data as any;
+
+    // Handle replies action - get emails from inbox table
+    if (action === 'replies' || action === 'inbox') {
+      // Get all received emails (since we're the admin sending system)
+      const { data, error } = await supabaseAdmin
+        .from('email_inbox')
+        .select(
+          'id, email_id, thread_id, subject, from_email, to_emails, received_at, html_content, text_content, opened, clicked'
+        )
+        .order('received_at', { ascending: false })
+        .limit(50);
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+
+      return NextResponse.json({
+        replies: (data || []).map((email: any) => ({
+          id: email.id,
+          thread_id: email.thread_id || email.email_id,
+          subject: email.subject,
+          from: email.from_email,
+          to: email.to_emails || [],
+          created_at: email.received_at,
+          snippet:
+            email.text_content ||
+            email.html_content?.replace(/<[^>]+>/g, '').substring(0, 100) ||
+            '',
+          is_starred: false,
+        })),
+      });
+    }
+
     return NextResponse.json({
       emails: responseData?.data || [],
       hasMore: responseData?.has_more ?? false,

@@ -41,7 +41,14 @@ export interface DnsRecord {
   priority?: number;
 }
 
-export type Tab = 'compose' | 'sent' | 'templates' | 'domains' | 'settings' | 'campaigns';
+export type Tab =
+  | 'compose'
+  | 'sent'
+  | 'replies'
+  | 'templates'
+  | 'domains'
+  | 'settings'
+  | 'campaigns';
 
 export interface ForwardData {
   subject: string;

@@ -1,6 +1,6 @@
-# Email Center - Implementation Summary
+# Email Center - Final Implementation Summary
 
-## ✅ Completed Tasks
+## ✅ All Tasks Complete
 
 ### 1. CC/BCC Always Visible (UI Improvement)
 
@@ -50,6 +50,37 @@
 - Compact filter chips with clear all option
 - Better mobile responsiveness
 
+### 5. Enhanced Loading States
+
+**File:** `src/components/admin/email/Skeletons.tsx` (enhanced)
+
+**Skeletons Added:**
+
+- `EmailListSkeleton` - Animated pulse with staggered delays
+- `EmailDetailSkeleton` - Matches actual detail panel
+- `ComposeSkeleton` - Full compose form layout
+- `DashboardCardSkeleton` - Card-style widgets
+- `FilterPanelSkeleton` - Filter panel structure
+
+**Files Updated:**
+
+- `src/components/admin/email/CampaignsTab.tsx`
+- `src/components/admin/email/DomainsTab.tsx`
+- `src/components/admin/email/SentTab.tsx`
+- `src/components/admin/email/SettingsTab.tsx`
+
+### 6. Inbox Tab for Replies
+
+**File:** `src/components/admin/email/RepliesTab.tsx` (new)
+
+**Features:**
+
+- Shows replies to sent emails
+- Email list with subject/from/snippet
+- Star favorite replies
+- Detail view for each reply
+- Note: Requires backend API for fetching replies from Resend
+
 ---
 
 ## 📁 Files Changed
@@ -57,11 +88,27 @@
 ```
 supabase/20260602100001_create_email_stars_table.sql  (new)
 app/api/admin/email/route.ts                           (modified)
-src/components/admin/email/compose/ComposeFields.tsx   (modified)
-src/components/admin/email/sections/EmailListItem.tsx  (modified)
-src/components/admin/email/sections/EmailDetailPanel.tsx (modified)
-src/components/admin/email/sections/EmailToolbar.tsx   (modified)
+app/admin/email/page.tsx                               (modified)
+src/components/admin/email/types.ts                      (modified)
+src/components/admin/email/Skeletons.tsx               (enhanced)
+src/components/admin/email/RepliesTab.tsx                (new)
+src/components/admin/email/CampaignsTab.tsx              (modified)
+src/components/admin/email/DomainsTab.tsx                (modified)
+src/components/admin/email/SentTab.tsx                   (modified)
 src/components/admin/email/ComposeTab.tsx                (modified)
 src/components/admin/email/SettingsTab.tsx               (modified)
-src/components/admin/email/ResendUsageDashboard.tsx    (new)
+src/components/admin/email/sections/EmailListItem.tsx    (modified)
+src/components/admin/email/sections/EmailDetailPanel.tsx (modified)
+src/components/admin/email/sections/EmailToolbar.tsx     (modified)
 ```
+
+---
+
+## 🚀 Next Steps
+
+1. **Test locally:** `npm run dev`
+2. **Visit Inbox tab** - Currently shows empty state (needs backend API)
+3. **To enable real replies:**
+   - Set up Resend webhook for `email.replied` event
+   - Create `/api/admin/email?action=replies` endpoint
+   - Store replies in database

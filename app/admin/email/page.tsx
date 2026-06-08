@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mail, PenLine, Inbox, Megaphone, FileText, Globe, Settings } from 'lucide-react';
+import { Mail, PenLine, Inbox, Reply, Megaphone, FileText, Globe, Settings } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { supabase } from '@/src/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Tab, ForwardData, ReplyData, TemplatePrefill } from '@/src/components/admin/email/types';
 import { ComposeTab } from '@/src/components/admin/email/ComposeTab';
 import { SentTab } from '@/src/components/admin/email/SentTab';
+import { RepliesTab } from '@/src/components/admin/email/RepliesTab';
 import { TemplatesTab } from '@/src/components/admin/email/TemplatesTab';
 import { DomainsTab } from '@/src/components/admin/email/DomainsTab';
 import { SettingsTab } from '@/src/components/admin/email/SettingsTab';
@@ -18,6 +19,7 @@ import { CampaignsTab } from '@/src/components/admin/email/CampaignsTab';
 const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
   { id: 'compose', label: 'Compose', icon: PenLine },
   { id: 'sent', label: 'Sent', icon: Inbox },
+  { id: 'replies', label: 'Inbox', icon: Reply },
   { id: 'campaigns', label: 'Campaigns', icon: Megaphone },
   { id: 'templates', label: 'Templates', icon: FileText },
   { id: 'domains', label: 'Domains', icon: Globe },
@@ -244,6 +246,7 @@ export default function AdminEmailPage() {
             />
           )}
           {activeTab === 'sent' && <SentTab onForward={handleForward} onReply={handleReply} />}
+          {activeTab === 'replies' && <RepliesTab />}
           {activeTab === 'campaigns' && <CampaignsTab />}
           {activeTab === 'templates' && <TemplatesTab onUseTemplate={handleUseTemplate} />}
           {activeTab === 'domains' && <DomainsTab />}
