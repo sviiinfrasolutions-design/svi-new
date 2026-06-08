@@ -191,7 +191,7 @@ export default function OfferLetterPage() {
         const slab = SALARY_SLABS.find((s) => s.salary === numVal);
         if (slab) {
           updated.target = slab.target.toString();
-          updated.offerSlab = slab.offerSlab;
+          updated.offerSlab = slab.offerSlab.replace('%', '');
           setSalaryOpen(false);
         } else setSalaryOpen(true);
       }
@@ -201,7 +201,7 @@ export default function OfferLetterPage() {
         const slab = SALARY_SLABS.find((s) => s.target === numVal);
         if (slab) {
           updated.salaryCtc = slab.salary.toString();
-          updated.offerSlab = slab.offerSlab;
+          updated.offerSlab = slab.offerSlab.replace('%', '');
           setTargetOpen(false);
         } else setTargetOpen(true);
       }
@@ -215,7 +215,7 @@ export default function OfferLetterPage() {
       ...formData,
       salaryCtc: s.salary.toString(),
       target: s.target.toString(),
-      offerSlab: s.offerSlab,
+      offerSlab: s.offerSlab.replace('%', ''),
     });
     setSalaryOpen(false);
     setTargetOpen(false);
@@ -553,11 +553,14 @@ export default function OfferLetterPage() {
               </div>
 
               <FormField
-                label="Offer Slab"
+                label="Offer Slab (%)"
                 name="offerSlab"
+                type="number"
                 value={formData.offerSlab}
                 onChange={handleChange}
                 required
+                min="0"
+                step="any"
               />
               <FormField
                 label="Appointment Date"

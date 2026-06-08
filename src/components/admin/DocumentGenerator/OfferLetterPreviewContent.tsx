@@ -146,10 +146,21 @@ export default function OfferLetterPreviewContent({
               {' per month'})
             </>
           )}
-          {formData.offerSlab && <span className="font-bold"> = {formData.offerSlab}</span>}
-          {!formData.offerSlab && formData.target && ' = 3%'}, which includes all statutory benefits
-          as applicable. Additional performance-based incentives will be provided as per company
-          policy.
+          {formData.offerSlab && (
+            <span className="font-bold">
+              {' '}
+              You will receive {formData.offerSlab.replace(/%$/, '')}% commission on your sales
+              achievements.{' '}
+            </span>
+          )}
+          {!formData.offerSlab && formData.target && (
+            <span className="font-bold">
+              {' '}
+              You will receive 3% commission on your sales achievements.{' '}
+            </span>
+          )}
+          which includes all statutory benefits as applicable. Additional performance-based
+          incentives will be provided as per company policy.
         </p>
 
         {/* ── Sales Compensation Condition (Term 3.5) ── */}
