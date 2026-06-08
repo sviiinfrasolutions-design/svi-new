@@ -101,6 +101,7 @@ interface FormSelectProps {
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   options: { value: string; label: string }[];
   className?: string;
+  required?: boolean;
 }
 
 export function FormSelect({
@@ -110,16 +111,18 @@ export function FormSelect({
   onChange,
   options,
   className = '',
+  required = false,
 }: FormSelectProps) {
   return (
     <div className={className}>
       <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400">
-        {label}
+        {label} {required && '*'}
       </label>
       <select
         name={name}
         value={value}
         onChange={onChange}
+        required={required}
         className="focus:border-brand-gold focus:ring-brand-gold/50 w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2.5 font-sans text-sm text-gray-900 transition-all focus:ring-1 focus:outline-none dark:border-white/10 dark:bg-[#111118] dark:text-white"
       >
         {options.map((opt) => (

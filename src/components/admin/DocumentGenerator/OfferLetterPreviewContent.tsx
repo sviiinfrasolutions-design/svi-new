@@ -1,4 +1,5 @@
 import React from 'react';
+import { SalarySlabType } from '@/src/components/admin/OfferLetter/SlabSelector';
 
 interface OfferLetterFormData {
   date?: string;
@@ -22,6 +23,7 @@ interface OfferLetterFormData {
   salesCompensationType?: string;
   noSaleMonths?: string;
   customSalaryPercent?: string;
+  subsistenceAllowance?: string;
 }
 
 interface CompanyInfo {
@@ -35,9 +37,11 @@ interface CompanyInfo {
 export default function OfferLetterPreviewContent({
   formData,
   companyInfo,
+  matchedSlab,
 }: {
   formData: OfferLetterFormData;
   companyInfo: CompanyInfo;
+  matchedSlab?: SalarySlabType | null;
 }) {
   const isSalesDepartment = formData.department === 'Sales';
 
@@ -209,8 +213,8 @@ export default function OfferLetterPreviewContent({
             <span className="font-bold">
               ₹
               {(() => {
-                const pct = parseFloat(formData.customSalaryPercent || 0);
-                const ctc = parseFloat(formData.salaryCtc || 0);
+                const pct = parseFloat(formData.customSalaryPercent || '0');
+                const ctc = parseFloat(formData.salaryCtc || '0');
                 return pct && ctc
                   ? Math.round((pct / 100) * ctc).toLocaleString('en-IN')
                   : '[Amount]';

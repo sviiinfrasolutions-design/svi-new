@@ -10,82 +10,23 @@ import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
 import {
   FileSignature,
   RefreshCw,
-  ChevronDown,
   SlidersHorizontal,
   CircleDollarSign,
   Calendar,
   Trash2,
   TrendingUp,
   Plus,
+  ChevronDown,
 } from 'lucide-react';
 
 import { exportToPDF, exportToImage } from '@/src/lib/utils/documentExporter';
 import OfferLetterPreviewContent from '@/src/components/admin/DocumentGenerator/OfferLetterPreviewContent';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { SlabSelector, SALARY_SLABS } from '@/src/components/admin/OfferLetter/SlabSelector';
+import { useEffect, useState, useCallback } from 'react';
 
 const DEPARTMENTS = ['Sales', 'IT', 'Management'];
 
 const SALES_DESIGNATIONS = ['Telecaller', 'BDM', 'BDE', 'Sales Manager', 'Team Leader'];
-
-const SALARY_SLABS = [
-  { target: 120, salary: 17000, offerSlab: '3%' },
-  { target: 140, salary: 18000, offerSlab: '3%' },
-  { target: 160, salary: 19000, offerSlab: '3%' },
-  { target: 180, salary: 20000, offerSlab: '3%' },
-  { target: 210, salary: 22000, offerSlab: '3%' },
-  { target: 250, salary: 25000, offerSlab: '3%' },
-  { target: 290, salary: 28000, offerSlab: '3%' },
-  { target: 320, salary: 30000, offerSlab: '3%' },
-  { target: 380, salary: 35000, offerSlab: '3%' },
-  { target: 450, salary: 40000, offerSlab: '3%' },
-  { target: 520, salary: 45000, offerSlab: '3%' },
-  { target: 600, salary: 50000, offerSlab: '3%' },
-];
-
-// ─── Suggestion Dropdown ─────────────────────────────────────────
-function SlabSuggestions({
-  slabs,
-  activeKey,
-  activeVal,
-  selectedSalary,
-  onSelect,
-  format,
-}: {
-  slabs: typeof SALARY_SLABS;
-  activeKey: 'salary' | 'target';
-  activeVal: string;
-  selectedSalary: number;
-  onSelect: (s: (typeof SALARY_SLABS)[number]) => void;
-  format: (s: (typeof SALARY_SLABS)[number]) => { left: string; right: string };
-}) {
-  if (slabs.length === 0)
-    return <div className="px-3 py-2 text-xs text-gray-400">No matching slab</div>;
-  return (
-    <div className="py-1">
-      {slabs.map((s) => {
-        const isActive =
-          s[activeKey] === (activeKey === 'salary' ? selectedSalary : parseFloat(activeVal));
-        const { left, right } = format(s);
-        return (
-          <button
-            key={s[activeKey]}
-            type="button"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              onSelect(s);
-            }}
-            className={`flex w-full items-center justify-between px-3 py-2 text-left text-xs transition-colors hover:bg-gray-50 dark:hover:bg-white/5 ${
-              isActive ? 'text-brand-gold font-medium' : 'text-gray-700 dark:text-gray-300'
-            }`}
-          >
-            <span>{left}</span>
-            <span className="text-gray-400">{right}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 
 export default function OfferLetterPage() {
   const { token } = useAdminSession();
@@ -141,84 +82,81 @@ export default function OfferLetterPage() {
   const [preview, setPreview] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [savedOffers, setSavedOffers] = useState<any[]>([]);
-  const [salaryOpen, setSalaryOpen] = useState(false);
-  const [targetOpen, setTargetOpen] = useState(false);
   const [showSlabs, setShowSlabs] = useState(false);
   const [salesCustomDesignation, setSalesCustomDesignation] = useState('');
   const [showCustomDesignation, setShowCustomDesignation] = useState(false);
 
-  const salaryRef = useRef<HTMLDivElement>(null);
-  const targetRef = useRef<HTMLDivElement>(null);
-
   const handleClickOutside = useCallback((e: MouseEvent) => {
-    if (salaryRef.current && !salaryRef.current.contains(e.target as Node)) setSalaryOpen(false);
-    if (targetRef.current && !targetRef.current.contains(e.target as Node)) setTargetOpen(false);
+    // Handled by SlabSelector component
   }, []);
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [handleClickOutside]);
 
-  const matchedSlab = SALARY_SLABS.find((s) => parseFloat(formData.salaryCtc) === s.salary);
+  const matchedSlab = formData.salaryCtc
+    ? SALARY_SLABS.find((s) => parseFloat(formData.salaryCtc) === s.salary)
+    : formData.target
+      ? SALARY_SLABS.find((s) => parseFloat(formData.target) === s.target)
+      : null;
 
-  const salarySuggestions = formData.salaryCtc
-    ? SALARY_SLABS.filter((s) => {
-        const v = parseFloat(formData.salaryCtc) || 0;
-        return (
-          s.salary.toString().includes(formData.salaryCtc) ||
-          (v > 0 && Math.abs(s.salary - v) <= 2000)
-        );
-      })
-    : SALARY_SLABS;
-  const targetSuggestions = formData.target
-    ? SALARY_SLABS.filter((s) => {
-        const v = parseFloat(formData.target) || 0;
-        return (
-          s.target.toString().includes(formData.target) || (v > 0 && Math.abs(s.target - v) <= 20)
-        );
-      })
-    : SALARY_SLABS;
+  // Helper to find slab by value
+  const findSlabByValue = (
+    value: string,
+    key: 'salary' | 'target'
+  ): (typeof SALARY_SLABS)[number] | null => {
+    const numVal = parseFloat(value);
+    if (isNaN(numVal)) return null;
+    return SALARY_SLABS.find((s) => s[key] === numVal) || null;
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    const updated = { ...formData, [name]: value } as any;
-
-    if (name === 'salaryCtc' && value) {
-      const numVal = parseFloat(value);
-      if (!isNaN(numVal)) {
-        const slab = SALARY_SLABS.find((s) => s.salary === numVal);
-        if (slab) {
-          updated.target = slab.target.toString();
-          updated.offerSlab = slab.offerSlab.replace('%', '');
-          setSalaryOpen(false);
-        } else setSalaryOpen(true);
-      }
-    } else if (name === 'target' && value) {
-      const numVal = parseFloat(value);
-      if (!isNaN(numVal)) {
-        const slab = SALARY_SLABS.find((s) => s.target === numVal);
-        if (slab) {
-          updated.salaryCtc = slab.salary.toString();
-          updated.offerSlab = slab.offerSlab.replace('%', '');
-          setTargetOpen(false);
-        } else setTargetOpen(true);
-      }
-    }
-
-    setFormData(updated);
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const selectSalarySlab = (s: (typeof SALARY_SLABS)[number]) => {
+  const handleSalaryChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, salaryCtc: value }));
+    const slab = findSlabByValue(value, 'salary');
+    if (slab) {
+      setFormData((prev) => ({
+        ...prev,
+        target: slab.target.toString(),
+        offerSlab: slab.offerSlab.replace('%', ''),
+      }));
+    }
+  };
+
+  const handleTargetChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, target: value }));
+    const slab = findSlabByValue(value, 'target');
+    if (slab) {
+      setFormData((prev) => ({
+        ...prev,
+        salaryCtc: slab.salary.toString(),
+        offerSlab: slab.offerSlab.replace('%', ''),
+      }));
+    }
+  };
+
+  const handleSalarySelect = (s: (typeof SALARY_SLABS)[number]) => {
     setFormData({
       ...formData,
       salaryCtc: s.salary.toString(),
       target: s.target.toString(),
       offerSlab: s.offerSlab.replace('%', ''),
     });
-    setSalaryOpen(false);
-    setTargetOpen(false);
+  };
+
+  const handleTargetSelect = (s: (typeof SALARY_SLABS)[number]) => {
+    setFormData({
+      ...formData,
+      salaryCtc: s.salary.toString(),
+      target: s.target.toString(),
+      offerSlab: s.offerSlab.replace('%', ''),
+    });
   };
 
   const handleLoadOffer = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -476,92 +414,22 @@ export default function OfferLetterPage() {
                 required
               />
 
-              {/* ── Salary ── */}
-              <div ref={salaryRef} className="relative">
-                <FormField
-                  label="Salary (CTC) / month"
-                  name="salaryCtc"
-                  type="number"
-                  value={formData.salaryCtc}
-                  onChange={handleChange}
-                  onFocus={() => formData.salaryCtc && setSalaryOpen(true)}
-                  required
+              {/* ── Salary Slab Selector (Extracted Component) ── */}
+              <div className="md:col-span-2">
+                <SlabSelector
+                  salaryCtc={formData.salaryCtc}
+                  target={formData.target}
+                  offerSlab={formData.offerSlab}
+                  onSalaryChange={handleSalaryChange}
+                  onTargetChange={handleTargetChange}
+                  onOfferSlabChange={(value) =>
+                    setFormData((prev) => ({ ...prev, offerSlab: value }))
+                  }
+                  onSalarySelect={handleSalarySelect}
+                  onTargetSelect={handleTargetSelect}
                 />
-                {formData.salaryCtc && (
-                  <div className="absolute top-7 right-2.5">
-                    <span
-                      className={`inline-block rounded px-1.5 py-0.5 text-[10px] leading-tight font-medium ${
-                        matchedSlab
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                          : 'bg-gray-100 text-gray-500 dark:bg-white/10 dark:text-gray-400'
-                      }`}
-                    >
-                      {matchedSlab ? `${matchedSlab.target} Sq.Yd` : 'Custom'}
-                    </span>
-                  </div>
-                )}
-                {salaryOpen && formData.salaryCtc && (
-                  <div className="absolute z-50 mt-0.5 w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-[#1a1a23]">
-                    <SlabSuggestions
-                      slabs={salarySuggestions}
-                      activeKey="salary"
-                      activeVal={formData.salaryCtc}
-                      selectedSalary={matchedSlab?.salary || 0}
-                      onSelect={selectSalarySlab}
-                      format={(s) => ({
-                        left: `₹${s.salary.toLocaleString('en-IN')}`,
-                        right: `${s.target} Sq.Yd`,
-                      })}
-                    />
-                  </div>
-                )}
               </div>
 
-              {/* ── Target ── */}
-              <div ref={targetRef} className="relative">
-                <FormField
-                  label="Target (Sq. Yd.)"
-                  name="target"
-                  type="number"
-                  value={formData.target}
-                  onChange={handleChange}
-                  onFocus={() => formData.target && setTargetOpen(true)}
-                  required
-                />
-                {formData.target && matchedSlab && (
-                  <div className="absolute top-7 right-2.5">
-                    <span className="inline-block rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] leading-tight font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
-                      ₹{matchedSlab.salary.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                )}
-                {targetOpen && formData.target && (
-                  <div className="absolute z-50 mt-0.5 w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-[#1a1a23]">
-                    <SlabSuggestions
-                      slabs={targetSuggestions}
-                      activeKey="target"
-                      activeVal={formData.target}
-                      selectedSalary={matchedSlab?.salary || 0}
-                      onSelect={selectSalarySlab}
-                      format={(s) => ({
-                        left: `${s.target} Sq.Yd`,
-                        right: `₹${s.salary.toLocaleString('en-IN')}`,
-                      })}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <FormField
-                label="Offer Slab (%)"
-                name="offerSlab"
-                type="number"
-                value={formData.offerSlab}
-                onChange={handleChange}
-                required
-                min="0"
-                step="any"
-              />
               <FormField
                 label="Appointment Date"
                 name="appointmentDate"
@@ -602,7 +470,7 @@ export default function OfferLetterPage() {
                         <button
                           key={slab.target}
                           type="button"
-                          onClick={() => selectSalarySlab(slab)}
+                          onClick={() => handleSalarySelect(slab)}
                           className={`rounded-lg border px-3 py-2 text-left text-xs transition-all ${
                             active
                               ? 'border-brand-gold bg-brand-gold/5 text-brand-gold'
@@ -991,7 +859,11 @@ export default function OfferLetterPage() {
           </div>
 
           <PreviewContainer previewId="offerPreview" hasPreview={preview}>
-            <OfferLetterPreviewContent formData={formData} companyInfo={companyInfo} />
+            <OfferLetterPreviewContent
+              formData={formData}
+              companyInfo={companyInfo}
+              matchedSlab={matchedSlab}
+            />
           </PreviewContainer>
 
           <DownloadOptions
