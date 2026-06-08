@@ -39,21 +39,17 @@ export function ComposeFields({
   onFromNameChange,
   onReplyToChange,
 }: ComposeFieldsProps) {
-  const [showCc, setShowCc] = useState(!!cc);
-  const [showBcc, setShowBcc] = useState(!!bcc);
+  const [showCcField, setShowCcField] = useState(false);
+  const [showBccField, setShowBccField] = useState(false);
   const [showSenderOptions, setShowSenderOptions] = useState(
     !!replyTo || (!!fromName && fromName !== 'SVI Infra')
   );
 
+  // Auto-show CC/BCC when they have values (from reply/forward)
+  const showCc = showCcField || !!cc;
+  const showBcc = showBccField || !!bcc;
+
   // Synchronize internal visibility states with external prop updates (e.g. template loading, replies, forwards)
-  useEffect(() => {
-    if (cc) setShowCc(true);
-  }, [cc]);
-
-  useEffect(() => {
-    if (bcc) setShowBcc(true);
-  }, [bcc]);
-
   useEffect(() => {
     if (replyTo || (fromName && fromName !== 'SVI Infra')) {
       setShowSenderOptions(true);
@@ -78,8 +74,8 @@ export function ComposeFields({
           {!showCc && (
             <button
               type="button"
-              onClick={() => setShowCc(true)}
-              className="rounded-md border border-dashed border-gray-300 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-400 transition-all hover:border-blue-400 hover:text-blue-500 dark:border-gray-700 dark:hover:border-blue-500"
+              onClick={() => setShowCcField(true)}
+              className="rounded-md border border-blue-200/60 bg-blue-50/80 px-2 py-0.5 text-[10px] font-bold tracking-wide text-blue-600 transition-all hover:border-blue-300 hover:bg-blue-100 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400"
             >
               +CC
             </button>
@@ -87,8 +83,8 @@ export function ComposeFields({
           {!showBcc && (
             <button
               type="button"
-              onClick={() => setShowBcc(true)}
-              className="rounded-md border border-dashed border-gray-300 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-400 transition-all hover:border-violet-400 hover:text-violet-500 dark:border-gray-700 dark:hover:border-violet-500"
+              onClick={() => setShowBccField(true)}
+              className="rounded-md border border-violet-200/60 bg-violet-50/80 px-2 py-0.5 text-[10px] font-bold tracking-wide text-violet-600 transition-all hover:border-violet-300 hover:bg-violet-100 dark:border-violet-500/20 dark:bg-violet-500/10 dark:text-violet-400"
             >
               +BCC
             </button>
@@ -97,9 +93,9 @@ export function ComposeFields({
             <button
               type="button"
               onClick={() => setShowSenderOptions(true)}
-              className="rounded-md border border-dashed border-gray-300 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-400 transition-all hover:border-emerald-400 hover:text-emerald-500 dark:border-gray-700 dark:hover:border-emerald-500"
+              className="rounded-md border border-emerald-200/60 bg-emerald-50/80 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-600 transition-all hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400"
             >
-              +Sender Options
+              +Sender
             </button>
           )}
         </div>
@@ -131,7 +127,7 @@ export function ComposeFields({
                 type="button"
                 onClick={() => {
                   onCcChange('');
-                  setShowCc(false);
+                  setShowCcField(false);
                 }}
                 className="ml-2 text-gray-400 hover:text-red-400"
               >
@@ -168,7 +164,7 @@ export function ComposeFields({
                 type="button"
                 onClick={() => {
                   onBccChange('');
-                  setShowBcc(false);
+                  setShowBccField(false);
                 }}
                 className="ml-2 text-gray-400 hover:text-red-400"
               >

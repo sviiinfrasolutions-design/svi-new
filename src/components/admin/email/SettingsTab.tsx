@@ -16,8 +16,11 @@ import {
   AtSign,
   User,
   Zap,
+  Calendar,
+  Mail,
 } from 'lucide-react';
 import { getToken } from './helpers';
+import { ResendUsageDashboard } from './ResendUsageDashboard';
 
 export function SettingsTab({ adminEmail }: { adminEmail: string }) {
   const [testTo, setTestTo] = useState(adminEmail);
@@ -281,6 +284,13 @@ export function SettingsTab({ adminEmail }: { adminEmail: string }) {
           </div>
         )}
       </div>
+
+      {/* Usage Dashboard - full width below */}
+      {isDev && (
+        <div className="lg:col-span-5">
+          <ResendUsageDashboard />
+        </div>
+      )}
     </div>
   );
 }

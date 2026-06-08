@@ -3,6 +3,9 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   compress: true,
+  turbopack: {
+    root: __dirname,
+  },
   async headers() {
     return [
       {

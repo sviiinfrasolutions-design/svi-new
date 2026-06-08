@@ -113,6 +113,50 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, data: result.data });
     }
 
+    if (action === 'star') {
+      const { emailId } = body;
+      if (!emailId) return NextResponse.json({ error: 'Missing email id' }, { status: 400 });
+
+      const { data, error } = await supabaseAdmin
+        .from('email_stars')
+        .insert({ email_id: emailId, admin_id: admin.id })
+        .select();
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+      return NextResponse.json({ success: true, starred: true });
+    }
+
+    if (action === 'unstar') {
+      const { emailId } = body;
+      if (!emailId) return NextResponse.json({ error: 'Missing email id' }, { status: 400 });
+
+      const { error } = await supabaseAdmin
+        .from('email_stars')
+        .delete()
+        .eq('email_id', emailId)
+        .eq('admin_id', admin.id);
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+      return NextResponse.json({ success: true, starred: false });
+    }
+
+    if (action === 'get_starred') {
+      const { data, error } = await supabaseAdmin
+        .from('email_stars')
+        .select('email_id')
+        .eq('admin_id', admin.id);
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+      const starredIds = new Set((data || []).map((d: { email_id: string }) => d.email_id));
+      return NextResponse.json({ success: true, starredIds });
+    }
+
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   } catch (error) {
     console.error('Email send error:', error);
