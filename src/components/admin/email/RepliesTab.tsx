@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { Inbox, Mail, Star } from 'lucide-react';
+import { toast } from 'sonner';
 import { getToken } from './helpers';
 import { EmailDetailSkeleton } from './Skeletons';
 import type { EmailDetail } from './types';
@@ -18,12 +19,17 @@ interface ReplyItem {
   is_starred: boolean;
 }
 
-export function RepliesTab() {
+interface RepliesTabProps {
+  adminEmail?: string;
+}
+
+export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
   const [replies, setReplies] = useState<ReplyItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReply, setSelectedReply] = useState<EmailDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [starred, setStarred] = useState<Set<string>>(new Set());
+  const [adminEmail, setAdminEmail] = useState<string>(propAdminEmail || '');
 
   const fetchReplies = useCallback(async () => {
     setLoading(true);
@@ -33,7 +39,15 @@ export function RepliesTab() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      setReplies(data.replies || []);
+
+      // Handle both 'emails' and 'replies' keys for compatibility
+      const emailList = data.emails || data.replies || [];
+
+      // Get admin email from storage
+      const stored = localStorage.getItem('adminEmail');
+      if (stored) setAdminEmail(stored);
+
+      setReplies(emailList);
     } catch (e) {
       console.error('Failed to fetch replies:', e);
       setReplies([]);
@@ -75,6 +89,20 @@ export function RepliesTab() {
   if (!selectedReply) {
     return (
       <div className="rounded-xl border border-gray-200/80 bg-white dark:border-gray-700/60 dark:bg-[#0e0e14]">
+        {/* Header with Admin Email */}
+        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-gray-800">
+          <div>
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white">Inbox Replies</h3>
+            {adminEmail && (
+              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                Logged in as:{' '}
+                <span className="font-medium text-gray-600 dark:text-gray-300">{adminEmail}</span>
+              </p>
+            )}
+          </div>
+          <div className="h-6 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
+        </div>
+
         {loading ? (
           <div className="p-4">
             <div className="mb-4 flex items-center justify-between">

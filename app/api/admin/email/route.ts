@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       }
 
       return NextResponse.json({
-        replies: (data || []).map((email: any) => ({
+        emails: (data || []).map((email: any) => ({
           id: email.id,
           thread_id: email.thread_id || email.email_id,
           subject: email.subject,
