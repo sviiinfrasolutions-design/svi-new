@@ -196,6 +196,37 @@ export function DashboardCardSkeleton() {
   );
 }
 
+/* ─── Deleted Email List Skeleton ─── */
+export function DeletedEmailListSkeleton({ count = 5 }: { count?: number }) {
+  return (
+    <div className="divide-y divide-gray-100 dark:divide-gray-800">
+      {Array.from({ length: count }).map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.05, duration: 0.3 }}
+          className="flex items-start gap-2.5 px-4 py-3.5"
+        >
+          <SkeletonPulse className="h-5 w-5 shrink-0 rounded" delay={i * 0.1} />
+          <SkeletonPulse className="h-9 w-9 shrink-0 rounded-full" delay={i * 0.15} />
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="flex items-center gap-2">
+              <SkeletonPulse className="h-3.5 w-3.5 rounded" delay={i * 0.2} />
+              <SkeletonPulse className="h-4 w-4/5" delay={i * 0.2} />
+            </div>
+            <SkeletonPulse className="h-3 w-3/4" delay={i * 0.25} />
+            <div className="flex items-center gap-3 pt-1">
+              <SkeletonPulse className="h-2.5 w-20" delay={i * 0.3} />
+              <SkeletonPulse className="h-2.5 w-16" delay={i * 0.3} />
+            </div>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
 /* ─── Filter Panel Skeleton ─── */
 export function FilterPanelSkeleton() {
   return (

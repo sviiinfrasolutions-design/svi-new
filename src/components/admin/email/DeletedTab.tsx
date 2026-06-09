@@ -7,7 +7,6 @@ import {
   RefreshCw,
   RotateCcw,
   AlertTriangle,
-  Inbox,
   Loader2,
   Check,
   Search,
@@ -17,11 +16,11 @@ import {
 import { toast } from 'sonner';
 import type { DeletedEmail } from './types';
 import { getToken, formatTime } from './helpers';
+import { DeletedEmailListSkeleton } from './Skeletons';
 import {
   getInitials,
   getAvatarColor,
   StatusDot,
-  getStatusLabel,
   containerVariants,
   itemVariants,
 } from './sections/constants';
@@ -362,9 +361,7 @@ export function DeletedTab() {
       {/* ─── List ─── */}
       <div className="scrollbar-gold overflow-y-auto" style={{ maxHeight: 'calc(100vh - 320px)' }}>
         {h.loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-5 w-5 animate-spin text-red-400" />
-          </div>
+          <DeletedEmailListSkeleton />
         ) : h.error ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <AlertTriangle className="mb-3 h-7 w-7 text-red-400" />

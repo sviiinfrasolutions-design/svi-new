@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { EMAIL_TEMPLATES } from './constants';
-import { Skeletons } from './Skeletons';
 import { getToken, saveDraft, loadDraft, clearDraft, fileToBase64 } from './helpers';
 import {
   extractTemplateVars as parseExtractTemplateVars,
