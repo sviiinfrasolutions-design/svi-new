@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { AppError, handleApiError } from '@/src/lib/api/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,8 +33,7 @@ export async function GET() {
       'shivani-vatika': shivaniImages,
       'shyam-aangan': shyamImages,
     });
-  } catch (error) {
-    console.error('Error reading project images:', error);
-    return NextResponse.json({ error: 'Failed to read images' }, { status: 500 });
+  } catch (err) {
+    return handleApiError(err);
   }
 }

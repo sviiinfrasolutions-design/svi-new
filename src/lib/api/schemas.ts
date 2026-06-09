@@ -47,6 +47,7 @@ export const grievanceSchema = z.object({
   email: z.string().email(),
   phone: z.string().regex(/^[6-9]\d{9}$/),
   category: z.string().min(1, 'Category is required'),
+  subject: z.string().min(3).max(200),
   description: z.string().min(20).max(5000),
 });
 

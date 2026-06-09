@@ -2,8 +2,6 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { AppError } from './errors';
 
-type ZodSchema = z.ZodSchema;
-
 /**
  * Validates the request body against a Zod schema.
  * Throws AppError with validation details if invalid.
@@ -11,7 +9,10 @@ type ZodSchema = z.ZodSchema;
  * @example
  * const body = await validateBody(request, createUserSchema);
  */
-export async function validateBody<T>(request: NextRequest, schema: ZodSchema): Promise<T> {
+export async function validateBody<T extends z.ZodTypeAny>(
+  request: NextRequest,
+  schema: T
+): Promise<z.infer<T>> {
   let body: unknown;
   try {
     body = await request.json();
@@ -30,7 +31,7 @@ export async function validateBody<T>(request: NextRequest, schema: ZodSchema): 
     );
   }
 
-  return result.data as T;
+  return result.data as z.infer<T>;
 }
 
 /**
@@ -40,7 +41,7 @@ export async function validateBody<T>(request: NextRequest, schema: ZodSchema): 
  * @example
  * const query = validateQuery(request, paginationSchema);
  */
-export function validateQuery<T>(request: NextRequest, schema: ZodSchema): T {
+export function validateQuery<T extends z.ZodTypeAny>(request: NextRequest, schema: T): z.infer<T> {
   const url = new URL(request.url);
   const params = Object.fromEntries(url.searchParams.entries());
 
@@ -55,5 +56,5 @@ export function validateQuery<T>(request: NextRequest, schema: ZodSchema): T {
     );
   }
 
-  return result.data as T;
+  return result.data as z.infer<T>;
 }

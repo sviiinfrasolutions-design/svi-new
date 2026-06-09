@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
+import { AppError, handleApiError } from '@/src/lib/api/errors';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,14 +10,10 @@ export async function GET(request: NextRequest) {
       .eq('active', true)
       .order('name', { ascending: true });
 
-    if (error) {
-      console.error('Error fetching active properties:', error.message);
-      return NextResponse.json({ error: 'Failed to fetch properties' }, { status: 500 });
-    }
+    if (error) throw AppError.internal('Failed to fetch properties');
 
     return NextResponse.json({ properties: properties || [] });
-  } catch (err: any) {
-    console.error('GET properties public error:', err);
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+  } catch (err) {
+    return handleApiError(err);
   }
 }

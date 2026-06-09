@@ -1,6 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { NotificationHelper } from '@/src/lib/supabase/notifications';
+import { AppError, handleApiError } from '@/src/lib/api/errors';
+import { validateBody } from '@/src/lib/api/validate';
+import { grievanceSchema } from '@/src/lib/api/schemas';
+import { created } from '@/src/lib/api/response';
 
 function generateTicketId(): string {
   const digits = Math.floor(100000 + Math.random() * 900000);
@@ -8,69 +12,58 @@ function generateTicketId(): string {
 }
 
 export async function POST(request: NextRequest) {
-  let body;
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    const body = await validateBody(request, grievanceSchema);
+    const { name, email, phone, category, subject, description } = body;
+    const ticketId = generateTicketId();
 
-  const { name, email, phone, category, subject, description } = body;
+    const { data, error } = await supabaseAdmin
+      .from('grievances')
+      .insert({
+        name,
+        email,
+        phone,
+        ticket_id: ticketId,
+        category,
+        subject,
+        description,
+        status: 'open',
+      })
+      .select()
+      .single();
 
-  if (!name || !email || !phone || !category || !subject || !description) {
-    return NextResponse.json(
-      { error: 'All fields (name, email, phone, category, subject, description) are required' },
-      { status: 400 }
-    );
-  }
+    if (error) {
+      console.error('Grievance submission error:', error.message);
+      if (error.message.includes('duplicate') || error.message.includes('unique')) {
+        const retryTicketId = generateTicketId();
+        const { data: retryData, error: retryError } = await supabaseAdmin
+          .from('grievances')
+          .insert({
+            name,
+            email,
+            phone,
+            ticket_id: retryTicketId,
+            category,
+            subject,
+            description,
+            status: 'open',
+          })
+          .select()
+          .single();
 
-  const ticketId = generateTicketId();
+        if (retryError) {
+          throw AppError.internal('Failed to submit grievance');
+        }
 
-  const { data, error } = await supabaseAdmin
-    .from('grievances')
-    .insert({
-      name,
-      email,
-      phone,
-      ticket_id: ticketId,
-      category,
-      subject,
-      description,
-      status: 'open',
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Grievance submission error:', error.message);
-    // If it's a duplicate ticket_id, retry once
-    if (error.message.includes('duplicate') || error.message.includes('unique')) {
-      const retryTicketId = generateTicketId();
-      const { data: retryData, error: retryError } = await supabaseAdmin
-        .from('grievances')
-        .insert({
-          name,
-          email,
-          phone,
-          ticket_id: retryTicketId,
-          category,
-          subject,
-          description,
-          status: 'open',
-        })
-        .select()
-        .single();
-
-      if (retryError) {
-        return NextResponse.json({ error: 'Failed to submit grievance' }, { status: 500 });
+        return await sendGrievanceResponse(retryData, retryTicketId);
       }
-
-      return await sendGrievanceResponse(retryData, retryTicketId);
+      throw AppError.internal('Failed to submit grievance');
     }
-    return NextResponse.json({ error: 'Failed to submit grievance' }, { status: 500 });
-  }
 
-  return await sendGrievanceResponse(data, ticketId);
+    return await sendGrievanceResponse(data, ticketId);
+  } catch (err) {
+    return handleApiError(err);
+  }
 }
 
 async function sendGrievanceResponse(
@@ -185,8 +178,5 @@ async function sendGrievanceResponse(
     }
   }
 
-  return NextResponse.json(
-    { success: true, id: data.id, ticket_id: data.ticket_id },
-    { status: 201 }
-  );
+  return created({ success: true, id: data.id, ticket_id: data.ticket_id });
 }
