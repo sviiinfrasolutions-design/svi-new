@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
 import { NotificationHelper } from '@/src/lib/supabase/notifications';
+import { emailCampaignSchema } from '@/src/lib/api/schemas';
+import { AppError, handleApiError } from '@/src/lib/api/errors';
 
 /**
  * DELETE /api/admin/campaigns?lottery_id=xxx
@@ -75,87 +77,94 @@ export async function GET(request: NextRequest) {
  * Create a new campaign
  */
 export async function POST(request: NextRequest) {
-  const admin = await verifyAdmin(request);
-  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  let body: any;
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-  }
+    const admin = await verifyAdmin(request);
+    if (!admin) throw AppError.unauthorized();
 
-  const {
-    title,
-    subject,
-    body_html,
-    recipient_group = 'all_users',
-    custom_emails,
-    scheduled_at,
-    reminder_at,
-    reminder_subject,
-    lottery_id,
-  } = body;
+    let body: any;
+    try {
+      body = await request.json();
+    } catch {
+      throw AppError.badRequest('Invalid JSON');
+    }
 
-  if (!title || !subject || !body_html) {
-    return NextResponse.json(
-      { error: 'title, subject, and body_html are required' },
-      { status: 400 }
-    );
-  }
+    const parsed = emailCampaignSchema.safeParse(body);
+    if (!parsed.success) {
+      throw AppError.validationError(
+        parsed.error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          message: issue.message,
+          code: issue.code,
+        }))
+      );
+    }
 
-  if (recipient_group === 'custom' && (!custom_emails || custom_emails.length === 0)) {
-    return NextResponse.json(
-      { error: 'custom_emails required when recipient_group is custom' },
-      { status: 400 }
-    );
-  }
-
-  const status = scheduled_at ? 'scheduled' : 'draft';
-
-  const { data: campaign, error } = await supabaseAdmin
-    .from('email_campaigns')
-    .insert({
+    const {
       title,
       subject,
       body_html,
-      recipient_group,
-      custom_emails: recipient_group === 'custom' ? custom_emails : null,
-      status,
-      scheduled_at: scheduled_at || null,
-      reminder_at: reminder_at || null,
-      reminder_subject: reminder_subject || null,
-      created_by: admin.id,
-      lottery_id: lottery_id || null,
-    })
-    .select()
-    .single();
+      recipient_group = 'all_users',
+      custom_emails,
+      scheduled_at,
+      reminder_at,
+      reminder_subject,
+      lottery_id,
+    } = parsed.data;
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (recipient_group === 'custom' && (!custom_emails || custom_emails.length === 0)) {
+      throw AppError.badRequest('Custom recipient group requires at least one email address');
+    }
 
-  // Log
-  try {
-    await supabaseAdmin.from('activity_logs').insert({
-      user_id: admin.id,
-      action_type: 'campaign_created',
-      description: `Campaign "${title}" created (${status}).`,
-      metadata: { campaignId: campaign.id, status },
-    });
-  } catch (_err) {
-    // Audit logging is non-critical; silently ignore failures
-  }
+    const status = scheduled_at ? 'scheduled' : 'draft';
 
-  try {
-    const { data: profile } = await supabaseAdmin
-      .from('profiles')
-      .select('full_name')
-      .eq('id', admin.id)
+    const { data: campaign, error } = await supabaseAdmin
+      .from('email_campaigns')
+      .insert({
+        title,
+        subject,
+        body_html,
+        recipient_group,
+        custom_emails: recipient_group === 'custom' ? custom_emails : null,
+        status,
+        scheduled_at: scheduled_at || null,
+        reminder_at: reminder_at || null,
+        reminder_subject: reminder_subject || null,
+        created_by: admin.id,
+        lottery_id: lottery_id || null,
+      })
+      .select()
       .single();
-    const adminName = profile?.full_name || admin.email || 'Admin';
-    await NotificationHelper.campaignCreated(title, adminName);
-  } catch (notifErr) {
-    console.error('Failed to create campaign creation notification:', notifErr);
-  }
 
-  return NextResponse.json({ campaign });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Log
+    try {
+      await supabaseAdmin.from('activity_logs').insert({
+        user_id: admin.id,
+        action_type: 'campaign_created',
+        description: `Campaign "${title}" created (${status}).`,
+        metadata: { campaignId: campaign.id, status },
+      });
+    } catch (_err) {
+      // Audit logging is non-critical; silently ignore failures
+    }
+
+    try {
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('full_name')
+        .eq('id', admin.id)
+        .single();
+      const adminName = profile?.full_name || admin.email || 'Admin';
+      await NotificationHelper.campaignCreated(title, adminName);
+    } catch (notifErr) {
+      console.error('Failed to create campaign creation notification:', notifErr);
+    }
+
+    return NextResponse.json({ campaign });
+  } catch (err: unknown) {
+    return handleApiError(err);
+  }
 }

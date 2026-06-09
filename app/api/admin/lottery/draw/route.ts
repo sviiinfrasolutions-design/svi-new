@@ -4,35 +4,45 @@ import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
 import crypto from 'crypto';
 import { Resend } from 'resend';
 import { winnerEmailHtml, nonWinnerEmailHtml } from '@/src/lib/email-templates';
+import { lotteryDrawSchema } from '@/src/lib/api/schemas';
+import { AppError, handleApiError } from '@/src/lib/api/errors';
 
 export async function POST(request: NextRequest) {
-  const admin = await verifyAdmin(request);
-  if (!admin) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  let body;
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      throw AppError.unauthorized();
+    }
 
-  const { lotteryId, winnerId, winnerIds } = body;
-  if (!lotteryId) {
-    return NextResponse.json({ error: 'lotteryId is required' }, { status: 400 });
-  }
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      throw AppError.badRequest('Invalid JSON body');
+    }
 
-  // Normalize to array: support single winnerId or multiple winnerIds
-  const selectedWinnerIds: string[] = winnerIds
-    ? Array.isArray(winnerIds)
-      ? winnerIds
-      : [winnerIds]
-    : winnerId
-      ? [winnerId]
-      : [];
+    const parsed = lotteryDrawSchema.safeParse(body);
+    if (!parsed.success) {
+      throw AppError.validationError(
+        parsed.error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          message: issue.message,
+          code: issue.code,
+        }))
+      );
+    }
 
-  try {
+    const { lotteryId, winnerId, winnerIds } = parsed.data;
+
+    // Normalize to array: support single winnerId or multiple winnerIds
+    const selectedWinnerIds: string[] = winnerIds
+      ? Array.isArray(winnerIds)
+        ? winnerIds
+        : [winnerIds]
+      : winnerId
+        ? [winnerId]
+        : [];
+
     // 1. Fetch active lottery
     const { data: lottery, error: lotteryError } = await supabaseAdmin
       .from('lotteries')
@@ -222,8 +232,7 @@ export async function POST(request: NextRequest) {
         email: w.email,
       })),
     });
-  } catch (err: any) {
-    console.error('Lottery draw server error:', err);
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+  } catch (err: unknown) {
+    return handleApiError(err);
   }
 }
