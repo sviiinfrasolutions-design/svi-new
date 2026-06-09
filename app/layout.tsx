@@ -7,6 +7,7 @@ import type { Metadata, Viewport } from 'next';
 
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import QueryProvider from '@/src/components/QueryProvider';
 import { ThemeScript } from '@/src/components/ThemeProvider';
 
 const inter = Inter({
@@ -207,7 +208,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.variable} ${playfair.variable}`}>
         <ThemeScript />
-        {children}
+        <QueryProvider>{children}</QueryProvider>
         <Analytics />
         <SpeedInsights />
       </body>
