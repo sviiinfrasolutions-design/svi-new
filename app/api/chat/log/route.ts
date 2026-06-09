@@ -34,30 +34,26 @@ export async function POST(req: NextRequest) {
     // fallback
   }
 
-  // Build payload — omit message_count columns if they don't exist in table yet
+  // Build payload — skip message_count/user_message_count until columns exist
   const payload: {
     session_id: string;
     messages: string;
     user_agent: string;
     updated_at: string;
-    message_count?: number;
-    user_message_count?: number;
   } = {
     session_id: sessionId,
     messages: typeof messages === 'string' ? messages : JSON.stringify(messages),
     user_agent: userAgent,
     updated_at: new Date().toISOString(),
   };
-  if (msgCount !== null) payload.message_count = msgCount;
-  if (userCount !== null) payload.user_message_count = userCount;
 
   const { error } = await supabaseAdmin.from('chat_logs').upsert(payload,
     { onConflict: 'session_id' }
   );
 
   if (error) {
-    console.error('Chat log save error:', error.message);
-    return NextResponse.json({ error: 'Failed to save' }, { status: 500 });
+    console.error('Chat log save error:', error);
+    return NextResponse.json({ error: 'Failed to save', detail: error.message }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });
