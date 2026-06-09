@@ -85,6 +85,8 @@ export default function ChatBot() {
   const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const logSaveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
   const { messages, sendMessage, status, stop, error, setMessages } = useChat({
     transport: new DefaultChatTransport({
@@ -142,35 +144,35 @@ export default function ChatBot() {
 
   // ─── Save log to server periodically & on close ────────────────────────
   const saveLog = useCallback(() => {
-    if (messages.length === 0) return;
+    const msgs = messagesRef.current;
+    if (msgs.length === 0) return;
     fetch('/api/chat/log', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         sessionId,
-        messages: messages.slice(-50), // Last 50 messages
+        messages: msgs.slice(-50),
         userAgent: navigator.userAgent,
       }),
     }).catch(() => {});
-  }, [messages, sessionId]);
+  }, [sessionId]);
 
   // Periodic save every 30s while chat is open + save on close
   useEffect(() => {
-    if (!isOpen || messages.length === 0) return;
+    if (!isOpen) return;
     logSaveTimerRef.current = setInterval(saveLog, 30000);
     return () => {
       clearInterval(logSaveTimerRef.current);
-      // Save when chat closes
-      if (messages.length > 0) saveLog();
+      saveLog();
     };
-  }, [isOpen, messages.length, saveLog]);
+  }, [isOpen, saveLog]);
 
   // Save on unmount (page navigation)
   useEffect(() => {
     return () => {
-      if (messages.length > 0) saveLog();
+      saveLog();
     };
-  }, [messages, saveLog]);
+  }, [saveLog]);
 
   // ─── Lead capture: Show after 3rd AI message ───────────────────────────
   useEffect(() => {
