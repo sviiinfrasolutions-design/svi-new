@@ -16,13 +16,13 @@ CREATE INDEX IF NOT EXISTS idx_chat_leads_phone ON chat_leads(phone);
 -- Row Level Security
 ALTER TABLE chat_leads ENABLE ROW LEVEL SECURITY;
 
--- Only admins can read chat_leads
+DROP POLICY IF EXISTS "Admins can read chat_leads" ON chat_leads;
 CREATE POLICY "Admins can read chat_leads"
   ON chat_leads
   FOR SELECT
   USING (auth.role() = 'authenticated');
 
--- Anyone can insert (public form submission)
+DROP POLICY IF EXISTS "Anyone can insert chat_leads" ON chat_leads;
 CREATE POLICY "Anyone can insert chat_leads"
   ON chat_leads
   FOR INSERT

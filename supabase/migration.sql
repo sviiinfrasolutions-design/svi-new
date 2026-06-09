@@ -308,10 +308,12 @@ CREATE INDEX IF NOT EXISTS idx_chat_leads_phone ON chat_leads(phone);
 
 ALTER TABLE chat_leads ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can read chat_leads" ON chat_leads;
 CREATE POLICY "Admins can read chat_leads"
   ON chat_leads FOR SELECT
   USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Anyone can insert chat_leads" ON chat_leads;
 CREATE POLICY "Anyone can insert chat_leads"
   ON chat_leads FOR INSERT
   WITH CHECK (true);
@@ -336,14 +338,17 @@ CREATE INDEX IF NOT EXISTS idx_chat_logs_created_at ON chat_logs(created_at DESC
 
 ALTER TABLE chat_logs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can read chat_logs" ON chat_logs;
 CREATE POLICY "Admins can read chat_logs"
   ON chat_logs FOR SELECT
   USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Anyone can insert chat_logs" ON chat_logs;
 CREATE POLICY "Anyone can insert chat_logs"
   ON chat_logs FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admins can update chat_logs" ON chat_logs;
 CREATE POLICY "Admins can update chat_logs"
   ON chat_logs FOR UPDATE
   USING (auth.role() = 'authenticated')
