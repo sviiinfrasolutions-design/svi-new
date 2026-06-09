@@ -352,6 +352,8 @@ export function useSentEmails(): UseSentEmailsReturn {
     }
   }, [datePreset]);
 
+  console.log('[useSentEmails] datePreset:', datePreset, 'dateCutoff:', dateCutoff);
+
   /* ─── Processed list: filter → sort ─── */
   const processed = useMemo(() => {
     let list = [...emails];
