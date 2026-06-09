@@ -377,20 +377,10 @@ export function useSentEmails(): UseSentEmailsReturn {
 
     // Date range
     if (dateCutoff) {
-      console.log('[DEBUG] Date filter active:', {
-        datePreset,
-        dateCutoff: dateCutoff.toISOString(),
-        emailsCount: list.length,
-        sampleDates: list.slice(0, 3).map((e) => e.created_at),
-      });
       list = list.filter((e) => {
         const emailDate = new Date(e.created_at);
-        const isValid = !isNaN(emailDate.getTime());
-        const passes = isValid && emailDate >= dateCutoff;
-        if (!isValid) console.log('[DEBUG] Invalid date:', e.created_at);
-        return passes;
+        return !isNaN(emailDate.getTime()) && emailDate >= dateCutoff;
       });
-      console.log('[DEBUG] After date filter:', list.length);
     }
 
     // From filter
