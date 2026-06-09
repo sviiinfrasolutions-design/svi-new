@@ -70,7 +70,7 @@ export function DesktopNav({
   onToggleTheme,
 }: DesktopNavProps) {
   return (
-    <nav className="hidden items-center gap-8 md:flex">
+    <nav className="hidden items-center gap-8 lg:flex">
       {NAV_LINKS.map((link) => (
         <NavLink
           key={link.name}
