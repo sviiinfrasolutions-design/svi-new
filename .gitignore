@@ -60,3 +60,4 @@ replace_bba_3.py
 *.exe
 *.pdf
 salary*
+.playwright-mcp/

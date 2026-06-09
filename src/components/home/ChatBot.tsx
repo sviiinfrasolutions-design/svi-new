@@ -85,14 +85,15 @@ export default function ChatBot() {
   const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const logSaveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const messagesRef = useRef(messages);
-  messagesRef.current = messages;
 
   const { messages, sendMessage, status, stop, error, setMessages } = useChat({
     transport: new DefaultChatTransport({
       api: '/api/chat',
     }),
   });
+
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
   // ─── Typing dots animation ──────────────────────────────────────────────
   useEffect(() => {
