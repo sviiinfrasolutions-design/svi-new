@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { Star, MoreVertical, ExternalLink } from 'lucide-react';
+import { Star, MoreVertical, Check } from 'lucide-react';
 import { formatTime } from '../helpers';
 import { getInitials, getAvatarColor, StatusDot, getStatusLabel, itemVariants } from './constants';
 import type { SentEmail } from '../types';
@@ -10,8 +10,10 @@ interface EmailListItemProps {
   email: SentEmail;
   isSelected: boolean;
   isStarred: boolean;
+  isChecked: boolean;
   onSelect: (id: string) => void;
   onToggleStar: (id: string, e: React.MouseEvent | React.KeyboardEvent) => void;
+  onToggleCheck: (id: string) => void;
   onOpenMenu?: (id: string, e: React.MouseEvent) => void;
 }
 
@@ -19,21 +21,49 @@ export function EmailListItem({
   email,
   isSelected,
   isStarred,
+  isChecked,
   onSelect,
   onToggleStar,
+  onToggleCheck,
   onOpenMenu,
 }: EmailListItemProps) {
   const firstTo = email.to?.[0] || '';
   const initials = getInitials(firstTo);
   const avatarColor = getAvatarColor(firstTo);
 
+  /* ─── Row click handler: select email for detail view ─── */
+  const handleRowClick = () => {
+    onSelect(email.id);
+  };
+
+  /* ─── Checkbox click: toggle multi-select ─── */
+  const handleCheckClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleCheck(email.id);
+  };
+
+  const handleCheckKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.stopPropagation();
+      onToggleCheck(email.id);
+    }
+  };
+
   return (
     <motion.div variants={itemVariants} key={email.id}>
       <div className="group relative">
-        {/* Main content */}
-        <button
-          onClick={() => onSelect(email.id)}
-          className={`flex w-full items-start gap-3.5 px-5 py-4 text-left transition-all ${
+        {/* Row wrapper — clickable without using <button> so we can nest interactive checkbox */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={handleRowClick}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleRowClick();
+            }
+          }}
+          className={`flex w-full cursor-pointer items-start gap-2.5 px-5 py-4 text-left transition-all ${
             isSelected
               ? 'bg-brand-gold/[0.06] dark:bg-brand-gold/[0.04]'
               : 'hover:bg-gray-50/80 dark:hover:bg-white/[0.015]'
@@ -42,6 +72,22 @@ export function EmailListItem({
           {isSelected && (
             <div className="bg-brand-gold absolute top-0 bottom-0 left-0 w-[3px] rounded-r-full" />
           )}
+
+          {/* Checkbox for multi-select */}
+          <div
+            onClick={handleCheckClick}
+            onKeyDown={handleCheckKeyDown}
+            role="checkbox"
+            aria-checked={isChecked}
+            tabIndex={0}
+            className={`relative z-10 mt-1 flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded border-2 transition-all ${
+              isChecked
+                ? 'border-brand-gold bg-brand-gold text-white'
+                : 'hover:border-brand-gold/50 dark:hover:border-brand-gold/50 border-gray-300 dark:border-gray-600'
+            }`}
+          >
+            {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
+          </div>
 
           {/* Avatar */}
           <div
@@ -60,7 +106,7 @@ export function EmailListItem({
               {isStarred && <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" />}
             </div>
 
-            {/* Recipients with better formatting */}
+            {/* Recipients */}
             <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-500">
               {email.to && email.to.length > 0 ? `To: ${email.to.join(', ')}` : '(no recipients)'}
             </p>
@@ -75,9 +121,20 @@ export function EmailListItem({
               </span>
             </div>
           </div>
-        </button>
 
-        {/* Actions menu button */}
+          {/* Star quick-toggle (visible when starred) */}
+          {isStarred && (
+            <Star
+              className="mt-1 h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleStar(email.id, e);
+              }}
+            />
+          )}
+        </div>
+
+        {/* Actions menu button (visible on hover) */}
         <button
           onClick={(e) => {
             e.stopPropagation();

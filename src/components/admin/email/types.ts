@@ -48,7 +48,19 @@ export type Tab =
   | 'templates'
   | 'domains'
   | 'settings'
-  | 'campaigns';
+  | 'campaigns'
+  | 'trash';
+
+export interface DeletedEmail {
+  id: string;
+  email_id: string;
+  subject: string;
+  from: string;
+  to: string[];
+  created_at: string;
+  last_event: string;
+  deleted_at: string;
+}
 
 export interface ForwardData {
   subject: string;

@@ -14,6 +14,10 @@ import {
   Mail,
   Send,
   BarChart3,
+  Trash2,
+  CheckSquare,
+  Square,
+  Loader2,
 } from 'lucide-react';
 import {
   SORT_OPTIONS,
@@ -51,6 +55,11 @@ interface EmailToolbarProps {
   onFromFilterChange: (v: string) => void;
   onStarToggle: () => void;
   onSearchClear: () => void;
+  // ─── Multi-select & Delete ───
+  selectedCount: number;
+  onSelectAll: () => void;
+  onDeleteSelected: () => void;
+  deleting: boolean;
 }
 
 export function EmailToolbar({
@@ -79,29 +88,92 @@ export function EmailToolbar({
   onFromFilterChange,
   onStarToggle,
   onSearchClear,
+  selectedCount,
+  onSelectAll,
+  onDeleteSelected,
+  deleting,
 }: EmailToolbarProps) {
   return (
     <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-3.5 dark:border-gray-800">
+      {/* Selection mode bar */}
+      <AnimatePresence>
+        {selectedCount > 0 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="mb-3 flex items-center justify-between rounded-lg bg-red-50/80 px-3 py-2 dark:bg-red-500/10">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-semibold text-red-600 dark:text-red-400">
+                  {selectedCount} selected
+                </span>
+                <button
+                  onClick={onSelectAll}
+                  className="text-[11px] font-medium text-gray-500 underline transition-colors hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  Select all
+                </button>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={onDeleteSelected}
+                  disabled={deleting}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-red-600 disabled:opacity-50"
+                >
+                  {deleting ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3.5 w-3.5" />
+                  )}
+                  Delete
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Top row: Search + Actions */}
       <div className="flex items-center justify-between gap-3">
-        {/* Search */}
-        <div className="relative max-w-md flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search emails..."
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="focus-gold w-full rounded-lg border border-gray-200 bg-gray-50/80 py-2 pr-8 pl-10 text-sm text-gray-900 placeholder-gray-400 outline-none dark:border-gray-700 dark:bg-gray-800/50 dark:text-white dark:placeholder-gray-500"
-          />
-          {search && (
-            <button
-              onClick={onSearchClear}
-              className="absolute top-1/2 right-2.5 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
+        {/* Select all checkbox + Search */}
+        <div className="flex flex-1 items-center gap-2">
+          {/* Select all toggle */}
+          <button
+            onClick={onSelectAll}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/5"
+            title="Toggle select all"
+          >
+            {selectedCount > 0 ? (
+              <CheckSquare className="text-brand-gold h-4 w-4" />
+            ) : (
+              <Square className="h-4 w-4" />
+            )}
+          </button>
+
+          {/* Search */}
+          <div className="relative max-w-md flex-1">
+            <Search className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search emails..."
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="focus-gold w-full rounded-lg border border-gray-200 bg-gray-50/80 py-2 pr-8 pl-10 text-sm text-gray-900 placeholder-gray-400 outline-none dark:border-gray-700 dark:bg-gray-800/50 dark:text-white dark:placeholder-gray-500"
+            />
+            {search && (
+              <button
+                onClick={onSearchClear}
+                className="absolute top-1/2 right-2.5 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Action buttons */}

@@ -9,7 +9,9 @@ import { useSentEmails } from './hooks/useSentEmails';
 import { EmailToolbar, ActiveFilterChips } from './sections/EmailToolbar';
 import { EmailListItem } from './sections/EmailListItem';
 import { EmailDetailPanel } from './sections/EmailDetailPanel';
+import { ConfirmDialog } from './ConfirmDialog';
 import { containerVariants } from './sections/constants';
+import { useState } from 'react';
 
 interface SentTabProps {
   onForward?: (data: ForwardData) => void;
@@ -18,6 +20,7 @@ interface SentTabProps {
 
 export function SentTab({ onForward, onReply }: SentTabProps) {
   const h = useSentEmails();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   /* ─── Forward / Reply ─── */
   const handleForward = () => {
@@ -43,6 +46,21 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
       originalSubject: h.selected.subject,
       cc: h.selected.cc,
     });
+  };
+
+  /* ─── Delete handlers ─── */
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    const count = h.selectedIds.size;
+    await h.deleteSelectedEmails();
+    setShowDeleteConfirm(false);
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -83,6 +101,11 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
           onFromFilterChange={h.setFromFilter}
           onStarToggle={() => h.setShowStarredOnly(!h.showStarredOnly)}
           onSearchClear={() => h.setSearch('')}
+          // Multi-select & Delete props
+          selectedCount={h.selectedIds.size}
+          onSelectAll={h.selectAllEmails}
+          onDeleteSelected={handleDeleteClick}
+          deleting={h.deleting}
         />
 
         {/* Active filter chips */}
@@ -118,7 +141,7 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
           )}
         </AnimatePresence>
 
-        {/* Results count */}
+        {/* Results count + selection info */}
         {!h.loading && !h.error && (
           <div className="flex items-center justify-between border-b border-gray-50 px-4 py-1.5 dark:border-gray-800/50">
             <span className="font-mono text-[10px] text-gray-400">
@@ -126,9 +149,16 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
                 ? `${h.emails.length} email${h.emails.length !== 1 ? 's' : ''}`
                 : `${h.processed.length} of ${h.emails.length} email${h.emails.length !== 1 ? 's' : ''}`}
             </span>
-            {h.hasActiveFilters && (
-              <span className="text-brand-gold text-[10px] font-medium">Filtered</span>
-            )}
+            <div className="flex items-center gap-3">
+              {h.selectedIds.size > 0 && (
+                <span className="font-mono text-[10px] font-medium text-red-500">
+                  {h.selectedIds.size} selected
+                </span>
+              )}
+              {h.hasActiveFilters && (
+                <span className="text-brand-gold text-[10px] font-medium">Filtered</span>
+              )}
+            </div>
           </div>
         )}
 
@@ -182,8 +212,10 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
                   email={email}
                   isSelected={h.selected?.id === email.id}
                   isStarred={h.starred.has(email.id)}
+                  isChecked={h.selectedIds.has(email.id)}
                   onSelect={h.fetchDetail}
                   onToggleStar={h.toggleStar}
+                  onToggleCheck={h.toggleSelectEmail}
                 />
               ))}
             </motion.div>
@@ -237,6 +269,18 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
           onToggleStar={h.toggleStar}
         />
       )}
+
+      {/* ─── Delete Confirmation Dialog ─── */}
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title="Delete emails?"
+        message={`Are you sure you want to delete ${h.selectedIds.size} email${h.selectedIds.size > 1 ? 's' : ''}? This action will hide ${h.selectedIds.size > 1 ? 'them' : 'it'} from your Sent tab. You can restore deleted emails by contacting support.`}
+        confirmLabel={`Delete ${h.selectedIds.size} email${h.selectedIds.size > 1 ? 's' : ''}`}
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   );
 }

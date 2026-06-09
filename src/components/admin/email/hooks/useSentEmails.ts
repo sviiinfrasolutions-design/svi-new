@@ -61,6 +61,15 @@ interface UseSentEmailsReturn {
   setStatusFilter: React.Dispatch<React.SetStateAction<Set<string>>>;
   copyText: (text: string, type: string) => Promise<void>;
   copyId: (id: string) => void;
+  // ─── Multi-select & Delete ───
+  selectedIds: Set<string>;
+  isAllSelected: boolean;
+  toggleSelectEmail: (id: string) => void;
+  selectAllEmails: () => void;
+  clearSelection: () => void;
+  deleting: boolean;
+  deleteSelectedEmails: () => Promise<number>;
+  addToDeleted: (ids: string[]) => void;
 }
 
 export function useSentEmails(): UseSentEmailsReturn {
@@ -100,6 +109,73 @@ export function useSentEmails(): UseSentEmailsReturn {
     }
   });
   const [showStarredOnly, setShowStarredOnly] = useState(false);
+
+  /* ─── Multi-select & Delete ─── */
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+
+  const toggleSelectEmail = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  const addToDeleted = (ids: string[]) => {
+    setEmails((prev) => prev.filter((e) => !ids.includes(e.id)));
+    setSelectedIds(new Set());
+    if (selected && ids.includes(selected.id)) {
+      setSelected(null);
+    }
+  };
+
+  const deleteSelectedEmails = async (): Promise<number> => {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return 0;
+    setDeleting(true);
+    try {
+      const token = await getToken();
+      // Include full email data so the Recycle Bin can display it
+      const emailData = processed
+        .filter((e) => selectedIds.has(e.id))
+        .map((e) => ({
+          id: e.id,
+          subject: e.subject,
+          from: e.from,
+          to: e.to,
+          created_at: e.created_at,
+          last_event: e.last_event,
+        }));
+      const res = await fetch('/api/admin/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          action: 'delete_emails',
+          emailIds: ids,
+          emails: emailData,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete emails');
+      addToDeleted(ids);
+      toast.success(`${ids.length} email${ids.length > 1 ? 's' : ''} deleted`);
+      return ids.length;
+    } catch (e) {
+      toast.error((e as Error).message);
+      return 0;
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   /* ─── Copy / Detail ─── */
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -343,6 +419,19 @@ export function useSentEmails(): UseSentEmailsReturn {
     sortDir,
   ]);
 
+  const isAllSelected = useMemo(
+    () => processed.length > 0 && processed.every((e) => selectedIds.has(e.id)),
+    [processed, selectedIds]
+  );
+
+  const selectAllEmails = () => {
+    if (isAllSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(processed.map((e) => e.id)));
+    }
+  };
+
   const sortLabel = useMemo(() => {
     const opt = SORT_OPTIONS.find((o) => o.field === sortField);
     return `${opt?.label || 'Date'} ${sortDir === 'asc' ? '↑' : '↓'}`;
@@ -397,5 +486,14 @@ export function useSentEmails(): UseSentEmailsReturn {
     setStatusFilter,
     copyText,
     copyId,
+    // ─── Multi-select & Delete ───
+    selectedIds,
+    isAllSelected,
+    toggleSelectEmail,
+    selectAllEmails,
+    clearSelection,
+    deleting,
+    deleteSelectedEmails,
+    addToDeleted,
   };
 }
