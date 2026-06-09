@@ -1,4 +1,8 @@
-const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
+const OVERPASS_URLS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+];
+
 const SEARCH_RADIUS = 2000; // meters
 
 export interface NearbyPlace {
@@ -96,6 +100,10 @@ function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+/**
+ * Fetches nearby places from the Overpass API with automatic retry
+ * across multiple endpoints and graceful fallback.
+ */
 export async function fetchNearbyPlaces(
   lat: number,
   lng: number,
@@ -103,7 +111,7 @@ export async function fetchNearbyPlaces(
   signal?: AbortSignal
 ): Promise<NearbyPlace[]> {
   const query = `
-    [out:json][timeout:15];
+    [out:json][timeout:10];
     (
       node["amenity"](around:${radius},${lat},${lng});
       node["shop"](around:${radius},${lat},${lng});
@@ -111,50 +119,101 @@ export async function fetchNearbyPlaces(
       node["leisure"](around:${radius},${lat},${lng});
       node["railway"="station"](around:${radius},${lat},${lng});
     );
-    out center 50;
+    out center 40;
   `;
 
-  const response = await fetch(OVERPASS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ data: query }),
-    signal,
-  });
+  // Try each Overpass API endpoint in order
+  for (const [index, url] of OVERPASS_URLS.entries()) {
+    // Create a fresh AbortController for this attempt (unless parent signal fires)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12_000); // 12s per attempt
 
-  if (!response.ok) {
-    throw new Error(`Overpass API error: ${response.status}`);
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ data: query }),
+        signal: signal ? combineSignals(signal, controller.signal) : controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        console.warn(`Overpass API (${url}) returned ${response.status}, trying next...`);
+        continue; // Try next endpoint
+      }
+
+      const data = await response.json();
+      const elements: any[] = data.elements || [];
+
+      const places: NearbyPlace[] = elements
+        .filter((el: any) => {
+          const tags = el.tags || {};
+          return tags.name && typeof tags.name === 'string' && tags.name.trim();
+        })
+        .map((el: any) => {
+          const tags = el.tags || {};
+          const amenity =
+            tags.amenity || tags.shop || tags.tourism || tags.leisure || tags.railway || '';
+          const category = categorizePlace(amenity, amenity);
+          const placeLat = el.lat || el.center?.lat || lat;
+          const placeLng = el.lon || el.center?.lon || lng;
+
+          return {
+            id: `osm-${el.type}-${el.id}`,
+            name: tags.name.trim(),
+            lat: placeLat,
+            lng: placeLng,
+            category,
+            type: amenity || 'attraction',
+            distance: Math.round(haversineDistance(lat, lng, placeLat, placeLng)),
+          };
+        })
+        .sort((a: NearbyPlace, b: NearbyPlace) => (a.distance || 0) - (b.distance || 0))
+        .slice(0, 40);
+
+      return places;
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+
+      // If the parent signal aborted, stop retrying
+      if (signal?.aborted) {
+        throw err;
+      }
+
+      // If it's a timeout or network error, log and try the next endpoint
+      if (err.name === 'AbortError' || err.name === 'TimeoutError' || err.type === 'rejected') {
+        console.warn(`Overpass API (${url}) failed (${err.message}), trying next...`);
+        continue;
+      }
+
+      // For other errors, also try next endpoint
+      console.warn(`Overpass API (${url}) error: ${err.message}, trying next...`);
+      continue;
+    }
   }
 
-  const data = await response.json();
-  const elements: any[] = data.elements || [];
+  // All endpoints exhausted — return empty instead of crashing
+  console.warn('All Overpass API endpoints failed, returning empty places.');
+  return [];
+}
 
-  const places: NearbyPlace[] = elements
-    .filter((el: any) => {
-      const tags = el.tags || {};
-      return tags.name && typeof tags.name === 'string' && tags.name.trim();
-    })
-    .map((el: any) => {
-      const tags = el.tags || {};
-      const amenity =
-        tags.amenity || tags.shop || tags.tourism || tags.leisure || tags.railway || '';
-      const category = categorizePlace(amenity, amenity);
-      const placeLat = el.lat || el.center?.lat || lat;
-      const placeLng = el.lon || el.center?.lon || lng;
+/**
+ * Combines two AbortSignals into one.
+ * Aborts if EITHER signal aborts.
+ */
+function combineSignals(...signals: AbortSignal[]): AbortSignal {
+  const controller = new AbortController();
 
-      return {
-        id: `osm-${el.type}-${el.id}`,
-        name: tags.name.trim(),
-        lat: placeLat,
-        lng: placeLng,
-        category,
-        type: amenity || 'attraction',
-        distance: Math.round(haversineDistance(lat, lng, placeLat, placeLng)),
-      };
-    })
-    .sort((a: NearbyPlace, b: NearbyPlace) => (a.distance || 0) - (b.distance || 0))
-    .slice(0, 40);
+  for (const signal of signals) {
+    if (signal.aborted) {
+      controller.abort(signal.reason);
+      return controller.signal;
+    }
+    signal.addEventListener('abort', () => controller.abort(signal.reason), { once: true });
+  }
 
-  return places;
+  return controller.signal;
 }
 
 export function getCategoryInfo(category: PlaceCategory): PlaceCategoryInfo {
