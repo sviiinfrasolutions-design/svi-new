@@ -17,7 +17,7 @@ export default function ClientProviders({ children }: { children: ReactNode }) {
       <ThemeProvider>
         <ScrollToTop />
         <Header />
-        <main className="flex min-h-screen flex-grow flex-col">{children}</main>
+        <main className="flex min-h-screen flex-grow flex-col overflow-x-hidden">{children}</main>
         <Footer />
         <ChatBot />
         <BackToTop />

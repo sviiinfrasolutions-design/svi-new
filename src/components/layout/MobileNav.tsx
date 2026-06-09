@@ -44,7 +44,7 @@ function MobileLink({
   return (
     <Link
       href={href}
-      className={`block py-0.5 text-[16px] font-semibold tracking-wide transition-colors min-[380px]:text-[17px] ${
+      className={`block py-2.5 text-[16px] font-semibold tracking-wide transition-colors min-[380px]:text-[17px] ${
         isActive
           ? 'text-brand-gold'
           : 'text-brand-navy hover:text-brand-gold dark:hover:text-brand-gold dark:text-gray-100'
@@ -150,7 +150,7 @@ export function MobileNav({
             >
               <button
                 onClick={onToggleProjects}
-                className="text-brand-navy group flex w-full items-center justify-between py-0.5 text-left text-[16px] font-semibold tracking-wide min-[380px]:text-[17px] dark:text-gray-100"
+                className="text-brand-navy group flex w-full items-center justify-between py-2.5 text-left text-[16px] font-semibold tracking-wide min-[380px]:text-[17px] dark:text-gray-100"
               >
                 <span>Projects</span>
                 <ChevronDown
@@ -171,7 +171,7 @@ export function MobileNav({
                   <Link
                     href="/projects/current"
                     onClick={onClose}
-                    className="hover:text-brand-gold flex items-center gap-2 py-1 text-[13.5px] font-medium text-gray-600 transition-colors min-[380px]:text-[14.5px] dark:text-gray-400"
+                    className="hover:text-brand-gold flex items-center gap-2 py-2 text-[13.5px] font-medium text-gray-600 transition-colors min-[380px]:text-[14.5px] dark:text-gray-400"
                   >
                     <Building2 size={15} className="text-brand-gold/70" />
                     Current Projects
@@ -179,7 +179,7 @@ export function MobileNav({
                   <Link
                     href="/projects/completed"
                     onClick={onClose}
-                    className="hover:text-brand-gold flex items-center gap-2 py-1 text-[13.5px] font-medium text-gray-600 transition-colors min-[380px]:text-[14.5px] dark:text-gray-400"
+                    className="hover:text-brand-gold flex items-center gap-2 py-2 text-[13.5px] font-medium text-gray-600 transition-colors min-[380px]:text-[14.5px] dark:text-gray-400"
                   >
                     <CheckSquare size={15} className="text-brand-gold/70" />
                     Completed Projects
@@ -217,7 +217,7 @@ export function MobileNav({
                 <Link
                   href="/lottery"
                   onClick={onClose}
-                  className={`block py-0.5 text-[16px] font-semibold tracking-wide transition-colors min-[380px]:text-[17px] ${
+                  className={`block py-2.5 text-[16px] font-semibold tracking-wide transition-colors min-[380px]:text-[17px] ${
                     currentPath === '/lottery'
                       ? 'text-brand-gold'
                       : 'text-brand-gold/80 hover:text-brand-gold'
