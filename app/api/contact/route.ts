@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { NotificationHelper } from '@/src/lib/supabase/notifications';
+import { rateLimit } from '@/src/lib/api/rateLimit';
+import { contactSchema } from '@/src/lib/api/schemas';
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 5 submissions per IP per minute
+  const limited = rateLimit(request, { limit: 5, windowSeconds: 60 });
+  if (limited) return limited;
+
   let body;
   try {
     body = await request.json();
@@ -10,14 +16,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { name, email, phone, subject, message } = body;
-
-  if (!name || !email || !phone || !subject || !message) {
-    return NextResponse.json(
-      { error: 'All fields (name, email, phone, subject, message) are required' },
-      { status: 400 }
-    );
+  const parsed = contactSchema.safeParse(body);
+  if (!parsed.success) {
+    const fieldErrors = parsed.error.flatten().fieldErrors;
+    return NextResponse.json({ error: 'Validation failed', details: fieldErrors }, { status: 400 });
   }
+
+  const { name, email, phone, subject, message } = parsed.data;
 
   const { data, error } = await supabaseAdmin
     .from('contact_submissions')

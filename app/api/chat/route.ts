@@ -1,9 +1,14 @@
 import { convertToModelMessages, streamText, UIMessage } from 'ai';
 import { groq } from '@ai-sdk/groq';
+import { rateLimit } from '@/src/lib/api/rateLimit';
+import { type NextRequest } from 'next/server';
 
 export const maxDuration = 30;
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  // Rate limit: 20 chat messages per IP per minute
+  const limited = rateLimit(req, { limit: 20, windowSeconds: 60 });
+  if (limited) return limited;
   const { messages }: { messages: UIMessage[] } = await req.json();
 
   const result = streamText({

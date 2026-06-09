@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { NotificationHelper } from '@/src/lib/supabase/notifications';
+import { rateLimit } from '@/src/lib/api/rateLimit';
 
 const STORAGE_BUCKET = 'registration-docs';
 
@@ -74,6 +75,10 @@ async function uploadFile(
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 3 registrations per IP per minute
+  const limited = rateLimit(request, { limit: 3, windowSeconds: 60 });
+  if (limited) return limited;
+
   let formData: FormData;
   try {
     formData = await request.formData();
