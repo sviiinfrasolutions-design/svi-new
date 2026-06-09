@@ -200,7 +200,7 @@ export function ResendUsageDashboard({ className }: ResendUsageDashboardProps) {
               <div className="text-xs text-gray-400">
                 Period:{' '}
                 <span className="font-medium text-gray-600 dark:text-gray-300">
-                  {usageData.period}
+                  {usageData?.period || 'N/A'}
                 </span>
               </div>
               <a
