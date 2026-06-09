@@ -222,6 +222,7 @@ export function EmailToolbar({
                 transition={{ duration: 0.15 }}
                 className="absolute top-full right-0 z-50 mt-1.5 w-56 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
                 onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
               >
                 <div className="p-1.5">
                   {SORT_OPTIONS.map((opt) => {
@@ -325,6 +326,7 @@ function FilterPanel({
       exit={{ height: 0, opacity: 0 }}
       transition={{ duration: 0.2 }}
       className="overflow-hidden border-b border-gray-100 dark:border-gray-800"
+      onMouseDown={(e) => e.stopPropagation()}
     >
       <div className="space-y-4 px-4 py-3">
         {/* Status filter */}
