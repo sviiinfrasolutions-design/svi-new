@@ -1,29 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
+import { AppError, handleApiError } from '@/src/lib/api/errors';
 
 export async function GET(request: NextRequest) {
-  const admin = await verifyAdmin(request);
-  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const admin = await verifyAdmin(request);
+    if (!admin) throw AppError.unauthorized();
 
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  // Parallelize all data fetches
-  const [growthResult, documentStats, trends] = await Promise.all([
-    fetchUserGrowth(thirtyDaysAgo),
-    fetchDocumentStats(),
-    calculateTrends(),
-  ]);
+    // Parallelize all data fetches
+    const [growthResult, documentStats, trends] = await Promise.all([
+      fetchUserGrowth(thirtyDaysAgo),
+      fetchDocumentStats(),
+      calculateTrends(),
+    ]);
 
-  const response = NextResponse.json({
-    userGrowth: growthResult,
-    documentStats,
-    trends,
-  });
+    const response = NextResponse.json({
+      userGrowth: growthResult,
+      documentStats,
+      trends,
+    });
 
-  response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=60');
-  return response;
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=60');
+    return response;
+  } catch (err) {
+    return handleApiError(err);
+  }
 }
 
 /**
