@@ -76,6 +76,7 @@ export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [showLeadCapture, setShowLeadCapture] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [leadDismissed, setLeadDismissed] = useState(false);
   const [feedback, setFeedback] = useState<Record<string, 'up' | 'down' | null>>({});
   const [sessionId] = useState(generateSessionId);
   const [isListening, setIsListening] = useState(false);
@@ -177,13 +178,13 @@ export default function ChatBot() {
 
   // ─── Lead capture: Show after 3rd AI message ───────────────────────────
   useEffect(() => {
-    if (messages.length >= 5 && !leadSubmitted && !showLeadCapture) {
+    if (messages.length >= 5 && !leadSubmitted && !leadDismissed && !showLeadCapture) {
       const aiCount = messages.filter((m) => m.role === 'assistant').length;
       if (aiCount >= 2) {
         setShowLeadCapture(true);
       }
     }
-  }, [messages, leadSubmitted, showLeadCapture]);
+  }, [messages, leadSubmitted, leadDismissed, showLeadCapture]);
 
   const [input, setInput] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(true);
@@ -482,7 +483,10 @@ export default function ChatBot() {
             {/* Lead Capture */}
             {showLeadCapture && (
               <LeadCapture
-                onClose={() => setShowLeadCapture(false)}
+                onClose={() => {
+                  setShowLeadCapture(false);
+                  setLeadDismissed(true);
+                }}
                 onSubmitted={() => setLeadSubmitted(true)}
               />
             )}
