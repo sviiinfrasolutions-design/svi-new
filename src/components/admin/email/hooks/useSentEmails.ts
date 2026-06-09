@@ -340,13 +340,14 @@ export function useSentEmails(): UseSentEmailsReturn {
     const now = new Date();
     switch (datePreset) {
       case 'today':
-        return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        // Use UTC midnight for consistent comparison
+        return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
       case '7d':
-        return new Date(now.getTime() - 7 * 86400000);
+        return new Date(Date.now() - 7 * 86400000);
       case '30d':
-        return new Date(now.getTime() - 30 * 86400000);
+        return new Date(Date.now() - 30 * 86400000);
       case '90d':
-        return new Date(now.getTime() - 90 * 86400000);
+        return new Date(Date.now() - 90 * 86400000);
       default:
         return null;
     }
