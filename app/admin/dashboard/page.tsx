@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import ActivityTimeline from '@/src/components/admin/ActivityTimeline';
 import DocumentStatsChart from '@/src/components/admin/ChartComponents/DocumentStatsChart';
@@ -26,6 +27,7 @@ import UserGrowthChart from '@/src/components/admin/ChartComponents/UserGrowthCh
 import type { UserProfile } from '@/src/lib/supabase/types';
 import { supabase } from '@/src/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { useUsers, useAnalytics, useActivities } from '@/src/hooks/useDashboard';
 import { Badge } from '@/src/components/admin/helpers/Badge';
 import { renderPropertyInterestTags } from '@/src/components/admin/helpers/PropertyInterestTags';
 import { CreateUserModal } from '@/src/components/admin/modals/CreateUserModal';
@@ -42,52 +44,38 @@ const GRID_STYLE = {
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
   const router = useRouter();
-  const [users, setUsers] = useState<UserProfile[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  // Auth state
   const [token, setToken] = useState('');
   const [adminName, setAdminName] = useState('');
+  const [currentAdminId, setCurrentAdminId] = useState('');
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // UI state
   const [search, setSearch] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [showAdvisorSettings, setShowAdvisorSettings] = useState(false);
   const [editTarget, setEditTarget] = useState<UserProfile | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserProfile | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [currentAdminId, setCurrentAdminId] = useState('');
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
-  const [analytics, setAnalytics] = useState<{
-    userGrowth: Array<{ date: string; users: number }>;
-    documentStats: Array<{ name: string; count: number }>;
-    trends: { userGrowth: string; clientGrowth: string; adminCount: string };
-  } | null>(null);
-  const [activities, setActivities] = useState<
-    Array<{
-      id: string;
-      type: 'user' | 'document' | 'settings' | 'download';
-      title: string;
-      description: string;
-      timestamp: string;
-      user: string;
-    }>
-  >([]);
   const [properties, setProperties] = useState<Array<{ name: string; slug: string }>>([]);
+
+  // React Query hooks — data fetching with caching
+  const { data: usersData, isLoading: usersLoading } = useUsers(token);
+  const { data: analytics } = useAnalytics(token);
+  const { data: activitiesData } = useActivities(token);
+  const users = usersData?.users ?? [];
+  const activities = activitiesData?.activities ?? [];
+  const loading = authLoading || (usersLoading && !usersData);
 
   const showToast = (type: 'success' | 'error', msg: string) => {
     setToast({ type, msg });
     setTimeout(() => setToast(null), 3500);
   };
 
-  const fetchUsers = useCallback(async (tkn: string) => {
-    const res = await fetch('/api/admin/users', {
-      headers: { Authorization: `Bearer ${tkn}` },
-    });
-    if (res.ok) {
-      const json = await res.json();
-      setUsers(json.users);
-    }
-    setLoading(false);
-  }, []);
-
-  // Consolidated: auth check + parallel data fetch (users, analytics, activities)
+  // Auth check — only sets token and admin info
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
@@ -106,38 +94,18 @@ export default function AdminDashboard() {
         return;
       }
 
-      const tkn = session.access_token;
-      setToken(tkn);
+      setToken(session.access_token);
       setCurrentAdminId(session.user.id);
       setAdminName(profile?.full_name || session.user.email || 'Admin');
+      setAuthLoading(false);
 
-      const authHeaders = { Authorization: `Bearer ${tkn}` };
-      const [usersRes, analyticsRes, activitiesRes, propertiesRes] = await Promise.all([
-        fetch('/api/admin/users', { headers: authHeaders }),
-        fetch('/api/admin/analytics', { headers: authHeaders }),
-        fetch('/api/admin/activities?limit=10', { headers: authHeaders }),
-        supabase
-          .from('properties')
-          .select('name, slug')
-          .eq('active', true)
-          .order('name', { ascending: true }),
-      ]);
-
-      if (usersRes.ok) {
-        const json = await usersRes.json();
-        setUsers(json.users);
-      }
-      if (analyticsRes.ok) {
-        setAnalytics(await analyticsRes.json());
-      }
-      if (activitiesRes.ok) {
-        const data = await activitiesRes.json();
-        setActivities(data.activities || []);
-      }
-      if (propertiesRes && !propertiesRes.error && propertiesRes.data) {
-        setProperties(propertiesRes.data);
-      }
-      setLoading(false);
+      // Fetch properties (non-sensitive, can be done directly)
+      const { data: propertiesData } = await supabase
+        .from('properties')
+        .select('name, slug')
+        .eq('active', true)
+        .order('name', { ascending: true });
+      if (propertiesData) setProperties(propertiesData);
     });
   }, [router]);
 
@@ -158,7 +126,8 @@ export default function AdminDashboard() {
         const j = await res.json();
         throw new Error(j.error);
       }
-      setUsers((u) => u.filter((x) => x.id !== deleteTarget.id));
+      // React Query will automatically refetch users on next mount
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
       showToast('success', `${deleteTarget.full_name} has been deleted.`);
     } catch (err: unknown) {
       showToast('error', err instanceof Error ? err.message : 'Delete failed');
@@ -312,8 +281,7 @@ export default function AdminDashboard() {
           </div>
           <button
             onClick={() => {
-              setLoading(true);
-              fetchUsers(token);
+              queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
             }}
             className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-5 py-3 text-xs font-bold tracking-widest text-gray-700 uppercase transition-all hover:bg-gray-50 dark:border-white/10 dark:bg-[#0e0e14]/85 dark:text-gray-300 dark:hover:bg-white/5"
           >
@@ -547,7 +515,7 @@ export default function AdminDashboard() {
             properties={properties}
             onClose={() => setShowCreate(false)}
             onSuccess={() => {
-              fetchUsers(token);
+              queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
               showToast('success', 'User created successfully!');
             }}
           />
@@ -559,7 +527,7 @@ export default function AdminDashboard() {
             properties={properties}
             onClose={() => setEditTarget(null)}
             onSuccess={() => {
-              fetchUsers(token);
+              queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
               showToast('success', 'User updated successfully!');
             }}
           />
