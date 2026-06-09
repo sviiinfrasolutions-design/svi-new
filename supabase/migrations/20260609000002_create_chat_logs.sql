@@ -58,6 +58,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS chat_logs_updated_at_trigger ON chat_logs;
 CREATE TRIGGER chat_logs_updated_at_trigger
   BEFORE UPDATE ON chat_logs
   FOR EACH ROW
@@ -80,6 +81,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS chat_leads_notify_trigger ON chat_leads;
 CREATE TRIGGER chat_leads_notify_trigger
   AFTER INSERT ON chat_leads
   FOR EACH ROW

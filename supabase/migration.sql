@@ -169,9 +169,9 @@ create table if not exists public.documents (
 );
 
 -- Indexes for performance
-create index idx_documents_user_id on public.documents(user_id);
-create index idx_documents_type on public.documents(document_type);
-create index idx_documents_created_at on public.documents(created_at desc);
+create index if not exists idx_documents_user_id on public.documents(user_id);
+create index if not exists idx_documents_type on public.documents(document_type);
+create index if not exists idx_documents_created_at on public.documents(created_at desc);
 
 -- RLS Policies
 alter table public.documents enable row level security;
@@ -215,9 +215,9 @@ create table if not exists public.notifications (
 );
 
 -- Indexes for performance
-create index idx_notifications_user_id on public.notifications(user_id);
-create index idx_notifications_is_read on public.notifications(is_read);
-create index idx_notifications_created_at on public.notifications(created_at desc);
+create index if not exists idx_notifications_user_id on public.notifications(user_id);
+create index if not exists idx_notifications_is_read on public.notifications(is_read);
+create index if not exists idx_notifications_created_at on public.notifications(created_at desc);
 
 -- RLS Policies
 alter table public.notifications enable row level security;
@@ -264,9 +264,9 @@ create table if not exists public.activity_logs (
   created_at timestamptz not null default now()
 );
 
-create index idx_activity_logs_user_id on public.activity_logs(user_id);
-create index idx_activity_logs_action_type on public.activity_logs(action_type);
-create index idx_activity_logs_created_at on public.activity_logs(created_at desc);
+create index if not exists idx_activity_logs_user_id on public.activity_logs(user_id);
+create index if not exists idx_activity_logs_action_type on public.activity_logs(action_type);
+create index if not exists idx_activity_logs_created_at on public.activity_logs(created_at desc);
 
 alter table public.activity_logs enable row level security;
 
@@ -369,6 +369,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS chat_logs_updated_at_trigger ON chat_logs;
 CREATE TRIGGER chat_logs_updated_at_trigger
   BEFORE UPDATE ON chat_logs
   FOR EACH ROW
@@ -386,6 +387,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS chat_leads_notify_trigger ON chat_leads;
 CREATE TRIGGER chat_leads_notify_trigger
   AFTER INSERT ON chat_leads
   FOR EACH ROW
