@@ -9,7 +9,7 @@ import Header from '@/src/components/Header';
 import type { ReactNode } from 'react';
 import ScrollToTop from '@/src/components/common/ScrollToTop';
 import { ThemeProvider } from '@/src/components/ThemeProvider';
-import WhatsAppChat from '@/src/components/common/WhatsAppChat';
+import ChatBot from '@/src/components/home/ChatBot';
 
 export default function ClientProviders({ children }: { children: ReactNode }) {
   return (
@@ -19,7 +19,7 @@ export default function ClientProviders({ children }: { children: ReactNode }) {
         <Header />
         <main className="flex min-h-screen flex-grow flex-col">{children}</main>
         <Footer />
-        <WhatsAppChat />
+        <ChatBot />
         <BackToTop />
         <CookieConsent />
         <Analytics />
