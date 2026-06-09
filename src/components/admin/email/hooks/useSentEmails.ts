@@ -303,12 +303,10 @@ export function useSentEmails(): UseSentEmailsReturn {
 
   /* ─── Filter handlers ─── */
   const toggleStatus = (s: string) => {
-    console.log('[toggleStatus] called with:', s);
     setStatusFilter((prev) => {
       const next = new Set(prev);
       if (next.has(s)) next.delete(s);
       else next.add(s);
-      console.log('[toggleStatus] new set:', [...next]);
       return next;
     });
   };
@@ -356,9 +354,6 @@ export function useSentEmails(): UseSentEmailsReturn {
 
   /* ─── Processed list: filter → sort ─── */
   const processed = useMemo(() => {
-    console.log('[processed] recalculating, emails:', emails.length, 'statusFilter:', [
-      ...statusFilter,
-    ]);
     let list = [...emails];
 
     // Search (subject, from, to)
