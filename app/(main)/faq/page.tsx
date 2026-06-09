@@ -1,8 +1,15 @@
-'use client';
-
-import FAQSection from '@/src/components/common/FAQSection';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { ALL_FAQS } from '@/src/data/faq/general';
+
+const FAQSection = dynamic(() => import('@/src/components/common/FAQSection'));
+
+export const metadata: Metadata = {
+  title: 'Frequently Asked Questions',
+  description:
+    'Find answers to common questions about SVI Infra Solutions projects, services, and real estate investments.',
+};
 
 export default function FAQ() {
   return (

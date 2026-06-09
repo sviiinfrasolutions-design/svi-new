@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   AlertCircle,
   ChevronDown,
@@ -112,6 +112,8 @@ const GRADIENT_STYLE = {
 
 export default function Registration() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const needRegistration = searchParams.get('needRegistration');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -343,7 +345,7 @@ export default function Registration() {
       const res = await fetch('/api/registration', { method: 'POST', body });
       if (!res.ok) throw new Error('Submission failed');
       setIsPaymentModalOpen(false);
-      router.push('/thank-you');
+      router.push('/thank-you?registered=1');
     } catch (err) {
       setSubmitError('Failed to submit registration. Please try again.');
     } finally {
@@ -473,6 +475,12 @@ export default function Registration() {
           <p className="animate-hero-subtitle mx-auto max-w-2xl text-base leading-relaxed text-gray-500 md:text-lg dark:text-gray-400">
             Please fill out the form below to register with SVI Infra Solutions Pvt. Ltd.
           </p>
+
+          {needRegistration && (
+            <div className="mx-auto mt-6 max-w-xl rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400">
+              Please complete the registration form first before accessing the confirmation page.
+            </div>
+          )}
         </div>
       </section>
 

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import ThankYouCard from './ThankYouCard';
 
 export const metadata: Metadata = {
@@ -13,7 +14,17 @@ const GRADIENT_STYLE = {
   backgroundSize: '40px 40px',
 };
 
-export default function ThankYou() {
+export default async function ThankYou({
+  searchParams,
+}: {
+  searchParams: Promise<{ registered?: string }>;
+}) {
+  // Only show thank-you if user actually submitted the registration form
+  const params = await searchParams;
+  if (!params.registered) {
+    redirect('/registration?needRegistration=1');
+  }
+
   return (
     <div className="bg-brand-bg relative flex min-h-screen items-center justify-center py-20 pt-24 dark:bg-gray-900">
       <div
