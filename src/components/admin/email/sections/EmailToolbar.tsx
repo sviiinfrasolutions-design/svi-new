@@ -362,10 +362,7 @@ function FilterPanel({
             {DATE_PRESETS.map((preset) => (
               <button
                 key={preset.key}
-                onClick={() => {
-                  console.log('[FilterPanel] Date preset clicked:', preset.key);
-                  onDatePresetChange(preset.key);
-                }}
+                onClick={() => onDatePresetChange(preset.key)}
                 className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all ${
                   datePreset === preset.key
                     ? 'bg-brand-gold text-white'
