@@ -158,7 +158,8 @@
     },
     "blog": {
       "title": "Blog",
-      "heading": "Our Latest Updates"
+      "heading": "Our Latest Updates",
+      "subtitle": "Stay informed with the latest market trends, investment guides, and updates from SVI Infra Solutions."
     },
     "registration": {
       "title": "Property Registration",

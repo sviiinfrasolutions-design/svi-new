@@ -1,8 +1,11 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
 
 export default function BlogHero() {
+  const t = useTranslations('pages.blog');
+
   return (
     <section className="bg-brand-navy relative overflow-hidden py-20 text-center dark:bg-gray-900">
       <div
@@ -19,7 +22,7 @@ export default function BlogHero() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 font-serif text-4xl leading-tight text-white md:text-6xl"
         >
-          Insights &amp; Updates
+          {t('heading')}
         </motion.h1>
         <motion.div
           initial={{ opacity: 0 }}
@@ -28,8 +31,8 @@ export default function BlogHero() {
           className="bg-brand-gold mx-auto mb-6 h-px w-16"
         ></motion.div>
         <p className="mx-auto max-w-2xl text-lg leading-relaxed text-gray-300">
-          Stay informed with the latest market trends, investment guides, and updates from SVI Infra
-          Solutions.
+          {t('subtitle') ||
+            'Stay informed with the latest market trends, investment guides, and updates from SVI Infra Solutions.'}
         </p>
       </div>
     </section>
