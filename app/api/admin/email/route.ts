@@ -11,6 +11,99 @@ function getResend() {
   return new Resend(apiKey);
 }
 
+async function syncInboundEmails(resend: Resend) {
+  try {
+    const resendEmails = await resend.emails.receiving.list();
+    const emails = (resendEmails.data as any)?.data || resendEmails.data || [];
+    if (emails.length === 0) return;
+
+    const emailIds = emails.map((e: any) => e.id).filter(Boolean);
+    if (emailIds.length === 0) return;
+
+    const { data: existingRecords, error: checkError } = await supabaseAdmin
+      .from('email_inbox')
+      .select('email_id')
+      .in('email_id', emailIds);
+
+    if (checkError) {
+      console.error('[SYNC] Error checking existing emails in database:', checkError);
+      return;
+    }
+
+    const existingIds = new Set((existingRecords || []).map((r: any) => r.email_id));
+    const missingEmails = emails.filter((e: any) => !existingIds.has(e.id));
+
+    if (missingEmails.length === 0) return;
+
+    console.log(`[SYNC] Found ${missingEmails.length} missing inbound emails. Syncing now...`);
+
+    for (const e of missingEmails) {
+      const emailId = e.id;
+      try {
+        const { data: emailData, error: fetchError } = await resend.emails.receiving.get(emailId);
+        if (fetchError) {
+          console.error(`[SYNC] Error fetching email details for ${emailId}:`, fetchError);
+          continue;
+        }
+
+        const fromRaw = (emailData as any).from || '';
+        let fromEmail = fromRaw;
+        let fromName = '';
+        const nameMatch = fromRaw.match(/^"?([^"<]*)"?\s*<([^>]+)>/);
+        if (nameMatch) {
+          fromName = nameMatch[1].trim();
+          fromEmail = nameMatch[2].trim();
+        }
+
+        const toEmails: string[] = [];
+        const rawTo = (emailData as any).to || [];
+        (Array.isArray(rawTo) ? rawTo : [rawTo]).forEach((addr: string) => {
+          const m = addr.match(/<([^>]+)>/);
+          toEmails.push(m ? m[1] : addr);
+        });
+
+        const insertData = {
+          email_id: emailId,
+          thread_id: (emailData as any).thread_id || (emailData as any).message_id || emailId,
+          subject: (emailData as any).subject || '(No Subject)',
+          from_email: fromEmail,
+          from_name: fromName || null,
+          to_emails: toEmails,
+          html_content: (emailData as any).html || null,
+          text_content: (emailData as any).text || null,
+          received_at: (emailData as any).created_at || new Date().toISOString(),
+          status: 'received',
+        };
+
+        const { error: insertError } = await supabaseAdmin.from('email_inbox').insert(insertData);
+        if (insertError) {
+          if (
+            insertError.message?.includes('duplicate key') ||
+            insertError.message?.includes('column "from_name" of relation')
+          ) {
+            const { error: insertError2 } = await supabaseAdmin.from('email_inbox').insert({
+              ...insertData,
+              from_name: undefined,
+            });
+            if (insertError2 && !insertError2.message?.includes('duplicate key')) {
+              console.error(
+                `[SYNC] Failed to insert email ${emailId} without from_name:`,
+                insertError2
+              );
+            }
+          } else {
+            console.error(`[SYNC] Failed to insert email ${emailId}:`, insertError);
+          }
+        }
+      } catch (err) {
+        console.error(`[SYNC] Exception syncing email ${emailId}:`, err);
+      }
+    }
+  } catch (err) {
+    console.error('[SYNC] Exception during inbound email sync:', err);
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const admin = await verifyAdmin(request);
@@ -46,14 +139,23 @@ export async function GET(request: NextRequest) {
         // Resend API may not support filtering yet
       }
 
+      // How many emails received today
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const { count, error: countError } = await supabaseAdmin
+        .from('email_inbox')
+        .select('*', { count: 'exact', head: true })
+        .gte('received_at', todayStart.toISOString());
+
+      const todayCount = countError ? 0 : count || 0;
+
       return NextResponse.json({
         configured: !!inboundDomain,
         inboundDomain: inboundDomain || null,
         webhookSecretConfigured: webhookSecret,
         webhookUrl,
         inboundDomains,
-        // How many emails received today
-        todayCount: 0, // Will be filled from DB
+        todayCount,
       });
     }
 
@@ -64,10 +166,13 @@ export async function GET(request: NextRequest) {
 
     // ─── Inbox / Replies — from email_inbox table ───
     if (action === 'replies' || action === 'inbox') {
+      // Sync latest emails from Resend receiving API
+      await syncInboundEmails(resend);
+
       const { data, error } = await supabaseAdmin
         .from('email_inbox')
         .select(
-          'id, email_id, thread_id, subject, from_email, to_emails, received_at, html_content, text_content, opened, clicked'
+          'id, email_id, thread_id, subject, from_email, from_name, to_emails, received_at, html_content, text_content, opened, clicked'
         )
         .order('received_at', { ascending: false })
         .limit(50);
@@ -76,14 +181,19 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 400 });
       }
 
+      const filteredEmails = (data || []).filter(
+        (email: any) => !email.email_id?.startsWith('test-')
+      );
+
       return NextResponse.json({
-        emails: (data || []).map((email: any) => ({
+        emails: filteredEmails.map((email: any) => ({
           id: email.id,
           email_id: email.email_id,
           thread_id: email.thread_id || email.email_id,
           subject: email.subject,
           from: email.from_email,
           from_email: email.from_email,
+          from_name: email.from_name || null,
           to: email.to_emails || [],
           created_at: email.received_at,
           snippet:
@@ -118,6 +228,7 @@ export async function GET(request: NextRequest) {
           subject: data.subject,
           from: data.from_email,
           from_email: data.from_email,
+          from_name: data.from_name || null,
           to: data.to_emails || [],
           created_at: data.received_at,
           html: data.html_content,

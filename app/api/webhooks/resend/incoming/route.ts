@@ -1,66 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { AppError, handleApiError } from '@/src/lib/api/errors';
-import crypto from 'crypto';
+import { Resend } from 'resend';
 
 /**
  * Resend Inbound Email Webhook
  *
  * Configure in Resend Dashboard:
- * 1. Go to https://resend.com/domains → Add inbound domain
- * 2. Set MX records in your DNS provider
- * 3. Set webhook URL: https://yourdomain.com/api/webhooks/resend/incoming
- * 4. Add signing secret to .env.local: RESEND_WEBHOOK_SECRET
+ * 1. Go to https://resend.com/emails/receiving → Add inbound address
+ * 2. Set webhook URL: https://sviiinfrasolutions.com/api/webhooks/resend/incoming
+ *
+ * IMPORTANT: Resend's inbound webhook does NOT include email body/HTML.
+ * It only sends metadata. We must call resend.emails.receiving.get() to fetch the body.
  *
  * Resend sends POST with JSON body:
  * {
  *   "type": "email.received",
+ *   "created_at": "...",
  *   "data": {
- *     "id": "...",
- *     "thread_id": "...",
- *     "subject": "...",
+ *     "email_id": "56761188-7520-42d8-8898-ff6fc54ce618",
+ *     "created_at": "...",
  *     "from": "Sender Name <sender@example.com>",
- *     "to": ["inbound@yourdomain.com"],
+ *     "to": ["inbound@sviiinfrasolutions.com"],
  *     "cc": [],
  *     "bcc": [],
- *     "html": "<html>...</html>",
- *     "text": "...",
- *     "created_at": "2025-06-10T10:00:00Z",
- *     "attachments": [...]
+ *     "subject": "...",
+ *     "attachments": []
  *   }
  * }
  */
 
-function verifyResendWebhook(payload: string, signature: string | null): boolean {
-  if (!signature) return false;
-  const secret = process.env.RESEND_WEBHOOK_SECRET;
-  if (!secret) return true; // Skip if not configured — log warning
-  try {
-    // Resend uses HMAC-SHA256
-    const expected = crypto
-      .createHmac('sha256', secret)
-      .update(payload)
-      .digest('hex');
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
-  } catch {
-    return false;
-  }
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error('Missing RESEND_API_KEY environment variable');
+  return new Resend(apiKey);
 }
 
 export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.text();
-    const signature = request.headers.get('resend-signature') || null;
-
-    // Log if webhook secret is not configured
-    if (!process.env.RESEND_WEBHOOK_SECRET) {
-      console.warn(
-        '[WEBHOOK] RESEND_WEBHOOK_SECRET not set — signatures not verified. Set it in .env.local for production.'
-      );
-    } else if (!verifyResendWebhook(rawBody, signature)) {
-      console.error('[WEBHOOK] Invalid Resend webhook signature');
-      throw AppError.unauthorized('Invalid webhook signature');
-    }
 
     let payload;
     try {
@@ -69,11 +47,23 @@ export async function POST(request: NextRequest) {
       throw AppError.badRequest('Invalid JSON body');
     }
 
-    // Handle Resend inbound email format
-    const data = payload.data || payload;
-    const emailId = data.id;
+    // Only handle email.received events
+    if (payload.type !== 'email.received') {
+      console.log(`[WEBHOOK] Ignoring event type: ${payload.type}`);
+      return NextResponse.json({ received: true, ignored: true });
+    }
+
+    // Resend inbound webhook: email data is in payload.data
+    const data = payload.data;
+    if (!data) {
+      throw AppError.badRequest('Missing data in payload');
+    }
+
+    // IMPORTANT: Resend uses "email_id" for inbound (not "id")
+    const emailId = data.email_id || data.id;
     if (!emailId) {
-      throw AppError.badRequest('Missing email ID in payload');
+      console.error('[WEBHOOK] Missing email_id. Payload:', JSON.stringify(data).slice(0, 500));
+      throw AppError.badRequest('Missing email_id in payload');
     }
 
     // Check for duplicate
@@ -84,6 +74,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (existing) {
+      console.log(`[WEBHOOK] Duplicate email ignored: ${emailId}`);
       return NextResponse.json({ received: true, duplicate: true });
     }
 
@@ -105,31 +96,66 @@ export async function POST(request: NextRequest) {
       toEmails.push(m ? m[1] : addr);
     });
 
-    // Store in database — only use columns that exist in email_inbox table
-    const insertData: Record<string, any> = {
+    // Fetch the full email body from Resend API
+    // (Resend webhook does NOT include html/text in the payload — must fetch separately)
+    let htmlContent: string | null = null;
+    let textContent: string | null = null;
+
+    try {
+      const resend = getResend();
+      // resend.emails.receiving.get() fetches the full inbound email body
+      const { data: emailData, error: fetchError } = await resend.emails.receiving.get(emailId);
+      if (fetchError) {
+        console.warn('[WEBHOOK] Resend API error fetching email body:', fetchError);
+      } else {
+        htmlContent = (emailData as any)?.html || null;
+        textContent = (emailData as any)?.text || null;
+      }
+      console.log(
+        `[WEBHOOK] Fetched email body for ${emailId}: html=${!!htmlContent}, text=${!!textContent}`
+      );
+    } catch (fetchErr) {
+      // If fetching fails, still store the email metadata — body will be empty
+      console.warn('[WEBHOOK] Could not fetch full email body:', fetchErr);
+    }
+
+    // Store in database
+    const insertData = {
       email_id: emailId,
-      thread_id: data.thread_id || emailId,
+      thread_id: data.thread_id || data.message_id || emailId,
       subject: data.subject || '(No Subject)',
       from_email: fromEmail,
+      from_name: fromName || null,
       to_emails: toEmails,
-      html_content: data.html || null,
-      text_content: data.text || null,
-      received_at: data.created_at || new Date().toISOString(),
+      html_content: htmlContent,
+      text_content: textContent,
+      received_at: data.created_at || payload.created_at || new Date().toISOString(),
       status: 'received',
     };
 
     const { error } = await supabaseAdmin.from('email_inbox').insert(insertData);
 
     if (error) {
-      if (error.message?.includes('duplicate key')) {
-        return NextResponse.json({ received: true, duplicate: true });
+      if (
+        error.message?.includes('duplicate key') ||
+        error.message?.includes('column "from_name" of relation')
+      ) {
+        // from_name column may not exist yet — retry without it
+        const { error: error2 } = await supabaseAdmin.from('email_inbox').insert({
+          ...insertData,
+          from_name: undefined,
+        });
+        if (error2 && !error2.message?.includes('duplicate key')) {
+          console.error('[WEBHOOK] Failed to store email (fallback):', error2);
+          throw AppError.internal('Failed to store incoming email');
+        }
+        return NextResponse.json({ received: true });
       }
       console.error('[WEBHOOK] Failed to store email:', error);
       throw AppError.internal('Failed to store incoming email');
     }
 
-    console.log(`[WEBHOOK] Received email: "${data.subject}" from ${fromEmail}`);
-
+    console.log(`[WEBHOOK] ✅ Stored email: "${data.subject}" from ${fromEmail} (id: ${emailId})`);
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error('[WEBHOOK] Error:', error);

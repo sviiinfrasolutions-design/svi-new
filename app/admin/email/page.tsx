@@ -6,7 +6,7 @@ import {
   Mail,
   PenLine,
   Inbox,
-  Reply,
+  Send,
   Megaphone,
   FileText,
   Globe,
@@ -29,8 +29,8 @@ import { DeletedTab } from '@/src/components/admin/email/DeletedTab';
 
 const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
   { id: 'compose', label: 'Compose', icon: PenLine },
-  { id: 'sent', label: 'Sent', icon: Inbox },
-  { id: 'replies', label: 'Inbox', icon: Reply },
+  { id: 'replies', label: 'Inbox', icon: Inbox },
+  { id: 'sent', label: 'Sent', icon: Send },
   { id: 'campaigns', label: 'Campaigns', icon: Megaphone },
   { id: 'templates', label: 'Templates', icon: FileText },
   { id: 'domains', label: 'Domains', icon: Globe },

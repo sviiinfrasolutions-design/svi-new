@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
-import { Inbox, Mail, Star } from 'lucide-react';
+import { Inbox, Mail, Star, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { getToken } from './helpers';
 import { EmailDetailSkeleton } from './Skeletons';
@@ -13,6 +13,7 @@ interface ReplyItem {
   thread_id: string;
   subject: string;
   from: string;
+  from_name?: string;
   to: string[];
   created_at: string;
   snippet: string;
@@ -23,52 +24,82 @@ interface RepliesTabProps {
   adminEmail?: string;
 }
 
+const POLL_INTERVAL = 30_000; // 30 seconds auto-refresh
+
 export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
   const [replies, setReplies] = useState<ReplyItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedReply, setSelectedReply] = useState<EmailDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [starred, setStarred] = useState<Set<string>>(new Set());
   const [adminEmail, setAdminEmail] = useState<string>(propAdminEmail || '');
+  const [lastFetched, setLastFetched] = useState<Date | null>(null);
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchReplies = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = await getToken();
-      if (!token) {
-        setError('Not authenticated. Please sign in.');
-        setReplies([]);
-        return;
+  const fetchReplies = useCallback(
+    async (isBackground = false) => {
+      if (!isBackground) setLoading(true);
+      else setRefreshing(true);
+      setError(null);
+      try {
+        const token = await getToken();
+        if (!token) {
+          setError('Not authenticated. Please sign in.');
+          setReplies([]);
+          return;
+        }
+        const res = await fetch('/api/admin/email?action=inbox', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data?.error?.message || data?.error || 'Failed to load inbox');
+          setReplies([]);
+          return;
+        }
+        const emailList = data.emails || data.replies || [];
+        const stored = localStorage.getItem('adminEmail');
+        if (stored) setAdminEmail(stored);
+
+        // Show toast only if new emails arrived during background refresh
+        if (isBackground && emailList.length > replies.length) {
+          const diff = emailList.length - replies.length;
+          toast.success(`${diff} new email${diff > 1 ? 's' : ''} received!`);
+        }
+
+        setReplies(emailList);
+        setLastFetched(new Date());
+      } catch (e) {
+        console.error('Failed to fetch replies:', e);
+        if (!isBackground) setError('Network error. Please try again.');
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-      const res = await fetch('/api/admin/email?action=inbox', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data?.error?.message || data?.error || 'Failed to load inbox');
-        setReplies([]);
-        return;
-      }
-      // Handle both 'emails' and 'replies' keys for compatibility
-      const emailList = data.emails || data.replies || [];
-      // Get admin email from storage
-      const stored = localStorage.getItem('adminEmail');
-      if (stored) setAdminEmail(stored);
-      setReplies(emailList);
-    } catch (e) {
-      console.error('Failed to fetch replies:', e);
-      setError('Network error. Please try again.');
-      setReplies([]);
-    } finally {
-      setLoading(false);
-    }
+    },
+    [replies.length]
+  );
+
+  // Initial fetch
+  useEffect(() => {
+    fetchReplies(false);
   }, []);
 
+  // Background polling every 30s
   useEffect(() => {
-    fetchReplies();
+    pollRef.current = setInterval(() => {
+      fetchReplies(true);
+    }, POLL_INTERVAL);
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
   }, [fetchReplies]);
+
+  const handleManualRefresh = () => {
+    fetchReplies(false);
+  };
 
   const fetchDetail = async (id: string) => {
     setLoadingDetail(true);
@@ -82,6 +113,7 @@ export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
       setSelectedReply(data.email);
     } catch (e) {
       console.error('Failed to load email:', e);
+      toast.error('Failed to load email content');
     } finally {
       setLoadingDetail(false);
     }
@@ -96,29 +128,48 @@ export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
     });
   };
 
+  /** Format sender display name */
+  const formatSender = (item: ReplyItem) => {
+    if (item.from_name) return item.from_name;
+    return item.from;
+  };
+
+  /** Inbox header shared between views */
+  const InboxHeader = () => (
+    <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-gray-800">
+      <div>
+        <h3 className="text-sm font-bold text-gray-900 dark:text-white">Inbox Replies</h3>
+        {adminEmail && (
+          <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+            Logged in as:{' '}
+            <span className="font-medium text-gray-600 dark:text-gray-300">{adminEmail}</span>
+          </p>
+        )}
+        {lastFetched && (
+          <p className="mt-0.5 text-[10px] text-gray-400 dark:text-gray-600">
+            Updated {lastFetched.toLocaleTimeString('en-IN')}
+          </p>
+        )}
+      </div>
+      <button
+        onClick={handleManualRefresh}
+        disabled={loading || refreshing}
+        title="Refresh inbox"
+        className="hover:border-brand-gold/40 hover:text-brand-gold flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-500 transition-all disabled:opacity-50 dark:border-gray-700 dark:text-gray-400"
+      >
+        <RefreshCw className={`h-3 w-3 ${refreshing ? 'animate-spin' : ''}`} />
+        {refreshing ? 'Refreshing…' : 'Refresh'}
+      </button>
+    </div>
+  );
+
   if (!selectedReply) {
     return (
       <div className="rounded-xl border border-gray-200/80 bg-white dark:border-gray-700/60 dark:bg-[#0e0e14]">
-        {/* Header with Admin Email */}
-        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-gray-800">
-          <div>
-            <h3 className="text-sm font-bold text-gray-900 dark:text-white">Inbox Replies</h3>
-            {adminEmail && (
-              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                Logged in as:{' '}
-                <span className="font-medium text-gray-600 dark:text-gray-300">{adminEmail}</span>
-              </p>
-            )}
-          </div>
-          <div className="h-6 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
-        </div>
+        <InboxHeader />
 
         {loading ? (
           <div className="p-4">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white">Inbox Replies</h3>
-              <div className="h-6 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
-            </div>
             {[...Array(5)].map((_, i) => (
               <div key={i} className="animate-pulse">
                 <div className="flex items-start gap-3.5 border-b border-gray-100 px-5 py-4 dark:border-gray-800">
@@ -140,13 +191,13 @@ export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
               <Mail className="h-6 w-6 text-red-500" />
             </div>
-            <h3 className="text-base font-bold text-gray-900 dark:text-white">Failed to load inbox</h3>
-            <p className="mt-2 max-w-sm text-sm text-red-500 dark:text-red-400">
-              {error}
-            </p>
+            <h3 className="text-base font-bold text-gray-900 dark:text-white">
+              Failed to load inbox
+            </h3>
+            <p className="mt-2 max-w-sm text-sm text-red-500 dark:text-red-400">{error}</p>
             <button
-              onClick={fetchReplies}
-              className="mt-4 rounded-lg bg-brand-gold px-4 py-2 text-xs font-bold text-brand-navy uppercase transition-all hover:shadow-lg"
+              onClick={handleManualRefresh}
+              className="bg-brand-gold text-brand-navy mt-4 rounded-lg px-4 py-2 text-xs font-bold uppercase transition-all hover:shadow-lg"
             >
               Retry
             </button>
@@ -156,11 +207,14 @@ export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
             <Inbox className="mb-4 h-12 w-12 text-gray-300 dark:text-gray-700" />
             <h3 className="text-base font-bold text-gray-900 dark:text-white">No replies yet</h3>
             <p className="mt-2 max-w-sm text-sm text-gray-500 dark:text-gray-400">
-              When someone replies to your sent emails, they'll appear here automatically.
+              When someone replies to your sent emails, they&apos;ll appear here automatically.
+            </p>
+            <p className="mt-1 text-xs text-gray-400 dark:text-gray-600">
+              Auto-refreshes every 30 seconds
             </p>
           </div>
         ) : (
-          <div className="max-h-[calc(100vh-280px)] overflow-y-auto">
+          <div className="max-h-[calc(100vh-320px)] overflow-y-auto">
             {replies.map((reply, i) => (
               <motion.div
                 key={reply.id}
@@ -175,20 +229,39 @@ export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
                     starred.has(reply.id) ? 'bg-amber-50/50 dark:bg-amber-500/5' : ''
                   }`}
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
-                    <Mail className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  {/* Avatar with initials */}
+                  <div className="from-brand-gold/30 to-brand-gold/10 text-brand-gold dark:from-brand-gold/20 dark:to-brand-gold/5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-sm font-bold">
+                    {(reply.from_name || reply.from || '?')[0].toUpperCase()}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-2">
                       <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
                         {reply.subject}
                       </p>
-                      {starred.has(reply.id) && (
-                        <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" />
-                      )}
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        {starred.has(reply.id) && (
+                          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleStar(reply.id);
+                          }}
+                          className="opacity-0 transition-opacity group-hover:opacity-100"
+                        >
+                          <Star
+                            className={`h-3.5 w-3.5 ${starred.has(reply.id) ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`}
+                          />
+                        </button>
+                      </div>
                     </div>
                     <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-                      {reply.from} → {reply.to?.[0] || ''}
+                      {formatSender(reply)}
+                      {reply.from_name && (
+                        <span className="ml-1 text-gray-400 dark:text-gray-600">
+                          &lt;{reply.from}&gt;
+                        </span>
+                      )}
                     </p>
                     <p className="mt-0.5 truncate text-xs text-gray-400">{reply.snippet}</p>
                     <div className="mt-1.5 flex items-center gap-3">
@@ -209,15 +282,25 @@ export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
   return (
     <div className="grid grid-cols-1 gap-0 overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm lg:grid-cols-5 dark:border-gray-700/60 dark:bg-[#0e0e14]">
       {/* Email List */}
-      <div className="flex flex-col transition-all duration-300 lg:col-span-2">
+      <div className="flex flex-col border-r border-gray-100 transition-all duration-300 lg:col-span-2 dark:border-gray-800">
         <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2.5 dark:border-gray-800">
           <h3 className="text-sm font-bold text-gray-900 dark:text-white">Inbox</h3>
-          <button
-            onClick={() => setSelectedReply(null)}
-            className="text-xs text-gray-400 hover:text-gray-600"
-          >
-            Back
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleManualRefresh}
+              disabled={refreshing}
+              title="Refresh"
+              className="hover:text-brand-gold text-gray-400 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            </button>
+            <button
+              onClick={() => setSelectedReply(null)}
+              className="text-xs text-gray-400 hover:text-gray-600"
+            >
+              Back
+            </button>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto">
           {replies.map((reply, i) => (
@@ -230,7 +313,7 @@ export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
             >
               <button
                 onClick={() => fetchDetail(reply.id)}
-                className={`flex w-full items-start gap-3.5 px-5 py-4 text-left transition-all hover:bg-gray-50/80 dark:hover:bg-white/[0.015] ${
+                className={`flex w-full items-start gap-3 px-4 py-3.5 text-left transition-all hover:bg-gray-50/80 dark:hover:bg-white/[0.015] ${
                   starred.has(reply.id)
                     ? 'bg-amber-50/50 dark:bg-amber-500/5'
                     : selectedReply?.id === reply.id
@@ -238,22 +321,17 @@ export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
                       : ''
                 }`}
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
-                  <Mail className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <div className="from-brand-gold/20 to-brand-gold/5 text-brand-gold flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-xs font-bold">
+                  {(reply.from_name || reply.from || '?')[0].toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
-                      {reply.subject}
-                    </p>
-                    {starred.has(reply.id) && (
-                      <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" />
-                    )}
-                  </div>
-                  <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-                    From: {reply.from}
+                  <p className="truncate text-xs font-semibold text-gray-900 dark:text-white">
+                    {reply.subject}
                   </p>
-                  <p className="mt-0.5 truncate text-xs text-gray-400">{reply.snippet}</p>
+                  <p className="truncate text-[11px] text-gray-500 dark:text-gray-400">
+                    {formatSender(reply)}
+                  </p>
+                  <p className="mt-0.5 truncate text-[11px] text-gray-400">{reply.snippet}</p>
                 </div>
               </button>
             </motion.div>
@@ -273,16 +351,30 @@ export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
             </h2>
             <div className="space-y-1.5 text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-start gap-2">
-                <span className="w-12 shrink-0 text-xs font-semibold text-gray-400 uppercase">From</span>
-                <span>{selectedReply.from || selectedReply.from_email || 'Unknown'}</span>
+                <span className="w-12 shrink-0 text-xs font-semibold text-gray-400 uppercase">
+                  From
+                </span>
+                <span>
+                  {(selectedReply as any).from_name
+                    ? `${(selectedReply as any).from_name} <${selectedReply.from || selectedReply.from_email}>`
+                    : selectedReply.from || selectedReply.from_email || 'Unknown'}
+                </span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="w-12 shrink-0 text-xs font-semibold text-gray-400 uppercase">To</span>
+                <span className="w-12 shrink-0 text-xs font-semibold text-gray-400 uppercase">
+                  To
+                </span>
                 <span>{(selectedReply.to || selectedReply.to_emails || []).join(', ')}</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="w-12 shrink-0 text-xs font-semibold text-gray-400 uppercase">Date</span>
-                <span>{new Date(selectedReply.created_at || selectedReply.received_at || '').toLocaleString('en-IN')}</span>
+                <span className="w-12 shrink-0 text-xs font-semibold text-gray-400 uppercase">
+                  Date
+                </span>
+                <span>
+                  {new Date(
+                    selectedReply.created_at || selectedReply.received_at || ''
+                  ).toLocaleString('en-IN')}
+                </span>
               </div>
             </div>
           </div>
@@ -291,15 +383,21 @@ export function RepliesTab({ adminEmail: propAdminEmail }: RepliesTabProps) {
           <div className="flex-1 overflow-y-auto p-6">
             {selectedReply.html ? (
               <div
-                className="prose prose-sm max-w-none dark:prose-invert"
+                className="prose prose-sm dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: selectedReply.html }}
               />
             ) : selectedReply.text ? (
-              <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 dark:text-gray-300">
+              <pre className="font-sans text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300">
                 {selectedReply.text}
               </pre>
             ) : (
-              <p className="text-sm italic text-gray-400">No content</p>
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Mail className="mb-3 h-10 w-10 text-gray-200 dark:text-gray-700" />
+                <p className="text-sm text-gray-400 italic">Email body not available.</p>
+                <p className="mt-1 text-xs text-gray-300 dark:text-gray-600">
+                  This may happen if Resend could not fetch the full email content.
+                </p>
+              </div>
             )}
           </div>
         </div>

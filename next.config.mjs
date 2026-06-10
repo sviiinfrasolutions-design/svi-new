@@ -16,6 +16,10 @@ const nextConfig = {
   logging: {
     fetches: { fullUrl: true },
   },
+  // Fix Turbopack root detection when multiple lockfiles exist
+  turbopack: {
+    root: process.cwd(),
+  },
   async headers() {
     return [
       {
