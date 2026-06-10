@@ -99,5 +99,74 @@
     "subtitle": "Join thousands of happy families and investors. Our experts are ready to assist you in finding the perfect property match.",
     "registerNow": "Register Now",
     "contactUs": "Contact Us"
+  },
+  "pages": {
+    "about": {
+      "title": "About SVI Infra Solutions",
+      "heading": "Building Legacies Since 2009",
+      "subtitle": "Our Story",
+      "para1": "For over 17 years, SVI Infra Solutions Pvt. Ltd. has been synonymous with trust, quality, and integrity in the Indian real estate market. We have successfully completed 15+ projects, delivering joy to over 5000+ happy clients.",
+      "para2": "Our vision extends beyond just building structures; we create communities, shape lifestyles, and provide high-value investment avenues. Focused significantly on the Phulera Smart City, Jaipur region, and the DMIC/DFC corridors, our integrity-driven approach has made us a preferred partner for home buyers and investors alike.",
+      "expertise": "Expertise",
+      "services": "Services We Offer"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "heading": "Get In Touch",
+      "formName": "Your Name",
+      "formEmail": "Email Address",
+      "formPhone": "Phone Number",
+      "formSubject": "Subject",
+      "formMessage": "Message",
+      "formSubmit": "Send Message",
+      "officeHours": "Office Hours",
+      "monFri": "Mon - Fri: 10:00 AM - 6:00 PM",
+      "sat": "Saturday: 10:00 AM - 4:00 PM"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "heading": "Everything You Need to Know"
+    },
+    "careers": {
+      "title": "Careers at SVI Infra",
+      "heading": "Join Our Team",
+      "subtitle": "Build your career with a trusted real estate developer"
+    },
+    "leadership": {
+      "title": "Leadership Team",
+      "heading": "Meet Our Leaders"
+    },
+    "payment": {
+      "title": "Make a Payment",
+      "heading": "Pay Online"
+    },
+    "grievance": {
+      "title": "Raise a Grievance",
+      "heading": "Share Your Concern"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "heading": "Our Privacy Policy"
+    },
+    "terms": {
+      "title": "Terms & Conditions",
+      "heading": "Terms of Use"
+    },
+    "calculators": {
+      "title": "EMI & ROI Calculators",
+      "heading": "Plan Your Investment"
+    },
+    "blog": {
+      "title": "Blog",
+      "heading": "Our Latest Updates"
+    },
+    "registration": {
+      "title": "Property Registration",
+      "heading": "Register Your Interest"
+    },
+    "thankYou": {
+      "title": "Thank You",
+      "heading": "Registration Received"
+    }
   }
 }
