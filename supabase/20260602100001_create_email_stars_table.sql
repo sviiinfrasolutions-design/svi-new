@@ -16,17 +16,17 @@ CREATE INDEX IF NOT EXISTS idx_email_stars_email_id ON email_stars(email_id);
 -- Enable RLS
 ALTER TABLE email_stars ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can only see their own starred emails
-CREATE POLICY IF NOT EXISTS "Users can view their own starred emails"
+DROP POLICY IF EXISTS "Users can view their own starred emails" ON email_stars;
+CREATE POLICY "Users can view their own starred emails"
   ON email_stars FOR SELECT
   USING (auth.uid() = admin_id);
 
--- Policy: Users can star emails
-CREATE POLICY IF NOT EXISTS "Users can star emails"
+DROP POLICY IF EXISTS "Users can star emails" ON email_stars;
+CREATE POLICY "Users can star emails"
   ON email_stars FOR INSERT
   WITH CHECK (auth.uid() = admin_id);
 
--- Policy: Users can unstar emails
-CREATE POLICY IF NOT EXISTS "Users can unstar emails"
+DROP POLICY IF EXISTS "Users can unstar emails" ON email_stars;
+CREATE POLICY "Users can unstar emails"
   ON email_stars FOR DELETE
   USING (auth.uid() = admin_id);

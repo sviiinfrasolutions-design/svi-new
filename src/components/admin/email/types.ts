@@ -59,7 +59,8 @@ export type Tab =
   | 'domains'
   | 'settings'
   | 'campaigns'
-  | 'trash';
+  | 'trash'
+  | 'scheduled';
 
 export interface DeletedEmail {
   id: string;
@@ -72,6 +73,24 @@ export interface DeletedEmail {
   deleted_at: string;
 }
 
+export interface ScheduledEmail {
+  id: string;
+  to_emails: string[];
+  cc_emails?: string[] | null;
+  bcc_emails?: string[] | null;
+  subject: string;
+  html_body: string;
+  reply_to?: string | null;
+  in_reply_to?: string | null;
+  scheduled_at: string;
+  status: 'pending' | 'sent' | 'cancelled' | 'failed';
+  metadata?: {
+    from: string;
+    has_attachments?: boolean;
+  };
+  created_at: string;
+}
+
 export interface ForwardData {
   subject: string;
   html: string;
@@ -79,6 +98,7 @@ export interface ForwardData {
   originalTo: string[];
   originalDate: string;
   originalSubject: string;
+  attachments?: any[];
 }
 
 export interface ReplyData {
@@ -89,6 +109,8 @@ export interface ReplyData {
   originalDate: string;
   originalSubject: string;
   cc?: string[];
+  originalMessageId?: string;
+  attachments?: any[];
 }
 
 export interface DraftData {

@@ -81,6 +81,7 @@ export function RepliesTab({ adminEmail: propAdminEmail, onForward, onReply }: R
       originalTo: selectedReply.to || (selectedReply as any).to_emails || [],
       originalDate: selectedReply.created_at,
       originalSubject: selectedReply.subject,
+      attachments: selectedReply.attachments || [],
     });
   };
 
@@ -94,6 +95,8 @@ export function RepliesTab({ adminEmail: propAdminEmail, onForward, onReply }: R
       originalDate: selectedReply.created_at,
       originalSubject: selectedReply.subject,
       cc: selectedReply.cc,
+      originalMessageId: selectedReply.id,
+      attachments: selectedReply.attachments || [],
     });
   };
 
@@ -282,9 +285,17 @@ export function RepliesTab({ adminEmail: propAdminEmail, onForward, onReply }: R
                 transition={{ delay: i * 0.03 }}
                 className="border-b border-gray-100 last:border-b-0 dark:border-gray-800"
               >
-                <button
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      fetchDetail(reply.id);
+                    }
+                  }}
                   onClick={() => fetchDetail(reply.id)}
-                  className={`flex w-full items-start gap-3.5 px-5 py-4 text-left transition-all hover:bg-gray-50/80 dark:hover:bg-white/[0.015] ${
+                  className={`group flex w-full items-start gap-3.5 px-5 py-4 text-left transition-all hover:bg-gray-50/80 dark:hover:bg-white/[0.015] ${
                     starred.has(reply.id) ? 'bg-amber-50/50 dark:bg-amber-500/5' : ''
                   }`}
                 >
@@ -334,7 +345,7 @@ export function RepliesTab({ adminEmail: propAdminEmail, onForward, onReply }: R
                       )}
                     </div>
                   </div>
-                </button>
+                </div>
               </motion.div>
             ))}
           </div>

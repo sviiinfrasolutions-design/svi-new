@@ -32,6 +32,7 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
       originalTo: h.selected.to || [],
       originalDate: h.selected.created_at,
       originalSubject: h.selected.subject,
+      attachments: h.selected.attachments || [],
     });
   };
 
@@ -45,6 +46,8 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
       originalDate: h.selected.created_at,
       originalSubject: h.selected.subject,
       cc: h.selected.cc,
+      originalMessageId: h.selected.id,
+      attachments: h.selected.attachments || [],
     });
   };
 

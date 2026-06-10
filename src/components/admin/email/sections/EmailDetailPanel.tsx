@@ -274,15 +274,22 @@ export function EmailDetailPanel({
               {/* Attachments Section */}
               {selected.attachments && selected.attachments.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="mb-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <h3 className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
                     Attachments ({selected.attachments.length})
                   </h3>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {selected.attachments.map((attachment: any, index: number) => {
-                      const isBase64 = attachment.content && typeof attachment.content === 'string' && !attachment.content.includes(' ');
-                      const downloadHref = isBase64 
-                        ? `data:${attachment.content_type || 'application/octet-stream'};base64,${attachment.content}`
-                        : '#';
+                      const isBase64 =
+                        attachment.content &&
+                        typeof attachment.content === 'string' &&
+                        !attachment.content.includes(' ');
+                      const hasUrl = !!attachment.url;
+                      const downloadHref = hasUrl
+                        ? attachment.url
+                        : isBase64
+                          ? `data:${attachment.content_type || 'application/octet-stream'};base64,${attachment.content}`
+                          : '#';
+                      const canDownload = hasUrl || isBase64;
                       return (
                         <div
                           key={index}
@@ -303,10 +310,12 @@ export function EmailDetailPanel({
                               )}
                             </div>
                           </div>
-                          {isBase64 ? (
+                          {canDownload ? (
                             <a
                               href={downloadHref}
                               download={attachment.filename || `attachment-${index + 1}`}
+                              target={hasUrl ? '_blank' : undefined}
+                              rel={hasUrl ? 'noopener noreferrer' : undefined}
                               className="ml-3 rounded-lg p-2 text-gray-400 hover:bg-gray-50 hover:text-gray-600 dark:hover:bg-white/5 dark:hover:text-gray-300"
                               title="Download"
                             >

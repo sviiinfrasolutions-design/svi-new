@@ -63,20 +63,47 @@ async function syncInboundEmails(resend: Resend) {
         });
 
         const rawAttachments = (emailData as any).attachments;
-        const normalizedAttachments =
-          rawAttachments && Array.isArray(rawAttachments) && rawAttachments.length > 0
-            ? rawAttachments.map((att: any) => ({
-                filename: att.filename || att.name || null,
-                content_type: att.content_type || att.type || null,
-                size: att.size || null,
-                content:
-                  att.content &&
-                  typeof att.content === 'string' &&
-                  att.content.length < 5_000_000
-                    ? att.content
-                    : null,
-              }))
-            : null;
+        const normalizedAttachments: any[] = [];
+        if (rawAttachments && Array.isArray(rawAttachments) && rawAttachments.length > 0) {
+          for (const att of rawAttachments) {
+            const filename = att.filename || att.name || 'unnamed_attachment';
+            const content_type = att.content_type || att.type || 'application/octet-stream';
+            const size = att.size || null;
+            const content =
+              att.content && typeof att.content === 'string' && att.content.length < 5_000_000
+                ? att.content
+                : null;
+
+            let url = null;
+            if (content) {
+              const buffer = Buffer.from(content, 'base64');
+              const filePath = `${emailId}/${filename}`;
+              const { error: uploadError } = await supabaseAdmin.storage
+                .from('email-attachments')
+                .upload(filePath, buffer, { contentType: content_type, upsert: true });
+
+              if (!uploadError) {
+                const { data: publicUrlData } = supabaseAdmin.storage
+                  .from('email-attachments')
+                  .getPublicUrl(filePath);
+                url = publicUrlData.publicUrl;
+              } else {
+                console.error(
+                  `[SYNC] Failed to upload attachment ${filename} for email ${emailId}:`,
+                  uploadError
+                );
+              }
+            }
+
+            normalizedAttachments.push({
+              filename,
+              content_type,
+              size,
+              content,
+              url,
+            });
+          }
+        }
 
         const insertData = {
           email_id: emailId,
@@ -103,7 +130,9 @@ async function syncInboundEmails(resend: Resend) {
             const fallbackData: any = { ...insertData };
             delete fallbackData.from_name;
             delete fallbackData.attachments;
-            const { error: insertError2 } = await supabaseAdmin.from('email_inbox').insert(fallbackData);
+            const { error: insertError2 } = await supabaseAdmin
+              .from('email_inbox')
+              .insert(fallbackData);
             if (insertError2 && !insertError2.message?.includes('duplicate key')) {
               console.error(
                 `[SYNC] Failed to insert email ${emailId} without from_name:`,
@@ -112,6 +141,22 @@ async function syncInboundEmails(resend: Resend) {
             }
           } else {
             console.error(`[SYNC] Failed to insert email ${emailId}:`, insertError);
+          }
+        }
+
+        if (normalizedAttachments && normalizedAttachments.length > 0) {
+          const attachmentRecords = normalizedAttachments.map((att: any) => ({
+            email_id: emailId,
+            filename: att.filename,
+            content_type: att.content_type,
+            size: att.size,
+            url: att.url,
+          }));
+          const { error: attError } = await supabaseAdmin
+            .from('email_attachments')
+            .insert(attachmentRecords);
+          if (attError && !attError.message?.includes('duplicate key')) {
+            console.error(`[SYNC] Failed to insert attachments for email ${emailId}:`, attError);
           }
         }
       } catch (err) {
@@ -178,6 +223,19 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    if (action === 'scheduled') {
+      const { data, error } = await supabaseAdmin
+        .from('scheduled_emails')
+        .select('*')
+        .order('scheduled_at', { ascending: true });
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+
+      return NextResponse.json({ success: true, emails: data });
+    }
+
     if (action === 'email' && emailId) {
       const email = await resend.emails.get(emailId);
       return NextResponse.json({ email: email.data });
@@ -240,6 +298,12 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Email not found' }, { status: 404 });
       }
 
+      // Fetch attachments from the new table
+      const { data: attachmentsData } = await supabaseAdmin
+        .from('email_attachments')
+        .select('*')
+        .eq('email_id', data.email_id);
+
       return NextResponse.json({
         email: {
           id: data.id,
@@ -255,7 +319,10 @@ export async function GET(request: NextRequest) {
           text: data.text_content,
           opened: data.opened,
           clicked: data.clicked,
-          attachments: data.attachments || undefined,
+          attachments:
+            attachmentsData && attachmentsData.length > 0
+              ? attachmentsData
+              : data.attachments || undefined,
         },
       });
     }
@@ -304,7 +371,19 @@ export async function POST(request: NextRequest) {
     const { action } = body;
 
     if (action === 'send') {
-      const { to, subject, html, from, replyTo, cc, bcc, text, attachments, inReplyTo } = body;
+      const {
+        to,
+        subject,
+        html,
+        from,
+        replyTo,
+        cc,
+        bcc,
+        text,
+        attachments,
+        inReplyTo,
+        scheduledAt,
+      } = body;
 
       if (!to || !subject || (!html && !text)) {
         return NextResponse.json(
@@ -315,7 +394,96 @@ export async function POST(request: NextRequest) {
 
       const fromAddress = from || 'SVI Infra <noreply@sviiinfrasolutions.com>';
 
-      // Build attachments array for Resend API
+      // If scheduledAt is provided, queue it in the database instead of sending immediately
+      if (scheduledAt) {
+        // Insert into scheduled_emails
+        const { data: scheduledRecord, error: scheduleError } = await supabaseAdmin
+          .from('scheduled_emails')
+          .insert({
+            to_emails: Array.isArray(to) ? to : [to],
+            cc_emails: cc ? (Array.isArray(cc) ? cc : [cc]) : null,
+            bcc_emails: bcc ? (Array.isArray(bcc) ? bcc : [bcc]) : null,
+            subject,
+            html_body: html || text || '', // Fallback to text
+            reply_to: replyTo || null,
+            in_reply_to: inReplyTo || null,
+            scheduled_at: scheduledAt,
+            status: 'pending',
+            metadata: {
+              from: fromAddress,
+              has_attachments: Array.isArray(attachments) && attachments.length > 0,
+            },
+          })
+          .select('id')
+          .single();
+
+        if (scheduleError || !scheduledRecord) {
+          console.error('Error scheduling email:', scheduleError);
+          return NextResponse.json({ error: 'Failed to schedule email' }, { status: 500 });
+        }
+
+        const emailId = scheduledRecord.id;
+
+        // Handle attachments for scheduled emails
+        if (Array.isArray(attachments) && attachments.length > 0) {
+          for (const att of attachments) {
+            const buffer = Buffer.from(att.content, 'base64');
+            const filePath = `${emailId}/${att.filename}`;
+            let url = null;
+
+            const { error: uploadError } = await supabaseAdmin.storage
+              .from('email-attachments')
+              .upload(filePath, buffer, {
+                contentType: att.type || 'application/octet-stream',
+                upsert: true,
+              });
+
+            if (!uploadError) {
+              const { data: publicUrlData } = supabaseAdmin.storage
+                .from('email-attachments')
+                .getPublicUrl(filePath);
+              url = publicUrlData.publicUrl;
+            } else {
+              console.error(
+                `Failed to upload scheduled attachment ${att.filename} for email ${emailId}:`,
+                uploadError
+              );
+            }
+
+            const { error: attInsertError } = await supabaseAdmin.from('email_attachments').insert({
+              email_id: emailId,
+              filename: att.filename,
+              content_type: att.type || 'application/octet-stream',
+              size: att.size || buffer.length,
+              url: url,
+            });
+
+            if (attInsertError) {
+              console.error(
+                `Failed to insert scheduled attachment record for ${att.filename}:`,
+                attInsertError
+              );
+            }
+          }
+        }
+
+        // Optional notification logging
+        try {
+          const { data: profileData } = await supabaseAdmin
+            .from('profiles')
+            .select('full_name')
+            .eq('id', admin.id)
+            .single();
+          const adminName = profileData?.full_name || admin.email || 'Admin';
+          console.log(`[Admin Email] Email scheduled by ${adminName} for ${scheduledAt}`);
+        } catch (notifErr) {
+          // ignore
+        }
+
+        return NextResponse.json({ success: true, id: emailId, scheduled: true });
+      }
+
+      // Build attachments array for Resend API (Immediate Send)
       const resendAttachments =
         Array.isArray(attachments) && attachments.length > 0
           ? attachments.map((att: { filename: string; content: string }) => ({
@@ -358,6 +526,49 @@ export async function POST(request: NextRequest) {
         console.error('Failed to create email sent notification:', notifErr);
       }
 
+      if (result.data?.id && Array.isArray(attachments) && attachments.length > 0) {
+        const emailId = result.data.id;
+        for (const att of attachments) {
+          const buffer = Buffer.from(att.content, 'base64');
+          const filePath = `${emailId}/${att.filename}`;
+          let url = null;
+
+          const { error: uploadError } = await supabaseAdmin.storage
+            .from('email-attachments')
+            .upload(filePath, buffer, {
+              contentType: att.type || 'application/octet-stream',
+              upsert: true,
+            });
+
+          if (!uploadError) {
+            const { data: publicUrlData } = supabaseAdmin.storage
+              .from('email-attachments')
+              .getPublicUrl(filePath);
+            url = publicUrlData.publicUrl;
+          } else {
+            console.error(
+              `Failed to upload outbound attachment ${att.filename} for email ${emailId}:`,
+              uploadError
+            );
+          }
+
+          const { error: attInsertError } = await supabaseAdmin.from('email_attachments').insert({
+            email_id: emailId,
+            filename: att.filename,
+            content_type: att.type || 'application/octet-stream',
+            size: att.size || buffer.length,
+            url: url,
+          });
+
+          if (attInsertError) {
+            console.error(
+              `Failed to insert outbound attachment record for ${att.filename}:`,
+              attInsertError
+            );
+          }
+        }
+      }
+
       return NextResponse.json({ success: true, id: result.data?.id });
     }
 
@@ -366,6 +577,21 @@ export async function POST(request: NextRequest) {
       if (!id) return NextResponse.json({ error: 'Missing email id' }, { status: 400 });
       const result = await resend.emails.cancel(id);
       return NextResponse.json({ success: true, data: result.data });
+    }
+
+    if (action === 'cancel_scheduled') {
+      const { id } = body;
+      if (!id) return NextResponse.json({ error: 'Missing scheduled email id' }, { status: 400 });
+
+      const { error } = await supabaseAdmin
+        .from('scheduled_emails')
+        .update({ status: 'cancelled' })
+        .eq('id', id);
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+      return NextResponse.json({ success: true });
     }
 
     if (action === 'star') {

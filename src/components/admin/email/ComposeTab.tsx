@@ -63,6 +63,7 @@ export function ComposeTab({
   const [draftSaved, setDraftSaved] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
   const [inReplyToMessageId, setInReplyToMessageId] = useState<string | null>(null);
+  const [scheduledAt, setScheduledAt] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load saved draft on mount
@@ -82,6 +83,7 @@ export function ComposeTab({
       setTemplateHtml(null);
       setSelectedTemplate(null);
       setInReplyToMessageId(null);
+      setAttachments(forwardData.attachments || []);
       setEditorKey((prev) => prev + 1);
       onClearPrefill?.();
     }
@@ -97,6 +99,7 @@ export function ComposeTab({
       setTemplateHtml(null);
       setSelectedTemplate(null);
       setInReplyToMessageId(replyData.originalMessageId || null);
+      setAttachments(replyData.attachments || []);
       setEditorKey((prev) => prev + 1);
       onClearPrefill?.();
     }
@@ -543,6 +546,7 @@ export function ComposeTab({
             attachments.length > 0
               ? attachments.map((a) => ({ filename: a.name, content: a.base64 }))
               : undefined,
+          scheduledAt: scheduledAt || undefined,
         }),
       });
       const data = await res.json();
@@ -564,6 +568,7 @@ export function ComposeTab({
           setInReplyToMessageId(null);
           setSelectedTemplate(null);
           setAttachments([]);
+          setScheduledAt(null);
         }, 3000);
       }
     } catch {
@@ -586,6 +591,7 @@ export function ComposeTab({
     setError(null);
     setAttachments([]);
     setInReplyToMessageId(null);
+    setScheduledAt(null);
     clearDraft();
   };
 
@@ -685,12 +691,14 @@ export function ComposeTab({
           adminEmail={adminEmail}
           forwardData={forwardData}
           replyData={replyData}
+          scheduledAt={scheduledAt}
           onToChange={setTo}
           onCcChange={setCc}
           onBccChange={setBcc}
           onSubjectChange={setSubject}
           onFromNameChange={setFromName}
           onReplyToChange={setReplyTo}
+          onScheduledAtChange={setScheduledAt}
         />
 
         {/* Attachments */}
