@@ -11,6 +11,7 @@ import ShareButtons from './ShareButtons';
 import RelatedPosts from './RelatedPosts';
 import ReadingProgress from './ReadingProgress';
 import TableOfContents, { BackToTop } from './TableOfContents';
+import FloatingShare from './FloatingShare';
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
@@ -252,6 +253,9 @@ export default async function BlogPost({ params }: Props) {
 
       {/* Back to top */}
       <BackToTop />
+
+      {/* Floating share */}
+      <FloatingShare title={title} />
 
       {/* Related Posts */}
       {relatedPosts.length > 0 && <RelatedPosts posts={relatedPosts} locale={locale} />}
