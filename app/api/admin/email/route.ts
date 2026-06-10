@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
       const { data, error } = await supabaseAdmin
         .from('email_inbox')
         .select(
-          'id, email_id, thread_id, subject, from_email, from_name, to_emails, received_at, html_content, text_content, opened, clicked'
+          'id, email_id, thread_id, subject, from_email, to_emails, received_at, html_content, text_content, opened, clicked'
         )
         .order('received_at', { ascending: false })
         .limit(50);
@@ -82,9 +82,8 @@ export async function GET(request: NextRequest) {
           email_id: email.email_id,
           thread_id: email.thread_id || email.email_id,
           subject: email.subject,
-          from: email.from_name ? `${email.from_name} <${email.from_email}>` : email.from_email,
+          from: email.from_email,
           from_email: email.from_email,
-          from_name: email.from_name,
           to: email.to_emails || [],
           created_at: email.received_at,
           snippet:
@@ -117,9 +116,8 @@ export async function GET(request: NextRequest) {
           email_id: data.email_id,
           thread_id: data.thread_id,
           subject: data.subject,
-          from: data.from_name ? `${data.from_name} <${data.from_email}>` : data.from_email,
+          from: data.from_email,
           from_email: data.from_email,
-          from_name: data.from_name,
           to: data.to_emails || [],
           created_at: data.received_at,
           html: data.html_content,

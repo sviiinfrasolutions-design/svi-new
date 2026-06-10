@@ -105,27 +105,20 @@ export async function POST(request: NextRequest) {
       toEmails.push(m ? m[1] : addr);
     });
 
-    // Store in database
-    const { error } = await supabaseAdmin.from('email_inbox').insert({
+    // Store in database — only use columns that exist in email_inbox table
+    const insertData: Record<string, any> = {
       email_id: emailId,
       thread_id: data.thread_id || emailId,
       subject: data.subject || '(No Subject)',
       from_email: fromEmail,
-      from_name: fromName,
       to_emails: toEmails,
-      cc_emails: Array.isArray(data.cc) ? data.cc : [],
       html_content: data.html || null,
       text_content: data.text || null,
       received_at: data.created_at || new Date().toISOString(),
       status: 'received',
-      attachments: data.attachments
-        ? data.attachments.map((a: any) => ({
-            filename: a.filename,
-            content_type: a.content_type,
-            size: a.size,
-          }))
-        : null,
-    });
+    };
+
+    const { error } = await supabaseAdmin.from('email_inbox').insert(insertData);
 
     if (error) {
       if (error.message?.includes('duplicate key')) {
