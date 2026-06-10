@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
 import { NotificationHelper } from '@/src/lib/supabase/notifications';
 import { rateLimit } from '@/src/lib/api/rateLimit';
+import { AppError, handleApiError } from '@/src/lib/api/errors';
 
 const STORAGE_BUCKET = 'registration-docs';
 
@@ -16,8 +17,7 @@ function escapeHtml(str: string): string {
 
 function isValidEmail(emailStr: string): boolean {
   if (!emailStr) return false;
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(emailStr);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailStr);
 }
 
 async function sendEmailWithRetry(
@@ -31,20 +31,13 @@ async function sendEmailWithRetry(
     try {
       attempt++;
       const result = await resend.emails.send(payload);
-      if (result.error) {
-        throw new Error(result.error.message || 'Resend API returned an error');
-      }
-      console.log(
-        `[Email Audit] Email sent successfully on attempt ${attempt} (ID: ${result.data?.id})`
-      );
+      if (result.error) throw new Error(result.error.message || 'Resend API error');
+      console.log(`[Email] Sent on attempt ${attempt} (ID: ${result.data?.id})`);
       return result;
     } catch (err: any) {
-      console.error(`[Email Audit Error] Attempt ${attempt} failed: ${err.message || err}`);
-      if (attempt >= maxRetries) {
-        throw err;
-      }
+      console.error(`[Email] Attempt ${attempt} failed: ${err.message}`);
+      if (attempt >= maxRetries) throw err;
       const delay = initialDelay * Math.pow(2, attempt - 1);
-      console.log(`[Email Audit] Retrying in ${delay}ms...`);
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
@@ -56,478 +49,358 @@ async function uploadFile(
 ): Promise<{ path: string; url: string } | null> {
   const ext = file.name.split('.').pop() || 'jpg';
   const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-
   const { error } = await supabaseAdmin.storage.from(STORAGE_BUCKET).upload(fileName, file, {
     contentType: file.type,
     upsert: false,
   });
-
   if (error) {
     console.error('File upload error:', error.message);
     return null;
   }
-
   const { data } = await supabaseAdmin.storage
     .from(STORAGE_BUCKET)
-    .createSignedUrl(fileName, 60 * 60 * 24 * 7); // 7 days
-
+    .createSignedUrl(fileName, 60 * 60 * 24 * 7);
   return { path: fileName, url: data?.signedUrl ?? '' };
 }
 
-export async function POST(request: NextRequest) {
-  // Rate limit: 3 registrations per IP per minute
-  const limited = rateLimit(request, { limit: 3, windowSeconds: 60 });
-  if (limited) return limited;
-
-  let formData: FormData;
+export async function POST(_request: NextRequest) {
   try {
-    formData = await request.formData();
-  } catch {
-    return NextResponse.json({ error: 'Invalid form data' }, { status: 400 });
-  }
+    // Rate limit: 3 registrations per IP per minute
+    const limited = rateLimit(request, { limit: 3, windowSeconds: 60 });
+    if (limited) return limited;
 
-  const firstName = formData.get('firstName') as string;
-  const lastName = formData.get('lastName') as string;
-  const mobileNo = formData.get('mobileNo') as string;
-  const email = formData.get('email') as string;
-  const soWoDo = formData.get('soWoDo') as string;
-  const dob = formData.get('dob') as string;
-  const aadharNumber = formData.get('aadharNumber') as string;
-  const panNumber = formData.get('panNumber') as string;
-  const state = formData.get('state') as string;
-  const city = formData.get('city') as string;
-  const address = formData.get('address') as string;
-  const advisorName = formData.get('advisorName') as string;
-  const project = formData.get('project') as string;
-  const propertySize = formData.get('propertySize') as string;
-  const propertyType = formData.get('propertyType') as string;
-  const plotPreference = formData.get('plotPreference') as string;
-  const paymentPlan = formData.get('paymentPlan') as string;
-  const paymentMode = formData.get('paymentMode') as string;
-  const schemeAmount = formData.get('schemeAmount') as string;
-
-  // Validate required fields
-  if (
-    !firstName ||
-    !mobileNo ||
-    !email ||
-    !soWoDo ||
-    !dob ||
-    !aadharNumber ||
-    !state ||
-    !city ||
-    !address ||
-    !advisorName ||
-    !project ||
-    !propertySize ||
-    !propertyType ||
-    !plotPreference ||
-    !paymentPlan ||
-    !paymentMode ||
-    !schemeAmount
-  ) {
-    return NextResponse.json({ error: 'All required fields must be filled' }, { status: 400 });
-  }
-
-  // Handle file uploads with strict server-side validation (max 150KB, safe formats)
-  const photoFile = formData.get('photo') as File | null;
-  const panCardFile = formData.get('panCard') as File | null;
-
-  const MAX_FILE_SIZE = 150 * 1024; // 150KB
-  const ALLOWED_MIME_TYPES = [
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/webp',
-    'application/pdf',
-  ];
-
-  if (photoFile && photoFile.size > 0) {
-    if (photoFile.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'Photo file size must be under 150KB' }, { status: 400 });
-    }
-    if (!ALLOWED_MIME_TYPES.includes(photoFile.type)) {
-      return NextResponse.json(
-        { error: 'Only JPG, PNG, WEBP, or PDF files are allowed for photos' },
-        { status: 400 }
-      );
-    }
-  }
-
-  if (panCardFile && panCardFile.size > 0) {
-    if (panCardFile.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: 'PAN Card file size must be under 150KB' },
-        { status: 400 }
-      );
-    }
-    if (!ALLOWED_MIME_TYPES.includes(panCardFile.type)) {
-      return NextResponse.json(
-        { error: 'Only JPG, PNG, WEBP, or PDF files are allowed for PAN Card' },
-        { status: 400 }
-      );
-    }
-  }
-
-  let photoUrl: string | null = null;
-  let panCardFileUrl: string | null = null;
-
-  if (photoFile && photoFile.size > 0) {
-    const result = await uploadFile(photoFile, 'photos');
-    photoUrl = result?.url ?? null;
-  }
-  if (panCardFile && panCardFile.size > 0) {
-    const result = await uploadFile(panCardFile, 'pan-cards');
-    panCardFileUrl = result?.url ?? null;
-  }
-
-  // Insert into database with automatic, collision-safe submission ID generation
-  let data: any = null;
-  let success = false;
-  let attempts = 0;
-  const maxAttempts = 3;
-
-  while (attempts < maxAttempts && !success) {
-    attempts++;
-
-    // 1. Retrieve the highest currently assigned submission ID to avoid duplication
-    const { data: existing, error: fetchError } = await supabaseAdmin
-      .from('registrations')
-      .select('submission_id')
-      .not('submission_id', 'is', null)
-      .order('submission_id', { ascending: false })
-      .limit(1);
-
-    if (fetchError) {
-      console.error(
-        `[Attempt ${attempts}] Database fetch error during ID generation:`,
-        fetchError.message
-      );
-      return NextResponse.json(
-        { error: 'Database connection failure during ID generation' },
-        { status: 500 }
-      );
+    let formData: FormData;
+    try {
+      formData = await request.formData();
+    } catch {
+      throw AppError.badRequest('Invalid form data');
     }
 
-    let nextId = 'SVI2200';
-    if (existing && existing.length > 0 && existing[0].submission_id) {
-      const highestId = existing[0].submission_id;
-      const match = highestId.match(/^SVI(\d+)$/);
-      if (match) {
-        const numericPart = parseInt(match[1], 10);
-        const nextNumeric = numericPart + 1;
-        const paddingLength = Math.max(4, match[1].length);
-        nextId = `SVI${String(nextNumeric).padStart(paddingLength, '0')}`;
-      } else {
-        console.warn(
-          `Highest submission ID has unexpected format: ${highestId}. Sequence continues from next index.`
-        );
-      }
+    const firstName = formData.get('firstName') as string;
+    const lastName = formData.get('lastName') as string;
+    const mobileNo = formData.get('mobileNo') as string;
+    const email = formData.get('email') as string;
+    const soWoDo = formData.get('soWoDo') as string;
+    const dob = formData.get('dob') as string;
+    const aadharNumber = formData.get('aadharNumber') as string;
+    const panNumber = formData.get('panNumber') as string;
+    const state = formData.get('state') as string;
+    const city = formData.get('city') as string;
+    const address = formData.get('address') as string;
+    const advisorName = formData.get('advisorName') as string;
+    const project = formData.get('project') as string;
+    const propertySize = formData.get('propertySize') as string;
+    const propertyType = formData.get('propertyType') as string;
+    const plotPreference = formData.get('plotPreference') as string;
+    const paymentPlan = formData.get('paymentPlan') as string;
+    const paymentMode = formData.get('paymentMode') as string;
+    const schemeAmount = formData.get('schemeAmount') as string;
+
+    if (
+      !firstName ||
+      !mobileNo ||
+      !email ||
+      !soWoDo ||
+      !dob ||
+      !aadharNumber ||
+      !state ||
+      !city ||
+      !address ||
+      !advisorName ||
+      !project ||
+      !propertySize ||
+      !propertyType ||
+      !plotPreference ||
+      !paymentPlan ||
+      !paymentMode ||
+      !schemeAmount
+    ) {
+      throw AppError.badRequest('All required fields must be filled');
     }
 
-    // 2. Attach the generated submission_id and insert the user registration record
-    const { data: insertedData, error: insertError } = await supabaseAdmin
-      .from('registrations')
-      .insert({
-        name: firstName,
-        last_name: lastName || null,
-        email,
-        phone: mobileNo,
-        so_wo_do: soWoDo,
-        preferred_date: dob || null,
-        aadhar_number: aadharNumber,
-        pan_number: panNumber || null,
-        photo_url: photoUrl,
-        pan_card_file_url: panCardFileUrl,
-        state,
-        city,
-        address,
-        advisor_name: advisorName,
-        project,
-        property_size: propertySize,
-        property_type: propertyType,
-        plot_preference: plotPreference,
-        payment_plan: paymentPlan,
-        payment_mode: paymentMode,
-        scheme_amount: schemeAmount,
-        property_interest: project, // backward compat
-        submission_id: nextId,
-      })
-      .select()
-      .single();
+    const photoFile = formData.get('photo') as File | null;
+    const panCardFile = formData.get('panCard') as File | null;
+    const MAX_FILE_SIZE = 150 * 1024;
+    const ALLOWED_MIME_TYPES = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'application/pdf',
+    ];
 
-    if (insertError) {
-      // Check for unique key violation (PostgreSQL code 23505) and retry
-      if (insertError.code === '23505') {
-        console.warn(
-          `[Registration Concurrency] Submission ID collision detected on ID ${nextId}. Retrying... (Attempt ${attempts}/${maxAttempts})`
-        );
-        continue;
-      }
-
-      console.error('Registration insertion error:', insertError.message);
-      return NextResponse.json({ error: 'Failed to submit registration' }, { status: 500 });
+    if (photoFile && photoFile.size > 0) {
+      if (photoFile.size > MAX_FILE_SIZE)
+        throw AppError.badRequest('Photo file size must be under 150KB');
+      if (!ALLOWED_MIME_TYPES.includes(photoFile.type))
+        throw AppError.badRequest('Only JPG, PNG, WEBP, or PDF allowed for photos');
+    }
+    if (panCardFile && panCardFile.size > 0) {
+      if (panCardFile.size > MAX_FILE_SIZE)
+        throw AppError.badRequest('PAN Card file size must be under 150KB');
+      if (!ALLOWED_MIME_TYPES.includes(panCardFile.type))
+        throw AppError.badRequest('Only JPG, PNG, WEBP, or PDF allowed for PAN Card');
     }
 
-    data = insertedData;
-    success = true;
-  }
+    let photoUrl: string | null = null;
+    let panCardFileUrl: string | null = null;
+    if (photoFile && photoFile.size > 0) {
+      const result = await uploadFile(photoFile, 'photos');
+      if (!result) throw AppError.internal('Failed to upload photo');
+      photoUrl = result.url;
+    }
+    if (panCardFile && panCardFile.size > 0) {
+      const result = await uploadFile(panCardFile, 'pan-cards');
+      if (!result) throw AppError.internal('Failed to upload PAN card');
+      panCardFileUrl = result.url;
+    }
 
-  if (!success) {
-    console.error(`Failed to assign a unique submission ID after ${maxAttempts} attempts.`);
-    return NextResponse.json(
-      { error: 'Concurrent registration conflict. Please try again.' },
-      { status: 500 }
-    );
-  }
+    let data: any = null;
+    let success = false;
+    let attempts = 0;
+    const maxAttempts = 3;
 
-  // Log successfully generated submission ID along with timestamp for auditing
-  console.log(
-    `[Registration Audit] Generated submission ID: ${data.submission_id} for user: ${data.name} ${data.last_name || ''} at timestamp: ${data.created_at || new Date().toISOString()}`
-  );
+    while (attempts < maxAttempts && !success) {
+      attempts++;
+      const { data: existing, error: fetchError } = await supabaseAdmin
+        .from('registrations')
+        .select('submission_id')
+        .not('submission_id', 'is', null)
+        .order('submission_id', { ascending: false })
+        .limit(1);
 
-  // Send email notification (non-blocking)
-  const emailStatus = { sent: false, error: null as string | null };
-  let primaryRecipient = email;
-  try {
-    const resendApiKey = process.env.RESEND_API_KEY;
-    if (resendApiKey) {
-      const { Resend } = await import('resend');
-      const resend = new Resend(resendApiKey);
+      if (fetchError) throw AppError.internal('Database error during ID generation');
 
-      // Fetch dynamic email settings from database
-      let adminEmail = process.env.ADMIN_EMAIL || 'admin@sviinfra.com';
-      let sendUserCopy = true;
-      let bccAdvisor = true;
-      let notifyOnRegistration = true;
-      let senderName = 'SVI Infra';
-      let senderEmail = 'noreply@sviiinfrasolutions.com';
-      let retryAttempts = 3;
-
-      try {
-        const { data: emailSetting } = await supabaseAdmin
-          .from('portal_settings')
-          .select('value')
-          .eq('key', 'email_settings')
-          .single();
-
-        if (emailSetting?.value && typeof emailSetting.value === 'object') {
-          const val = emailSetting.value as any;
-          if (val.admin_email) adminEmail = val.admin_email;
-          if (val.send_user_copy !== undefined) sendUserCopy = !!val.send_user_copy;
-          if (val.bcc_advisor !== undefined) bccAdvisor = !!val.bcc_advisor;
-          if (val.notify_on_registration !== undefined)
-            notifyOnRegistration = !!val.notify_on_registration;
-          if (val.sender_name) senderName = val.sender_name;
-          if (val.sender_email) senderEmail = val.sender_email;
-          if (typeof val.retry_attempts === 'number') retryAttempts = val.retry_attempts;
-        }
-      } catch (settingsErr) {
-        console.warn('Failed to load email settings from DB, using fallback:', settingsErr);
-      }
-
-      // Exit early if registration alerts are globally disabled
-      if (!notifyOnRegistration) {
-        console.log(
-          '[Email Audit] Property registration alerts are disabled in settings. Skipping email dispatch.'
-        );
-        emailStatus.sent = false;
-        emailStatus.error = 'Disabled in settings';
-        return NextResponse.json({
-          success: true,
-          id: data.id,
-          submissionId: data.submission_id,
-          emailStatus,
-        });
-      }
-
-      // Fetch dynamic advisor profile to retrieve advisor email/real_email
-      let advisorEmail: string | null = null;
-      if (advisorName) {
-        try {
-          const { data: advProfile } = await supabaseAdmin
-            .from('profiles')
-            .select('email, real_email')
-            .eq('full_name', advisorName)
-            .limit(1);
-
-          if (advProfile && advProfile.length > 0) {
-            advisorEmail = advProfile[0].real_email || advProfile[0].email || null;
-            console.log(`[Email Audit] Advisor profile found: ${advisorName} -> ${advisorEmail}`);
-          } else {
-            console.warn(`[Email Audit] No advisor profile found with name: ${advisorName}`);
-          }
-        } catch (advisorErr) {
-          console.error('[Email Audit] Failed to lookup advisor profile:', advisorErr);
+      let nextId = 'SVI2200';
+      if (existing && existing.length > 0 && existing[0].submission_id) {
+        const match = existing[0].submission_id.match(/^SVI(\d+)$/);
+        if (match) {
+          const nextNumeric = parseInt(match[1], 10) + 1;
+          nextId = `SVI${String(nextNumeric).padStart(Math.max(4, match[1].length), '0')}`;
         }
       }
 
-      // Multi-recipient distribution list construction
-      const bccList: string[] = [];
+      const { data: insertedData, error: insertError } = await supabaseAdmin
+        .from('registrations')
+        .insert({
+          name: firstName,
+          last_name: lastName || null,
+          email,
+          phone: mobileNo,
+          so_wo_do: soWoDo,
+          preferred_date: dob || null,
+          aadhar_number: aadharNumber,
+          pan_number: panNumber || null,
+          photo_url: photoUrl,
+          pan_card_file_url: panCardFileUrl,
+          state,
+          city,
+          address,
+          advisor_name: advisorName,
+          project,
+          property_size: propertySize,
+          property_type: propertyType,
+          plot_preference: plotPreference,
+          payment_plan: paymentPlan,
+          payment_mode: paymentMode,
+          scheme_amount: schemeAmount,
+          property_interest: project,
+          submission_id: nextId,
+        })
+        .select()
+        .single();
 
-      // Determine Primary Recipient and BCC lists based on user settings
-      let isFallbackRoute = false;
-
-      if (sendUserCopy) {
-        primaryRecipient = email;
-        if (!isValidEmail(email)) {
+      if (insertError) {
+        if (insertError.code === '23505') {
           console.warn(
-            `[Email Audit] Applicant email is missing or invalid: ${email}. Routing primary delivery to Admin instead.`
+            `[Registration] Collision on ID ${nextId}, retry ${attempts}/${maxAttempts}`
           );
-          primaryRecipient = adminEmail;
-          isFallbackRoute = true;
-        } else {
-          // If sending to applicant, add admin to BCC
-          if (isValidEmail(adminEmail)) {
+          continue;
+        }
+        throw AppError.internal('Failed to submit registration');
+      }
+      data = insertedData;
+      success = true;
+    }
+
+    if (!success) throw AppError.internal('Concurrent registration conflict. Please try again.');
+
+    console.log(
+      `[Registration] Submission ID: ${data.submission_id} for ${firstName} at ${data.created_at || new Date().toISOString()}`
+    );
+
+    // Send email notification (non-blocking)
+    const emailStatus = { sent: false, error: null as string | null };
+    let primaryRecipient = email;
+    try {
+      const resendApiKey = process.env.RESEND_API_KEY;
+      if (resendApiKey) {
+        const { Resend } = await import('resend');
+        const resend = new Resend(resendApiKey);
+
+        let adminEmail = process.env.ADMIN_EMAIL || 'admin@sviinfra.com';
+        let sendUserCopy = true;
+        let bccAdvisor = true;
+        let notifyOnRegistration = true;
+        let senderName = 'SVI Infra';
+        let senderEmail = 'noreply@sviiinfrasolutions.com';
+        let retryAttempts = 3;
+
+        try {
+          const { data: emailSetting } = await supabaseAdmin
+            .from('portal_settings')
+            .select('value')
+            .eq('key', 'email_settings')
+            .single();
+          if (emailSetting?.value && typeof emailSetting.value === 'object') {
+            const val = emailSetting.value as any;
+            if (val.admin_email) adminEmail = val.admin_email;
+            if (val.send_user_copy !== undefined) sendUserCopy = !!val.send_user_copy;
+            if (val.bcc_advisor !== undefined) bccAdvisor = !!val.bcc_advisor;
+            if (val.notify_on_registration !== undefined)
+              notifyOnRegistration = !!val.notify_on_registration;
+            if (val.sender_name) senderName = val.sender_name;
+            if (val.sender_email) senderEmail = val.sender_email;
+            if (typeof val.retry_attempts === 'number') retryAttempts = val.retry_attempts;
+          }
+        } catch (settingsErr) {
+          console.warn('[Registration] Failed to load email settings:', settingsErr);
+        }
+
+        if (!notifyOnRegistration) {
+          console.log('[Registration] Email alerts disabled in settings.');
+          emailStatus.sent = false;
+          emailStatus.error = 'Disabled in settings';
+          return NextResponse.json({
+            success: true,
+            id: data.id,
+            submissionId: data.submission_id,
+            emailStatus,
+          });
+        }
+
+        let advisorEmail: string | null = null;
+        if (advisorName) {
+          try {
+            const { data: advProfile } = await supabaseAdmin
+              .from('profiles')
+              .select('email, real_email')
+              .eq('full_name', advisorName)
+              .limit(1);
+            if (advProfile && advProfile.length > 0) {
+              advisorEmail = advProfile[0].real_email || advProfile[0].email;
+            }
+          } catch (advisorErr) {
+            console.error('[Registration] Failed to lookup advisor:', advisorErr);
+          }
+        }
+
+        const bccList: string[] = [];
+        let isFallbackRoute = false;
+
+        if (sendUserCopy) {
+          primaryRecipient = email;
+          if (!isValidEmail(email)) {
+            primaryRecipient = adminEmail;
+            isFallbackRoute = true;
+          } else if (isValidEmail(adminEmail)) {
             bccList.push(adminEmail);
           }
+        } else {
+          primaryRecipient = adminEmail;
+          isFallbackRoute = true;
         }
-      } else {
-        // Not sending copy to applicant: primary recipient is directly admin
-        primaryRecipient = adminEmail;
-        isFallbackRoute = true;
-      }
 
-      // Add advisor to BCC (only if bcc_advisor toggle is enabled)
-      if (bccAdvisor && advisorEmail && isValidEmail(advisorEmail)) {
-        bccList.push(advisorEmail);
-      }
+        if (bccAdvisor && advisorEmail && isValidEmail(advisorEmail)) {
+          bccList.push(advisorEmail);
+        }
 
-      // Generate customized HTML content containing all registration details
-      const emailHtmlContent = `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px; background-color: #ffffff;">
-          <div style="text-align: right; margin-bottom: 15px;">
-            <span style="background-color: #c9a84c; color: #ffffff; font-size: 9px; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; font-family: sans-serif;">
-              ✨ System Automated Notification
-            </span>
-          </div>
-          <h2 style="color: #c9a84c; font-family: serif; border-bottom: 2px solid #f0d080; padding-bottom: 10px; margin-bottom: 20px;">
-            ${isFallbackRoute ? 'Administrative Record: Property Registration' : 'Registration Acknowledgment'}
-          </h2>
-          
-          <p>Dear <strong>${escapeHtml(firstName)} ${escapeHtml(lastName || '')}</strong>,</p>
-          <p>Thank you for registering with SVI Infra Solutions. We are pleased to acknowledge receipt of your property registration inquiry details.</p>
-          
-          <div style="background-color: #f9f9f9; color: #333333; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c9a84c;">
-            <h3 style="margin-top: 0; color: #111; font-size: 14px; border-bottom: 1px solid #eaeaea; padding-bottom: 5px;">Submission Details</h3>
-            <table style="border-collapse:collapse;width:100%;font-size:13px;">
-              <tr><td style="padding:6px 0;font-weight:bold;width:40%">Submission ID:</td><td style="padding:6px 0">${data.submission_id}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Project Name:</td><td style="padding:6px 0">${escapeHtml(project)}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Property Type & Size:</td><td style="padding:6px 0">${escapeHtml(propertyType)} (${escapeHtml(propertySize)})</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Plot Preference:</td><td style="padding:6px 0">${escapeHtml(plotPreference)}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Assigned Advisor:</td><td style="padding:6px 0">${escapeHtml(advisorName)}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Payment Plan:</td><td style="padding:6px 0">${escapeHtml(paymentPlan)}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Payment Mode:</td><td style="padding:6px 0">${escapeHtml(paymentMode)}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Scheme Registration Amount:</td><td style="padding:6px 0">INR ${escapeHtml(schemeAmount)}</td></tr>
-            </table>
-          </div>
-
-          <div style="background-color: #f9f9f9; color: #333333; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #333;">
-            <h3 style="margin-top: 0; color: #111; font-size: 14px; border-bottom: 1px solid #eaeaea; padding-bottom: 5px;">Applicant Contact Information</h3>
-            <table style="border-collapse:collapse;width:100%;font-size:13px;">
-              <tr><td style="padding:6px 0;font-weight:bold;width:40%">Mobile No:</td><td style="padding:6px 0">${escapeHtml(mobileNo)}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Email:</td><td style="padding:6px 0">${escapeHtml(email)}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Date of Birth:</td><td style="padding:6px 0">${escapeHtml(dob)}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Aadhaar Number:</td><td style="padding:6px 0">${escapeHtml(aadharNumber)}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">PAN Number:</td><td style="padding:6px 0">${escapeHtml(panNumber || 'N/A')}</td></tr>
-              <tr><td style="padding:6px 0;font-weight:bold">Address:</td><td style="padding:6px 0">${escapeHtml(address)}, ${escapeHtml(city)}, ${escapeHtml(state)}</td></tr>
-            </table>
-          </div>
-
-          ${
-            photoUrl || panCardFileUrl
-              ? `
-            <div style="margin: 20px 0;">
-              <h3 style="color: #111; font-size: 14px;">Submitted Documents</h3>
-              <ul style="padding-left: 20px; font-size: 13px;">
-                ${photoUrl ? `<li><a href="${photoUrl}" style="color: #c9a84c; text-decoration: none;">View Applicant Photo</a></li>` : ''}
-                ${panCardFileUrl ? `<li><a href="${panCardFileUrl}" style="color: #c9a84c; text-decoration: none;">View PAN Card File</a></li>` : ''}
-              </ul>
+        const emailHtmlContent = `
+          <div style="font-family: sans-serif;max-width:600px;margin:0 auto;padding:20px;border:1px solid #eaeaea;border-radius:10px;background:#fff;">
+            <div style="text-align:right;margin-bottom:15px;">
+              <span style="background:#c9a84c;color:#fff;font-size:9px;font-weight:bold;padding:4px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:1px;">
+                ✨ System Automated Notification
+              </span>
             </div>
-          `
-              : ''
-          }
-          
-          <p style="font-size: 13px;">Our dedicated property advisor will review your preferences and get in touch with you shortly to assist with the next steps.</p>
-          <p style="font-size: 13px;">If you have any questions or require modifications to your submission, feel free to contact us at <a href="mailto:${adminEmail}" style="color: #c9a84c; text-decoration: none;">${adminEmail}</a>.</p>
-          
-          <br>
-          <hr style="border: none; border-top: 1px solid #eaeaea;" />
-          <p style="font-size: 11px; color: #888; text-align: center; margin-top: 15px;">
-            This is an automated administrative notification copy sent simultaneously to the applicant, assigned advisor, and support administration.<br>
-            <strong>SVI Infra Solutions Pvt. Ltd.</strong>
-          </p>
-        </div>
-      `;
+            <h2 style="color:#c9a84c;font-family:serif;border-bottom:2px solid #f0d080;padding-bottom:10px;">
+              ${isFallbackRoute ? 'Admin Record: Property Registration' : 'Registration Acknowledgment'}
+            </h2>
+            <p>Dear <strong>${escapeHtml(firstName)} ${escapeHtml(lastName || '')}</strong>,</p>
+            <p>Thank you for registering with SVI Infra Solutions.</p>
+            <div style="background:#f9f9f9;padding:15px;border-radius:8px;margin:20px 0;border-left:4px solid #c9a84c;">
+              <h3 style="margin-top:0;">Submission Details</h3>
+              <table style="border-collapse:collapse;width:100%;font-size:13px;">
+                <tr><td style="padding:6px 0;font-weight:bold;width:40%">Submission ID:</td><td style="padding:6px 0">${data.submission_id}</td></tr>
+                <tr><td style="padding:6px 0;font-weight:bold">Project:</td><td style="padding:6px 0">${escapeHtml(project)}</td></tr>
+                <tr><td style="padding:6px 0;font-weight:bold">Type & Size:</td><td style="padding:6px 0">${escapeHtml(propertyType)} (${escapeHtml(propertySize)})</td></tr>
+                <tr><td style="padding:6px 0;font-weight:bold">Advisor:</td><td style="padding:6px 0">${escapeHtml(advisorName)}</td></tr>
+                <tr><td style="padding:6px 0;font-weight:bold">Amount:</td><td style="padding:6px 0">INR ${escapeHtml(schemeAmount)}</td></tr>
+              </table>
+            </div>
+            <p style="font-size:13px;">Our advisor will contact you shortly.</p>
+            <hr style="border:none;border-top:1px solid #eaeaea;"/>
+            <p style="font-size:11px;color:#888;text-align:center;">SVI Infra Solutions Pvt. Ltd.</p>
+          </div>`;
 
-      // Single-recipient check: If there's no BCC list and we are falling back, or sending normally
-      const emailPayload: any = {
-        from: `${senderName} <${senderEmail}>`,
-        to: primaryRecipient,
-        subject: `[SYSTEM-AUTO] Property Registration Received: ${firstName} ${lastName || ''} - Submission ${data.submission_id}`,
-        html: emailHtmlContent,
-        headers: {
-          'X-Auto-Response': 'true',
-          'X-System-Generated': 'true',
-          'X-SVI-Event': 'property_registration',
-        },
-        tags: [
-          { name: 'category', value: 'system_automation' },
-          { name: 'event', value: 'property_registration' },
-        ],
-      };
+        const emailPayload: any = {
+          from: `${senderName} <${senderEmail}>`,
+          to: primaryRecipient,
+          subject: `[SYSTEM-AUTO] Registration: ${firstName} ${lastName || ''} - ${data.submission_id}`,
+          html: emailHtmlContent,
+          headers: {
+            'X-Auto-Response': 'true',
+            'X-System-Generated': 'true',
+            'X-SVI-Event': 'property_registration',
+          },
+          tags: [
+            { name: 'category', value: 'system_automation' },
+            { name: 'event', value: 'property_registration' },
+          ],
+        };
 
-      // Add BCC list if populated
-      if (bccList.length > 0) {
-        // Filter out primary recipient to avoid duplicates
-        const uniqueBcc = bccList.filter(
-          (addr) => addr.toLowerCase() !== primaryRecipient.toLowerCase()
-        );
-        if (uniqueBcc.length > 0) {
-          emailPayload.bcc = uniqueBcc;
+        if (bccList.length > 0) {
+          const uniqueBcc = bccList.filter(
+            (a) => a.toLowerCase() !== primaryRecipient.toLowerCase()
+          );
+          if (uniqueBcc.length > 0) emailPayload.bcc = uniqueBcc;
+        }
+
+        await sendEmailWithRetry(resend, emailPayload, retryAttempts);
+        emailStatus.sent = true;
+
+        try {
+          await NotificationHelper.emailDispatched(
+            primaryRecipient,
+            emailPayload.subject,
+            data.submission_id
+          );
+        } catch (notifErr) {
+          console.error('[Registration] Email dispatch log failed:', notifErr);
         }
       }
-
-      // Dispatch using backoff retry handler
-      await sendEmailWithRetry(resend, emailPayload, retryAttempts);
-      emailStatus.sent = true;
-
-      // Dynamic System Notification Alert
+    } catch (emailErr: any) {
+      console.error('[Registration] Email failed:', emailErr);
+      emailStatus.error = emailErr.message;
       try {
-        await NotificationHelper.emailDispatched(
+        await NotificationHelper.emailDispatchFailed(
           primaryRecipient,
-          emailPayload.subject,
+          emailStatus.error || 'Unknown',
           data.submission_id
         );
       } catch (notifErr) {
-        console.error('Failed to log email dispatched system alert:', notifErr);
+        console.error('[Registration] Failure log failed:', notifErr);
       }
     }
-  } catch (emailErr: any) {
-    console.error(
-      '[Email Notification Failure] Registration completed but notification delivery failed:',
-      emailErr
-    );
-    emailStatus.error = emailErr.message || String(emailErr);
 
-    // Dynamic System Notification Failure Alert
-    try {
-      await NotificationHelper.emailDispatchFailed(
-        primaryRecipient,
-        emailStatus.error || 'Unknown Outage',
-        data.submission_id
-      );
-    } catch (notifErr) {
-      console.error('Failed to log email dispatch failure system alert:', notifErr);
-    }
+    return NextResponse.json({
+      success: true,
+      id: data.id,
+      submissionId: data.submission_id,
+      emailStatus,
+    });
+  } catch (error) {
+    return handleApiError(error);
   }
-
-  return NextResponse.json({
-    success: true,
-    id: data.id,
-    submissionId: data.submission_id,
-    emailStatus,
-  });
 }
 
 // GET /api/registration — retrieve active advisor names
@@ -551,24 +424,18 @@ export async function GET(request: NextRequest) {
     }
 
     const advisorIds: string[] = settingData.value.ids;
-
     const { data: profiles, error: profilesError } = await supabaseAdmin
       .from('profiles')
       .select('full_name')
       .in('id', advisorIds);
 
-    if (profilesError) {
-      console.error('Error fetching advisor profiles:', profilesError.message);
-      return NextResponse.json({ error: 'Failed to fetch advisors' }, { status: 500 });
-    }
+    if (profilesError) throw AppError.internal('Failed to fetch advisors');
 
     const advisorNames = (profiles || [])
       .map((p) => p.full_name)
       .sort((a, b) => a.localeCompare(b));
-
     return NextResponse.json({ advisors: advisorNames });
-  } catch (err: any) {
-    console.error('GET registration error:', err);
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error) {
+    return handleApiError(error);
   }
 }

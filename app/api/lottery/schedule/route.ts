@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
+import { AppError } from '@/src/lib/api/errors';
 
 /**
  * GET /api/lottery/schedule
  * Public endpoint — returns the active lottery's scheduled draw info (for countdown)
- * Only returns info if status is 'pending' or 'reminder_sent' AND show_countdown = true
  */
 export async function GET(_request: NextRequest) {
   try {
-    // Find the active lottery
     const { data: activeLottery, error: lError } = await supabaseAdmin
       .from('lotteries')
       .select('id, title')
@@ -22,7 +21,6 @@ export async function GET(_request: NextRequest) {
       return NextResponse.json({ scheduled: null });
     }
 
-    // Check if there is a pending/reminder_sent scheduled draw with show_countdown = true
     const { data: scheduledDraw, error: sError } = await supabaseAdmin
       .from('scheduled_draws')
       .select('id, scheduled_at, show_countdown, include_countdown_in_email, status')

@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
+import { AppError, handleApiError } from '@/src/lib/api/errors';
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await request.json();
+    let payload;
+    try {
+      payload = await request.json();
+    } catch {
+      throw AppError.badRequest('Invalid JSON body');
+    }
 
-    // Get email data
     const emailData = {
       id: payload.data?.id || payload.id,
       thread_id: payload.data?.thread_id || payload.thread_id,
@@ -17,7 +22,6 @@ export async function POST(request: NextRequest) {
       created_at: payload.data?.created_at || payload.created_at,
     };
 
-    // Insert into email_inbox table
     const { error } = await supabaseAdmin.from('email_inbox').insert({
       email_id: emailData.id,
       thread_id: emailData.thread_id,
@@ -31,12 +35,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('Failed to store email:', error);
+      console.error('Webhook: Failed to store email:', error);
+      throw AppError.internal('Failed to store email');
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error('Webhook error:', error);
-    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 400 });
+    return handleApiError(error);
   }
 }
