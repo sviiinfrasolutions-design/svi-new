@@ -58,6 +58,7 @@ export default async function BlogPost({ params }: Props) {
   const category = isHindi && post.categoryHi ? post.categoryHi : post.category;
   const tags = isHindi && post.tagsHi ? post.tagsHi : post.tags;
   const readTime = isHindi && post.readTimeHi ? post.readTimeHi : post.readTime;
+  const takeaways = isHindi && post.takeawaysHi ? post.takeawaysHi : post.takeaways;
 
   // Get other posts for related section
   const relatedPosts = SHARED_BLOG_POSTS.filter((p) => p.slug !== slug).slice(0, 2);
@@ -139,6 +140,31 @@ export default async function BlogPost({ params }: Props) {
             {excerpt}
           </p>
         </div>
+
+        {/* Key Takeaways */}
+        {takeaways && takeaways.length > 0 && (
+          <div className="blog-takeaways">
+            <h3 className="text-brand-navy mb-3 flex items-center gap-2 font-serif text-lg font-bold dark:text-gray-100">
+              <span className="bg-brand-gold text-brand-navy flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
+                !
+              </span>
+              {isHindi ? 'ज़रूरी बातें' : 'Key Takeaways'}
+            </h3>
+            <ul className="space-y-2">
+              {takeaways.map((t, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300"
+                >
+                  <span className="bg-brand-gold/20 text-brand-gold mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold">
+                    {i + 1}
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Content */}
         <div

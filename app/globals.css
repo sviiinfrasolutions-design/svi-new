@@ -463,3 +463,149 @@ table {
   border-color: #c9a84c;
   box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
 }
+
+/* ═══════════════════════════════════════════════
+   Blog Content Styles
+   ═══════════════════════════════════════════════ */
+
+/* ─── Highlighted/important words ─── */
+.blog-content mark {
+  background: linear-gradient(120deg, rgba(201, 168, 76, 0.15) 0%, rgba(201, 168, 76, 0.3) 100%);
+  color: inherit;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-weight: 600;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.dark .blog-content mark {
+  background: linear-gradient(120deg, rgba(201, 168, 76, 0.2) 0%, rgba(201, 168, 76, 0.35) 100%);
+}
+
+/* ─── Drop cap for first paragraph ─── */
+.blog-content > p:first-of-type::first-letter {
+  float: left;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 3.5em;
+  line-height: 0.8;
+  padding-right: 0.1em;
+  padding-top: 0.05em;
+  color: #c9a84c;
+  font-weight: 700;
+}
+
+/* ─── Better blockquotes ─── */
+.blog-content blockquote {
+  position: relative;
+  border-left: 4px solid #c9a84c !important;
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.05) 0%, rgba(201, 168, 76, 0.02) 100%) !important;
+  border-radius: 0 12px 12px 0 !important;
+  padding: 1.25rem 1.5rem !important;
+  margin: 2rem 0 !important;
+  font-style: italic;
+}
+
+.blog-content blockquote::before {
+  content: '\201C';
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  font-size: 3rem;
+  color: rgba(201, 168, 76, 0.3);
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+/* ─── Numbered list styling ─── */
+.blog-content ol {
+  counter-reset: blog-counter;
+  list-style: none;
+  padding-left: 0;
+}
+
+.blog-content ol li {
+  counter-increment: blog-counter;
+  position: relative;
+  padding-left: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.blog-content ol li::before {
+  content: counter(blog-counter);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  background: linear-gradient(135deg, #c9a84c, #d4b65c);
+  color: #0a1a2f;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* ─── Key Takeaways box ─── */
+.blog-takeaways {
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.08) 0%, rgba(201, 168, 76, 0.02) 100%);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dark .blog-takeaways {
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.1) 0%, rgba(201, 168, 76, 0.03) 100%);
+  border-color: rgba(201, 168, 76, 0.15);
+}
+
+/* ─── Category filter tabs ─── */
+.blog-category-tab {
+  position: relative;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.blog-category-tab:hover {
+  border-color: rgba(201, 168, 76, 0.3);
+  background: rgba(201, 168, 76, 0.05);
+}
+
+.blog-category-tab.active {
+  background: linear-gradient(135deg, #c9a84c, #d4b65c);
+  color: #0a1a2f;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+}
+
+/* ─── Card glow on hover ─── */
+.blog-card-glow {
+  position: relative;
+}
+
+.blog-card-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0) 0%, rgba(201, 168, 76, 0) 100%);
+  z-index: -1;
+  transition: all 0.5s ease;
+  opacity: 0;
+}
+
+.blog-card-glow:hover::before {
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.3) 0%, rgba(201, 168, 76, 0.1) 100%);
+  opacity: 1;
+  filter: blur(8px);
+}
