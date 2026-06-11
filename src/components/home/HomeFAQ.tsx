@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import FAQSection from '@/src/components/common/FAQSection';
+import FAQSection from '@/src/components/faq/FAQSection';
 import { BUYING_PROCESS_FAQS, INVESTMENT_FAQS } from '@/src/data/faq/general';
 import { BUYING_PROCESS_FAQS_HI, INVESTMENT_FAQS_HI } from '@/src/data/faq/hi';
 

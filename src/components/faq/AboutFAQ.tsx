@@ -1,6 +1,6 @@
 'use client';
 
-import FAQSection from '@/src/components/common/FAQSection';
+import FAQSection from '@/src/components/faq/FAQSection';
 import { INVESTMENT_FAQS, LEGAL_FAQS } from '@/src/data/faq/general';
 
 const ABOUT_FAQS = [...INVESTMENT_FAQS, ...LEGAL_FAQS];

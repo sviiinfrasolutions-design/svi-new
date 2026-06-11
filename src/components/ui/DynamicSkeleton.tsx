@@ -11,11 +11,7 @@ interface SkeletonProps {
  * Base skeleton block with shimmer animation.
  */
 export function SkeletonBlock({ className = '' }: SkeletonProps) {
-  return (
-    <div
-      className={`animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700 ${className}`}
-    />
-  );
+  return <div className={`animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700 ${className}`} />;
 }
 
 /**

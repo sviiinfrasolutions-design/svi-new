@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 
 import AdminHeader from '@/src/components/admin/AdminHeader';
 import AdminSidebar from '@/src/components/admin/AdminSidebar';
-import { AdminSessionProvider } from '@/src/components/admin/AdminSessionProvider';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { ThemeProvider } from '@/src/components/ThemeProvider';
@@ -48,38 +47,32 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
 
   // If on the admin login page, completely bypass the admin panel outer frame (header & sidebar)
   if (pathname === '/admin') {
-    return (
-      <AdminSessionProvider>
-        <div className="min-h-screen w-full">{children}</div>
-      </AdminSessionProvider>
-    );
+    return <div className="min-h-screen w-full">{children}</div>;
   }
 
   const mounted = !loading;
 
   return (
-    <AdminSessionProvider>
-      <div
-        className="flex min-h-screen w-full bg-gray-50 font-sans text-gray-900 dark:bg-[#0a0a0f] dark:text-white"
-        style={{ visibility: mounted ? 'visible' : 'hidden' }}
-      >
-        <AdminSidebar
-          mobileOpen={mobileSidebarOpen}
-          onMobileClose={() => setMobileSidebarOpen(false)}
+    <div
+      className="flex min-h-screen w-full bg-gray-50 font-sans text-gray-900 dark:bg-[#0a0a0f] dark:text-white"
+      style={{ visibility: mounted ? 'visible' : 'hidden' }}
+    >
+      <AdminSidebar
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
+      />
+      <div className="relative flex h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
+        <AdminHeader
+          isDark={isDark}
+          toggleTheme={toggleTheme}
+          userId={userId || ''}
+          adminName={profile?.full_name || 'Admin'}
+          onMenuClick={() => setMobileSidebarOpen(true)}
         />
-        <div className="relative flex h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
-          <AdminHeader
-            isDark={isDark}
-            toggleTheme={toggleTheme}
-            userId={userId || ''}
-            adminName={profile?.full_name || 'Admin'}
-            onMenuClick={() => setMobileSidebarOpen(true)}
-          />
 
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">{children}</main>
-        </div>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">{children}</main>
       </div>
-    </AdminSessionProvider>
+    </div>
   );
 }
 

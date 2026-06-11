@@ -147,6 +147,6 @@ describe('GET /api/admin/users', () => {
 
     expect(response.status).toBe(500);
     const data = await response.json();
-    expect(data.error).toBe('Connection timeout');
+    expect(data.error?.message || data.error).toBe('Connection timeout');
   });
 });

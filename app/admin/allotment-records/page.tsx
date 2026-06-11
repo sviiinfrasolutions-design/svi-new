@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
+import { useAuthStore } from '@/src/stores/authStore';
 import {
   FileText,
   Search,
@@ -47,7 +47,7 @@ interface SavedAllotment {
 }
 
 export default function AllotmentRecordsPage() {
-  const { token } = useAdminSession();
+  const { token } = useAuthStore();
   const [allotments, setAllotments] = useState<SavedAllotment[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

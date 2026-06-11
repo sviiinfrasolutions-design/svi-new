@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { MessageSquareWarning } from 'lucide-react';
 import GrievanceForm from './GrievanceForm';
 
-const GrievanceFAQ = dynamic(() => import('@/src/components/common/ContactFAQ'));
+const GrievanceFAQ = dynamic(() => import('@/src/components/faq/ContactFAQ'));
 
 type Props = {
   params: Promise<{ locale: string }>;

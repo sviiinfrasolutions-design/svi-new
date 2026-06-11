@@ -8,7 +8,7 @@ import { ArrowRight } from 'lucide-react';
 import AnimatedSection, {
   StaggerContainer,
   StaggerItem,
-} from '@/src/components/common/AnimatedSection';
+} from '@/src/components/ui/AnimatedSection';
 
 const PROJECTS = [
   {

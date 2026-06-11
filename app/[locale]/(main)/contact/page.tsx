@@ -10,7 +10,7 @@ import maplibregl, { NavigationControl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { fetchNearbyPlaces, getCategoryInfo, type NearbyPlace } from '@/src/lib/nearby-places';
 
-const ContactFAQ = dynamic(() => import('@/src/components/common/ContactFAQ'), { ssr: false });
+const ContactFAQ = dynamic(() => import('@/src/components/faq/ContactFAQ'), { ssr: false });
 
 const DIGIT_REGEX = /\d/g;
 

@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
     const userId = searchParams.get('userId');
+    const source = searchParams.get('source');
     const limit = Math.max(1, parseInt(searchParams.get('limit') || '50') || 50);
 
     let query = supabaseAdmin
@@ -30,6 +31,10 @@ export async function GET(request: NextRequest) {
 
     if (type) query = query.eq('document_type', type);
     if (userId) query = query.eq('user_id', userId);
+    if (source) {
+      // Filter by jsonb metadata->>'source'
+      query = query.eq('metadata->>source', source);
+    }
 
     const { data, error } = await query;
     if (error) throw AppError.internal(error.message);

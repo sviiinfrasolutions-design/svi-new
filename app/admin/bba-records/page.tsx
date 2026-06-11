@@ -1,6 +1,6 @@
 'use client';
 
-import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
+import { useAuthStore } from '@/src/stores/authStore';
 import {
   FileText,
   Search,
@@ -54,7 +54,7 @@ interface SavedBba {
 }
 
 export default function BbaRecordsPage() {
-  const { token } = useAdminSession();
+  const { token } = useAuthStore();
   const [bbas, setBbas] = useState<SavedBba[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

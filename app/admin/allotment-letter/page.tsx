@@ -6,7 +6,7 @@ import {
   FormSelect,
   PreviewContainer,
 } from '@/src/components/admin/DocumentGenerator/Shared';
-import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
+import { useAuthStore } from '@/src/stores/authStore';
 import { FileText, RefreshCw, X } from 'lucide-react';
 
 import { exportToPDF, exportToImage } from '@/src/lib/utils/documentExporter';
@@ -15,7 +15,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/src/lib/supabase/client';
 
 export default function AllotmentLetterPage() {
-  const { token } = useAdminSession();
+  const { token } = useAuthStore();
 
   interface Advisor {
     full_name: string;

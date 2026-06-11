@@ -6,7 +6,7 @@ import {
   FormSelect,
   PreviewContainer,
 } from '@/src/components/admin/DocumentGenerator/Shared';
-import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
+import { useAuthStore } from '@/src/stores/authStore';
 import { FileText, RefreshCw, ClipboardList } from 'lucide-react';
 
 import { exportToPDF, exportToImage } from '@/src/lib/utils/documentExporter';
@@ -16,7 +16,7 @@ import { supabase } from '@/src/lib/supabase/client';
 import BbaPreviewContent from '@/src/components/admin/DocumentGenerator/BbaPreviewContent';
 
 export default function BbaPage() {
-  const { token } = useAdminSession();
+  const { token } = useAuthStore();
 
   const [savedBbas, setSavedBbas] = useState<any[]>([]);
 

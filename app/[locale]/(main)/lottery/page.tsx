@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import LotteryClientSection from '@/src/components/lottery/LotteryClientSection';
-import LotteryFAQ from '@/src/components/common/ProjectsFAQ';
+import LotteryFAQ from '@/src/components/faq/ProjectsFAQ';
 
 export const metadata: Metadata = {
   title: 'Lucky Draw | SVI Infra Solutions',

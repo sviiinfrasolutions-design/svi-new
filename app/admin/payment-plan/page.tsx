@@ -6,14 +6,14 @@ import {
   FormSelect,
   PreviewContainer,
 } from '@/src/components/admin/DocumentGenerator/Shared';
-import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
+import { useAuthStore } from '@/src/stores/authStore';
 
 import { Calculator } from 'lucide-react';
 import { exportToPDF, exportToImage } from '@/src/lib/utils/documentExporter';
 import { useState } from 'react';
 
 export default function PaymentPlanPage() {
-  const { token } = useAdminSession();
+  const { token } = useAuthStore();
   const [formData, setFormData] = useState({
     unitNo: '',
     plotSize: '',

@@ -86,6 +86,12 @@ vi.mock('resend', () => {
   };
 });
 
+vi.mock('@/src/lib/api/rateLimit', () => {
+  return {
+    rateLimit: vi.fn(() => null),
+  };
+});
+
 import { POST } from '@/app/api/registration/route';
 
 function createMockRegistrationFormData(overrides: Record<string, string | File> = {}): FormData {
@@ -290,7 +296,7 @@ describe('POST /api/registration - Automatic Submission ID Generation', () => {
     expect(res.status).toBe(500);
 
     const body = await res.json();
-    expect(body.error).toBe('Database connection failure during ID generation');
+    expect(body.error?.message || body.error).toBe('Database error during ID generation');
   });
 
   it('should handle other insertion failures gracefully by returning 500', async () => {
@@ -311,7 +317,7 @@ describe('POST /api/registration - Automatic Submission ID Generation', () => {
     expect(res.status).toBe(500);
 
     const body = await res.json();
-    expect(body.error).toBe('Failed to submit registration');
+    expect(body.error?.message || body.error).toBe('Failed to submit registration');
   });
 
   describe('Email Notification Enhancements', () => {

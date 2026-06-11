@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
+import { useAuthStore } from '@/src/stores/authStore';
 import {
   Receipt,
   Search,
@@ -50,7 +50,7 @@ const GRID_STYLE = {
 };
 
 export default function ReceiptRecordsPage() {
-  const { token } = useAdminSession();
+  const { token } = useAuthStore();
   const [receipts, setReceipts] = useState<SavedReceipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

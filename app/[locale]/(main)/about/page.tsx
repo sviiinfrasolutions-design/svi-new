@@ -5,7 +5,7 @@ import { setRequestLocale, getTranslations } from 'next-intl/server';
 import MissionValuesCards from './MissionValuesCards';
 import ServicesList from './ServicesList';
 
-const AboutFAQ = dynamic(() => import('@/src/components/common/AboutFAQ'));
+const AboutFAQ = dynamic(() => import('@/src/components/faq/AboutFAQ'));
 
 type Props = {
   params: Promise<{ locale: string }>;

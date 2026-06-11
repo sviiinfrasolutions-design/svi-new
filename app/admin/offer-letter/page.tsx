@@ -6,7 +6,7 @@ import {
   FormSelect,
   PreviewContainer,
 } from '@/src/components/admin/DocumentGenerator/Shared';
-import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
+import { useAuthStore } from '@/src/stores/authStore';
 import {
   FileSignature,
   RefreshCw,
@@ -30,7 +30,7 @@ const DEPARTMENTS = ['Sales', 'IT', 'Management'];
 const SALES_DESIGNATIONS = ['Telecaller', 'BDM', 'BDE', 'Sales Manager', 'Team Leader'];
 
 export default function OfferLetterPage() {
-  const { token } = useAdminSession();
+  const { token } = useAuthStore();
   const [companyInfo, setCompanyInfo] = useState({
     company_name: 'SVI Infra Solutions Pvt. Ltd.',
     company_address: 'A-61 Sector 65 Noida Uttar Pradesh 201309',

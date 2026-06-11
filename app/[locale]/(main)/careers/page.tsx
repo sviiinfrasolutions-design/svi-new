@@ -6,7 +6,7 @@ import { setRequestLocale, getTranslations } from 'next-intl/server';
 import FreelancePerks from './FreelancePerks';
 import OnsiteRoles from './OnsiteRoles';
 
-const CareersFAQ = dynamic(() => import('@/src/components/common/AboutFAQ'));
+const CareersFAQ = dynamic(() => import('@/src/components/faq/AboutFAQ'));
 
 type Props = {
   params: Promise<{ locale: string }>;

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { ArrowLeft, Calendar, User, Tag, Clock, Bookmark } from 'lucide-react';
 import { BLOG_POST_MAP, BLOG_POSTS as SHARED_BLOG_POSTS } from '@/src/lib/blog';
 import { absoluteUrl } from '@/src/lib/seo';
-import BlogDetailFAQ from '@/src/components/common/ProjectsFAQ';
+import BlogDetailFAQ from '@/src/components/faq/ProjectsFAQ';
 import ShareButtons from './ShareButtons';
 import RelatedPosts from './RelatedPosts';
 import ReadingProgress from './ReadingProgress';

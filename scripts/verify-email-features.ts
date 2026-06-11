@@ -21,7 +21,7 @@ async function runTests() {
     const domains = await resend.domains.list();
     console.log(
       'Resend Domains accessible:',
-      domains.data?.map((d) => d.name)
+      (domains.data as any)?.map((d: any) => d.name)
     );
   } catch (error: any) {
     console.error('Error accessing Resend:', error.message);

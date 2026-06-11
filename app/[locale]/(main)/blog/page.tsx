@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import BlogHero from './BlogHero';
 import BlogCards from './BlogCards';
 
-const BlogFAQ = dynamic(() => import('@/src/components/common/ProjectsFAQ'));
+const BlogFAQ = dynamic(() => import('@/src/components/faq/ProjectsFAQ'));
 
 type Props = {
   params: Promise<{ locale: string }>;

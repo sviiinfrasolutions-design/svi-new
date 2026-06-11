@@ -11,7 +11,7 @@ const ProjectsSection = dynamic(() => import('@/src/components/home/ProjectsSect
 });
 const CTASection = dynamic(() => import('@/src/components/home/CTASection'), { ssr: false });
 const LotteryCTA = dynamic(() => import('@/src/components/lottery/LotteryCTA'), { ssr: false });
-const StatsCounter = dynamic(() => import('@/src/components/common/StatsCounter'), { ssr: false });
+const StatsCounter = dynamic(() => import('@/src/components/ui/StatsCounter'), { ssr: false });
 const HomeFAQ = dynamic(() => import('@/src/components/home/HomeFAQ'), { ssr: false });
 
 export default function HomeSections() {

@@ -16,7 +16,7 @@ import {
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 
-import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
+import { useAuthStore } from '@/src/stores/authStore';
 import { useTheme } from '@/src/components/ThemeProvider';
 import { supabase } from '@/src/lib/supabase/client';
 
@@ -42,7 +42,7 @@ const TABS = [
 ];
 
 export default function AdminSettings() {
-  const { token, userId, loading: sessionLoading } = useAdminSession();
+  const { token, userId, loading: sessionLoading } = useAuthStore();
   const { theme, setTheme } = useTheme();
 
   // Tab State

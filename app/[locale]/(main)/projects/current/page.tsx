@@ -13,10 +13,10 @@ import {
   Construction,
 } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, LinkedinIcon } from '@/src/components/common/social-icons';
-import HoverZoomImage from '@/src/components/common/HoverZoomImage';
+import HoverZoomImage from '@/src/components/ui/HoverZoomImage';
 import dynamic from 'next/dynamic';
 
-const ProjectsFAQ = dynamic(() => import('@/src/components/common/ProjectsFAQ'), { ssr: false });
+const ProjectsFAQ = dynamic(() => import('@/src/components/faq/ProjectsFAQ'), { ssr: false });
 
 // const GRADIENT_STYLE = {
 //   backgroundImage:
@@ -57,9 +57,7 @@ const currentProjectsData = [
   },
 ];
 
-const CompletedProjectsMap = lazy(() =>
-  import('@/src/components/CompletedProjectsMap').then((m) => ({ default: m.default }))
-);
+const CompletedProjectsMap = lazy(() => import('@/src/components/properties/CompletedProjectsMap'));
 
 export default function Projects() {
   const [projects, setProjects] = useState(currentProjectsData);

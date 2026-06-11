@@ -17,7 +17,7 @@ import { motion } from 'motion/react';
 import Captcha from '@/src/components/Captcha';
 import dynamic from 'next/dynamic';
 
-const RegistrationFAQ = dynamic(() => import('@/src/components/common/RegistrationFAQ'), {
+const RegistrationFAQ = dynamic(() => import('@/src/components/faq/RegistrationFAQ'), {
   ssr: false,
 });
 

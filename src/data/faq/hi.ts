@@ -1,4 +1,4 @@
-import type { FAQItem } from '@/src/components/common/FAQSection';
+import type { FAQItem } from '@/src/components/faq/FAQSection';
 
 export const BUYING_PROCESS_FAQS_HI: FAQItem[] = [
   {

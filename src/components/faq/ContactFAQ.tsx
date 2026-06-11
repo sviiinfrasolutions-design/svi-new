@@ -1,6 +1,6 @@
 'use client';
 
-import FAQSection from '@/src/components/common/FAQSection';
+import FAQSection from '@/src/components/faq/FAQSection';
 import { BUYING_PROCESS_FAQS, LEGAL_FAQS } from '@/src/data/faq/general';
 
 const CONTACT_FAQS = [...BUYING_PROCESS_FAQS.slice(0, 4), ...LEGAL_FAQS.slice(0, 2)];

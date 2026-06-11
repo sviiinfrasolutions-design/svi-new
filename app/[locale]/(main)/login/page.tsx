@@ -60,10 +60,21 @@ export default function Login() {
       });
       if (authError) throw authError;
 
-      setSuccess(true);
-      setTimeout(() => {
-        router.push('/payment'); // redirect to client portal after login
-      }, 1800);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        const isAdmin = profile?.role === 'admin';
+        setSuccess(true);
+        setTimeout(() => {
+          router.push(isAdmin ? '/admin/dashboard' : '/portal/dashboard');
+        }, 1800);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
       setShake(true);
@@ -117,10 +128,21 @@ export default function Login() {
       });
       if (verifyError) throw verifyError;
 
-      setSuccess(true);
-      setTimeout(() => {
-        router.push('/payment');
-      }, 1800);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        const isAdmin = profile?.role === 'admin';
+        setSuccess(true);
+        setTimeout(() => {
+          router.push(isAdmin ? '/admin/dashboard' : '/portal/dashboard');
+        }, 1800);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'OTP verification failed.');
       setShake(true);

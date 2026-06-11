@@ -32,7 +32,6 @@ export default function NotFound() {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(intervalRef.current!);
-          router.push('/');
           return 0;
         }
         return prev - 1;
@@ -41,7 +40,13 @@ export default function NotFound() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [router]);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && countdown === 0) {
+      router.push('/');
+    }
+  }, [countdown, mounted, router]);
 
   const cancelRedirect = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -96,7 +101,7 @@ export default function NotFound() {
         ))}
 
       {/* City skyline silhouette */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 opacity-[0.07] dark:opacity-[0.12]">
+      <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-32 opacity-[0.07] dark:opacity-[0.12]">
         <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="h-full w-full">
           <path
             d="M0,80 L40,80 L40,50 L50,50 L50,30 L60,30 L60,50 L70,50 L70,80
@@ -129,7 +134,7 @@ export default function NotFound() {
         <div className="relative mb-4 select-none">
           {/* Light mode */}
           <span
-            className="block font-serif text-[120px] font-bold leading-none dark:hidden md:text-[180px]"
+            className="block font-serif text-[120px] leading-none font-bold md:text-[180px] dark:hidden"
             style={{
               background: 'linear-gradient(135deg, #1a2744 0%, #2a3b61 40%, #c9a84c 100%)',
               WebkitBackgroundClip: 'text',
@@ -142,7 +147,7 @@ export default function NotFound() {
           </span>
           {/* Dark mode */}
           <span
-            className="hidden font-serif text-[120px] font-bold leading-none dark:block md:text-[180px]"
+            className="hidden font-serif text-[120px] leading-none font-bold md:text-[180px] dark:block"
             style={{
               background: 'linear-gradient(135deg, #1a2744 0%, #2a3b61 50%, #1a2744 100%)',
               WebkitBackgroundClip: 'text',
@@ -156,7 +161,7 @@ export default function NotFound() {
           </span>
           {/* Gold shimmer overlay (both modes) */}
           <span
-            className="pointer-events-none absolute inset-0 flex items-center justify-center font-serif text-[120px] font-bold leading-none md:text-[180px]"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center font-serif text-[120px] leading-none font-bold md:text-[180px]"
             style={{
               background:
                 'linear-gradient(135deg, transparent 30%, rgba(201,168,76,0.1) 50%, transparent 70%)',
@@ -177,13 +182,12 @@ export default function NotFound() {
           <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#c9a84c]" />
         </div>
 
-        <p className="mb-2 text-[10px] font-semibold tracking-[0.25em] uppercase text-[#c9a84c] opacity-90">
+        <p className="mb-2 text-[10px] font-semibold tracking-[0.25em] text-[#c9a84c] uppercase opacity-90">
           Page Not Found
         </p>
 
         <h1 className="mb-4 font-serif text-3xl leading-tight text-[#1a2744] md:text-4xl dark:text-white">
-          This Address Doesn&apos;t Exist{' '}
-          <span className="italic text-[#c9a84c]">...Yet</span>
+          This Address Doesn&apos;t Exist <span className="text-[#c9a84c] italic">...Yet</span>
         </h1>
 
         <p className="mx-auto mb-4 max-w-md text-sm leading-relaxed text-gray-500 dark:text-gray-400">
@@ -191,7 +195,7 @@ export default function NotFound() {
           construction — much like the finest properties we build.
         </p>
 
-        <p className="mb-8 font-serif text-base italic text-[#c9a84c]/80">
+        <p className="mb-8 font-serif text-base text-[#c9a84c]/80 italic">
           &ldquo;Where Dreams Take Address&rdquo; — but not at this URL.
         </p>
 
@@ -230,7 +234,7 @@ export default function NotFound() {
           <Link
             href="/"
             onClick={cancelRedirect}
-            className="flex items-center gap-2.5 bg-[#c9a84c] px-8 py-3.5 text-[11px] font-bold tracking-widest uppercase text-[#1a2744] shadow-lg transition-all hover:bg-[#dec070] hover:shadow-[0_0_24px_rgba(201,168,76,0.3)]"
+            className="flex items-center gap-2.5 bg-[#c9a84c] px-8 py-3.5 text-[11px] font-bold tracking-widest text-[#1a2744] uppercase shadow-lg transition-all hover:bg-[#dec070] hover:shadow-[0_0_24px_rgba(201,168,76,0.3)]"
           >
             <Home size={14} />
             Back to Home
@@ -238,7 +242,7 @@ export default function NotFound() {
           <Link
             href="/contact"
             onClick={cancelRedirect}
-            className="flex items-center gap-2.5 border border-[#1a2744]/30 px-8 py-3.5 text-[11px] font-bold tracking-widest uppercase text-[#1a2744] transition-all hover:border-[#c9a84c] hover:text-[#c9a84c] dark:border-white/20 dark:text-white/80 dark:hover:border-[#c9a84c]/60 dark:hover:text-white"
+            className="flex items-center gap-2.5 border border-[#1a2744]/30 px-8 py-3.5 text-[11px] font-bold tracking-widest text-[#1a2744] uppercase transition-all hover:border-[#c9a84c] hover:text-[#c9a84c] dark:border-white/20 dark:text-white/80 dark:hover:border-[#c9a84c]/60 dark:hover:text-white"
           >
             <ArrowLeft size={14} />
             Contact Support
@@ -247,7 +251,7 @@ export default function NotFound() {
 
         {/* Quick links */}
         <div className="border-t border-gray-200 pt-8 dark:border-white/10">
-          <p className="mb-4 text-[10px] font-semibold tracking-widest uppercase text-gray-400 dark:text-gray-500">
+          <p className="mb-4 text-[10px] font-semibold tracking-widest text-gray-400 uppercase dark:text-gray-500">
             You might be looking for
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">

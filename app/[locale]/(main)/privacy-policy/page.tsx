@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
-const PrivacyFAQ = dynamic(() => import('@/src/components/common/ProjectsFAQ'));
+const PrivacyFAQ = dynamic(() => import('@/src/components/faq/ProjectsFAQ'));
 
 type Props = {
   params: Promise<{ locale: string }>;

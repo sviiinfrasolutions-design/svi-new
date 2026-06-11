@@ -1,13 +1,13 @@
 'use client';
 
 import Analytics from '@/src/components/common/Analytics';
-import BackToTop from '@/src/components/common/BackToTop';
+import BackToTop from '@/src/components/ui/BackToTop';
 import CookieConsent from '@/src/components/common/CookieConsent';
-import ErrorBoundary from '@/src/components/common/ErrorBoundary';
+import ErrorBoundary from '@/src/components/ui/ErrorBoundary';
 import Footer from '@/src/components/layout/Footer';
 import Header from '@/src/components/layout/Header';
 import type { ReactNode } from 'react';
-import ScrollToTop from '@/src/components/common/ScrollToTop';
+import ScrollToTop from '@/src/components/ui/ScrollToTop';
 import { ThemeProvider } from '@/src/components/ThemeProvider';
 import ChatBot from '@/src/components/home/ChatBot';
 

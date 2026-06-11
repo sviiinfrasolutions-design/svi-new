@@ -1,6 +1,6 @@
 'use client';
 
-import FAQSection from '@/src/components/common/FAQSection';
+import FAQSection from '@/src/components/faq/FAQSection';
 import { BUYING_PROCESS_FAQS } from '@/src/data/faq/general';
 
 export default function RegistrationFAQ() {

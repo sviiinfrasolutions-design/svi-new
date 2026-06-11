@@ -7,6 +7,8 @@ export type Property = {
   slug?: string | null;
   active?: boolean;
   location?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   type?: string | null;
   status?: string | null;
   description?: string | null;

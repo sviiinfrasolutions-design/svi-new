@@ -6,7 +6,7 @@ import { Building2, Shield, TrendingUp } from 'lucide-react';
 import AnimatedSection, {
   StaggerContainer,
   StaggerItem,
-} from '@/src/components/common/AnimatedSection';
+} from '@/src/components/ui/AnimatedSection';
 
 const FEATURE_ICONS = [
   <Building2 size={32} key="agents" />,

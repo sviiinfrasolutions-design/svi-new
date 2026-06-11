@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase/client';
 import { createLotteryCampaign } from '@/src/lib/lottery/campaignHelpers';
-import { useAdminSession } from '@/src/components/admin/AdminSessionProvider';
+import { useAuthStore } from '@/src/stores/authStore';
 import { useLotteryData } from '@/src/components/admin/lottery/hooks/useLotteryData';
 import { useParticipantManagement } from '@/src/components/admin/lottery/hooks/useParticipantManagement';
 import { useScheduleDraw } from '@/src/components/admin/lottery/hooks/useScheduleDraw';
@@ -31,7 +31,7 @@ import { DashboardPanel } from '@/src/components/admin/lottery/DashboardPanel';
 import { HistoryTable } from '@/src/components/admin/lottery/HistoryTable';
 
 export default function AdminLotteryPage() {
-  const { token } = useAdminSession();
+  const { token } = useAuthStore();
   const [isPending, startTransition] = useTransition();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'create'>('dashboard');
 

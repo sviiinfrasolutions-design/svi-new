@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { ProjectDropdown } from './ProjectDropdown';
-import LanguageToggle from '@/src/components/LanguageToggle';
-import { ThemeToggle } from './ThemeToggle';
+import LanguageToggle from '@/src/components/ui/LanguageToggle';
+import { ThemeToggle } from '@/src/components/ui/ThemeToggle';
 
 interface DesktopNavProps {
   currentPath: string;

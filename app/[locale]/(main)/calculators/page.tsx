@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { setRequestLocale, getTranslations } from 'next-intl/server';
-import PropertyCalculator from '@/src/components/common/PropertyCalculator';
+import PropertyCalculator from '@/src/components/properties/PropertyCalculator';
 
 type Props = {
   params: Promise<{ locale: string }>;

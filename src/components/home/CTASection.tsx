@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import AnimatedSection from '@/src/components/common/AnimatedSection';
+import AnimatedSection from '@/src/components/ui/AnimatedSection';
 
 export default function CTASection() {
   const t = useTranslations('cta');

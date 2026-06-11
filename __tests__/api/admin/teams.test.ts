@@ -147,6 +147,6 @@ describe('GET /api/admin/attendance/teams', () => {
 
     expect(response.status).toBe(500);
     const data = await response.json();
-    expect(data.error).toBe('Table not found');
+    expect(data.error?.message || data.error).toBe('Table not found');
   });
 });

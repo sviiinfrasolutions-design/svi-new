@@ -18,9 +18,9 @@ export default function ReadingProgress() {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 w-full h-[3px] bg-transparent z-[9999] pointer-events-none">
+    <div className="pointer-events-none fixed top-0 left-0 z-[9999] h-[3px] w-full bg-transparent">
       <div
-        className="h-full bg-gradient-to-r from-brand-gold via-[#f0d080] to-brand-gold transition-all duration-75 ease-out shadow-[0_1px_10px_rgba(201,168,76,0.5)]"
+        className="from-brand-gold to-brand-gold h-full bg-gradient-to-r via-[#f0d080] shadow-[0_1px_10px_rgba(201,168,76,0.5)] transition-all duration-75 ease-out"
         style={{ width: `${completion}%` }}
       />
     </div>
