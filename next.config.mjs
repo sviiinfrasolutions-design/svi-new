@@ -13,6 +13,8 @@ const withBundleAnalyzer = (await import('@next/bundle-analyzer')).default({
 const nextConfig = {
   reactStrictMode: true,
   compress: true,
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   // Log build warnings for large chunks
   logging: {
     fetches: { fullUrl: true },

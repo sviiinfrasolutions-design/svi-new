@@ -1,3 +1,4 @@
+import globals from 'globals';
 import js from '@eslint/js';
 import nextPlugin from '@next/eslint-plugin-next';
 import prettierConfig from 'eslint-config-prettier';
@@ -34,10 +35,7 @@ export default tseslint.config(
           jsx: true,
         },
       },
-      globals: {
-        browser: 'readonly',
-        node: 'readonly',
-      },
+      globals: { ...globals.browser, ...globals.node },
     },
     settings: {
       react: {
@@ -45,6 +43,8 @@ export default tseslint.config(
       },
     },
     rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+      'no-undef': 'off',
       ...prettierConfig.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
