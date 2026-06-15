@@ -30,19 +30,12 @@ export function ResendUsageDashboard({ className }: ResendUsageDashboardProps) {
       setError(null);
       try {
         const token = await getToken();
-        // Note: Resend doesn't have a public usage API yet
-        // This would need to be implemented via a server-side function
-        // For now, we show placeholder data
-        const mockData: UsageData = {
-          period: 'June 2025',
-          sent: 42,
-          delivered: 40,
-          opened: 35,
-          clicked: 12,
-          bounces: 2,
-          spamComplaints: 0,
-        };
-        setUsageData(mockData);
+        const res = await fetch('/api/admin/email?action=usage', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Failed to fetch usage data');
+        const data = await res.json();
+        setUsageData(data);
       } catch (e) {
         setError('Failed to load usage data');
       } finally {

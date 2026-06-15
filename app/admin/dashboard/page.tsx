@@ -281,10 +281,10 @@ export default function AdminDashboard() {
 
         {/* Quick Actions & Activity Timeline */}
         <div className="mb-8 grid grid-cols-1 gap-6 xl:grid-cols-3">
-          <div className="xl:col-span-1">
+          <div className="min-w-0 xl:col-span-1">
             <QuickActions />
           </div>
-          <div className="xl:col-span-2">
+          <div className="min-w-0 xl:col-span-2">
             <ActivityTimeline activities={recentActivities} />
           </div>
         </div>

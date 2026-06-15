@@ -274,6 +274,51 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    if (action === 'usage') {
+      let sentCount = 0;
+      let deliveredCount = 0;
+      let openedCount = 0;
+      let clickedCount = 0;
+      let bouncedCount = 0;
+      let spamComplaintsCount = 0;
+
+      try {
+        const emailsResp = await resend.emails.list({ limit: 100 });
+        const responseData = emailsResp.data as any;
+        const allEmails = responseData?.data || [];
+
+        for (const email of allEmails) {
+          sentCount++; // Count total sent/attempted
+
+          if (email.last_event === 'delivered') deliveredCount++;
+          if (email.last_event === 'opened') {
+            deliveredCount++;
+            openedCount++;
+          }
+          if (email.last_event === 'clicked') {
+            deliveredCount++;
+            openedCount++;
+            clickedCount++;
+          }
+          if (email.last_event === 'bounced') bouncedCount++;
+          if (email.last_event === 'complained') spamComplaintsCount++;
+        }
+
+        return NextResponse.json({
+          period: new Date().toLocaleString('default', { month: 'long', year: 'numeric' }),
+          sent: sentCount,
+          delivered: deliveredCount,
+          opened: openedCount,
+          clicked: clickedCount,
+          bounces: bouncedCount,
+          spamComplaints: spamComplaintsCount,
+        });
+      } catch (err) {
+        console.error('Error fetching usage data:', err);
+        return NextResponse.json({ error: 'Failed to fetch usage data' }, { status: 500 });
+      }
+    }
+
     if (action === 'scheduled') {
       const { data, error } = await supabaseAdmin
         .from('scheduled_emails')

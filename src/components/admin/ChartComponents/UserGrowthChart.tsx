@@ -22,7 +22,7 @@ export default function UserGrowthChart({ data }: UserGrowthChartProps) {
   const mounted = useMounted();
 
   return (
-    <div className="rounded-2xl bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-[#0e0e14]/65">
+    <div className="min-w-0 rounded-2xl bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-[#0e0e14]/65">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">User Growth</h3>
