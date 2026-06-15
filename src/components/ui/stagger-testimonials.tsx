@@ -269,6 +269,14 @@ export const StaggerTestimonials: React.FC = () => {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
+  // Auto-play functionality
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleMove(1);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [testimonialsList]);
+
   return (
     <section className="bg-brand-bg dark:bg-brand-dark-bg relative overflow-hidden py-24">
       <div className="container mx-auto mb-16 px-4 text-center">
