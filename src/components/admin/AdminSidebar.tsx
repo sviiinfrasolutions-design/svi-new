@@ -71,9 +71,27 @@ function SidebarContent({
   isMobile?: boolean;
   onLinkClick?: () => void;
 }) {
-  const labelClass = `text-sm font-medium whitespace-nowrap transition-opacity duration-300 ${
-    collapsed && !isMobile ? 'opacity-0' : 'opacity-100'
+  const labelClass = `text-sm font-medium whitespace-nowrap transition-all duration-300 overflow-hidden ${
+    collapsed && !isMobile ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'
   }`;
+
+  const getLinkClass = (active: boolean) =>
+    `group relative flex items-center rounded-xl py-2.5 transition-all ${
+      collapsed && !isMobile ? 'justify-center px-0 gap-0 mx-2' : 'gap-3 px-3 mx-0'
+    } ${
+      active
+        ? 'bg-brand-gold/10 text-brand-gold'
+        : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5'
+    }`;
+
+  const renderTooltip = (name: string) => {
+    if (!collapsed || isMobile) return null;
+    return (
+      <div className="pointer-events-none invisible absolute left-full z-50 ml-4 rounded-md bg-gray-900 px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-white opacity-0 shadow-sm transition-all group-hover:visible group-hover:opacity-100 dark:bg-white dark:text-gray-900">
+        {name}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -96,34 +114,34 @@ function SidebarContent({
         <div className="bg-brand-gold text-brand-navy flex h-8 w-8 shrink-0 items-center justify-center rounded font-serif text-xl leading-none font-bold">
           S
         </div>
-        <motion.div animate={{ opacity: collapsed && !isMobile ? 0 : 1 }} className="flex flex-col">
-          <h1 className="text-brand-navy font-serif text-lg leading-tight font-bold dark:text-white">
+        <motion.div
+          animate={{ opacity: collapsed && !isMobile ? 0 : 1 }}
+          className="flex flex-col overflow-hidden"
+        >
+          <h1 className="text-brand-navy font-serif text-lg leading-tight font-bold whitespace-nowrap dark:text-white">
             SVI Infra
           </h1>
-          <p className="text-brand-gold text-[10px] font-bold tracking-widest uppercase">
+          <p className="text-brand-gold text-[10px] font-bold tracking-widest whitespace-nowrap uppercase">
             Admin Portal
           </p>
         </motion.div>
       </div>
 
       {/* Nav */}
-      <div className="custom-scrollbar flex flex-1 flex-col gap-1 overflow-x-hidden overflow-y-auto px-3 py-6">
+      <div
+        className={`flex flex-1 flex-col gap-1 overflow-x-hidden overflow-y-auto py-6 ${collapsed && !isMobile ? 'scrollbar-none px-2' : 'scrollbar-gold px-3'}`}
+      >
         {/* Dashboard */}
         <Link
           href="/admin/dashboard"
           onClick={onLinkClick}
-          className={`group flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 transition-all ${
-            pathname === '/admin/dashboard'
-              ? 'bg-brand-gold/10 text-brand-gold'
-              : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5'
-          }`}
-          title={collapsed && !isMobile ? 'Dashboard' : ''}
+          className={getLinkClass(pathname === '/admin/dashboard')}
         >
           <div className="relative flex shrink-0 items-center justify-center">
             {pathname === '/admin/dashboard' && (
               <motion.div
                 layoutId="active-nav"
-                className="bg-brand-gold absolute -left-3 h-8 w-1 rounded-r-full"
+                className={`bg-brand-gold absolute h-8 w-1 rounded-r-full ${collapsed && !isMobile ? '-left-[14px]' : '-left-3'}`}
               />
             )}
             <LayoutDashboard
@@ -131,12 +149,15 @@ function SidebarContent({
             />
           </div>
           <span className={labelClass}>Dashboard</span>
+          {renderTooltip('Dashboard')}
         </Link>
 
         {/* Documents section */}
         <div
-          className={`mt-6 mb-2 px-4 pb-0.5 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase transition-opacity duration-300 dark:text-gray-500 ${
-            collapsed && !isMobile ? 'opacity-0' : 'opacity-100'
+          className={`mt-6 mb-2 px-4 pb-0.5 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase transition-all duration-300 dark:text-gray-500 ${
+            collapsed && !isMobile
+              ? 'm-0 max-h-0 overflow-hidden p-0 opacity-0'
+              : 'max-h-[20px] opacity-100'
           }`}
         >
           Documents
@@ -149,18 +170,13 @@ function SidebarContent({
               key={item.name}
               href={item.path}
               onClick={onLinkClick}
-              className={`group flex items-center gap-3 overflow-hidden rounded-xl px-3 py-2.5 transition-all ${
-                active
-                  ? 'bg-brand-gold/10 text-brand-gold'
-                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5'
-              }`}
-              title={collapsed && !isMobile ? item.name : ''}
+              className={getLinkClass(active)}
             >
               <div className="relative flex shrink-0 items-center justify-center">
                 {active && (
                   <motion.div
                     layoutId="active-nav"
-                    className="bg-brand-gold absolute -left-3 h-8 w-1 rounded-r-full"
+                    className={`bg-brand-gold absolute h-8 w-1 rounded-r-full ${collapsed && !isMobile ? '-left-[14px]' : '-left-3'}`}
                   />
                 )}
                 <item.icon
@@ -168,14 +184,17 @@ function SidebarContent({
                 />
               </div>
               <span className={labelClass}>{item.name}</span>
+              {renderTooltip(item.name)}
             </Link>
           );
         })}
 
         {/* Management section */}
         <div
-          className={`mt-6 mb-2 px-4 pb-0.5 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase transition-opacity duration-300 dark:text-gray-500 ${
-            collapsed && !isMobile ? 'opacity-0' : 'opacity-100'
+          className={`mt-6 mb-2 px-4 pb-0.5 text-[10px] font-bold tracking-[0.15em] whitespace-nowrap text-gray-400 uppercase transition-all duration-300 dark:text-gray-500 ${
+            collapsed && !isMobile
+              ? 'm-0 max-h-0 overflow-hidden p-0 opacity-0'
+              : 'max-h-[20px] opacity-100'
           }`}
         >
           Management
@@ -188,18 +207,13 @@ function SidebarContent({
               key={item.name}
               href={item.path}
               onClick={onLinkClick}
-              className={`group flex items-center gap-3 overflow-hidden rounded-xl px-3 py-2.5 transition-all ${
-                active
-                  ? 'bg-brand-gold/10 text-brand-gold'
-                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5'
-              }`}
-              title={collapsed && !isMobile ? item.name : ''}
+              className={getLinkClass(active)}
             >
               <div className="relative flex shrink-0 items-center justify-center">
                 {active && (
                   <motion.div
                     layoutId="active-nav"
-                    className="bg-brand-gold absolute -left-3 h-8 w-1 rounded-r-full"
+                    className={`bg-brand-gold absolute h-8 w-1 rounded-r-full ${collapsed && !isMobile ? '-left-[14px]' : '-left-3'}`}
                   />
                 )}
                 <item.icon
@@ -207,28 +221,24 @@ function SidebarContent({
                 />
               </div>
               <span className={labelClass}>{item.name}</span>
+              {renderTooltip(item.name)}
             </Link>
           );
         })}
       </div>
 
       {/* Footer */}
-      <div className="dark:border-brand-gold/15 overflow-x-hidden border-t border-gray-200 p-3">
+      <div className="dark:border-brand-gold/15 overflow-visible border-t border-gray-200 p-3">
         <Link
           href="/admin/settings"
           onClick={onLinkClick}
-          className={`group flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 transition-all ${
-            pathname.startsWith('/admin/settings')
-              ? 'bg-brand-gold/10 text-brand-gold'
-              : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5'
-          }`}
-          title={collapsed && !isMobile ? 'Settings' : ''}
+          className={getLinkClass(pathname.startsWith('/admin/settings'))}
         >
           <div className="relative flex shrink-0 items-center justify-center">
             {pathname.startsWith('/admin/settings') && (
               <motion.div
                 layoutId="active-nav"
-                className="bg-brand-gold absolute -left-3 h-8 w-1 rounded-r-full"
+                className={`bg-brand-gold absolute h-8 w-1 rounded-r-full ${collapsed && !isMobile ? '-left-[14px]' : '-left-3'}`}
               />
             )}
             <Settings
@@ -236,17 +246,20 @@ function SidebarContent({
             />
           </div>
           <span className={labelClass}>Settings</span>
+          {renderTooltip('Settings')}
         </Link>
 
         <button
           onClick={handleLogout}
-          className="group mt-1 flex w-full cursor-pointer items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
-          title={collapsed && !isMobile ? 'Logout' : ''}
+          className={`group relative mt-1 flex w-full cursor-pointer items-center rounded-xl py-2.5 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10 ${
+            collapsed && !isMobile ? 'mx-2 justify-center px-0' : 'mx-0 gap-3 px-3'
+          }`}
         >
           <div className="flex shrink-0 items-center justify-center">
             <LogOut className="h-5 w-5 transition-transform group-hover:scale-110" />
           </div>
           <span className={labelClass}>Logout</span>
+          {renderTooltip('Logout')}
         </button>
       </div>
     </>
