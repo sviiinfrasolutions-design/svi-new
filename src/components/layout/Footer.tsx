@@ -6,6 +6,7 @@ import { FacebookIcon, InstagramIcon } from '@/src/components/common/social-icon
 import { type FormEvent, memo, useCallback, useState } from 'react';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -33,10 +34,13 @@ const Footer = memo(function Footer() {
         <div className="mb-12 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <Link href="/" className="mb-6 inline-block">
-              <img
+              <Image
                 src="/logo.png"
                 alt="SVI Infra Solutions Pvt. Ltd."
-                className="h-10 w-auto dark:brightness-0 dark:invert"
+                width={282}
+                height={83}
+                quality={100}
+                className="h-10 w-auto dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]"
               />
             </Link>
             <p className="mb-6 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
