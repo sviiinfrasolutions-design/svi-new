@@ -23,136 +23,142 @@ const testimonialImages = [
 const testimonials = [
   {
     tempId: 0,
-    testimonial: 'My favorite solution in the market. We work 5x faster with SVI Infra Solutions.',
-    by: 'Arjun, CEO at TechCorp',
+    testimonial:
+      'Investing in their completed commercial project in Noida was the best decision. The footfall is amazing and the ROI is solid.',
+    by: 'Arjun, Commercial Investor',
     imgSrc: testimonialImages[0],
   },
   {
     tempId: 1,
     testimonial:
-      "I'm confident my data is safe with SVI Infra Solutions. I can't say that about other providers.",
-    by: 'Rohan, CTO at SecureNet',
+      "We shifted to our new flat last month. The construction quality is top-class and it's 100% Vastu compliant. Very happy with SVI Infra.",
+    by: 'Rohan, Homeowner',
     imgSrc: testimonialImages[1],
   },
   {
     tempId: 2,
     testimonial:
-      "I know it's cliche, but we were lost before we found SVI Infra Solutions. Can't thank you guys enough!",
-    by: 'Priya, COO at InnovateCo',
+      "Possession was given exactly on time! Usually, builders delay a lot, but SVI Infra's completed projects are proof of their commitment.",
+    by: 'Priya, Resident',
     imgSrc: testimonialImages[2],
   },
   {
     tempId: 3,
     testimonial:
-      "SVI Infra Solutions's products make planning for the future seamless. Can't recommend them enough!",
-    by: 'Vikram, CFO at FuturePlanning',
+      'The location of their existing projects in Jaipur is prime. Perfect connectivity for daily commute and great neighborhood.',
+    by: 'Vikram, Real Estate Investor',
     imgSrc: testimonialImages[3],
   },
   {
     tempId: 4,
-    testimonial: "If I could give 11 stars, I'd give 12.",
-    by: 'Ananya, Head of Design at CreativeSolutions',
+    testimonial:
+      'Unki property management team bohot cooperative hai. Maintenance in the completed towers is excellent and hassle-free.',
+    by: 'Ananya, Business Owner',
     imgSrc: testimonialImages[4],
   },
   {
     tempId: 5,
-    testimonial: "SO SO SO HAPPY WE FOUND YOU GUYS!!!! I'd bet you've saved me 100 hours so far.",
-    by: 'Karan, Product Manager at TimeWise',
+    testimonial:
+      'Visited their site in Noida. The society is fully secure and the amenities for kids are really good. Finalized our booking the same day.',
+    by: 'Karan, Property Buyer',
     imgSrc: testimonialImages[5],
   },
   {
     tempId: 6,
     testimonial:
-      "Took some convincing, but now that we're on SVI Infra Solutions, we're never going back.",
-    by: 'Amit, Marketing Director at BrandBuilders',
+      'Retail space in their completed project has given my shop a huge boost. Parking and security is totally tension-free.',
+    by: 'Amit, Retail Entrepreneur',
     imgSrc: testimonialImages[6],
   },
   {
     tempId: 7,
     testimonial:
-      "I would be lost without SVI Infra Solutions's in-depth analytics. The ROI is EASILY 100X for us.",
-    by: 'Siddharth, Data Scientist at AnalyticsPro',
+      'I only trust SVI Infra for investment. Unke existing projects ki resale value aur demand hamesha market mein high rehti hai.',
+    by: 'Siddharth, Financial Analyst',
     imgSrc: testimonialImages[7],
   },
   {
     tempId: 8,
-    testimonial: "It's just the best. Period.",
-    by: 'Neha, UX Designer at UserFirst',
+    testimonial:
+      'My parents are really happy with the new apartment. Society temple nearby and a great park for their evening walks.',
+    by: 'Neha, Homeowner',
     imgSrc: testimonialImages[8],
   },
   {
     tempId: 9,
-    testimonial: 'I switched 5 years ago and never looked back.',
-    by: 'Kritika, DevOps Engineer at CloudMasters',
+    testimonial:
+      'Capital appreciation Noida wale completed project mein outstanding raha. Definitely a safe bet for NRI investors.',
+    by: 'Kritika, Asset Manager',
     imgSrc: testimonialImages[9],
   },
   {
     tempId: 10,
     testimonial:
-      "I've been searching for a solution like SVI Infra Solutions for YEARS. So glad I finally found one!",
-    by: 'Varun, Sales Director at RevenueRockets',
+      'SVI Infra literally delivers what they promise in the brochure. No hidden charges and super transparent booking process.',
+    by: 'Varun, Homeowner',
     imgSrc: testimonialImages[0],
   },
   {
     tempId: 11,
-    testimonial: "It's so simple and intuitive, we got the team up to speed in 10 minutes.",
-    by: 'Rahul, HR Manager at TalentForge',
+    testimonial:
+      'Existing projects ki maintenance itni achi hai ki society abhi bhi brand new lagti hai. Very proactive facility team.',
+    by: 'Rahul, Community Resident',
     imgSrc: testimonialImages[1],
   },
   {
     tempId: 12,
     testimonial:
-      "SVI Infra Solutions's customer support is unparalleled. They're always there when we need them.",
-    by: 'Sneha, Customer Success Manager at ClientCare',
+      'Leased an office space in their IT park. Electricity backup and internet connectivity is flawless. Great corporate vibe.',
+    by: 'Sneha, Startup Founder',
     imgSrc: testimonialImages[2],
   },
   {
     tempId: 13,
     testimonial:
-      "The efficiency gains we've seen since implementing SVI Infra Solutions are off the charts!",
-    by: 'Manish, Operations Manager at StreamlineSolutions',
+      'Clubhouse and green area in their residential project is amazing. Weekend pe bahaar jaane ki zarurat hi nahi padti ab.',
+    by: 'Manish, Property Buyer',
     imgSrc: testimonialImages[3],
   },
   {
     tempId: 14,
     testimonial:
-      "SVI Infra Solutions has revolutionized how we handle our workflow. It's a game-changer!",
-    by: 'Deepika, Workflow Specialist at ProcessPro',
+      "SVI Infra's completed commercial hubs have the best corporate crowd. Very premium feel and the layout is very spacious.",
+    by: 'Deepika, Corporate Client',
     imgSrc: testimonialImages[4],
   },
   {
     tempId: 15,
     testimonial:
-      "The scalability of SVI Infra Solutions's solution is impressive. It grows with our business seamlessly.",
-    by: 'Rajesh, Scaling Officer at GrowthGurus',
+      "Property papers and registry process was handled so smoothly. Really appreciate their legal team's support.",
+    by: 'Rajesh, Portfolio Investor',
     imgSrc: testimonialImages[5],
   },
   {
     tempId: 16,
     testimonial:
-      "I appreciate how SVI Infra Solutions continually innovates. They're always one step ahead.",
-    by: 'Kunal, Innovation Lead at FutureTech',
+      'The floor plan is very spacious. Natural light aur ventilation ka poora dhyan rakha gaya hai apartments mein.',
+    by: 'Kunal, Interior Designer',
     imgSrc: testimonialImages[6],
   },
   {
     tempId: 17,
     testimonial:
-      "The ROI we've seen with SVI Infra Solutions is incredible. It's paid for itself many times over.",
-    by: 'Ankit, Finance Analyst at ProfitPeak',
+      "We checked multiple options in NCR, but SVI's existing projects offer the best value for money and lifestyle.",
+    by: 'Ankit, Prospective Buyer',
     imgSrc: testimonialImages[7],
   },
   {
     tempId: 18,
     testimonial:
-      "SVI Infra Solutions's platform is so robust, yet easy to use. It's the perfect balance.",
-    by: 'Simran, Tech Lead at BalancedTech',
+      'Key handover ceremony was beautifully organized. Really felt like a VIP customer when taking possession.',
+    by: 'Simran, First-time Buyer',
     imgSrc: testimonialImages[8],
   },
   {
     tempId: 19,
     testimonial:
-      "We've tried many solutions, but SVI Infra Solutions stands out in terms of reliability and performance.",
-    by: 'Meera, Performance Manager at ReliableSystems',
+      "Trust is everything in real estate, and SVI's track record with completed projects speaks for itself. Ekdum genuine builder.",
+    by: 'Meera, Real Estate Consultant',
     imgSrc: testimonialImages[9],
   },
 ];
@@ -230,7 +236,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
           isCenter ? 'text-brand-navy/80' : 'text-gray-500 dark:text-gray-400'
         )}
       >
-        - {testimonial.by}
+        - {testimonial.by.split(',')[0]}
       </p>
     </div>
   );
