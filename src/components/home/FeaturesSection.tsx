@@ -2,33 +2,39 @@
 
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
-import { Building2, Shield, TrendingUp } from 'lucide-react';
+import { Network, ShieldCheck, HardHat, TrendingUp, Handshake, Headset } from 'lucide-react';
 import AnimatedSection, {
   StaggerContainer,
   StaggerItem,
 } from '@/src/components/ui/AnimatedSection';
 
 const FEATURE_ICONS = [
-  <Building2 size={32} key="agents" />,
-  <Shield size={32} key="service" />,
-  <TrendingUp size={32} key="expertise" />,
+  <Network size={32} key="connectivity" />,
+  <ShieldCheck size={32} key="security" />,
+  <HardHat size={32} key="development" />,
+  <TrendingUp size={32} key="growth" />,
+  <Handshake size={32} key="transparent" />,
+  <Headset size={32} key="support" />,
 ];
 
 export default function FeaturesSection() {
   const t = useTranslations('whyInvest');
 
   const features = [
-    { title: t('expertAgentsTitle'), desc: t('expertAgentsDesc') },
-    { title: t('trustedServiceTitle'), desc: t('trustedServiceDesc') },
-    { title: t('marketExpertiseTitle'), desc: t('marketExpertiseDesc') },
+    { title: t('futureConnectivityTitle'), desc: t('futureConnectivityDesc') },
+    { title: t('legalSecurityTitle'), desc: t('legalSecurityDesc') },
+    { title: t('developmentReadyTitle'), desc: t('developmentReadyDesc') },
+    { title: t('organicGrowthTitle'), desc: t('organicGrowthDesc') },
+    { title: t('transparentTransactionsTitle'), desc: t('transparentTransactionsDesc') },
+    { title: t('endToEndSupportTitle'), desc: t('endToEndSupportDesc') },
   ];
 
   return (
     <section
       className="bg-gray-50 py-16 md:py-24 dark:bg-gray-800"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 800px' }}
       role="region"
-      aria-label="Why invest with us"
+      aria-label="Why investors choose SVI"
     >
       <div className="container mx-auto px-4">
         <AnimatedSection type="fadeUp" className="mx-auto mb-20 max-w-3xl text-center">
@@ -43,7 +49,7 @@ export default function FeaturesSection() {
           </p>
         </AnimatedSection>
 
-        <StaggerContainer className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <StaggerContainer className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, idx) => (
             <StaggerItem key={idx}>
               <motion.div

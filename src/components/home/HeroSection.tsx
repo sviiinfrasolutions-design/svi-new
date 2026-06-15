@@ -170,6 +170,9 @@ export default function HeroSection({ images }: { images: HeroImage[] }) {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
               <Link
                 href="/projects/current"
+                onClick={() => {
+                  import('@vercel/analytics').then(({ track }) => track('hero_cta_click'));
+                }}
                 className="shimmer bg-brand-gold text-brand-navy inline-flex h-14 items-center justify-center px-10 text-[11px] font-bold tracking-[0.15em] uppercase shadow-[0_0_40px_rgba(212,175,55,0.3)] transition-all hover:shadow-[0_0_60px_rgba(212,175,55,0.5)]"
               >
                 {t('cta')}

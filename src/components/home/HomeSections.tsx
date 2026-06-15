@@ -9,6 +9,12 @@ const FeaturesSection = dynamic(() => import('@/src/components/home/FeaturesSect
 const ProjectsSection = dynamic(() => import('@/src/components/home/ProjectsSection'), {
   ssr: false,
 });
+const LeadershipSection = dynamic(() => import('@/src/components/home/LeadershipSection'), {
+  ssr: false,
+});
+const TimelineSection = dynamic(() => import('@/src/components/home/TimelineSection'), {
+  ssr: false,
+});
 const CTASection = dynamic(() => import('@/src/components/home/CTASection'), { ssr: false });
 const LotteryCTA = dynamic(() => import('@/src/components/lottery/LotteryCTA'), { ssr: false });
 const StatsCounter = dynamic(() => import('@/src/components/ui/StatsCounter'), { ssr: false });
@@ -22,7 +28,9 @@ export default function HomeSections() {
         <StatsCounter />
       </section>
       <FeaturesSection />
+      <TimelineSection />
       <ProjectsSection />
+      <LeadershipSection />
       <LotteryCTA />
       <HomeFAQ />
       <CTASection />

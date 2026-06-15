@@ -24,7 +24,7 @@ const testimonials = [
   {
     tempId: 0,
     testimonial:
-      'Investing in their completed commercial project in Noida was the best decision. The footfall is amazing and the ROI is solid.',
+      'Investing in their completed commercial project in Noida was the best decision. The footfall is amazing and the rental potential is excellent.',
     by: 'Arjun, Commercial Investor',
     imgSrc: testimonialImages[0],
   },
@@ -87,7 +87,7 @@ const testimonials = [
   {
     tempId: 9,
     testimonial:
-      'Capital appreciation Noida wale completed project mein outstanding raha. Definitely a safe bet for NRI investors.',
+      'The value growth in the Noida completed project has been outstanding. Definitely a great choice for NRI investors.',
     by: 'Kritika, Asset Manager',
     imgSrc: testimonialImages[9],
   },

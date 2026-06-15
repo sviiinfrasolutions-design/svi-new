@@ -1,5 +1,6 @@
 import ClientProviders from '@/src/components/ClientProviders';
 import Breadcrumbs from '@/src/components/ui/Breadcrumbs';
+import { FloatingContact } from '@/src/components/layout/FloatingContact';
 import type { ReactNode } from 'react';
 
 export default function MainLayout({ children }: { children: ReactNode }) {
@@ -7,6 +8,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
     <ClientProviders>
       <Breadcrumbs />
       {children}
+      <FloatingContact />
     </ClientProviders>
   );
 }

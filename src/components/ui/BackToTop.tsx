@@ -36,7 +36,7 @@ export default function BackToTop() {
   return (
     <button
       onClick={scrollToTop}
-      className="bg-brand-navy dark:bg-brand-gold text-brand-gold dark:text-brand-navy fixed right-6 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-xl"
+      className="bg-brand-navy dark:bg-brand-gold text-brand-gold dark:text-brand-navy fixed right-8 bottom-[240px] z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-xl"
       style={{
         opacity: isVisible ? 1 : 0,
         pointerEvents: isVisible ? 'auto' : 'none',
