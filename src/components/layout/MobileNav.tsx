@@ -2,6 +2,7 @@
 
 import { ChevronDown, Building2, CheckSquare, Phone, Mail, Menu, X } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import LanguageToggle from '@/src/components/ui/LanguageToggle';
 import { ThemeToggle } from '@/src/components/ui/ThemeToggle';
 
@@ -106,10 +107,14 @@ export function MobileNav({
         {/* Drawer Header */}
         <div className="absolute top-5 right-5 left-5 flex items-center justify-between">
           <Link href="/" onClick={onClose} className="flex items-center gap-2">
-            <img
+            <Image
               src="/logo.png"
               alt="SVI Infra Solutions Logo"
-              className="h-[30px] w-auto object-contain"
+              width={282}
+              height={83}
+              priority
+              quality={100}
+              className="h-[26px] w-auto object-contain dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]"
             />
           </Link>
           <div className="flex items-center gap-2.5">

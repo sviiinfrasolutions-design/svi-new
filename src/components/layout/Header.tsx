@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useHeaderNavigation } from '@/src/components/layout/useHeaderNavigation';
 import { DesktopNav } from '@/src/components/layout/DesktopNav';
 import { MobileNav } from '@/src/components/layout/MobileNav';
@@ -31,13 +32,17 @@ export default function Header() {
               href="/"
               className="z-50 flex items-center gap-3 transition-transform duration-300 hover:scale-102"
             >
-              <img
+              <Image
                 src="/logo.png"
                 alt="SVI Infra Solutions Logo"
-                className={`w-auto max-w-[130px] object-contain transition-all duration-300 min-[380px]:max-w-[170px] sm:max-w-none ${
+                width={282}
+                height={83}
+                priority
+                quality={100}
+                className={`w-auto max-w-[130px] object-contain transition-all duration-300 min-[380px]:max-w-[170px] sm:max-w-none dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] ${
                   h.isScrolled
-                    ? 'h-[28px] min-[380px]:h-[30px] sm:h-[32px] md:h-[36px]'
-                    : 'h-[32px] min-[380px]:h-[34px] sm:h-[38px] md:h-[42px]'
+                    ? 'h-[22px] min-[380px]:h-[24px] sm:h-[26px] md:h-[30px]'
+                    : 'h-[26px] min-[380px]:h-[28px] sm:h-[32px] md:h-[36px]'
                 } ${h.isHomeTransparent ? 'brightness-0 invert' : ''}`}
               />
             </Link>
