@@ -15,7 +15,7 @@
     },
     {
       "path": "/api/cron/process-scheduled-emails",
-      "schedule": "* * * * *"
+      "schedule": "0 0 * * *"
     },
     {
       "path": "/api/cron/cleanup-registrations",
