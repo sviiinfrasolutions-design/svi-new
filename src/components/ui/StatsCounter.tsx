@@ -63,7 +63,7 @@ const StatItem = memo(function StatItem({ end, label, suffix = '', duration = 20
         {count}
         {suffix}
       </div>
-      <div className="text-[10px] font-semibold tracking-[0.15em] text-gray-400 uppercase sm:text-xs">
+      <div className="text-[10px] font-semibold tracking-[0.15em] text-gray-600 uppercase sm:text-xs dark:text-gray-400">
         {label}
       </div>
     </div>
@@ -74,7 +74,7 @@ export default function StatsCounter() {
   const t = useTranslations('stats');
   return (
     <div className="container mx-auto px-4 py-12 md:py-16">
-      <div className="grid grid-cols-2 gap-4 divide-white/10 md:grid-cols-4 md:gap-8 md:divide-x">
+      <div className="divide-brand-navy/10 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8 md:divide-x dark:divide-white/10">
         <StatItem end={5000} suffix="+" label={t('propertiesSold')} />
         <StatItem end={5000} suffix="+" label={t('happyClients')} />
         <StatItem end={15} suffix="+" label={t('yearsExperience')} />

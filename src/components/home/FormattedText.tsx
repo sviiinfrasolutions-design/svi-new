@@ -150,7 +150,7 @@ function FormattedTextSegment({ item }: { item: MatchResult }) {
       return (
         <a
           href={formatPhoneHref(item.text)}
-          className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-sm font-semibold text-green-700 underline underline-offset-2 transition-colors hover:bg-green-100 dark:bg-green-950/30 dark:text-green-400 dark:hover:bg-green-950/50"
+          className="bg-brand-gold/10 text-brand-navy hover:bg-brand-gold/20 dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-sm font-semibold underline underline-offset-2 transition-colors dark:bg-white/5 dark:text-gray-300"
         >
           <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
             <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.58.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.58 1 1 0 01-.25 1.01l-2.2 2.2z" />
@@ -163,7 +163,7 @@ function FormattedTextSegment({ item }: { item: MatchResult }) {
       return (
         <a
           href={`mailto:${item.text}`}
-          className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-sm font-medium text-blue-700 underline underline-offset-2 transition-colors hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950/50"
+          className="bg-brand-gold/10 text-brand-navy hover:bg-brand-gold/20 dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-sm font-medium underline underline-offset-2 transition-colors dark:bg-white/5 dark:text-gray-300"
         >
           <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
             <path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />

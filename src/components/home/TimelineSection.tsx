@@ -3,37 +3,11 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { Map, MapPin, Building, Ruler, ShieldCheck, CheckCircle2 } from 'lucide-react';
-
-const TIMELINE_STEPS = [
-  {
-    title: 'Land Acquisition',
-    desc: 'Strategic identification and acquisition of high-potential land parcels in growth corridors.',
-    icon: <Map className="h-6 w-6" />,
-  },
-  {
-    title: 'Planning & Design',
-    desc: 'Collaborating with top architects to design sustainable, Vastu-compliant master plans.',
-    icon: <Ruler className="h-6 w-6" />,
-  },
-  {
-    title: 'Approvals & RERA',
-    desc: 'Securing all necessary government clearances to ensure 100% legal security and transparency.',
-    icon: <ShieldCheck className="h-6 w-6" />,
-  },
-  {
-    title: 'Infrastructure Development',
-    desc: 'Executing world-class infrastructure including roads, electricity, water, and landscaping.',
-    icon: <Building className="h-6 w-6" />,
-  },
-  {
-    title: 'Delivery & Handover',
-    desc: 'On-time possession with complete documentation and seamless transition for our buyers.',
-    icon: <CheckCircle2 className="h-6 w-6" />,
-  },
-];
+import { useTranslations } from 'next-intl';
 
 export default function TimelineSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations('timeline');
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -42,10 +16,38 @@ export default function TimelineSection() {
 
   const lineHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
 
+  const TIMELINE_STEPS = [
+    {
+      title: t('steps.landAcquisition.title'),
+      desc: t('steps.landAcquisition.desc'),
+      icon: <Map className="h-6 w-6" />,
+    },
+    {
+      title: t('steps.planningDesign.title'),
+      desc: t('steps.planningDesign.desc'),
+      icon: <Ruler className="h-6 w-6" />,
+    },
+    {
+      title: t('steps.approvalsRera.title'),
+      desc: t('steps.approvalsRera.desc'),
+      icon: <ShieldCheck className="h-6 w-6" />,
+    },
+    {
+      title: t('steps.infrastructure.title'),
+      desc: t('steps.infrastructure.desc'),
+      icon: <Building className="h-6 w-6" />,
+    },
+    {
+      title: t('steps.delivery.title'),
+      desc: t('steps.delivery.desc'),
+      icon: <CheckCircle2 className="h-6 w-6" />,
+    },
+  ];
+
   return (
     <section
       ref={containerRef}
-      className="bg-brand-navy relative overflow-hidden py-24 text-white"
+      className="bg-brand-bg text-brand-navy dark:bg-brand-dark-bg relative overflow-hidden py-24 dark:text-white"
       role="region"
       aria-label="Development Timeline"
     >
@@ -57,15 +59,15 @@ export default function TimelineSection() {
 
       <div className="relative z-10 container mx-auto px-4">
         <div className="mb-20 text-center">
-          <h4 className="text-brand-gold mb-4 text-[10px] font-semibold tracking-[0.2em] uppercase">
-            Development Process
+          <h4 className="text-brand-gold mb-4 text-sm font-semibold tracking-[0.2em] uppercase md:text-base">
+            {t('subtitle')}
           </h4>
-          <h2 className="font-serif text-3xl md:text-5xl">How We Build The Future</h2>
+          <h2 className="font-serif text-3xl md:text-5xl">{t('title')}</h2>
         </div>
 
         <div className="relative mx-auto max-w-3xl">
           {/* Central Line Track */}
-          <div className="absolute top-0 bottom-0 left-8 w-[2px] bg-white/10 md:left-1/2 md:-ml-[1px]" />
+          <div className="bg-brand-navy/10 absolute top-0 bottom-0 left-8 w-[2px] md:left-1/2 md:-ml-[1px] dark:bg-white/10" />
 
           {/* Animated Fill Line */}
           <motion.div
@@ -85,7 +87,7 @@ export default function TimelineSection() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true, margin: '-100px' }}
                     transition={{ duration: 0.5, delay: 0.2 }}
-                    className="border-brand-navy bg-brand-gold text-brand-navy absolute left-8 z-10 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full border-4 shadow-[0_0_15px_rgba(212,175,55,0.4)] md:left-1/2"
+                    className="border-brand-bg bg-brand-gold text-brand-navy dark:border-brand-dark-bg absolute left-8 z-10 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full border-4 shadow-[0_0_15px_rgba(212,175,55,0.4)] md:left-1/2"
                   >
                     {step.icon}
                   </motion.div>
@@ -101,10 +103,12 @@ export default function TimelineSection() {
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true, margin: '-100px' }}
                       transition={{ duration: 0.6, delay: 0.3 }}
-                      className="border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-colors hover:bg-white/10"
+                      className="border-brand-navy/10 border bg-white/50 p-6 shadow-sm backdrop-blur-sm transition-colors hover:bg-white/80 dark:border-white/10 dark:bg-white/5 dark:shadow-none dark:hover:bg-white/10"
                     >
                       <h3 className="text-brand-gold mb-3 font-serif text-2xl">{step.title}</h3>
-                      <p className="leading-relaxed text-white/70">{step.desc}</p>
+                      <p className="leading-relaxed text-gray-600 dark:text-white/70">
+                        {step.desc}
+                      </p>
                     </motion.div>
                   </div>
                 </div>

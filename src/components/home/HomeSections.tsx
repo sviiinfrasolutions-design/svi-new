@@ -24,7 +24,7 @@ export default function HomeSections() {
   return (
     <>
       <AboutSection />
-      <section className="bg-brand-navy border-brand-gold border-opacity-30 relative overflow-hidden border-y">
+      <section className="bg-brand-bg dark:bg-brand-dark-bg border-brand-gold border-opacity-30 relative overflow-hidden border-y">
         <StatsCounter />
       </section>
       <FeaturesSection />

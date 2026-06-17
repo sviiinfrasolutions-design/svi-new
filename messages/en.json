@@ -12,6 +12,32 @@
     "description": "Premium real estate developer with 15+ years of experience. Specializing in residential flats and commercial properties in Jaipur, Noida, and DMIC corridors.",
     "copyright": "© 2026 SVI Infra Solutions. All rights reserved."
   },
+  "timeline": {
+    "subtitle": "Development Process",
+    "title": "How We Build The Future",
+    "steps": {
+      "landAcquisition": {
+        "title": "Land Acquisition",
+        "desc": "Strategic identification and acquisition of high-potential land parcels in growth corridors."
+      },
+      "planningDesign": {
+        "title": "Planning & Design",
+        "desc": "Collaborating with top architects to design sustainable, Vastu-compliant master plans."
+      },
+      "approvalsRera": {
+        "title": "Approvals & RERA",
+        "desc": "Securing all necessary government clearances to ensure 100% legal security and transparency."
+      },
+      "infrastructure": {
+        "title": "Infrastructure Development",
+        "desc": "Executing world-class infrastructure including roads, electricity, water, and landscaping."
+      },
+      "delivery": {
+        "title": "Delivery & Handover",
+        "desc": "On-time possession with complete documentation and seamless transition for our buyers."
+      }
+    }
+  },
   "nav": {
     "home": "Home",
     "aboutUs": "About Us",

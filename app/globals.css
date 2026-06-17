@@ -13,7 +13,7 @@
   --color-brand-gold-dark: #b8904d;
   --color-brand-gold-text: #b8904d;
   --color-brand-bg: #fafafa;
-  
+
   /* Dark mode specific brand colors */
   --color-brand-dark-bg: #0b0c10;
   --color-brand-dark-surface: #14151a;
@@ -32,7 +32,7 @@
   }
 
   body {
-    @apply bg-brand-bg font-sans text-brand-navy antialiased dark:bg-brand-dark-bg dark:text-gray-100;
+    @apply bg-brand-bg text-brand-navy dark:bg-brand-dark-bg font-sans antialiased dark:text-gray-100;
     overflow-x: hidden;
   }
 
@@ -77,7 +77,12 @@
 @layer utilities {
   /* Gradient text */
   .text-gradient-gold {
-    background: linear-gradient(135deg, var(--color-brand-gold) 0%, var(--color-brand-gold-light) 50%, var(--color-brand-gold) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-brand-gold) 0%,
+      var(--color-brand-gold-light) 50%,
+      var(--color-brand-gold) 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -418,14 +423,14 @@ table {
 
 /* ─── Fix iOS input zoom (font-size < 16px triggers zoom) ─── */
 @media (max-width: 767px) {
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  input[type="number"],
-  input[type="password"],
-  input[type="search"],
-  input[type="url"],
-  input[type="date"],
+  input[type='text'],
+  input[type='email'],
+  input[type='tel'],
+  input[type='number'],
+  input[type='password'],
+  input[type='search'],
+  input[type='url'],
+  input[type='date'],
   select,
   textarea {
     font-size: 16px !important;
@@ -482,8 +487,8 @@ table {
 }
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-none {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* ─── Noise Texture Overlay ─── */
@@ -552,7 +557,11 @@ table {
 .blog-content blockquote {
   position: relative;
   border-left: 4px solid var(--color-brand-gold) !important;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.02) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(212, 175, 55, 0.05) 0%,
+    rgba(212, 175, 55, 0.02) 100%
+  ) !important;
   border-radius: 0 12px 12px 0 !important;
   padding: 1.25rem 1.5rem !important;
   margin: 2rem 0 !important;

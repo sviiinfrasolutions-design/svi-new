@@ -10,21 +10,21 @@ const QUICK_ACTIONS = [
     icon: Calendar,
     href: '/contact?subject=Site%20Visit',
     className:
-      'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950/50',
+      'bg-brand-navy/5 text-brand-navy hover:bg-brand-navy/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold',
   },
   {
     label: 'Call Back',
     icon: Phone,
     href: PHONE_HREF,
     className:
-      'bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-950/30 dark:text-green-400 dark:hover:bg-green-950/50',
+      'bg-brand-navy/5 text-brand-navy hover:bg-brand-navy/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold',
   },
   {
     label: 'Get Brochure',
     icon: FileText,
     href: '/contact?subject=Brochure%20Request',
     className:
-      'bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:hover:bg-amber-950/50',
+      'bg-brand-navy/5 text-brand-navy hover:bg-brand-navy/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold',
   },
 ];
 

@@ -597,9 +597,9 @@ export default function Registration() {
           </div>
 
           {/* CTA Section */}
-          <div className="bg-brand-navy mt-16 p-12 text-center text-white">
+          <div className="bg-brand-bg text-brand-navy dark:bg-brand-dark-bg mt-16 p-12 text-center dark:text-white">
             <h2 className="mb-4 font-serif text-3xl">Ready to Find Your Dream Home?</h2>
-            <p className="mb-8 text-sm text-gray-300">
+            <p className="mb-8 text-sm text-gray-600 dark:text-gray-300">
               Let our expert team help you navigate the real estate market and find the perfect
               property for you.
             </p>

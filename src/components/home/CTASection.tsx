@@ -10,7 +10,7 @@ export default function CTASection() {
   const t = useTranslations('cta');
   return (
     <section
-      className="bg-brand-navy relative overflow-hidden py-20"
+      className="bg-brand-bg dark:bg-brand-dark-bg relative overflow-hidden py-20"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
       role="region"
       aria-label="Call to action"
@@ -19,8 +19,10 @@ export default function CTASection() {
       <div className="bg-brand-gold/5 absolute -bottom-32 -left-32 h-80 w-80 rounded-full blur-3xl" />
 
       <AnimatedSection type="fadeUp" className="relative z-10 container mx-auto px-4 text-center">
-        <h2 className="mb-8 font-serif text-3xl text-white md:text-5xl">{t('title')}</h2>
-        <p className="mx-auto mb-8 max-w-2xl px-2 text-base leading-relaxed text-gray-300 md:mb-12 md:px-0 md:text-lg">
+        <h2 className="text-brand-navy mb-8 font-serif text-3xl md:text-5xl dark:text-white">
+          {t('title')}
+        </h2>
+        <p className="mx-auto mb-8 max-w-2xl px-2 text-base leading-relaxed text-gray-600 md:mb-12 md:px-0 md:text-lg dark:text-gray-300">
           {t('subtitle')}
         </p>
         <div className="flex flex-col items-center justify-center gap-5 sm:flex-row">
@@ -34,7 +36,7 @@ export default function CTASection() {
           </motion.div>
           <Link
             href="/contact"
-            className="group flex items-center gap-2 text-white/90 transition-colors hover:text-white"
+            className="group text-brand-navy/80 hover:text-brand-navy flex items-center gap-2 transition-colors dark:text-white/90 dark:hover:text-white"
           >
             <span className="hover-underline-gold text-[10px] font-semibold tracking-wider uppercase">
               {t('contactUs')}
