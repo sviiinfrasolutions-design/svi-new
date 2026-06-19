@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { ChevronDown, Building2, CheckSquare, Phone, Mail, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -52,7 +53,7 @@ function MobileLink({
   );
 }
 
-export function MobileNav({
+const MobileNav = memo(function MobileNav({
   isOpen,
   isProjectsOpen,
   currentPath,
@@ -288,4 +289,6 @@ export function MobileNav({
       </div>
     </>
   );
-}
+});
+
+export { MobileNav };

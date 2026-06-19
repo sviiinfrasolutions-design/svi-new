@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Analytics from '@/src/components/common/Analytics';
 import BackToTop from '@/src/components/ui/BackToTop';
 import CookieConsent from '@/src/components/common/CookieConsent';
@@ -9,7 +10,11 @@ import Header from '@/src/components/layout/Header';
 import type { ReactNode } from 'react';
 import ScrollToTop from '@/src/components/ui/ScrollToTop';
 import { ThemeProvider } from '@/src/components/ThemeProvider';
-import ChatBot from '@/src/components/home/ChatBot';
+
+const ChatBot = dynamic(() => import('@/src/components/home/ChatBot'), {
+  ssr: false,
+  loading: () => null,
+});
 
 export default function ClientProviders({ children }: { children: ReactNode }) {
   return (

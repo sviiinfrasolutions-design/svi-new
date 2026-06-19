@@ -52,15 +52,15 @@ export default function Login() {
 
     setIsSubmitting(true);
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.signInWithPassword({
         email: identifier,
         password,
       });
       if (authError) throw authError;
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -119,16 +119,16 @@ export default function Login() {
 
     setIsSubmitting(true);
     try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({
+      const {
+        data: { user },
+        error: verifyError,
+      } = await supabase.auth.verifyOtp({
         email: identifier,
         token: otp,
         type: 'email',
       });
       if (verifyError) throw verifyError;
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')

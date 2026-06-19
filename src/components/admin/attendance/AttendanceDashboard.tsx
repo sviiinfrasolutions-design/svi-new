@@ -2,8 +2,8 @@
 
 import { BarChart3, CalendarCheck, RefreshCw, TrendingUp, Users, XCircle } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
 
+import { useAttendanceAnalytics, type AttendanceAnalytics } from '@/src/hooks/adminQueries';
 import AttendanceStatusChart from '@/src/components/admin/ChartComponents/AttendanceStatusChart';
 import AttendanceTrendChart from '@/src/components/admin/ChartComponents/AttendanceTrendChart';
 import DynamicSkeleton from '@/src/components/ui/DynamicSkeleton';
@@ -13,22 +13,8 @@ interface AttendanceDashboardProps {
   showToast: (type: 'success' | 'error', msg: string) => void;
 }
 
-interface AnalyticsData {
-  today: {
-    present: number;
-    absent: number;
-    half_day: number;
-    leave: number;
-    total: number;
-    rate: number;
-  };
-  weeklyTrend: Array<{ date: string; rate: number }>;
-  monthlyBreakdown: Array<{ name: string; count: number }>;
-  thirtyDayTrend: Array<{ date: string; rate: number }>;
-}
-
 const STATS: Array<{
-  key: keyof AnalyticsData['today'];
+  key: keyof AttendanceAnalytics['today'];
   label: string;
   icon: typeof CalendarCheck;
   color: string;
@@ -66,34 +52,10 @@ const STATS: Array<{
   },
 ];
 
-export default function AttendanceDashboard({ token, showToast }: AttendanceDashboardProps) {
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function AttendanceDashboard(_props: AttendanceDashboardProps) {
+  const { data, isLoading, refetch } = useAttendanceAnalytics();
 
-  const fetchAnalytics = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/admin/attendance/analytics', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.error);
-      }
-      const json = await res.json();
-      setData(json);
-    } catch (err: unknown) {
-      showToast('error', err instanceof Error ? err.message : 'Failed to load analytics');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (token) fetchAnalytics();
-  }, [token]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div>
         <div className="mb-6 flex items-center justify-between">
@@ -137,7 +99,7 @@ export default function AttendanceDashboard({ token, showToast }: AttendanceDash
           <p className="text-xs text-gray-500 dark:text-gray-400">Attendance overview and trends</p>
         </div>
         <button
-          onClick={fetchAnalytics}
+          onClick={() => refetch()}
           className="dark:bg-brand-dark-surface/85 flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold tracking-widest text-gray-700 uppercase transition-all hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
         >
           <RefreshCw className="h-3.5 w-3.5" /> Refresh

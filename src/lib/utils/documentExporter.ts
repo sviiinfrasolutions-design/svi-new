@@ -1,6 +1,3 @@
-import html2canvas from 'html2canvas-pro';
-import jsPDF from 'jspdf';
-
 interface ExportOptions {
   elementId: string;
   filename: string;
@@ -18,15 +15,16 @@ export async function exportToPDF({
 }: ExportOptions): Promise<void> {
   if (typeof window === 'undefined') return;
 
+  const html2canvas = (await import('html2canvas-pro')).default;
+  const { default: jsPDF } = await import('jspdf');
+
   const element = document.getElementById(elementId);
   if (!element) {
     throw new Error(`Element with id "${elementId}" not found.`);
   }
 
-  // Clone the element to avoid modifying the original view
   const clone = element.cloneNode(true) as HTMLElement;
 
-  // Set proper styles for high-quality print layout
   clone.style.backgroundColor = 'white';
   clone.style.color = 'black';
   clone.style.width = width;
@@ -37,7 +35,6 @@ export async function exportToPDF({
   clone.style.padding = padding;
   clone.style.boxSizing = 'border-box';
 
-  // Wait for all images in the clone to load
   const images = clone.querySelectorAll('img');
   const imagePromises = Array.from(images).map((img) => {
     return new Promise<void>((resolve) => {
@@ -65,7 +62,7 @@ export async function exportToPDF({
       removeContainer: true,
       scrollX: 0,
       scrollY: 0,
-      windowWidth: 794, // A4 width in pixels at 96 DPI (210mm)
+      windowWidth: 794,
       windowHeight: clone.scrollHeight,
     });
 
@@ -129,6 +126,8 @@ export async function exportToImage({
   width = '210mm',
 }: ExportOptions): Promise<void> {
   if (typeof window === 'undefined') return;
+
+  const html2canvas = (await import('html2canvas-pro')).default;
 
   const element = document.getElementById(elementId);
   if (!element) {

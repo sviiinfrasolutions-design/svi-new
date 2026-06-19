@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/src/lib/supabase/client';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { MessageCircle, Trash2, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { useChatLogs, useClearChatLogs } from '@/src/hooks/adminQueries';
 
 interface ChatLog {
   id: string;
@@ -23,46 +22,15 @@ interface ChatDetail {
 }
 
 export default function AdminChatLogs() {
-  const router = useRouter();
-  const [token, setToken] = useState('');
-  const [logs, setLogs] = useState<ChatLog[]>([]);
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [selectedLog, setSelectedLog] = useState<ChatLog | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatDetail[]>([]);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        router.replace('/admin');
-        return;
-      }
-      setToken(session.access_token);
-    });
-  }, [router]);
+  const { data, isLoading, refetch } = useChatLogs(page);
+  const clearMutation = useClearChatLogs();
 
-  useEffect(() => {
-    if (!token) return;
-    fetchLogs();
-  }, [token, page]);
-
-  const fetchLogs = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/chat/log?page=${page}&limit=20`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error('Failed');
-      const data = await res.json();
-      setLogs(data.logs || []);
-      setTotalPages(data.pagination?.totalPages || 1);
-    } catch {
-      setLogs([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const logs = data?.logs ?? [];
+  const totalPages = data?.pagination?.totalPages ?? 1;
 
   const viewLog = (log: ChatLog) => {
     setSelectedLog(log);
@@ -74,22 +42,15 @@ export default function AdminChatLogs() {
     }
   };
 
-  const clearLogs = async () => {
+  const handleClearLogs = async () => {
     if (!confirm('Clear all chat logs?')) return;
-    try {
-      await fetch(`/api/chat/log?all=true`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchLogs();
-    } catch {
-      // Silently handle errors
-    }
+    await clearMutation.mutateAsync();
+    setSelectedLog(null);
+    setChatMessages([]);
   };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="bg-brand-gold/10 flex h-12 w-12 items-center justify-center rounded-xl">
@@ -106,14 +67,15 @@ export default function AdminChatLogs() {
         </div>
         <div className="flex gap-3">
           <button
-            onClick={fetchLogs}
+            onClick={() => refetch()}
             className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-bold tracking-wider text-gray-600 uppercase transition-all hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>
           <button
-            onClick={clearLogs}
-            className="flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-xs font-bold tracking-wider text-red-600 uppercase transition-all hover:bg-red-50 dark:border-red-800 dark:bg-gray-800 dark:text-red-400"
+            onClick={handleClearLogs}
+            disabled={clearMutation.isPending}
+            className="flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-xs font-bold tracking-wider text-red-600 uppercase transition-all hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:bg-gray-800 dark:text-red-400"
           >
             <Trash2 className="h-3.5 w-3.5" /> Clear All
           </button>
@@ -121,10 +83,9 @@ export default function AdminChatLogs() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Log List */}
         <div className="lg:col-span-2">
           <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
-            {loading ? (
+            {isLoading ? (
               <div className="flex items-center justify-center py-20">
                 <div className="border-brand-gold h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
               </div>
@@ -167,7 +128,6 @@ export default function AdminChatLogs() {
               </div>
             )}
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between border-t px-5 py-3 dark:border-gray-800">
                 <button
@@ -192,7 +152,6 @@ export default function AdminChatLogs() {
           </div>
         </div>
 
-        {/* Detail Panel */}
         <div className="lg:col-span-1">
           <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
             {!selectedLog ? (

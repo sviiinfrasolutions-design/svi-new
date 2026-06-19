@@ -1,26 +1,11 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { supabase } from '@/src/lib/supabase/client';
 import confetti from 'canvas-confetti';
-
-export interface Participant {
-  id: string;
-  name: string;
-  ticket_number: string;
-  is_winner: boolean;
-}
-
-export interface ActiveLottery {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  created_at: string;
-}
+import { useLotteryData, type Participant } from './useLotteryData';
 
 export interface UseLotteryDrawReturn {
-  activeLottery: ActiveLottery | null;
+  activeLottery: import('./useLotteryData').ActiveLottery | null;
   participants: Participant[];
   winners: Participant[];
   revealedWinners: Participant[];
@@ -52,11 +37,19 @@ export interface UseLotteryDrawReturn {
 }
 
 export function useLotteryDraw(): UseLotteryDrawReturn {
-  const [activeLottery, setActiveLottery] = useState<ActiveLottery | null>(null);
-  const [participants, setParticipants] = useState<Participant[]>([]);
+  const {
+    activeLottery,
+    participants,
+    historicalWinners,
+    error,
+    scheduledAt,
+    countdownStr,
+    fetchActiveLottery: fetchData,
+    fetchHallOfFame,
+  } = useLotteryData();
+
   const [winners, setWinners] = useState<Participant[]>([]);
 
-  // Animation & UI States
   const [isDrawArenaOpen, setIsDrawArenaOpen] = useState(false);
   const [isShuffling, setIsShuffling] = useState(false);
   const [shuffledNames, setShuffledNames] = useState<string[]>([]);
@@ -66,54 +59,28 @@ export function useLotteryDraw(): UseLotteryDrawReturn {
   const [activeWinnerIndex, setActiveWinnerIndex] = useState(0);
   const [winnerSwipeDir, setWinnerSwipeDir] = useState(1);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [historicalWinners, setHistoricalWinners] = useState<any[]>([]);
   const [visibleCount, setVisibleCount] = useState(10);
-  const [error, setError] = useState<string | null>(null);
-
-  // Countdown state
-  const [scheduledAt, setScheduledAt] = useState<Date | null>(null);
-  const [countdownStr, setCountdownStr] = useState<string | null>(null);
 
   const shuffleContainerRef = useRef<HTMLDivElement>(null);
   const shuffleTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const revealTimerRef = useRef<NodeJS.Timeout | null>(null);
   const carouselTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    fetchActiveLottery();
-    fetchHallOfFame();
-    fetchScheduleCountdown();
-    const pollInterval = setInterval(fetchScheduleCountdown, 30_000);
-    return () => clearInterval(pollInterval);
-  }, []);
+  const initialSyncRef = useRef(false);
 
   useEffect(() => {
-    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-    if (!scheduledAt) {
-      setCountdownStr(null);
-      return;
+    if (participants.length > 0 && !initialSyncRef.current) {
+      initialSyncRef.current = true;
+      const dbWinners = participants.filter((p) => p.is_winner);
+      if (dbWinners.length > 0) setWinners(dbWinners);
     }
-    const tick = () => {
-      const diff = scheduledAt.getTime() - Date.now();
-      if (diff <= 0) {
-        setCountdownStr(null);
-        setScheduledAt(null);
-        return;
-      }
-      const totalSec = Math.floor(diff / 1000);
-      const h = Math.floor(totalSec / 3600);
-      const m = Math.floor((totalSec % 3600) / 60);
-      const s = totalSec % 60;
-      const pad = (n: number) => String(n).padStart(2, '0');
-      setCountdownStr(h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`);
-    };
-    tick();
-    countdownIntervalRef.current = setInterval(tick, 1_000);
-    return () => {
-      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-    };
-  }, [scheduledAt]);
+  }, [participants]);
+
+  const fetchActiveLottery = useCallback(async () => {
+    initialSyncRef.current = false;
+    setWinners([]);
+    await fetchData();
+  }, [fetchData]);
 
   // Auto-rotate winners carousel
   useEffect(() => {
@@ -139,83 +106,6 @@ export function useLotteryDraw(): UseLotteryDrawReturn {
     };
   }, []);
 
-  const fetchScheduleCountdown = async () => {
-    try {
-      const res = await fetch('/api/lottery/schedule');
-      const json = await res.json();
-      if (json.scheduled?.scheduled_at) {
-        setScheduledAt(new Date(json.scheduled.scheduled_at));
-      } else {
-        setScheduledAt(null);
-      }
-    } catch {
-      // ignore
-    }
-  };
-
-  const fetchActiveLottery = async () => {
-    try {
-      setError(null);
-      const { data: lotteryData, error: lError } = await supabase
-        .from('lotteries')
-        .select('*')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (lError) throw lError;
-
-      if (lotteryData && lotteryData.length > 0) {
-        const active = lotteryData[0];
-        setActiveLottery(active);
-
-        const { data: participantsData, error: pError } = await supabase
-          .from('lottery_participants')
-          .select('id, name, ticket_number, is_winner')
-          .eq('lottery_id', active.id);
-
-        if (pError) throw pError;
-        setParticipants(participantsData || []);
-
-        const dbWinners = participantsData?.filter((p) => p.is_winner) || [];
-        if (dbWinners.length > 0) {
-          setWinners(dbWinners);
-        }
-      }
-    } catch (err: any) {
-      console.error('Error loading homepage lottery:', err);
-      setError(
-        err.message || 'Failed to connect to the database. Please check connection and try again.'
-      );
-    }
-  };
-
-  const fetchHallOfFame = async () => {
-    try {
-      const { data: lotteryData } = await supabase
-        .from('lotteries')
-        .select('id, title')
-        .in('status', ['active', 'completed'])
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (!lotteryData || lotteryData.length === 0) return;
-
-      const { data, error } = await supabase
-        .from('lottery_participants')
-        .select('name, ticket_number, is_winner, created_at')
-        .eq('lottery_id', lotteryData[0].id)
-        .order('is_winner', { ascending: false })
-        .order('created_at', { ascending: true });
-
-      if (!error && data) {
-        setHistoricalWinners(data);
-      }
-    } catch (err: any) {
-      console.error('Error fetching hall of fame:', err);
-    }
-  };
-
   // ── Sound Effects ──────────────────────────────────────────────────────
   const playTickSound = () => {
     if (!soundEnabled) return;
@@ -240,7 +130,12 @@ export function useLotteryDraw(): UseLotteryDrawReturn {
     try {
       const context = new (window.AudioContext || (window as any).webkitAudioContext)();
       const now = context.currentTime;
-      const playTone = (freq: number, start: number, duration: number, type: OscillatorType = 'sine') => {
+      const playTone = (
+        freq: number,
+        start: number,
+        duration: number,
+        type: OscillatorType = 'sine'
+      ) => {
         const osc = context.createOscillator();
         const gain = context.createGain();
         osc.connect(gain);
@@ -268,7 +163,12 @@ export function useLotteryDraw(): UseLotteryDrawReturn {
     try {
       const context = new (window.AudioContext || (window as any).webkitAudioContext)();
       const now = context.currentTime;
-      const playTone = (freq: number, start: number, duration: number, type: OscillatorType = 'sine') => {
+      const playTone = (
+        freq: number,
+        start: number,
+        duration: number,
+        type: OscillatorType = 'sine'
+      ) => {
         const osc = context.createOscillator();
         const gain = context.createGain();
         osc.connect(gain);
@@ -421,7 +321,7 @@ export function useLotteryDraw(): UseLotteryDrawReturn {
 
       revealTimerRef.current = setTimeout(revealNext, 400);
     },
-    [playRevealSound, playFanfareSound, triggerWinnerConfetti, triggerGrandFinale, fetchHallOfFame]
+    [playFanfareSound, triggerGrandFinale, triggerWinnerConfetti, fetchHallOfFame]
   );
 
   // ── Shuffle Animation ──────────────────────────────────────────────────
@@ -483,19 +383,21 @@ export function useLotteryDraw(): UseLotteryDrawReturn {
     shuffleTimerRef.current = setTimeout(tick, delay);
   };
 
-  const handleCarouselNavigate = useCallback((idx: number, dir: number) => {
-    setWinnerSwipeDir(dir);
-    setActiveWinnerIndex(idx);
-    // Restart auto-rotation timer
-    if (carouselTimerRef.current) clearInterval(carouselTimerRef.current);
-    if (winners.length > 1) {
-      carouselTimerRef.current = setInterval(() => {
-        setWinnerSwipeDir(1);
-        setActiveWinnerIndex((prev) => (prev + 1) % winners.length);
-        triggerMiniConfetti();
-      }, 3500);
-    }
-  }, [winners.length, triggerMiniConfetti]);
+  const handleCarouselNavigate = useCallback(
+    (idx: number, dir: number) => {
+      setWinnerSwipeDir(dir);
+      setActiveWinnerIndex(idx);
+      if (carouselTimerRef.current) clearInterval(carouselTimerRef.current);
+      if (winners.length > 1) {
+        carouselTimerRef.current = setInterval(() => {
+          setWinnerSwipeDir(1);
+          setActiveWinnerIndex((prev) => (prev + 1) % winners.length);
+          triggerMiniConfetti();
+        }, 3500);
+      }
+    },
+    [winners.length, triggerMiniConfetti]
+  );
 
   return {
     activeLottery,

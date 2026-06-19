@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import Link from 'next/link';
 import { ProjectDropdown } from './ProjectDropdown';
 import LanguageToggle from '@/src/components/ui/LanguageToggle';
@@ -52,7 +53,7 @@ function NavLink({
   );
 }
 
-export function DesktopNav({
+const DesktopNav = memo(function DesktopNav({
   currentPath,
   isHomeTransparent,
   lotteryVisible,
@@ -152,4 +153,6 @@ export function DesktopNav({
       />
     </nav>
   );
-}
+});
+
+export { DesktopNav };

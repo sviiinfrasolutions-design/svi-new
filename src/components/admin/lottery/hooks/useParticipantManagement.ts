@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import ExcelJS from 'exceljs';
 import type { Participant } from '../types';
 
 interface UseParticipantManagementReturn {
@@ -202,6 +201,7 @@ export function useParticipantManagement(): UseParticipantManagementReturn {
         reader.onload = async (e) => {
           try {
             const buffer = e.target?.result as ArrayBuffer;
+            const { default: ExcelJS } = await import('exceljs');
             const workbook = new ExcelJS.Workbook();
             await workbook.xlsx.load(buffer);
             const worksheet = workbook.worksheets[0];
