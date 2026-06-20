@@ -12,11 +12,19 @@ export interface Lottery {
   status: 'active' | 'completed' | 'inactive';
   created_at: string;
   winner?: {
+    id?: string;
     name: string;
     ticket_number: string;
     phone?: string;
     email?: string;
   } | null;
+  winners?: Array<{
+    id?: string;
+    name: string;
+    ticket_number: string;
+    phone?: string;
+    email?: string;
+  }>;
 }
 
 export interface DbParticipant {

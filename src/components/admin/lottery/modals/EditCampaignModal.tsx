@@ -32,6 +32,7 @@ export function EditCampaignModal({
   const [winnerPhone, setWinnerPhone] = useState('');
   const [winnerEmail, setWinnerEmail] = useState('');
   const [saving, setSaving] = useState(false);
+  const [addingWinner, setAddingWinner] = useState(false);
   const [tab, setTab] = useState<'details' | 'winner' | 'participants'>('details');
   const [participants, setParticipants] = useState<DbParticipant[]>([]);
   const [partsLoading, setPartsLoading] = useState(false);
@@ -69,10 +70,10 @@ export function EditCampaignModal({
     setTitle(lottery.title);
     setDescription(lottery.description || '');
     setStatus(lottery.status);
-    setWinnerName(lottery.winner?.name || '');
-    setWinnerTicket(lottery.winner?.ticket_number || '');
-    setWinnerPhone(lottery.winner?.phone || '');
-    setWinnerEmail(lottery.winner?.email || '');
+    setWinnerName('');
+    setWinnerTicket('');
+    setWinnerPhone('');
+    setWinnerEmail('');
     setTab('details');
     setPartsSearch('');
     setEditId(null);
@@ -209,6 +210,76 @@ export function EditCampaignModal({
       );
     } catch (err: any) {
       onError(err.message);
+    }
+  };
+
+  const handleAddWinner = async () => {
+    if (!lottery || !winnerName.trim() || !winnerTicket.trim()) return;
+    setAddingWinner(true);
+    try {
+      // Check if ticket number matches existing participant (case-insensitive)
+      const existingPart = participants.find(
+        (p) => p.ticket_number.toLowerCase() === winnerTicket.trim().toLowerCase()
+      );
+
+      if (existingPart) {
+        // Update existing participant to winner
+        const { error } = await supabase
+          .from('lottery_participants')
+          .update({
+            is_winner: true,
+            name: winnerName.trim(),
+            phone: winnerPhone.trim() || existingPart.phone || null,
+            email: winnerEmail.trim() || existingPart.email || null,
+          })
+          .eq('id', existingPart.id);
+
+        if (error) throw error;
+
+        setParticipants((prev) =>
+          prev.map((p) =>
+            p.id === existingPart.id
+              ? {
+                  ...p,
+                  is_winner: true,
+                  name: winnerName.trim(),
+                  phone: winnerPhone.trim() || existingPart.phone || null,
+                  email: winnerEmail.trim() || existingPart.email || null,
+                }
+              : p
+          )
+        );
+        onSuccess('Existing participant updated and marked as winner!');
+      } else {
+        // Create new participant with is_winner: true
+        const { data, error } = await supabase
+          .from('lottery_participants')
+          .insert({
+            lottery_id: lottery.id,
+            name: winnerName.trim(),
+            ticket_number: winnerTicket.trim(),
+            phone: winnerPhone.trim() || null,
+            email: winnerEmail.trim() || null,
+            is_winner: true,
+          })
+          .select('id, name, ticket_number, phone, email, is_winner')
+          .single();
+
+        if (error) throw error;
+
+        setParticipants((prev) => [...prev, data]);
+        onSuccess('Winner created successfully!');
+      }
+
+      // Reset inputs
+      setWinnerName('');
+      setWinnerTicket('');
+      setWinnerPhone('');
+      setWinnerEmail('');
+    } catch (err: any) {
+      onError(err.message || 'Failed to add winner.');
+    } finally {
+      setAddingWinner(false);
     }
   };
 
@@ -402,6 +473,17 @@ export function EditCampaignModal({
                     </div>
                   </div>
 
+                  <div className="flex justify-end">
+                    <button
+                      onClick={handleAddWinner}
+                      disabled={addingWinner || !winnerName.trim() || !winnerTicket.trim()}
+                      className="bg-brand-gold text-brand-navy inline-flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-all hover:opacity-90 disabled:opacity-50"
+                    >
+                      {addingWinner ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : null}
+                      Add Winner
+                    </button>
+                  </div>
+
                   {winnerName && (
                     <div className="border-brand-gold/30 rounded-2xl border bg-amber-50 p-5 dark:bg-amber-500/10">
                       <div className="flex items-center gap-4">
@@ -424,8 +506,8 @@ export function EditCampaignModal({
                   )}
 
                   <p className="text-[10px] text-slate-400 italic dark:text-gray-500">
-                    Leave winner name blank to clear existing winner records. Use "Toggle Winner" in
-                    the Participants tab for granular control.
+                    Use "Add Winner" to designate a participant as a winner. You can also toggle
+                    winners in the Participants tab.
                   </p>
 
                   {/* Current Winners List */}

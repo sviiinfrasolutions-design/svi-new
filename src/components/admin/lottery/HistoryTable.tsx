@@ -76,7 +76,28 @@ export function HistoryTable({
                     </span>
                   </td>
                   <td className="px-8 py-5">
-                    {l.winner ? (
+                    {l.winners && l.winners.length > 0 ? (
+                      <div className="space-y-2">
+                        {l.winners.map((w: any, idx: number) => (
+                          <div
+                            key={idx}
+                            className="border-b border-slate-100 pb-1.5 last:border-0 last:pb-0 dark:border-white/5"
+                          >
+                            <div className="text-brand-gold flex items-center gap-2 font-bold">
+                              <Award className="h-4 w-4 shrink-0" /> {w.name}
+                            </div>
+                            <div className="mt-0.5 pl-6 font-mono text-[10px] text-slate-500 dark:text-gray-500">
+                              Ticket: {w.ticket_number}
+                            </div>
+                            {w.id && (
+                              <div className="mt-0.5 pl-6 font-mono text-[9px] text-slate-500 dark:text-slate-400">
+                                ID: {w.id}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : l.winner ? (
                       <div>
                         <div className="text-brand-gold flex items-center gap-2 font-bold">
                           <Award className="h-4 w-4 shrink-0" /> {l.winner.name}
@@ -84,6 +105,11 @@ export function HistoryTable({
                         <div className="mt-1 font-mono text-[10px] text-slate-500 dark:text-gray-500">
                           Ticket: {l.winner.ticket_number}
                         </div>
+                        {l.winner.id && (
+                          <div className="mt-0.5 font-mono text-[9px] text-slate-500 dark:text-slate-400">
+                            ID: {l.winner.id}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <span className="text-xs text-slate-400 italic dark:text-gray-500">

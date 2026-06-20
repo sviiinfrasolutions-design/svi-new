@@ -56,21 +56,30 @@ export function useLotteryData(): UseLotteryDataReturn {
       if (pError) throw pError;
 
       const formattedLotteries: Lottery[] = (lotteriesData || []).map((l) => {
-        const winner = participantsData?.find((p) => p.lottery_id === l.id);
+        const campaignWinners = participantsData?.filter((p) => p.lottery_id === l.id) || [];
+        const firstWinner = campaignWinners[0];
         return {
           id: l.id,
           title: l.title,
           description: l.description,
           status: l.status,
           created_at: l.created_at,
-          winner: winner
+          winner: firstWinner
             ? {
-                name: winner.name,
-                ticket_number: winner.ticket_number,
-                phone: winner.phone,
-                email: winner.email,
+                id: firstWinner.id,
+                name: firstWinner.name,
+                ticket_number: firstWinner.ticket_number,
+                phone: firstWinner.phone,
+                email: firstWinner.email,
               }
             : null,
+          winners: campaignWinners.map((w) => ({
+            id: w.id,
+            name: w.name,
+            ticket_number: w.ticket_number,
+            phone: w.phone,
+            email: w.email,
+          })),
         };
       });
 
