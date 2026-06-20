@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Clock, ArrowRight, Trophy } from 'lucide-react';
 import Link from 'next/link';
@@ -73,6 +74,7 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 }
 
 export default function LotteryCTA() {
+  const t = useTranslations('pages.lottery');
   const [lottery, setLottery] = useState<ActiveLottery | null>(null);
   const [loading, setLoading] = useState(true);
   const { visible, loading: visLoading } = useLotteryVisibility();
@@ -116,7 +118,7 @@ export default function LotteryCTA() {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="relative overflow-hidden bg-gradient-to-br from-[#07070b] via-[#0e0e18] to-[#07070b] py-16 md:py-20"
         role="region"
-        aria-label="Active Lucky Draw"
+        aria-label={t('title')}
       >
         {/* Dot grid background */}
         <div
@@ -150,7 +152,7 @@ export default function LotteryCTA() {
             >
               <span className="bg-brand-gold/10 text-brand-gold border-brand-gold/30 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[10px] font-bold tracking-[0.25em] uppercase backdrop-blur-sm">
                 <Sparkles className="h-3.5 w-3.5 animate-pulse" />
-                Live Lucky Draw • {lottery.title}
+                {t('liveEvent')} • {lottery.title}
               </span>
             </motion.div>
 
@@ -163,23 +165,24 @@ export default function LotteryCTA() {
                 className="text-center lg:text-left"
               >
                 <h2 className="mb-4 font-serif text-3xl font-bold text-white md:text-4xl">
-                  SVI Infra{' '}
-                  <span
-                    className="italic"
-                    style={{
-                      backgroundImage:
-                        'linear-gradient(135deg, #d4af37, #f0d080, #b08f36, #dec070)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                    }}
-                  >
-                    Mega Giveaway
-                  </span>{' '}
-                  is Live!
+                  {t.rich('megaGiveawayIsLive', {
+                    gold: (chunks) => (
+                      <span
+                        className="italic"
+                        style={{
+                          backgroundImage:
+                            'linear-gradient(135deg, #d4af37, #f0d080, #b08f36, #dec070)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }}
+                      >
+                        {chunks}
+                      </span>
+                    ),
+                  })}
                 </h2>
                 <p className="max-w-md text-sm leading-relaxed text-gray-400">
-                  {lottery.description ??
-                    'Exclusive residential plot and luxury villa lucky drawings for registered SVI investors. Watch the live reveal!'}
+                  {lottery.description ?? t('description')}
                 </p>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
@@ -188,7 +191,7 @@ export default function LotteryCTA() {
                     className="bg-brand-gold text-brand-navy group inline-flex items-center justify-center gap-2 px-7 py-3.5 text-xs font-bold tracking-widest uppercase shadow-xl transition-all hover:brightness-110"
                   >
                     <Trophy className="h-4 w-4" />
-                    View Lucky Draw
+                    {t('title')}
                     <motion.span
                       animate={{ x: [0, 4, 0] }}
                       transition={{ duration: 1.2, repeat: Infinity }}
@@ -208,18 +211,25 @@ export default function LotteryCTA() {
               >
                 <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">
                   <Clock className="text-brand-gold h-3.5 w-3.5" />
-                  {expired ? 'Draw in progress' : drawDate ? 'Draw closes in' : 'Draw is live'}
+                  {expired
+                    ? t('shufflingProgress')
+                    : drawDate
+                      ? t('liveCountdown')
+                      : t('sessionActive')}
                 </div>
 
                 {drawDate && !expired ? (
                   <div className="flex items-end gap-3">
-                    <CountdownUnit value={timeLeft.days} label="Days" />
+                    <CountdownUnit
+                      value={timeLeft.days}
+                      label={t('days', { defaultValue: 'Days' })}
+                    />
                     <span className="text-brand-gold mb-4 text-2xl font-black">:</span>
-                    <CountdownUnit value={timeLeft.hours} label="Hrs" />
+                    <CountdownUnit value={timeLeft.hours} label={t('hrs')} />
                     <span className="text-brand-gold mb-4 text-2xl font-black">:</span>
-                    <CountdownUnit value={timeLeft.minutes} label="Min" />
+                    <CountdownUnit value={timeLeft.minutes} label={t('min')} />
                     <span className="text-brand-gold mb-4 text-2xl font-black">:</span>
-                    <CountdownUnit value={timeLeft.seconds} label="Sec" />
+                    <CountdownUnit value={timeLeft.seconds} label={t('sec')} />
                   </div>
                 ) : (
                   <motion.div
@@ -229,14 +239,18 @@ export default function LotteryCTA() {
                   >
                     <div className="text-brand-gold inline-flex items-center gap-2 text-lg font-black tracking-widest uppercase">
                       <Trophy className="h-4 w-4" />
-                      Drawing Now
+                      {t('shufflingText')}
                     </div>
-                    <div className="mt-1 text-xs text-gray-500">Live reveal in progress</div>
+                    <div className="mt-1 text-xs text-gray-500">
+                      {t('liveRevealInProgress', { defaultValue: 'Live reveal in progress' })}
+                    </div>
                   </motion.div>
                 )}
 
                 <p className="text-[10px] text-gray-600 italic">
-                  All draws are verified and audited via Supabase
+                  {t('auditedViaSupabase', {
+                    defaultValue: 'All draws are verified and audited via Supabase',
+                  })}
                 </p>
               </motion.div>
             </div>

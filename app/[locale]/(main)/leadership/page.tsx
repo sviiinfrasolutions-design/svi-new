@@ -2,68 +2,81 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { ArrowRight, Users, ChevronDown, Award, Briefcase, Plus, Minus } from 'lucide-react';
 import Link from 'next/link';
 
 const LeadershipFAQ = dynamic(() => import('@/src/components/faq/AboutFAQ'), { ssr: false });
 
-const HIERARCHY = {
-  directors: [
-    {
-      name: 'Iliyas Ali',
-      role: 'Director',
-      bio: "Key personnel behind SVI Infra Solutions Private Limited. Instrumental in guiding the company's strategic vision and operations.",
-    },
-    {
-      name: 'Vinod Kumar',
-      role: 'Director',
-      bio: 'Key personnel behind SVI Infra Solutions Private Limited. Brings extensive expertise in building construction and civil engineering.',
-    },
-  ],
-  areaManagers: [
-    { name: 'Radhe Shyam', role: 'Area Manager' },
-    { name: 'Kailash ', role: 'Area Manager' },
-  ],
-  hrManager: { name: 'To Be Announced', role: 'HR Manager' }, // Or actual name if provided
-  teamLead: { name: 'To Be Announced', role: 'Team Lead (TL)' }, // Or actual name if provided
-  staff: [
-    { role: 'BDE (Business Development Executive)' },
-    { role: 'BDM (Business Development Manager)' },
-    { role: 'Telecaller' },
-  ],
-};
-
-// Structured Data for Person (Leadership Team)
-const personSchema = {
-  '@context': 'https://schema.org',
-  '@graph': HIERARCHY.directors.map((member) => ({
-    '@type': 'Person',
-    name: member.name,
-    jobTitle: member.role,
-    description: member.bio,
-    worksFor: {
-      '@type': 'Organization',
-      name: 'SVI Infra Solutions Private Limited',
-      url: 'https://sviiinfrasolutions.com',
-    },
-    url: 'https://sviiinfrasolutions.com/leadership',
-  })),
-};
-
 export default function Leadership() {
+  const t = useTranslations('pages.leadership');
   const [maxVisibleLevel, setMaxVisibleLevel] = useState(1);
+
+  const hierarchy = {
+    directors: [
+      {
+        name: t('data.iliyasAli.name'),
+        role: t('data.iliyasAli.role'),
+        bio: t('data.iliyasAli.bio'),
+      },
+      {
+        name: t('data.vinodKumar.name'),
+        role: t('data.vinodKumar.role'),
+        bio: t('data.vinodKumar.bio'),
+      },
+    ],
+    areaManagers: [
+      {
+        name: t('data.radheShyam.name'),
+        role: t('data.radheShyam.role'),
+      },
+      {
+        name: t('data.kailash.name'),
+        role: t('data.kailash.role'),
+      },
+    ],
+    hrManager: {
+      name: t('data.hrManager.name'),
+      role: t('data.hrManager.role'),
+    },
+    teamLead: {
+      name: t('data.teamLead.name'),
+      role: t('data.teamLead.role'),
+    },
+    staff: [
+      { role: t('data.bde.role') },
+      { role: t('data.bdm.role') },
+      { role: t('data.telecaller.role') },
+    ],
+  };
+
+  const personSchema = {
+    '@context': 'https://schema.org',
+    '@graph': hierarchy.directors.map((member) => ({
+      '@type': 'Person',
+      name: member.name,
+      jobTitle: member.role,
+      description: member.bio,
+      worksFor: {
+        '@type': 'Organization',
+        name: 'SVI Infra Solutions Private Limited',
+        url: 'https://sviiinfrasolutions.com',
+      },
+      url: 'https://sviiinfrasolutions.com/leadership',
+    })),
+  };
 
   const getNextLevelName = (level: number) => {
     switch (level) {
       case 1:
-        return 'Area Managers';
+        return t('areaManagers');
       case 2:
-        return 'HR Department';
+        return t('hrDepartment');
       case 3:
-        return 'Team Lead';
+        return t('teamLead');
       case 4:
-        return 'Staff';
+        return t('staff');
       default:
         return '';
     }
@@ -99,13 +112,11 @@ export default function Leadership() {
         />
         <div className="relative z-10 container mx-auto px-4">
           <h1 className="animate-hero-h1 mb-6 font-serif text-3xl leading-tight text-white sm:text-4xl md:text-6xl">
-            Our Leadership
+            {t('title')}
           </h1>
           <div className="bg-brand-gold animate-hero-divider mx-auto mb-6 h-px w-16"></div>
           <p className="animate-hero-subtitle mx-auto max-w-2xl text-lg leading-relaxed text-gray-300">
-            Incorporated in December 2022 in Delhi, SVI Infra Solutions Private Limited is a
-            non-government private company involved in building construction and civil engineering,
-            based in Dwarka, Delhi. Meet the visionaries behind our success.
+            {t('subtitle')}
           </p>
         </div>
       </section>
@@ -114,7 +125,7 @@ export default function Leadership() {
         <div className="flex flex-col items-center">
           {/* Level 1: Directors */}
           <div className="relative z-10 grid w-full max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
-            {HIERARCHY.directors.map((member, idx) => (
+            {hierarchy.directors.map((member, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 40 }}
@@ -159,7 +170,7 @@ export default function Leadership() {
                 <ChevronDown className="text-brand-gold my-6 h-8 w-8 animate-bounce opacity-70" />
 
                 <div className="relative z-10 grid w-full max-w-2xl grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
-                  {HIERARCHY.areaManagers.map((member, idx) => (
+                  {hierarchy.areaManagers.map((member, idx) => (
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, y: 30 }}
@@ -207,7 +218,7 @@ export default function Leadership() {
                     <Briefcase size={18} className="text-white" />
                   </div>
                   <h4 className="text-brand-navy mt-2 font-serif text-xl dark:text-gray-100">
-                    {HIERARCHY.hrManager.role}
+                    {hierarchy.hrManager.role}
                   </h4>
                 </motion.div>
               </motion.div>
@@ -234,7 +245,7 @@ export default function Leadership() {
                   className="border-brand-gold/20 w-full max-w-sm rounded-lg border bg-white p-6 text-center shadow-md dark:border-gray-700 dark:bg-gray-800"
                 >
                   <h4 className="text-brand-navy font-serif text-lg dark:text-gray-100">
-                    {HIERARCHY.teamLead.role}
+                    {hierarchy.teamLead.role}
                   </h4>
                 </motion.div>
               </motion.div>
@@ -259,7 +270,7 @@ export default function Leadership() {
                   transition={{ duration: 0.5 }}
                   className="grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6"
                 >
-                  {HIERARCHY.staff.map((staff, idx) => (
+                  {hierarchy.staff.map((staff, idx) => (
                     <motion.div
                       key={idx}
                       whileHover={{ y: -5, borderColor: 'rgba(212, 175, 55, 0.8)' }}
@@ -290,7 +301,7 @@ export default function Leadership() {
                 onClick={() => setMaxVisibleLevel((prev) => prev + 1)}
                 className="group border-brand-gold/50 text-brand-navy hover:border-brand-gold hover:bg-brand-gold dark:text-brand-gold dark:hover:text-brand-navy relative flex cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-full border bg-white px-8 py-3.5 text-sm font-bold tracking-widest uppercase shadow-sm transition-all hover:text-white dark:bg-gray-900"
               >
-                <span>Reveal {getNextLevelName(maxVisibleLevel)}</span>
+                <span>{t('revealLevel', { levelName: getNextLevelName(maxVisibleLevel) })}</span>
                 <Plus
                   size={18}
                   className="transition-transform duration-300 group-hover:rotate-90"
@@ -302,7 +313,7 @@ export default function Leadership() {
                 onClick={() => setMaxVisibleLevel(1)}
                 className="group flex cursor-pointer items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-6 py-3.5 text-sm font-bold tracking-widest text-gray-600 uppercase shadow-sm transition-all hover:border-red-500 hover:text-red-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-red-400 dark:hover:text-red-400"
               >
-                <span>Collapse Hierarchy</span>
+                <span>{t('collapseHierarchy')}</span>
                 <Minus size={18} />
               </button>
             )}
@@ -319,18 +330,17 @@ export default function Leadership() {
             transition={{ duration: 0.7 }}
           >
             <h2 className="text-brand-navy mb-6 font-serif text-3xl md:text-4xl dark:text-gray-100">
-              Join Our Growing Team
+              {t('joinTeamTitle')}
             </h2>
             <p className="mb-10 text-lg leading-relaxed text-gray-600 dark:text-gray-400">
-              We are always looking for passionate professionals to join us in shaping the future of
-              real estate.
+              {t('joinTeamDesc')}
             </p>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
               <Link
                 href="/careers"
                 className="bg-brand-navy hover:bg-brand-gold hover:text-brand-navy inline-flex items-center gap-2 px-8 py-4 text-xs font-bold tracking-widest text-white uppercase transition-colors"
               >
-                View Open Positions <ArrowRight size={16} />
+                {t('viewPositions')} <ArrowRight size={16} />
               </Link>
             </motion.div>
           </motion.div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'motion/react';
 import { Zap, Crown, Play, Star, Ticket } from 'lucide-react';
 
@@ -37,6 +38,8 @@ export function DrawArenaModal({
   onStartShuffle,
   onCelebrate,
 }: DrawArenaModalProps) {
+  const t = useTranslations('pages.lottery');
+
   return (
     <AnimatePresence>
       {open && (
@@ -67,11 +70,9 @@ export function DrawArenaModal({
             <div className="relative mx-auto max-w-xl space-y-10">
               <div>
                 <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5 px-4 py-1.5 text-[10px] font-medium tracking-[0.2em] text-[#B38728] uppercase dark:text-[#D4AF37]">
-                  <Zap className="h-3 w-3 fill-[#D4AF37]" /> SECURE ARENA
+                  <Zap className="h-3 w-3 fill-[#D4AF37]" /> {t('secureArena')}
                 </div>
-                <h3 className="font-serif text-3xl font-light text-white md:text-5xl">
-                  {title}
-                </h3>
+                <h3 className="font-serif text-3xl font-light text-white md:text-5xl">{title}</h3>
               </div>
 
               {/* Shuffle Cylinder */}
@@ -87,10 +88,16 @@ export function DrawArenaModal({
                 <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-gradient-to-b from-[#020617] to-transparent" />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-gradient-to-t from-[#020617] to-transparent" />
 
-                <div ref={shuffleContainerRef} className="flex flex-col pt-10 transition-transform duration-75 ease-linear">
+                <div
+                  ref={shuffleContainerRef}
+                  className="flex flex-col pt-10 transition-transform duration-75 ease-linear"
+                >
                   {shuffledNames.length > 0 ? (
                     shuffledNames.map((name, idx) => (
-                      <div key={idx} className="flex h-[80px] items-center justify-center px-6 text-center">
+                      <div
+                        key={idx}
+                        className="flex h-[80px] items-center justify-center px-6 text-center"
+                      >
                         <span
                           className={`block truncate ${
                             drawWinnerCount > 0 && idx >= shuffledNames.length - drawWinnerCount
@@ -104,7 +111,7 @@ export function DrawArenaModal({
                     ))
                   ) : (
                     <div className="flex h-[80px] items-center justify-center text-xs font-medium tracking-widest text-slate-600 uppercase">
-                      Awaiting Command
+                      {t('awaitingCommand')}
                     </div>
                   )}
                 </div>
@@ -138,7 +145,10 @@ export function DrawArenaModal({
                           >
                             <Star className="h-3 w-3 fill-[#D4AF37] text-[#D4AF37]" />
                             <span className="text-[10px] font-semibold tracking-[0.2em] text-[#B38728] uppercase dark:text-[#D4AF37]">
-                              Winner #{idx + 1}
+                              {t('winnerIndex', {
+                                defaultValue: 'Winner #{index}',
+                                index: idx + 1,
+                              })}
                             </span>
                             <Star className="h-3 w-3 fill-[#D4AF37] text-[#D4AF37]" />
                           </motion.div>
@@ -171,8 +181,8 @@ export function DrawArenaModal({
               ) : (
                 <p className="mx-auto max-w-sm text-xs leading-relaxed font-medium tracking-widest text-slate-500 uppercase">
                   {isShuffling
-                    ? 'Cryptographic shuffle in progress...'
-                    : `Verify ${participants.length} entries and initiate secure shuffle`}
+                    ? t('shufflingProgress')
+                    : t('initiateShuffle', { count: participants.length })}
                 </p>
               )}
 
@@ -188,7 +198,7 @@ export function DrawArenaModal({
                   >
                     <span className="flex items-center justify-center gap-2">
                       <Crown className="h-4 w-4" />
-                      Celebrate Winners
+                      {t('celebrateWinners')}
                     </span>
                   </motion.button>
                 ) : (
@@ -200,14 +210,18 @@ export function DrawArenaModal({
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       {isShuffling ? (
                         <>
-                          <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="inline-block">
+                          <motion.span
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                            className="inline-block"
+                          >
                             <Zap className="h-3.5 w-3.5" />
                           </motion.span>
-                          Encrypting & Shuffling...
+                          {t('shufflingText')}
                         </>
                       ) : (
                         <>
-                          Initiate Sequence <Play className="h-3.5 w-3.5 fill-[#020617]" />
+                          {t('initiateSequence')} <Play className="h-3.5 w-3.5 fill-[#020617]" />
                         </>
                       )}
                     </span>

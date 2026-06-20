@@ -1,43 +1,45 @@
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { SITE_URL } from '@/src/lib/seo';
 import CurrentProjectsContent from '@/src/components/projects/CurrentProjectsContent';
 
-const currentProjectsData = [
+const currentProjectsData = (t: any) => [
   {
     id: 'shivani-vatika',
-    title: 'Shivani Vatika',
-    location: 'Nayla',
+    title: t('data.shivaniVatika.title'),
+    location: t('data.shivaniVatika.location'),
     lat: 26.85,
     lng: 76.0,
-    type: 'Modern Living',
-    description:
-      'A modern living community in the serene landscapes of Nayla, offering well-designed residential spaces in a rapidly developing area.',
-    fullDescription:
-      "Located in the serene landscapes of Nayla, Shivani Vatika is redefining modern community living. Offering uniquely crafted residential spaces equipped with essential urban facilities, this project reflects SVI Infra Solutions' commitment to quality, timely delivery, and producing environments that foster active and peaceful lifestyles. With excellent connectivity and promising growth potential, Shivani Vatika is an ideal choice for families seeking a balanced lifestyle.",
-    status: 'Under Development',
+    type: t('data.shivaniVatika.type'),
+    description: t('data.shivaniVatika.description'),
+    fullDescription: t('data.shivaniVatika.fullDescription'),
+    status: t('data.shivaniVatika.status'),
     img: '/images/project2.png',
     gallery: ['/images/project2.png', '/images/hero1.png'],
   },
   {
     id: 'shyam-aangan',
-    title: 'Shyam Aangan',
-    location: 'Basri Khurd near Jaipur',
+    title: t('data.shyamAangan.title'),
+    location: t('data.shyamAangan.location'),
     lat: 26.65,
     lng: 75.85,
-    type: 'Integrated Township',
-    description:
-      'JDA-approved integrated township on NH-12 (Tonk Road), perfectly positioned near the upcoming Inner Ring Road, IT corridors, and SEZs. Offers affordable pricing and flexible plans.',
-    fullDescription:
-      'Shyam Aangan is a sprawling, JDA-approved integrated township situated strategically on NH-12 (Tonk Road). It provides unparalleled connectivity to the upcoming Inner Ring Road, key IT corridors, and Special Economic Zones (SEZs). Designed to cater to diverse residential needs, the project blends affordable pricing with world-class facilities, paving the way for substantial future appreciation and a thriving community atmosphere.',
-    status: 'Under Development',
+    type: t('data.shyamAangan.type'),
+    description: t('data.shyamAangan.description'),
+    fullDescription: t('data.shyamAangan.fullDescription'),
+    status: t('data.shyamAangan.status'),
     img: '/images/project1.png',
     gallery: ['/images/project1.png'],
   },
 ];
 
-export default function CurrentProjectsPage() {
+export default async function CurrentProjectsPage(props: { params: Promise<{ locale: string }> }) {
+  const { locale } = await props.params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'pages.projects' });
+  const projects = currentProjectsData(t);
+
   const realEstateListingsSchema = {
     '@context': 'https://schema.org',
-    '@graph': currentProjectsData.map((project) => ({
+    '@graph': projects.map((project) => ({
       '@type': 'RealEstateListing',
       name: project.title,
       description: project.fullDescription || project.description,
@@ -72,17 +74,15 @@ export default function CurrentProjectsPage() {
       <section className="bg-brand-bg border-b border-gray-200 py-14 text-center md:py-20 dark:border-gray-700 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <h1 className="text-brand-navy animate-hero-h1 mb-6 font-serif text-3xl leading-tight sm:text-4xl md:text-6xl dark:text-gray-100">
-            Current Projects
+            {t('currentTitle')}
           </h1>
           <div className="bg-brand-gold animate-hero-divider mx-auto mb-6 h-px w-16"></div>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-gray-600 dark:text-gray-400">
-            Discover our ongoing developments. We are currently working on exciting new residential
-            and commercial projects in prime locations, offering unparalleled amenities and
-            lifestyle options.
+            {t('currentSubtitle')}
           </p>
         </div>
       </section>
-      <CurrentProjectsContent projects={currentProjectsData} />
+      <CurrentProjectsContent projects={projects} />
     </div>
   );
 }

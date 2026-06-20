@@ -1,4 +1,5 @@
 import { MapPin, PhoneIcon, Mail, Clock } from 'lucide-react';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { SITE_URL } from '@/src/lib/seo';
 import ContactForm from '@/src/components/contact/ContactForm';
 import ContactMapWrapper from '@/src/components/contact/ContactMapWrapper';
@@ -53,7 +54,11 @@ const localBusinessJsonLd = {
   priceRange: '$$$',
 };
 
-export default function Contact() {
+export default async function Contact(props: { params: Promise<{ locale: string }> }) {
+  const { locale } = await props.params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'pages.contact' });
+
   return (
     <div className="bg-brand-bg relative pt-20 pb-16 dark:bg-gray-900">
       <script
@@ -63,7 +68,7 @@ export default function Contact() {
       <section className="bg-brand-bg border-b border-gray-200 py-14 text-center md:py-20 dark:border-gray-700 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <h1 className="text-brand-navy animate-hero-h1 mb-6 font-serif text-3xl sm:text-4xl md:text-6xl dark:text-gray-100">
-            Contact Us
+            {t('title')}
           </h1>
           <div className="bg-brand-gold animate-hero-divider mx-auto h-px w-16"></div>
         </div>
@@ -75,10 +80,10 @@ export default function Contact() {
             <div className="lg:w-1/3">
               <div className="xs:p-6 h-full border border-gray-200 bg-white p-5 shadow-sm transition-shadow duration-500 hover:shadow-xl md:p-10 dark:border-gray-700 dark:bg-gray-800">
                 <h4 className="mb-4 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-500">
-                  Reach Out
+                  {t('reachOut')}
                 </h4>
                 <h3 className="text-brand-navy mb-10 font-serif text-3xl dark:text-gray-100">
-                  Get In Touch
+                  {t('heading')}
                 </h3>
 
                 <div className="space-y-10">
@@ -88,7 +93,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <h4 className="mb-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
-                        Our Office
+                        {t('ourOffice')}
                       </h4>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                         A-61 Sector 65,
@@ -104,13 +109,13 @@ export default function Contact() {
                     </div>
                     <div>
                       <h4 className="mb-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
-                        Phone
+                        {t('formPhone')}
                       </h4>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                         +91 73000 07643
                       </p>
                       <p className="text-brand-gold mt-2 text-xs font-bold tracking-widest uppercase">
-                        Main Office / Sales
+                        {t('mainOfficeSales')}
                       </p>
                     </div>
                   </div>
@@ -121,7 +126,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <h4 className="mb-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
-                        Emails
+                        {t('emails')}
                       </h4>
                       <a
                         href="mailto:info@sviinfrasolutions.com"
@@ -144,16 +149,16 @@ export default function Contact() {
                     </div>
                     <div>
                       <h4 className="mb-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
-                        Business Hours
+                        {t('businessHours')}
                       </h4>
                       <p className="mb-1 text-sm font-medium text-gray-600 dark:text-gray-300">
-                        Mon-Fri: 9AM - 7PM
+                        {t('monFriHours')}
                       </p>
                       <p className="mb-1 text-sm font-medium text-gray-600 dark:text-gray-300">
-                        Sat: 9AM - 5PM
+                        {t('satHours')}
                       </p>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                        Sun: 10AM - 4PM
+                        {t('sunHours')}
                       </p>
                     </div>
                   </div>

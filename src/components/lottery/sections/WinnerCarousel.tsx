@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'motion/react';
 import { Crown, Ticket, Sparkles, Star } from 'lucide-react';
 
@@ -23,6 +24,8 @@ export function WinnerCarousel({
   winnerSwipeDir,
   onNavigate,
 }: WinnerCarouselProps) {
+  const t = useTranslations('pages.lottery');
+
   if (winners.length === 0) return null;
 
   return (
@@ -33,9 +36,19 @@ export function WinnerCarousel({
         <AnimatePresence mode="wait">
           <motion.div
             key={winners[activeWinnerIndex]?.id ?? 'fallback'}
-            initial={{ opacity: 0, x: winnerSwipeDir > 0 ? 120 : -120, scale: 0.9, rotateY: winnerSwipeDir > 0 ? 8 : -8 }}
+            initial={{
+              opacity: 0,
+              x: winnerSwipeDir > 0 ? 120 : -120,
+              scale: 0.9,
+              rotateY: winnerSwipeDir > 0 ? 8 : -8,
+            }}
             animate={{ opacity: 1, x: 0, scale: 1, rotateY: 0 }}
-            exit={{ opacity: 0, x: winnerSwipeDir > 0 ? -120 : 120, scale: 0.9, rotateY: winnerSwipeDir > 0 ? -8 : 8 }}
+            exit={{
+              opacity: 0,
+              x: winnerSwipeDir > 0 ? -120 : 120,
+              scale: 0.9,
+              rotateY: winnerSwipeDir > 0 ? -8 : 8,
+            }}
             transition={{ type: 'spring', stiffness: 200, damping: 25, mass: 0.8 }}
             className="group/card relative overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-br from-white via-white to-slate-50 p-8 text-center shadow-xl shadow-[#D4AF37]/5 transition-all dark:border-[#D4AF37]/20 dark:from-[#D4AF37]/8 dark:via-[#D4AF37]/4 dark:to-transparent dark:shadow-[#D4AF37]/10"
           >
@@ -77,8 +90,12 @@ export function WinnerCarousel({
                 transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.2 }}
                 className="relative mb-4 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#D4AF37]/15 to-[#D4AF37]/5 px-4 py-1.5 text-[10px] font-bold tracking-widest text-[#B38728] uppercase dark:from-[#D4AF37]/20 dark:to-[#D4AF37]/10 dark:text-[#D4AF37]"
               >
-                <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="h-1.5 w-1.5 rounded-full bg-[#D4AF37]" />
-                Winner #{activeWinnerIndex + 1} of {winners.length}
+                <motion.div
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="h-1.5 w-1.5 rounded-full bg-[#D4AF37]"
+                />
+                {t('winnerNumber', { index: activeWinnerIndex + 1, total: winners.length })}
               </motion.div>
             )}
 

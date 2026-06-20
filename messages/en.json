@@ -139,6 +139,94 @@
     "visionStatement": "Our vision is to transform the infrastructure landscape by creating sustainable, premium, and value-driven real estate developments.",
     "founderStory": "With over two decades of profound experience in infrastructure and real estate, our leadership has guided SVI Infra towards becoming a trusted name. We believe in transparency, legal security, and uncompromising quality."
   },
+  "testimonials": {
+    "title": "What Our Clients Say",
+    "subtitle": "Discover why hundreds of families and businesses trust SVI Infra Solutions for their real estate needs.",
+    "ariaPrevious": "Previous testimonial",
+    "ariaNext": "Next testimonial",
+    "list": {
+      "t0": {
+        "text": "Investing in their completed commercial project in Noida was the best decision. The footfall is amazing and the rental potential is excellent.",
+        "by": "Arjun, Commercial Investor"
+      },
+      "t1": {
+        "text": "We shifted to our new flat last month. The construction quality is top-class and it's 100% Vastu compliant. Very happy with SVI Infra.",
+        "by": "Rohan, Homeowner"
+      },
+      "t2": {
+        "text": "Possession was given exactly on time! Usually, builders delay a lot, but SVI Infra's completed projects are proof of their commitment.",
+        "by": "Priya, Resident"
+      },
+      "t3": {
+        "text": "The location of their existing projects in Jaipur is prime. Perfect connectivity for daily commute and great neighborhood.",
+        "by": "Vikram, Real Estate Investor"
+      },
+      "t4": {
+        "text": "Their property management team is very cooperative. Maintenance in the completed towers is excellent and hassle-free.",
+        "by": "Ananya, Business Owner"
+      },
+      "t5": {
+        "text": "Visited their site in Noida. The society is fully secure and the amenities for kids are really good. Finalized our booking the same day.",
+        "by": "Karan, Property Buyer"
+      },
+      "t6": {
+        "text": "Retail space in their completed project has given my shop a huge boost. Parking and security is totally tension-free.",
+        "by": "Amit, Retail Entrepreneur"
+      },
+      "t7": {
+        "text": "I only trust SVI Infra for investment. The resale value and demand of their existing projects is always high in the market.",
+        "by": "Siddharth, Financial Analyst"
+      },
+      "t8": {
+        "text": "My parents are really happy with the new apartment. Society temple nearby and a great park for their evening walks.",
+        "by": "Neha, Homeowner"
+      },
+      "t9": {
+        "text": "The value growth in the Noida completed project has been outstanding. Definitely a great choice for NRI investors.",
+        "by": "Kritika, Asset Manager"
+      },
+      "t10": {
+        "text": "SVI Infra literally delivers what they promise in the brochure. No hidden charges and super transparent booking process.",
+        "by": "Varun, Homeowner"
+      },
+      "t11": {
+        "text": "Maintenance of existing projects is so good that the society still looks brand new. Very proactive facility team.",
+        "by": "Rahul, Community Resident"
+      },
+      "t12": {
+        "text": "Leased an office space in their IT park. Electricity backup and internet connectivity is flawless. Great corporate vibe.",
+        "by": "Sneha, Startup Founder"
+      },
+      "t13": {
+        "text": "Clubhouse and green area in their residential project is amazing. No need to go outside on weekends anymore.",
+        "by": "Manish, Property Buyer"
+      },
+      "t14": {
+        "text": "SVI Infra's completed commercial hubs have the best corporate crowd. Very premium feel and the layout is very spacious.",
+        "by": "Deepika, Corporate Client"
+      },
+      "t15": {
+        "text": "Property papers and registry process was handled so smoothly. Really appreciate their legal team's support.",
+        "by": "Rajesh, Portfolio Investor"
+      },
+      "t16": {
+        "text": "The floor plan is very spacious. Proper attention has been paid to natural light and ventilation in the apartments.",
+        "by": "Kunal, Interior Designer"
+      },
+      "t17": {
+        "text": "We checked multiple options in NCR, but SVI's existing projects offer the best value for money and lifestyle.",
+        "by": "Ankit, Prospective Buyer"
+      },
+      "t18": {
+        "text": "Key handover ceremony was beautifully organized. Really felt like a VIP customer when taking possession.",
+        "by": "Simran, First-time Buyer"
+      },
+      "t19": {
+        "text": "Trust is everything in real estate, and SVI's track record with completed projects speaks for itself. Extremely genuine builder.",
+        "by": "Meera, Real Estate Consultant"
+      }
+    }
+  },
   "pages": {
     "about": {
       "title": "About SVI Infra Solutions",
@@ -152,6 +240,16 @@
     "contact": {
       "title": "Contact Us",
       "heading": "Get In Touch",
+      "reachOut": "Reach Out",
+      "ourOffice": "Our Office",
+      "mainOfficeSales": "Main Office / Sales",
+      "emails": "Emails",
+      "businessHours": "Business Hours",
+      "monFriHours": "Mon-Fri: 9AM - 7PM",
+      "satHours": "Sat: 9AM - 5PM",
+      "sunHours": "Sun: 10AM - 4PM",
+      "inquiries": "Inquiries",
+      "sendMessage": "Send a Message",
       "formName": "Your Name",
       "formEmail": "Email Address",
       "formPhone": "Phone Number",
@@ -160,7 +258,23 @@
       "formSubmit": "Send Message",
       "officeHours": "Office Hours",
       "monFri": "Mon - Fri: 10:00 AM - 6:00 PM",
-      "sat": "Saturday: 10:00 AM - 4:00 PM"
+      "sat": "Saturday: 10:00 AM - 4:00 PM",
+      "validation": {
+        "nameRequired": "Name is required",
+        "nameMin": "Name must be at least 2 characters",
+        "nameFormat": "Name can only contain letters and spaces",
+        "emailRequired": "Email is required",
+        "emailFormat": "Please enter a valid email address",
+        "phoneRequired": "Phone number is required",
+        "phoneFormat": "Please enter a valid phone number (10-15 digits)",
+        "subjectRequired": "Subject is required",
+        "subjectMin": "Subject must be at least 3 characters",
+        "messageRequired": "Message is required",
+        "messageMin": "Message must be at least 10 characters",
+        "submitFailed": "Submission failed",
+        "submitError": "Failed to submit. Please try again.",
+        "submitting": "Sending..."
+      }
     },
     "faq": {
       "title": "Frequently Asked Questions",
@@ -173,7 +287,55 @@
     },
     "leadership": {
       "title": "Leadership Team",
-      "heading": "Meet Our Leaders"
+      "heading": "Meet Our Leaders",
+      "subtitle": "Incorporated in December 2022 in Delhi, SVI Infra Solutions Private Limited is a non-government private company involved in building construction and civil engineering, based in Dwarka, Delhi. Meet the visionaries behind our success.",
+      "directors": "Our Directors",
+      "areaManagers": "Area Managers",
+      "hrDepartment": "HR Department",
+      "teamLead": "Team Lead",
+      "staff": "Staff",
+      "revealLevel": "Reveal {levelName}",
+      "collapseHierarchy": "Collapse Hierarchy",
+      "joinTeamTitle": "Join Our Growing Team",
+      "joinTeamDesc": "We are always looking for passionate professionals to join us in shaping the future of real estate.",
+      "viewPositions": "View Open Positions",
+      "data": {
+        "iliyasAli": {
+          "name": "Iliyas Ali",
+          "role": "Director",
+          "bio": "Key personnel behind SVI Infra Solutions Private Limited. Instrumental in guiding the company's strategic vision and operations."
+        },
+        "vinodKumar": {
+          "name": "Vinod Kumar",
+          "role": "Director",
+          "bio": "Key personnel behind SVI Infra Solutions Private Limited. Brings extensive expertise in building construction and civil engineering."
+        },
+        "radheShyam": {
+          "name": "Radhe Shyam",
+          "role": "Area Manager"
+        },
+        "kailash": {
+          "name": "Kailash ",
+          "role": "Area Manager"
+        },
+        "hrManager": {
+          "name": "To Be Announced",
+          "role": "HR Manager"
+        },
+        "teamLead": {
+          "name": "To Be Announced",
+          "role": "Team Lead (TL)"
+        },
+        "bde": {
+          "role": "BDE (Business Development Executive)"
+        },
+        "bdm": {
+          "role": "BDM (Business Development Manager)"
+        },
+        "telecaller": {
+          "role": "Telecaller"
+        }
+      }
     },
     "payment": {
       "title": "Make a Payment",
@@ -206,12 +368,277 @@
       }
     },
     "registration": {
-      "title": "Property Registration",
-      "heading": "Register Your Interest"
+      "title": "Online Registration",
+      "heading": "Register Your Interest",
+      "sizes": {
+        "50-100": "50 to 100 (Sq.Yrd)",
+        "100-200": "100 to 200 (Sq.Yrd)",
+        "200-400": "200 to 400 (Sq.Yrd)",
+        "400-700": "400 to 700 (Sq.Yrd)",
+        "700-1000": "700 to 1000 (Sq.Yrd)",
+        "1000-1500": "1000 to 1500 (Sq.Yrd)",
+        "1500-2000": "1500 to 2000 (Sq.Yrd)"
+      },
+      "types": {
+        "residential-plot": "Residential Plot",
+        "commercial-shop": "Commercial shop",
+        "luxury-farm-house": "Luxury Farm House"
+      },
+      "preferences": {
+        "main-road": "Main Road",
+        "park": "Park",
+        "corner": "Corner",
+        "none": "None"
+      },
+      "plans": {
+        "3-months": "3 Months",
+        "6-months": "6 Months",
+        "12-months": "12 Months",
+        "18-months": "18 Months",
+        "24-months": "24 Months"
+      },
+      "modes": {
+        "online": "Online",
+        "cash": "Cash",
+        "net-banking": "Net Banking"
+      },
+      "subtitle": "Please fill out the form below to register with SVI Infra Solutions Pvt. Ltd.",
+      "needRegistrationError": "Please complete the registration form first before accessing the confirmation page.",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Enter first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Enter last name",
+      "mobileNo": "Mobile No",
+      "mobilePlaceholder": "Enter mobile number",
+      "email": "Email",
+      "emailPlaceholder": "Enter email address",
+      "soWoDo": "S/O, W/O, D/O",
+      "soWoDoPlaceholder": "Enter relation",
+      "dob": "Date of Birth",
+      "photoUpload": "Photo Upload",
+      "panUpload": "PAN Card Upload",
+      "aadharNumber": "Aadhar Number",
+      "aadharPlaceholder": "Enter 12-digit Aadhar",
+      "panNumber": "PAN Number",
+      "panPlaceholder": "Enter PAN number",
+      "state": "State",
+      "statePlaceholder": "Enter state",
+      "city": "City",
+      "cityPlaceholder": "Enter city",
+      "address": "Address",
+      "addressPlaceholder": "Enter full address",
+      "advisorName": "Advisor Name",
+      "advisorPlaceholder": "Select advisor",
+      "selectProjects": "Select Projects",
+      "projectPlaceholder": "Select project",
+      "propertySize": "Property Size",
+      "sizePlaceholder": "Select size",
+      "propertyType": "Property Type",
+      "typePlaceholder": "Select type",
+      "plotPreference": "Plot Preference",
+      "preferencePlaceholder": "Select preference",
+      "paymentPlan": "Payment Plan",
+      "planPlaceholder": "Select plan",
+      "paymentMode": "Payment Mode",
+      "modePlaceholder": "Select mode",
+      "schemeAmount": "Scheme Amount",
+      "schemeAmountPlaceholder": "Enter scheme amount",
+      "solveVerification": "Please solve the verification",
+      "submitButton": "Submit Registration",
+      "submitting": "Submitting...",
+      "noteTitle": "Note:",
+      "note1": "Please fill all the details properly and upload the correct documents, otherwise application can be rejected without notice.",
+      "note2": "Registration amount of 2100 and 5100 will be refunded to Applicants whose name will not be picked in the draw.",
+      "dreamHomeTitle": "Ready to Find Your Dream Home?",
+      "dreamHomeDesc": "Let our expert team help you navigate the real estate market and find the perfect property for you.",
+      "viewProjects": "View Projects",
+      "contactUs": "Contact Us",
+      "paymentModal": {
+        "title": "For Application Amount",
+        "subtitle": "Payment Details",
+        "scanPay": "SCAN & PAY",
+        "acceptUpi": "Payment Accepted from all UPI Apps.",
+        "accountName": "Account Name",
+        "accountNumber": "Account Number",
+        "ifscCode": "IFSC Code",
+        "bankBranch": "Bank / Branch",
+        "completeButton": "I have paid - Complete Registration",
+        "completing": "Completing..."
+      },
+      "validation": {
+        "firstNameRequired": "First name is required",
+        "firstNameMin": "First name must be at least 2 characters long",
+        "firstNameFormat": "First name should only contain letters",
+        "mobileRequired": "Mobile number is required",
+        "mobileFormat": "Please enter a valid 10-digit Indian mobile number (starts with 6-9)",
+        "emailRequired": "Email is required",
+        "emailFormat": "Please enter a valid email address",
+        "soWoDoRequired": "Relation name (S/O, W/O, D/O) is required",
+        "dobRequired": "Date of birth is required",
+        "dobFuture": "Date of birth cannot be in the future",
+        "dobAge": "You must be at least 18 years old to register",
+        "dobInvalid": "Please select a valid date of birth",
+        "aadharRequired": "Aadhar number is required",
+        "aadharFormat": "Please enter a valid 12-digit Indian Aadhar number (starts with 2-9)",
+        "panFormat": "Please enter a valid PAN number format (e.g., ABCDE1234F)",
+        "stateRequired": "State is required",
+        "cityRequired": "City is required",
+        "addressRequired": "Full address is required",
+        "advisorRequired": "Please select an advisor",
+        "projectRequired": "Please select a project",
+        "sizeRequired": "Please select property size",
+        "typeRequired": "Please select property type",
+        "preferenceRequired": "Please select plot preference",
+        "planRequired": "Please select payment plan",
+        "modeRequired": "Please select payment mode",
+        "amountRequired": "Scheme amount is required",
+        "amountPositive": "Scheme amount must be a positive number",
+        "captchaRequired": "Please solve the verification",
+        "fileSize": "File size must be under 150KB",
+        "fileType": "Only JPG, PNG, WEBP, or PDF files are allowed",
+        "submitError": "Failed to submit registration. Please try again."
+      }
     },
     "thankYou": {
       "title": "Thank You",
       "heading": "Registration Received"
+    },
+    "projects": {
+      "currentTitle": "Current Projects",
+      "completedTitle": "Completed Projects",
+      "currentSubtitle": "Discover our ongoing developments. We are currently working on exciting new residential and commercial projects in prime locations, offering unparalleled amenities and lifestyle options.",
+      "completedSubtitle": "Explore our portfolio of successfully delivered projects. Each property is a testament to our commitment to excellence, timely delivery, and unmatched quality.",
+      "projectLocations": "Project Locations",
+      "mapInitializing": "Initializing project locations map...",
+      "viewDetails": "View Details",
+      "statusLabel": "Status",
+      "getNotified": "Get Notified",
+      "underDevelopment": "Under Development",
+      "comingSoon": "Coming Soon",
+      "comingSoonDesc": "We are currently working on exciting new residential and commercial projects in prime locations. Check back soon for detailed layouts, pricing, and availability.",
+      "getNotifiedFirst": "Get Notified First",
+      "shareProject": "Share Project",
+      "downloadBrochure": "Download Brochure (PDF)",
+      "downloadPdf": "Download PDF",
+      "upcomingInterestTitle": "Interested in our Upcoming Projects?",
+      "upcomingInterestDesc": "Register your interest today to get early access and exclusive offers.",
+      "registerInterest": "Register interest",
+      "data": {
+        "shivaniVatika": {
+          "title": "Shivani Vatika",
+          "location": "Nayla",
+          "type": "Modern Living",
+          "description": "A modern living community in the serene landscapes of Nayla, offering well-designed residential spaces in a rapidly developing area.",
+          "fullDescription": "Located in the serene landscapes of Nayla, Shivani Vatika is redefining modern community living. Offering uniquely crafted residential spaces equipped with essential urban facilities, this project reflects SVI Infra Solutions' commitment to quality, timely delivery, and producing environments that foster active and peaceful lifestyles. With excellent connectivity and promising growth potential, Shivani Vatika is an ideal choice for families seeking a balanced lifestyle.",
+          "status": "Under Development"
+        },
+        "shyamAangan": {
+          "title": "Shyam Aangan",
+          "location": "Basri Khurd near Jaipur",
+          "type": "Integrated Township",
+          "description": "JDA-approved integrated township on NH-12 (Tonk Road), perfectly positioned near the upcoming Inner Ring Road, IT corridors, and SEZs. Offers affordable pricing and flexible plans.",
+          "fullDescription": "Shyam Aangan is a sprawling, JDA-approved integrated township situated strategically on NH-12 (Tonk Road). It provides unparalleled connectivity to the upcoming Inner Ring Road, key IT corridors, and Special Economic Zones (SEZs). Designed to cater to diverse residential needs, the project blends affordable pricing with world-class facilities, paving the way for substantial future appreciation and a thriving community atmosphere.",
+          "status": "Under Development"
+        },
+        "shreeShyamResidency": {
+          "title": "Shree Shyam Residency",
+          "location": "Jaipur (near Hope Farm Junction)",
+          "type": "3BHK/4BHK (Ready-to-move)",
+          "description": "A premium residential complex offering spacious 3BHK and 4BHK apartments with modern amenities, designed for those who appreciate luxury and comfort.",
+          "fullDescription": "Shree Shyam Residency is a hallmark of luxury living strategically positioned near Jaipur's Hope Farm Junction. Boasting meticulously designed 3BHK and 4BHK apartments, this ready-to-move complex offers an unparalleled lifestyle. Residents enjoy premium amenities including a state-of-the-art clubhouse, landscaped gardens, 24/7 security, and seamless connectivity to major city hubs. Every detail reflects our commitment to superior craftsmanship and architectural excellence.",
+          "status": "Completed"
+        },
+        "shivaniCity": {
+          "title": "Shivani City",
+          "location": "Manpura Machedi",
+          "type": "Premier Residential Development",
+          "description": "An elegantly planned residential development that completely sold out due to its unmatched quality, strategic location, and lifestyle offerings.",
+          "fullDescription": "Shivani City at Manpura Machedi stands as a premier residential development offering intricately planned plots and bespoke home designs. Selling out completely shortly after its launch, it proves high market demand and customer trust. The project integrates green parks, expansive walkways, and robust infrastructure, creating a wholesome environment tailored for modern families.",
+          "status": "Sold Out"
+        },
+        "shivaniResidency": {
+          "title": "Shivani Residency",
+          "location": "Dobadi near Sambhar & Fulera, Jaipur district",
+          "type": "Residential",
+          "description": "Nestled in a peaceful environment near Sambhar Lake, offering competitive pricing and a serene lifestyle away from the city hustle.",
+          "fullDescription": "Shivani Residency lies in a uniquely peaceful environment in Dobadi, nestled close to the historic Sambhar Lake and Fulera in the Jaipur district. Designed as an escape from city congestion, this residential haven provides spacious plots, lush surroundings, and top-tier infrastructure at incredibly competitive prices, catering specifically to families desiring a balanced and tranquil lifestyle.",
+          "status": "Completed"
+        }
+      }
+    },
+    "login": {
+      "title": "Client Portal",
+      "welcomeBack": "Welcome Back",
+      "authSuccess": "Authentication successful. Initializing your client document portal...",
+      "tagline": "Log in to view your property documents and payment schedules.",
+      "passwordTab": "Password",
+      "otpTab": "OTP Login",
+      "emailLabel": "Registered Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "loginButton": "Log In",
+      "sendOtpButton": "Send OTP",
+      "otpLabel": "Enter OTP",
+      "otpPlaceholder": "6-digit code",
+      "checkInbox": "Check your inbox at {email}",
+      "verifyButton": "Verify & Login",
+      "changeEmail": "← Change email",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register here",
+      "validation": {
+        "emailInvalid": "Invalid Email format",
+        "passwordMin": "At least 6 characters",
+        "otpDigits": "Must be 6 digits",
+        "emailRequired": "Please enter a valid email address.",
+        "passwordRequired": "Password must be at least 6 characters.",
+        "loginFailed": "Login failed. Please check your credentials.",
+        "sendOtpFailed": "Failed to send OTP.",
+        "otpRequired": "Please enter a valid 6-digit numeric OTP.",
+        "otpFailed": "OTP verification failed."
+      }
+    },
+    "lottery": {
+      "title": "Lucky Draw",
+      "portalBadge": "Official Lucky Draw Portal",
+      "megaGiveaway": "SVI Infra <gold>Mega Giveaway</gold>",
+      "megaGiveawayIsLive": "SVI Infra <gold>Mega Giveaway</gold> is Live!",
+      "description": "Exclusive residential plot and luxury villa lucky drawings for registered SVI investors and buyers. All draws are provably fair, audited, and processed via cryptographically secure database procedures.",
+      "systemOffline": "System Offline",
+      "reconnect": "Reconnect",
+      "liveEvent": "Official Live Event",
+      "grandDraw": "Grand Draw Lucky Winners",
+      "sessionActive": "Session Active",
+      "clients": "Clients",
+      "secure": "Secure",
+      "winners": "Winners",
+      "officialWinner": "Official Winner",
+      "officialWinners": "{count} Official Winners",
+      "winnerNumber": "Winner #{index} of {total}",
+      "waitingData": "Waiting for Data",
+      "noParticipantsDesc": "The admin has not uploaded the participant pool yet. Please wait.",
+      "winnerPrecomputed": "Winner Pre-computed",
+      "readyReveal": "Ready for reveal",
+      "enterArena": "Enter Live Arena",
+      "shareProject": "Share Project",
+      "hallOfFame": "Total Clients",
+      "scrollToTop": "Scroll to Top",
+      "betterLuck": "Better luck next time",
+      "noParticipants": "No Participants Yet",
+      "showLess": "Show Less",
+      "showMore": "Show More ({count} of {total} remaining)",
+      "liveCountdown": "Live Draw Countdown",
+      "scheduledFor": "Draw scheduled for <time>{date}</time> IST",
+      "hrs": "hrs",
+      "min": "min",
+      "sec": "sec",
+      "secureArena": "SECURE ARENA",
+      "awaitingCommand": "Awaiting Command",
+      "celebrateWinners": "Celebrate Winners",
+      "shufflingProgress": "Cryptographic shuffle in progress...",
+      "initiateShuffle": "Verify {count} entries and initiate secure shuffle",
+      "initiateSequence": "Initiate Sequence",
+      "shufflingText": "Encrypting & Shuffling..."
     }
   }
 }

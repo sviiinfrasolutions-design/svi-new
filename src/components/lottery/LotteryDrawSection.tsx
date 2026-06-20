@@ -1,6 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'motion/react';
+import { useTranslations } from 'next-intl';
 import {
   Gift,
   Sparkles,
@@ -18,6 +19,7 @@ import { HallOfFame } from './sections/HallOfFame';
 import { DrawArenaModal } from './sections/DrawArenaModal';
 
 export default function LotteryDrawSection() {
+  const t = useTranslations('pages.lottery');
   const {
     activeLottery,
     participants,
@@ -61,7 +63,7 @@ export default function LotteryDrawSection() {
               <AlertCircle className="h-8 w-8" />
             </div>
             <h3 className="mb-2 font-serif text-xl font-bold text-slate-900 dark:text-white">
-              System Offline
+              {t('systemOffline')}
             </h3>
             <p className="mb-6 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
               {error}
@@ -73,7 +75,7 @@ export default function LotteryDrawSection() {
               }}
               className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-xs font-bold tracking-wider text-white uppercase transition-all hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
             >
-              Reconnect
+              {t('reconnect')}
             </button>
           </div>
         </div>
@@ -103,7 +105,7 @@ export default function LotteryDrawSection() {
             viewport={{ once: true }}
             className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-5 py-2 text-xs font-semibold tracking-widest text-[#B38728] uppercase backdrop-blur-sm dark:text-[#D4AF37]"
           >
-            <Sparkles className="h-3.5 w-3.5" /> Official Live Event
+            <Sparkles className="h-3.5 w-3.5" /> {t('liveEvent')}
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -121,8 +123,7 @@ export default function LotteryDrawSection() {
             transition={{ delay: 0.2 }}
             className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-400"
           >
-            {activeLottery.description ||
-              'The ultimate giveaway for our premium clients. Winners are selected through a provably fair, cryptographically secure algorithm.'}
+            {activeLottery.description || t('description')}
           </motion.p>
         </div>
 
@@ -148,33 +149,46 @@ export default function LotteryDrawSection() {
                     </div>
                     <div>
                       <h3 className="font-serif text-2xl text-slate-900 dark:text-white">
-                        Grand Draw Lucky Winners
+                        {t('grandDraw')}
                       </h3>
                       <div className="mt-1 flex items-center gap-1.5 text-[11px] font-medium tracking-widest text-[#B38728] uppercase dark:text-[#D4AF37]">
                         <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                        Session Active
+                        {t('sessionActive')}
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={() => setSoundEnabled(!soundEnabled)}
                     className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-600 dark:border-[#D4AF37]/10 dark:bg-[#D4AF37]/5 dark:hover:bg-[#D4AF37]/10 dark:hover:text-[#D4AF37]"
-                    title={soundEnabled ? 'Mute audio' : 'Unmute audio'}
+                    title={
+                      soundEnabled
+                        ? t('muteAudio', { defaultValue: 'Mute audio' })
+                        : t('unmuteAudio', { defaultValue: 'Unmute audio' })
+                    }
                   >
-                    {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4 text-red-500 dark:text-red-400" />}
+                    {soundEnabled ? (
+                      <Volume2 className="h-4 w-4" />
+                    ) : (
+                      <VolumeX className="h-4 w-4 text-red-500 dark:text-red-400" />
+                    )}
                   </button>
                 </div>
 
                 {/* Stats */}
                 <div className="flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
                   <div className="flex flex-col">
-                    <span className="text-3xl font-light text-slate-900 dark:text-white">{participants.length}</span>
-                    <span className="mt-1 text-[10px] tracking-widest text-slate-400 uppercase dark:text-slate-500">Clients</span>
+                    <span className="text-3xl font-light text-slate-900 dark:text-white">
+                      {participants.length}
+                    </span>
+                    <span className="mt-1 text-[10px] tracking-widest text-slate-400 uppercase dark:text-slate-500">
+                      {t('clients')}
+                    </span>
                   </div>
                   <div className="h-12 w-px bg-slate-200 dark:bg-[#D4AF37]/10" />
                   <div className="flex flex-col">
                     <span className="flex items-center gap-2 text-lg font-light text-slate-900 dark:text-white">
-                      <ShieldCheck className="h-5 w-5 text-emerald-500 dark:text-emerald-400" /> Secure
+                      <ShieldCheck className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />{' '}
+                      {t('secure')}
                     </span>
                   </div>
                   {winners.length > 0 && (
@@ -184,7 +198,9 @@ export default function LotteryDrawSection() {
                         <span className="flex items-center gap-2 text-lg font-light text-[#B38728] dark:text-[#D4AF37]">
                           <Crown className="h-5 w-5" /> {winners.length}
                         </span>
-                        <span className="mt-1 text-[10px] tracking-widest text-slate-400 uppercase dark:text-slate-500">Winners</span>
+                        <span className="mt-1 text-[10px] tracking-widest text-slate-400 uppercase dark:text-slate-500">
+                          {t('winners')}
+                        </span>
                       </div>
                     </>
                   )}
@@ -195,7 +211,12 @@ export default function LotteryDrawSection() {
               <div className="relative mt-12 flex flex-col items-center pt-8">
                 <AnimatePresence mode="wait">
                   {winners.length > 0 ? (
-                    <motion.div key="winners-grid" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full">
+                    <motion.div
+                      key="winners-grid"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="w-full"
+                    >
                       <motion.div
                         initial={{ scale: 0, rotate: -20 }}
                         animate={{ scale: 1, rotate: 0 }}
@@ -213,7 +234,9 @@ export default function LotteryDrawSection() {
                       >
                         <span className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-5 py-2 text-[10px] font-semibold tracking-[0.2em] text-[#B38728] uppercase dark:text-[#D4AF37]">
                           <Crown className="h-3.5 w-3.5" />
-                          {winners.length === 1 ? 'Official Winner' : `${winners.length} Official Winners`}
+                          {winners.length === 1
+                            ? t('officialWinner')
+                            : t('officialWinners', { count: winners.length })}
                         </span>
                       </motion.div>
 
@@ -225,30 +248,47 @@ export default function LotteryDrawSection() {
                       />
                     </motion.div>
                   ) : participants.length === 0 ? (
-                    <motion.div key="no-data" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    <motion.div
+                      key="no-data"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       className="w-full rounded-2xl border border-rose-500/20 bg-rose-50 p-8 text-center dark:bg-rose-500/5"
                     >
                       <AlertCircle className="mx-auto mb-4 h-8 w-8 text-rose-500 dark:text-rose-400" />
-                      <div className="text-sm font-medium text-rose-600 dark:text-rose-400">Waiting for Data</div>
+                      <div className="text-sm font-medium text-rose-600 dark:text-rose-400">
+                        {t('waitingData')}
+                      </div>
                       <div className="mx-auto mt-2 text-xs text-slate-500">
-                        The admin has not uploaded the participant pool yet. Please wait.
+                        {t('noParticipantsDesc')}
                       </div>
                     </motion.div>
                   ) : (
-                    <motion.div key="ready" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full space-y-8 text-center">
+                    <motion.div
+                      key="ready"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="w-full space-y-8 text-center"
+                    >
                       <div className="relative flex flex-col items-center justify-center py-4">
-                        <motion.div animate={{ y: [0, -6, 0] }} transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}>
+                        <motion.div
+                          animate={{ y: [0, -6, 0] }}
+                          transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+                        >
                           <Gift className="mb-4 h-14 w-14 text-[#D4AF37] opacity-80" />
                         </motion.div>
-                        <div className="text-xl font-light text-slate-900 dark:text-white">Winner Pre-computed</div>
-                        <div className="mt-1 text-[10px] font-medium tracking-widest text-slate-500 uppercase dark:text-slate-400">Ready for reveal</div>
+                        <div className="text-xl font-light text-slate-900 dark:text-white">
+                          {t('winnerPrecomputed')}
+                        </div>
+                        <div className="mt-1 text-[10px] font-medium tracking-widest text-slate-500 uppercase dark:text-slate-400">
+                          {t('readyReveal')}
+                        </div>
                       </div>
                       <button
                         onClick={() => setIsDrawArenaOpen(true)}
                         className="group relative mx-auto w-full max-w-sm cursor-pointer overflow-hidden rounded-full bg-gradient-to-r from-slate-900 to-slate-800 px-8 py-4 text-xs font-semibold tracking-[0.15em] text-white uppercase transition-all duration-300 hover:from-slate-800 hover:to-slate-700 hover:shadow-lg dark:from-[#D4AF37] dark:to-[#B38728] dark:text-[#020617] dark:hover:from-[#E5C158] dark:hover:to-[#D4AF37]"
                       >
                         <span className="relative z-10 flex items-center justify-center gap-2">
-                          Enter Live Arena <Sparkles className="h-3.5 w-3.5" />
+                          {t('enterArena')} <Sparkles className="h-3.5 w-3.5" />
                         </span>
                       </button>
                     </motion.div>

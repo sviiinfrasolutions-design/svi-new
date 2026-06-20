@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'motion/react';
 import { Clock } from 'lucide-react';
 
@@ -10,6 +11,8 @@ interface CountdownBannerProps {
 }
 
 export function CountdownBanner({ countdownStr, scheduledAt }: CountdownBannerProps) {
+  const t = useTranslations('pages.lottery');
+
   return (
     <AnimatePresence>
       {countdownStr && scheduledAt && (
@@ -28,18 +31,17 @@ export function CountdownBanner({ countdownStr, scheduledAt }: CountdownBannerPr
               </div>
               <div>
                 <div className="text-[10px] font-bold tracking-widest text-[#D4AF37] uppercase">
-                  Live Draw Countdown
+                  {t('liveCountdown')}
                 </div>
                 <div className="mt-0.5 text-sm text-slate-300">
-                  Draw scheduled for{' '}
-                  <span className="font-semibold text-white">
-                    {scheduledAt.toLocaleString('en-IN', {
+                  {t.rich('scheduledFor', {
+                    date: scheduledAt.toLocaleString('en-IN', {
                       timeZone: 'Asia/Kolkata',
                       dateStyle: 'medium',
                       timeStyle: 'short',
-                    })}{' '}
-                    IST
-                  </span>
+                    }),
+                    time: (chunks) => <span className="font-semibold text-white">{chunks}</span>,
+                  })}
                 </div>
               </div>
             </div>
@@ -53,10 +55,10 @@ export function CountdownBanner({ countdownStr, scheduledAt }: CountdownBannerPr
                     </span>
                     <span className="mt-0.5 text-[9px] tracking-widest text-slate-400 uppercase">
                       {i === 0 && countdownStr.split(':').length === 3
-                        ? 'hrs'
+                        ? t('hrs')
                         : i === (countdownStr.split(':').length === 3 ? 1 : 0)
-                          ? 'min'
-                          : 'sec'}
+                          ? t('min')
+                          : t('sec')}
                     </span>
                   </div>
                 </React.Fragment>

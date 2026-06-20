@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, lazy, useCallback, useState, useEffect, type MouseEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
 import {
@@ -41,6 +42,7 @@ export default function CurrentProjectsContent({
 }: {
   projects: Project[];
 }) {
+  const t = useTranslations('pages.projects');
   const [projects, setProjects] = useState(initialProjects);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
@@ -137,7 +139,7 @@ export default function CurrentProjectsContent({
           >
             <div className="text-brand-navy dark:text-brand-gold mb-6 flex items-center gap-2">
               <MapPin size={24} />
-              <h2 className="font-serif text-2xl">Project Locations</h2>
+              <h2 className="font-serif text-2xl">{t('projectLocations')}</h2>
             </div>
             <Suspense
               fallback={
@@ -156,7 +158,7 @@ export default function CurrentProjectsContent({
                       <div className="bg-brand-gold h-4 w-4 rounded-full" />
                     </div>
                     <span className="text-xs font-semibold text-gray-400 dark:text-gray-500">
-                      Initializing project locations map...
+                      {t('mapInitializing')}
                     </span>
                   </div>
                 </div>
@@ -215,7 +217,7 @@ export default function CurrentProjectsContent({
                     </p>
 
                     <button className="text-brand-gold mb-6 inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase transition-all group-hover:gap-3">
-                      View Details <ArrowRight size={14} />
+                      {t('viewDetails')} <ArrowRight size={14} />
                     </button>
 
                     <div
@@ -224,7 +226,7 @@ export default function CurrentProjectsContent({
                     >
                       <div className="flex cursor-default flex-col">
                         <span className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                          Status
+                          {t('statusLabel')}
                         </span>
                         <span className="text-brand-gold mt-1 text-xs font-bold tracking-widest uppercase">
                           {project.status}
@@ -234,7 +236,7 @@ export default function CurrentProjectsContent({
                         href="/registration"
                         className="border-brand-gold text-brand-navy hover:text-brand-gold flex cursor-pointer items-center gap-2 border-b pb-1 text-xs font-bold tracking-widest uppercase transition-colors dark:text-gray-200"
                       >
-                        Get Notified <span aria-hidden="true">→</span>
+                        {t('getNotified')} <span aria-hidden="true">→</span>
                       </Link>
                     </div>
                   </div>
@@ -252,20 +254,19 @@ export default function CurrentProjectsContent({
                 <div className="bg-brand-navy absolute inset-0 -z-10 origin-bottom-right scale-0 opacity-5 transition-transform group-hover:scale-100"></div>
               </div>
               <h4 className="mb-4 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-500">
-                Under Development
+                {t('underDevelopment')}
               </h4>
               <h2 className="text-brand-navy mb-6 font-serif text-3xl dark:text-gray-100">
-                Coming Soon
+                {t('comingSoon')}
               </h2>
               <p className="mb-10 text-lg leading-relaxed text-gray-600 dark:text-gray-400">
-                We are currently working on exciting new residential and commercial projects in
-                prime locations. Check back soon for detailed layouts, pricing, and availability.
+                {t('comingSoonDesc')}
               </p>
               <Link
                 href="/registration"
                 className="bg-brand-navy hover:bg-brand-gold text-brand-gold hover:text-brand-navy border-brand-navy mx-auto flex inline-flex w-full items-center justify-center gap-2 border px-8 py-4 text-xs font-bold tracking-widest uppercase transition-colors sm:w-auto dark:border-gray-600 dark:bg-gray-700"
               >
-                Get Notified First
+                {t('getNotifiedFirst')}
               </Link>
             </motion.div>
           )}
@@ -293,7 +294,7 @@ export default function CurrentProjectsContent({
               <button
                 onClick={closeModal}
                 className="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center border border-gray-200 bg-white/50 backdrop-blur transition-colors hover:bg-white dark:border-gray-700 dark:bg-gray-800/50 dark:hover:bg-gray-800"
-                aria-label="Close modal"
+                aria-label={t('closeModal', { defaultValue: 'Close modal' })}
               >
                 <X size={20} className="text-brand-navy dark:text-gray-100" />
               </button>
@@ -330,14 +331,14 @@ export default function CurrentProjectsContent({
                         <button
                           onClick={prevImage}
                           className="hover:text-brand-gold absolute top-1/2 left-4 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-gray-200 bg-white/95 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:bg-white"
-                          aria-label="Previous image"
+                          aria-label={t('prevImage', { defaultValue: 'Previous image' })}
                         >
                           <ChevronLeft size={20} />
                         </button>
                         <button
                           onClick={nextImage}
                           className="hover:text-brand-gold absolute top-1/2 right-4 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-gray-200 bg-white/95 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:bg-white"
-                          aria-label="Next image"
+                          aria-label={t('nextImage', { defaultValue: 'Next image' })}
                         >
                           <ChevronRight size={20} />
                         </button>
@@ -388,13 +389,13 @@ export default function CurrentProjectsContent({
                   className="bg-brand-navy hover:bg-brand-gold hover:text-brand-navy flex w-full items-center justify-center gap-2 py-4 text-xs font-bold tracking-widest text-white uppercase transition-colors"
                 >
                   <ArrowRight size={16} />
-                  Get Notified First
+                  {t('getNotifiedFirst')}
                 </Link>
 
                 <div className="mt-8 mt-auto border-t border-gray-100 pt-8 dark:border-gray-700">
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                      <Share2 size={12} /> Share Project
+                      <Share2 size={12} /> {t('shareProject')}
                     </span>
                     <div className="flex items-center gap-3">
                       <a

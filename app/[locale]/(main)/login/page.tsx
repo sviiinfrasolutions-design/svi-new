@@ -5,9 +5,11 @@ import { UserCircle2, ArrowRight, AlertCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { supabase } from '@/src/lib/supabase/client';
 
 export default function Login() {
+  const t = useTranslations('pages.login');
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
@@ -39,13 +41,13 @@ export default function Login() {
     setPasswordTouched(true);
 
     if (!identifier || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) {
-      setError('Please enter a valid email address.');
+      setError(t('validation.emailRequired'));
       setShake(true);
       return;
     }
 
     if (!password || password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError(t('validation.passwordRequired'));
       setShake(true);
       return;
     }
@@ -74,7 +76,7 @@ export default function Login() {
         }, 1800);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
+      setError(err instanceof Error ? err.message : t('validation.loginFailed'));
       setShake(true);
     } finally {
       setIsSubmitting(false);
@@ -86,7 +88,7 @@ export default function Login() {
     setIdentifierTouched(true);
 
     if (!identifier || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) {
-      setError('Please enter a valid email address.');
+      setError(t('validation.emailRequired'));
       setShake(true);
       return;
     }
@@ -99,7 +101,7 @@ export default function Login() {
       if (otpError) throw otpError;
       setOtpSent(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to send OTP.');
+      setError(err instanceof Error ? err.message : t('validation.sendOtpFailed'));
       setShake(true);
     } finally {
       setIsSubmitting(false);
@@ -112,7 +114,7 @@ export default function Login() {
     setOtpTouched(true);
 
     if (!otp || !/^\d{6}$/.test(otp)) {
-      setError('Please enter a valid 6-digit numeric OTP.');
+      setError(t('validation.otpRequired'));
       setShake(true);
       return;
     }
@@ -142,7 +144,7 @@ export default function Login() {
         }, 1800);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'OTP verification failed.');
+      setError(err instanceof Error ? err.message : t('validation.otpFailed'));
       setShake(true);
     } finally {
       setIsSubmitting(false);
@@ -185,11 +187,11 @@ export default function Login() {
               </motion.div>
 
               <h2 className="text-brand-navy mb-3 font-serif text-2xl font-semibold tracking-wide dark:text-white">
-                Welcome Back
+                {t('welcomeBack')}
               </h2>
 
               <p className="mb-8 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
-                Authentication successful. Initializing your client document portal...
+                {t('authSuccess')}
               </p>
 
               {/* Luxury progress tracking bar */}
@@ -209,11 +211,9 @@ export default function Login() {
               <UserCircle2 size={32} />
             </div>
             <h1 className="text-brand-navy mb-2 font-serif text-3xl dark:text-white">
-              Client Portal
+              {t('title')}
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Log in to view your property documents and payment schedules.
-            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('tagline')}</p>
           </div>
 
           {/* Tab switcher */}
@@ -229,7 +229,7 @@ export default function Login() {
               }}
               className={`flex-1 pb-3 text-xs font-bold tracking-widest uppercase transition-colors ${loginMethod === 'password' ? 'text-brand-navy dark:text-brand-gold border-brand-navy dark:border-brand-gold border-b-2' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
             >
-              Password
+              {t('passwordTab')}
             </button>
             <button
               onClick={() => {
@@ -242,7 +242,7 @@ export default function Login() {
               }}
               className={`flex-1 pb-3 text-xs font-bold tracking-widest uppercase transition-colors ${loginMethod === 'otp' ? 'text-brand-navy dark:text-brand-gold border-brand-navy dark:border-brand-gold border-b-2' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
             >
-              OTP Login
+              {t('otpTab')}
             </button>
           </div>
 
@@ -263,7 +263,7 @@ export default function Login() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
-                    Registered Email
+                    {t('emailLabel')}
                   </label>
                   {showIdentifierError && (
                     <motion.span
@@ -271,7 +271,7 @@ export default function Login() {
                       animate={{ opacity: 1 }}
                       className="text-[10px] font-semibold text-red-500 dark:text-red-400"
                     >
-                      Invalid Email format
+                      {t('validation.emailInvalid')}
                     </motion.span>
                   )}
                 </div>
@@ -284,7 +284,7 @@ export default function Login() {
                   }}
                   onBlur={() => setIdentifierTouched(true)}
                   required
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                   className={`focus:border-brand-gold w-full border px-4 py-3 text-gray-900 transition-colors focus:outline-none ${
                     showIdentifierError
                       ? 'border-red-500 bg-red-500/5 focus:ring-1 focus:ring-red-500/20 dark:border-red-500/40 dark:bg-red-500/5 dark:text-white'
@@ -295,7 +295,7 @@ export default function Login() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
-                    Password
+                    {t('passwordLabel')}
                   </label>
                   {showPasswordError && (
                     <motion.span
@@ -303,7 +303,7 @@ export default function Login() {
                       animate={{ opacity: 1 }}
                       className="text-[10px] font-semibold text-red-500 dark:text-red-400"
                     >
-                      At least 6 characters
+                      {t('validation.passwordMin')}
                     </motion.span>
                   )}
                 </div>
@@ -316,7 +316,7 @@ export default function Login() {
                   }}
                   onBlur={() => setPasswordTouched(true)}
                   required
-                  placeholder="••••••••"
+                  placeholder={t('passwordPlaceholder')}
                   className={`focus:border-brand-gold w-full border px-4 py-3 text-gray-900 transition-colors focus:outline-none ${
                     showPasswordError
                       ? 'border-red-500 bg-red-500/5 focus:ring-1 focus:ring-red-500/20 dark:border-red-500/40 dark:bg-red-500/5 dark:text-white'
@@ -334,7 +334,7 @@ export default function Login() {
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
                 ) : (
                   <>
-                    Log In <ArrowRight size={16} />
+                    {t('loginButton')} <ArrowRight size={16} />
                   </>
                 )}
               </button>
@@ -344,7 +344,7 @@ export default function Login() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
-                    Registered Email
+                    {t('emailLabel')}
                   </label>
                   {showIdentifierError && (
                     <motion.span
@@ -352,7 +352,7 @@ export default function Login() {
                       animate={{ opacity: 1 }}
                       className="text-[10px] font-semibold text-red-500 dark:text-red-400"
                     >
-                      Invalid Email format
+                      {t('validation.emailInvalid')}
                     </motion.span>
                   )}
                 </div>
@@ -364,7 +364,7 @@ export default function Login() {
                     if (identifierTouched) setIdentifierTouched(false);
                   }}
                   onBlur={() => setIdentifierTouched(true)}
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                   disabled={otpSent}
                   className={`focus:border-brand-gold w-full border px-4 py-3 text-gray-900 transition-colors focus:outline-none disabled:opacity-60 ${
                     showIdentifierError
@@ -385,7 +385,7 @@ export default function Login() {
                     {isSubmitting ? (
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                     ) : (
-                      'Send OTP'
+                      t('sendOtpButton')
                     )}
                   </button>
                 </>
@@ -394,7 +394,7 @@ export default function Login() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <label className="text-brand-navy text-[10px] font-bold tracking-widest uppercase dark:text-gray-300">
-                        Enter OTP
+                        {t('otpLabel')}
                       </label>
                       {showOtpError && (
                         <motion.span
@@ -402,7 +402,7 @@ export default function Login() {
                           animate={{ opacity: 1 }}
                           className="text-[10px] font-semibold text-red-500 dark:text-red-400"
                         >
-                          Must be 6 digits
+                          {t('validation.otpDigits')}
                         </motion.span>
                       )}
                     </div>
@@ -416,7 +416,7 @@ export default function Login() {
                         if (otpTouched) setOtpTouched(false);
                       }}
                       onBlur={() => setOtpTouched(true)}
-                      placeholder="6-digit code"
+                      placeholder={t('otpPlaceholder')}
                       className={`focus:border-brand-gold w-full border px-4 py-3 text-center text-2xl tracking-[0.5em] text-gray-900 transition-colors focus:outline-none ${
                         showOtpError
                           ? 'border-red-500 bg-red-500/5 focus:ring-1 focus:ring-red-500/20 dark:border-red-500/40 dark:bg-red-500/5 dark:text-white'
@@ -424,7 +424,7 @@ export default function Login() {
                       }`}
                     />
                     <p className="text-center text-xs text-gray-500">
-                      Check your inbox at <span className="text-brand-gold">{identifier}</span>
+                      {t('checkInbox', { email: identifier })}
                     </p>
                   </div>
                   <button
@@ -436,7 +436,7 @@ export default function Login() {
                       <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
                     ) : (
                       <>
-                        Verify & Login <ArrowRight size={16} />
+                        {t('verifyButton')} <ArrowRight size={16} />
                       </>
                     )}
                   </button>
@@ -449,7 +449,7 @@ export default function Login() {
                     }}
                     className="w-full cursor-pointer text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                   >
-                    ← Change email
+                    {t('changeEmail')}
                   </button>
                 </form>
               )}
@@ -457,12 +457,12 @@ export default function Login() {
           )}
 
           <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-            Don't have an account?{' '}
+            {t('noAccount')}{' '}
             <Link
               href="/registration"
               className="text-brand-navy dark:text-brand-gold hover:text-brand-gold font-bold transition-colors dark:hover:text-white"
             >
-              Register here
+              {t('registerLink')}
             </Link>
           </div>
         </motion.div>

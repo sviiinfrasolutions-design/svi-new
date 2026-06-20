@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState, type ChangeEvent } from 'react
 import { useRouter } from 'next/navigation';
 import { AlertCircle, Check, Copy, X } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useTranslations } from 'next-intl';
 import { FormInput, FormSelect, FormFileUpload } from './FormElements';
 import Captcha from '@/src/components/Captcha';
 import dynamic from 'next/dynamic';
@@ -95,6 +96,7 @@ const INITIAL_FORM: FormData = {
 
 export default function RegistrationForm() {
   const router = useRouter();
+  const t = useTranslations('pages.registration');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -107,6 +109,43 @@ export default function RegistrationForm() {
   const [projects, setProjects] = useState<{ value: string; label: string }[]>([]);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const propertySizes = [
+    { value: '50-100', label: t('sizes.50-100') },
+    { value: '100-200', label: t('sizes.100-200') },
+    { value: '200-400', label: t('sizes.200-400') },
+    { value: '400-700', label: t('sizes.400-700') },
+    { value: '700-1000', label: t('sizes.700-1000') },
+    { value: '1000-1500', label: t('sizes.1000-1500') },
+    { value: '1500-2000', label: t('sizes.1500-2000') },
+  ];
+
+  const propertyTypes = [
+    { value: 'residential-plot', label: t('types.residential-plot') },
+    { value: 'commercial-shop', label: t('types.commercial-shop') },
+    { value: 'luxury-farm-house', label: t('types.luxury-farm-house') },
+  ];
+
+  const plotPreferences = [
+    { value: 'main-road', label: t('preferences.main-road') },
+    { value: 'park', label: t('preferences.park') },
+    { value: 'corner', label: t('preferences.corner') },
+    { value: 'none', label: t('preferences.none') },
+  ];
+
+  const paymentPlans = [
+    { value: '3-months', label: t('plans.3-months') },
+    { value: '6-months', label: t('plans.6-months') },
+    { value: '12-months', label: t('plans.12-months') },
+    { value: '18-months', label: t('plans.18-months') },
+    { value: '24-months', label: t('plans.24-months') },
+  ];
+
+  const paymentModes = [
+    { value: 'online', label: t('modes.online') },
+    { value: 'cash', label: t('modes.cash') },
+    { value: 'net-banking', label: t('modes.net-banking') },
+  ];
 
   const handleCopy = useCallback((text: string, fieldId: string) => {
     navigator.clipboard.writeText(text);
@@ -146,34 +185,34 @@ export default function RegistrationForm() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
+      newErrors.firstName = t('validation.firstNameRequired');
     } else if (formData.firstName.trim().length < 2) {
-      newErrors.firstName = 'First name must be at least 2 characters long';
+      newErrors.firstName = t('validation.firstNameMin');
     } else if (!/^[a-zA-Z\s]+$/.test(formData.firstName)) {
-      newErrors.firstName = 'First name should only contain letters';
+      newErrors.firstName = t('validation.firstNameFormat');
     }
 
     if (!formData.mobileNo.trim()) {
-      newErrors.mobileNo = 'Mobile number is required';
+      newErrors.mobileNo = t('validation.mobileRequired');
     } else {
       const cleanMobile = formData.mobileNo.replace(/\s/g, '');
       if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
-        newErrors.mobileNo = 'Please enter a valid 10-digit Indian mobile number (starts with 6-9)';
+        newErrors.mobileNo = t('validation.mobileFormat');
       }
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('validation.emailRequired');
     } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email.trim())) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('validation.emailFormat');
     }
 
     if (!formData.soWoDo.trim()) {
-      newErrors.soWoDo = 'Relation name (S/O, W/O, D/O) is required';
+      newErrors.soWoDo = t('validation.soWoDoRequired');
     }
 
     if (!formData.dob) {
-      newErrors.dob = 'Date of birth is required';
+      newErrors.dob = t('validation.dobRequired');
     } else {
       const birthDate = new Date(formData.dob);
       const today = new Date();
@@ -184,60 +223,59 @@ export default function RegistrationForm() {
       }
 
       if (birthDate > today) {
-        newErrors.dob = 'Date of birth cannot be in the future';
+        newErrors.dob = t('validation.dobFuture');
       } else if (age < 18) {
-        newErrors.dob = 'You must be at least 18 years old to register';
+        newErrors.dob = t('validation.dobAge');
       } else if (age > 100) {
-        newErrors.dob = 'Please select a valid date of birth';
+        newErrors.dob = t('validation.dobInvalid');
       }
     }
 
     if (!formData.aadharNumber.trim()) {
-      newErrors.aadharNumber = 'Aadhar number is required';
+      newErrors.aadharNumber = t('validation.aadharRequired');
     } else {
       const cleanAadhar = formData.aadharNumber.replace(/\s/g, '');
       if (!/^[2-9]\d{11}$/.test(cleanAadhar)) {
-        newErrors.aadharNumber =
-          'Please enter a valid 12-digit Indian Aadhar number (starts with 2-9)';
+        newErrors.aadharNumber = t('validation.aadharFormat');
       }
     }
 
     if (formData.panNumber.trim()) {
       if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(formData.panNumber.trim())) {
-        newErrors.panNumber = 'Please enter a valid PAN number format (e.g., ABCDE1234F)';
+        newErrors.panNumber = t('validation.panFormat');
       }
     }
 
-    if (!formData.state.trim()) newErrors.state = 'State is required';
-    if (!formData.city.trim()) newErrors.city = 'City is required';
-    if (!formData.address.trim()) newErrors.address = 'Full address is required';
-    if (!formData.advisorName) newErrors.advisorName = 'Please select an advisor';
-    if (!formData.project) newErrors.project = 'Please select a project';
-    if (!formData.propertySize) newErrors.propertySize = 'Please select property size';
-    if (!formData.propertyType) newErrors.propertyType = 'Please select property type';
-    if (!formData.plotPreference) newErrors.plotPreference = 'Please select plot preference';
-    if (!formData.paymentPlan) newErrors.paymentPlan = 'Please select payment plan';
-    if (!formData.paymentMode) newErrors.paymentMode = 'Please select payment mode';
+    if (!formData.state.trim()) newErrors.state = t('validation.stateRequired');
+    if (!formData.city.trim()) newErrors.city = t('validation.cityRequired');
+    if (!formData.address.trim()) newErrors.address = t('validation.addressRequired');
+    if (!formData.advisorName) newErrors.advisorName = t('validation.advisorRequired');
+    if (!formData.project) newErrors.project = t('validation.projectRequired');
+    if (!formData.propertySize) newErrors.propertySize = t('validation.sizeRequired');
+    if (!formData.propertyType) newErrors.propertyType = t('validation.typeRequired');
+    if (!formData.plotPreference) newErrors.plotPreference = t('validation.preferenceRequired');
+    if (!formData.paymentPlan) newErrors.paymentPlan = t('validation.planRequired');
+    if (!formData.paymentMode) newErrors.paymentMode = t('validation.modeRequired');
 
     if (!formData.schemeAmount.trim()) {
-      newErrors.schemeAmount = 'Scheme amount is required';
+      newErrors.schemeAmount = t('validation.amountRequired');
     } else {
       const amount = Number(formData.schemeAmount);
       if (isNaN(amount) || amount <= 0) {
-        newErrors.schemeAmount = 'Scheme amount must be a positive number';
+        newErrors.schemeAmount = t('validation.amountPositive');
       }
     }
 
     if (!captchaValid) {
-      newErrors.captcha = 'Please solve the verification';
-      setCaptchaError('Please solve the verification');
+      newErrors.captcha = t('validation.captchaRequired');
+      setCaptchaError(t('validation.captchaRequired'));
     } else {
       setCaptchaError('');
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData, captchaValid]);
+  }, [formData, captchaValid, t]);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -256,7 +294,7 @@ export default function RegistrationForm() {
       if (!file) return;
 
       if (file.size > 150 * 1024) {
-        setErrors((prev) => ({ ...prev, [type]: 'File size must be under 150KB' }));
+        setErrors((prev) => ({ ...prev, [type]: t('validation.fileSize') }));
         return;
       }
 
@@ -268,7 +306,7 @@ export default function RegistrationForm() {
         'application/pdf',
       ];
       if (!allowedTypes.includes(file.type)) {
-        setErrors((prev) => ({ ...prev, [type]: 'Only JPG, PNG, WEBP, or PDF files are allowed' }));
+        setErrors((prev) => ({ ...prev, [type]: t('validation.fileType') }));
         return;
       }
 
@@ -276,7 +314,7 @@ export default function RegistrationForm() {
       else setPanCardFile(file);
       setErrors((prev) => ({ ...prev, [type]: '' }));
     },
-    []
+    [t]
   );
 
   const removeFile = useCallback((type: 'photo' | 'panCard') => {
@@ -309,11 +347,11 @@ export default function RegistrationForm() {
       setIsPaymentModalOpen(false);
       router.push('/thank-you?registered=1');
     } catch (err) {
-      setSubmitError('Failed to submit registration. Please try again.');
+      setSubmitError(t('validation.submitError'));
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, photoFile, panCardFile, router]);
+  }, [formData, photoFile, panCardFile, router, t]);
 
   return (
     <>
@@ -327,54 +365,54 @@ export default function RegistrationForm() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <FormInput
                 name="firstName"
-                label="First Name"
+                label={t('firstName')}
                 value={formData.firstName}
                 errors={errors}
                 onChange={handleChange}
                 type="text"
-                placeholder="Enter first name"
+                placeholder={t('firstNamePlaceholder')}
               />
               <FormInput
                 name="lastName"
-                label="Last Name"
+                label={t('lastName')}
                 value={formData.lastName}
                 errors={errors}
                 onChange={handleChange}
                 type="text"
-                placeholder="Enter last name"
+                placeholder={t('lastNamePlaceholder')}
               />
 
               <FormInput
                 name="mobileNo"
-                label="Mobile No"
+                label={t('mobileNo')}
                 value={formData.mobileNo}
                 errors={errors}
                 onChange={handleChange}
                 type="tel"
-                placeholder="Enter mobile number"
+                placeholder={t('mobilePlaceholder')}
               />
               <FormInput
                 name="email"
-                label="Email"
+                label={t('email')}
                 value={formData.email}
                 errors={errors}
                 onChange={handleChange}
                 type="email"
-                placeholder="Enter email address"
+                placeholder={t('emailPlaceholder')}
               />
 
               <FormInput
                 name="soWoDo"
-                label="S/O, W/O, D/O"
+                label={t('soWoDo')}
                 value={formData.soWoDo}
                 errors={errors}
                 onChange={handleChange}
                 type="text"
-                placeholder="Enter relation"
+                placeholder={t('soWoDoPlaceholder')}
               />
               <FormInput
                 name="dob"
-                label="Date"
+                label={t('dob')}
                 value={formData.dob}
                 errors={errors}
                 onChange={handleChange}
@@ -383,7 +421,7 @@ export default function RegistrationForm() {
 
               <FormFileUpload
                 type="photo"
-                label="Photo Upload"
+                label={t('photoUpload')}
                 file={photoFile}
                 errors={errors}
                 onFileChange={handleFileChange}
@@ -391,7 +429,7 @@ export default function RegistrationForm() {
               />
               <FormFileUpload
                 type="panCard"
-                label="PAN Card Upload"
+                label={t('panUpload')}
                 file={panCardFile}
                 errors={errors}
                 onFileChange={handleFileChange}
@@ -400,127 +438,127 @@ export default function RegistrationForm() {
 
               <FormInput
                 name="aadharNumber"
-                label="Aadhar Number"
+                label={t('aadharNumber')}
                 value={formData.aadharNumber}
                 errors={errors}
                 onChange={handleChange}
                 type="text"
-                placeholder="Enter 12-digit Aadhar"
+                placeholder={t('aadharPlaceholder')}
               />
               <FormInput
                 name="panNumber"
-                label="PAN Number"
+                label={t('panNumber')}
                 value={formData.panNumber}
                 errors={errors}
                 onChange={handleChange}
                 type="text"
-                placeholder="Enter PAN number"
+                placeholder={t('panPlaceholder')}
               />
 
               <FormInput
                 name="state"
-                label="State"
+                label={t('state')}
                 value={formData.state}
                 errors={errors}
                 onChange={handleChange}
                 type="text"
-                placeholder="Enter state"
+                placeholder={t('statePlaceholder')}
               />
               <FormInput
                 name="city"
-                label="City"
+                label={t('city')}
                 value={formData.city}
                 errors={errors}
                 onChange={handleChange}
                 type="text"
-                placeholder="Enter city"
+                placeholder={t('cityPlaceholder')}
               />
 
               <FormInput
                 name="address"
-                label="Address"
+                label={t('address')}
                 value={formData.address}
                 errors={errors}
                 onChange={handleChange}
                 type="text"
-                placeholder="Enter full address"
+                placeholder={t('addressPlaceholder')}
               />
               <FormSelect
                 name="advisorName"
-                label="Advisor Name"
+                label={t('advisorName')}
                 value={formData.advisorName}
                 options={advisors}
                 errors={errors}
                 onChange={handleChange}
-                placeholder="Select advisor"
+                placeholder={t('advisorPlaceholder')}
               />
 
               <FormSelect
                 name="project"
-                label="Select Projects"
+                label={t('selectProjects')}
                 value={formData.project}
                 options={projects}
                 errors={errors}
                 onChange={handleChange}
-                placeholder="Select project"
+                placeholder={t('projectPlaceholder')}
               />
               <FormSelect
                 name="propertySize"
-                label="Property Size"
+                label={t('propertySize')}
                 value={formData.propertySize}
-                options={PROPERTY_SIZES}
+                options={propertySizes}
                 errors={errors}
                 onChange={handleChange}
-                placeholder="Select size"
+                placeholder={t('sizePlaceholder')}
               />
 
               <FormSelect
                 name="propertyType"
-                label="Property Type"
+                label={t('propertyType')}
                 value={formData.propertyType}
-                options={PROPERTY_TYPES}
+                options={propertyTypes}
                 errors={errors}
                 onChange={handleChange}
-                placeholder="Select type"
+                placeholder={t('typePlaceholder')}
               />
               <FormSelect
                 name="plotPreference"
-                label="Plot Preference"
+                label={t('plotPreference')}
                 value={formData.plotPreference}
-                options={PLOT_PREFERENCES}
+                options={plotPreferences}
                 errors={errors}
                 onChange={handleChange}
-                placeholder="Select preference"
+                placeholder={t('preferencePlaceholder')}
               />
 
               <FormSelect
                 name="paymentPlan"
-                label="Payment Plan"
+                label={t('paymentPlan')}
                 value={formData.paymentPlan}
-                options={PAYMENT_PLANS}
+                options={paymentPlans}
                 errors={errors}
                 onChange={handleChange}
-                placeholder="Select plan"
+                placeholder={t('planPlaceholder')}
               />
               <FormSelect
                 name="paymentMode"
-                label="Payment Mode"
+                label={t('paymentMode')}
                 value={formData.paymentMode}
-                options={PAYMENT_MODES}
+                options={paymentModes}
                 errors={errors}
                 onChange={handleChange}
-                placeholder="Select mode"
+                placeholder={t('modePlaceholder')}
               />
 
               <div className="sm:col-span-2">
                 <FormInput
                   name="schemeAmount"
-                  label="Scheme Amount"
+                  label={t('schemeAmount')}
                   value={formData.schemeAmount}
                   errors={errors}
                   onChange={handleChange}
                   type="text"
-                  placeholder="Enter scheme amount"
+                  placeholder={t('schemeAmountPlaceholder')}
                 />
               </div>
 
@@ -543,7 +581,7 @@ export default function RegistrationForm() {
                 {isSubmitting ? (
                   <div className="h-4 w-4 animate-spin border-2 border-current border-t-transparent"></div>
                 ) : (
-                  'Submit Registration'
+                  t('submitButton')
                 )}
               </button>
             </div>
@@ -551,33 +589,26 @@ export default function RegistrationForm() {
 
           <div className="mt-6 space-y-2 text-center">
             <p className="text-[11px] text-gray-500">
-              Note: Please fill all the details properly and upload the correct documents, otherwise
-              application can be rejected without notice.
+              {t('noteTitle')} {t('note1')}
             </p>
-            <p className="text-[11px] text-gray-500">
-              Registration amount of 2100 and 5100 will be refunded to Applicants whose name will
-              not be picked in the draw.
-            </p>
+            <p className="text-[11px] text-gray-500">{t('note2')}</p>
           </div>
 
           <div className="bg-brand-bg text-brand-navy dark:bg-brand-dark-bg mt-16 p-12 text-center dark:text-white">
-            <h2 className="mb-4 font-serif text-3xl">Ready to Find Your Dream Home?</h2>
-            <p className="mb-8 text-sm text-gray-600 dark:text-gray-300">
-              Let our expert team help you navigate the real estate market and find the perfect
-              property for you.
-            </p>
+            <h2 className="mb-4 font-serif text-3xl">{t('dreamHomeTitle')}</h2>
+            <p className="mb-8 text-sm text-gray-600 dark:text-gray-300">{t('dreamHomeDesc')}</p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
                 href="/projects/current"
                 className="bg-brand-gold text-brand-navy hover:bg-brand-gold/90 px-8 py-3 text-xs font-bold tracking-widest uppercase transition-colors"
               >
-                View Projects
+                {t('viewProjects')}
               </a>
               <a
                 href="/contact"
                 className="border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-navy border px-8 py-3 text-xs font-bold tracking-widest uppercase transition-colors"
               >
-                Contact Us
+                {t('contactUs')}
               </a>
             </div>
           </div>
@@ -602,9 +633,11 @@ export default function RegistrationForm() {
 
             <div className="mt-2 mb-6">
               <h2 className="mb-1 font-serif text-[28px] text-[#1e293b] dark:text-white">
-                For Application Amount
+                {t('paymentModal.title')}
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Payment Details</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('paymentModal.subtitle')}
+              </p>
             </div>
 
             <div className="flex flex-col items-start gap-8 md:flex-row">
@@ -704,7 +737,7 @@ export default function RegistrationForm() {
                       </div>
 
                       <div className="mb-1.5 font-sans text-[10px] font-extrabold tracking-widest text-[#1e293b] uppercase">
-                        SCAN & PAY
+                        {t('paymentModal.scanPay')}
                       </div>
 
                       <div className="border-gray-150 mb-2 flex aspect-square w-full items-center justify-center rounded-lg border bg-white p-1.5 shadow-sm">
@@ -725,7 +758,7 @@ export default function RegistrationForm() {
 
                       <div className="mb-2.5 space-y-1 text-center">
                         <div className="font-sans text-[8px] leading-tight font-extrabold text-[#1e293b]">
-                          Payment Accepted from all UPI Apps.
+                          {t('paymentModal.acceptUpi')}
                         </div>
                         <div className="text-[8.5px] leading-tight font-bold text-gray-700">
                           सभी UPI Apps से भुगतान स्वीकृत किया जाता है।
@@ -771,7 +804,7 @@ export default function RegistrationForm() {
               <div className="flex w-full flex-1 flex-col space-y-4">
                 <div className="flex flex-col space-y-1.5">
                   <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Account Name
+                    {t('paymentModal.accountName')}
                   </span>
                   <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#f8fafc] p-3.5 dark:border-gray-700 dark:bg-gray-800">
                     <span className="mr-2 font-mono text-[13px] leading-tight tracking-wider break-words text-[#1e293b] uppercase dark:text-white">
@@ -794,7 +827,7 @@ export default function RegistrationForm() {
 
                 <div className="flex flex-col space-y-1.5">
                   <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Account Number
+                    {t('paymentModal.accountNumber')}
                   </span>
                   <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#f8fafc] p-3.5 dark:border-gray-700 dark:bg-gray-800">
                     <span className="font-mono text-[13px] tracking-wider text-[#1e293b] dark:text-white">
@@ -817,7 +850,7 @@ export default function RegistrationForm() {
 
                 <div className="flex flex-col space-y-1.5">
                   <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    IFSC Code
+                    {t('paymentModal.ifscCode')}
                   </span>
                   <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#f8fafc] p-3.5 dark:border-gray-700 dark:bg-gray-800">
                     <span className="font-mono text-[13px] tracking-wider text-[#1e293b] dark:text-white">
@@ -840,7 +873,7 @@ export default function RegistrationForm() {
 
                 <div className="flex flex-col space-y-1.5">
                   <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Bank / Branch
+                    {t('paymentModal.bankBranch')}
                   </span>
                   <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#f8fafc] p-3.5 dark:border-gray-700 dark:bg-gray-800">
                     <span className="font-mono text-[13px] tracking-wider text-[#1e293b] dark:text-white">
@@ -864,7 +897,7 @@ export default function RegistrationForm() {
                   {isSubmitting ? (
                     <span className="border-brand-navy h-5 w-5 animate-spin rounded-full border-2 border-t-transparent"></span>
                   ) : (
-                    'I have paid - Complete Registration'
+                    t('paymentModal.completeButton')
                   )}
                 </button>
               </div>

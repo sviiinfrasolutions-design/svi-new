@@ -3,12 +3,14 @@
 import { useCallback, useState, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { submitContactForm } from '@/src/actions/contact';
 
 const DIGIT_REGEX = /\d/g;
 
 export default function ContactForm() {
   const router = useRouter();
+  const t = useTranslations('pages.contact');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -23,34 +25,30 @@ export default function ContactForm() {
   const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    else if (formData.name.length < 2) newErrors.name = 'Name must be at least 2 characters';
-    else if (!/^[a-zA-Z\s]+$/.test(formData.name))
-      newErrors.name = 'Name can only contain letters and spaces';
+    if (!formData.name.trim()) newErrors.name = t('validation.nameRequired');
+    else if (formData.name.length < 2) newErrors.name = t('validation.nameMin');
+    else if (!/^[a-zA-Z\s]+$/.test(formData.name)) newErrors.name = t('validation.nameFormat');
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email) newErrors.email = 'Email is required';
-    else if (!emailRegex.test(formData.email))
-      newErrors.email = 'Please enter a valid email address';
+    if (!formData.email) newErrors.email = t('validation.emailRequired');
+    else if (!emailRegex.test(formData.email)) newErrors.email = t('validation.emailFormat');
 
     const phoneRegex = /^\+?[\d\s-]{10,15}$/;
     const digitCount = (formData.phone.match(DIGIT_REGEX) || []).length;
-    if (!formData.phone) newErrors.phone = 'Phone number is required';
+    if (!formData.phone) newErrors.phone = t('validation.phoneRequired');
     else if (!phoneRegex.test(formData.phone) || digitCount < 10 || digitCount > 15) {
-      newErrors.phone = 'Please enter a valid phone number (10-15 digits)';
+      newErrors.phone = t('validation.phoneFormat');
     }
 
-    if (!formData.subject.trim()) newErrors.subject = 'Subject is required';
-    else if (formData.subject.length < 3)
-      newErrors.subject = 'Subject must be at least 3 characters';
+    if (!formData.subject.trim()) newErrors.subject = t('validation.subjectRequired');
+    else if (formData.subject.length < 3) newErrors.subject = t('validation.subjectMin');
 
-    if (!formData.message.trim()) newErrors.message = 'Message is required';
-    else if (formData.message.length < 10)
-      newErrors.message = 'Message must be at least 10 characters';
+    if (!formData.message.trim()) newErrors.message = t('validation.messageRequired');
+    else if (formData.message.length < 10) newErrors.message = t('validation.messageMin');
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData]);
+  }, [formData, t]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -64,17 +62,17 @@ export default function ContactForm() {
         Object.entries(formData).forEach(([key, value]) => fd.append(key, value));
         const result = await submitContactForm(fd);
         if (!result.success) {
-          setSubmitError(result.error || 'Submission failed');
+          setSubmitError(result.error || t('validation.submitFailed'));
           return;
         }
         router.push('/thank-you');
       } catch {
-        setSubmitError('Failed to submit. Please try again.');
+        setSubmitError(t('validation.submitError'));
       } finally {
         setIsSubmitting(false);
       }
     },
-    [validateForm, formData, router]
+    [validateForm, formData, router, t]
   );
 
   const handleChange = useCallback(
@@ -91,10 +89,10 @@ export default function ContactForm() {
   return (
     <div className="border border-gray-200 bg-white p-6 shadow-sm md:p-10 dark:border-gray-700 dark:bg-gray-800">
       <h4 className="mb-4 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-500">
-        Inquiries
+        {t('inquiries')}
       </h4>
       <h3 className="text-brand-navy mb-8 font-serif text-3xl dark:text-gray-100">
-        Send a Message
+        {t('sendMessage')}
       </h3>
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -103,7 +101,7 @@ export default function ContactForm() {
               htmlFor="name"
               className="mb-2 block text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase dark:text-gray-400"
             >
-              Your Name
+              {t('formName')}
             </label>
             <input
               type="text"
@@ -130,7 +128,7 @@ export default function ContactForm() {
               htmlFor="email"
               className="mb-2 block text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase dark:text-gray-400"
             >
-              Email Address
+              {t('formEmail')}
             </label>
             <input
               type="email"
@@ -159,7 +157,7 @@ export default function ContactForm() {
               htmlFor="phone"
               className="mb-2 block text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase dark:text-gray-400"
             >
-              Phone Number
+              {t('formPhone')}
             </label>
             <input
               type="tel"
@@ -187,7 +185,7 @@ export default function ContactForm() {
               htmlFor="subject"
               className="mb-2 block text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase dark:text-gray-400"
             >
-              Subject
+              {t('formSubject')}
             </label>
             <input
               type="text"
@@ -223,7 +221,7 @@ export default function ContactForm() {
             htmlFor="message"
             className="mb-2 block text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase dark:text-gray-400"
           >
-            Message
+            {t('formMessage')}
           </label>
           <textarea
             id="message"
@@ -266,7 +264,7 @@ export default function ContactForm() {
           {isSubmitting ? (
             <div className="h-4 w-4 animate-spin border-2 border-current border-t-transparent"></div>
           ) : (
-            'Send Message'
+            t('formSubmit')
           )}
         </button>
       </form>

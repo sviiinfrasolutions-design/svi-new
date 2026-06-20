@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 const SQRT_5000 = Math.sqrt(5000);
 
@@ -23,6 +24,7 @@ const testimonialImages = [
 const testimonials = [
   {
     tempId: 0,
+    id: 0,
     testimonial:
       'Investing in their completed commercial project in Noida was the best decision. The footfall is amazing and the rental potential is excellent.',
     by: 'Arjun, Commercial Investor',
@@ -30,6 +32,7 @@ const testimonials = [
   },
   {
     tempId: 1,
+    id: 1,
     testimonial:
       "We shifted to our new flat last month. The construction quality is top-class and it's 100% Vastu compliant. Very happy with SVI Infra.",
     by: 'Rohan, Homeowner',
@@ -37,6 +40,7 @@ const testimonials = [
   },
   {
     tempId: 2,
+    id: 2,
     testimonial:
       "Possession was given exactly on time! Usually, builders delay a lot, but SVI Infra's completed projects are proof of their commitment.",
     by: 'Priya, Resident',
@@ -44,6 +48,7 @@ const testimonials = [
   },
   {
     tempId: 3,
+    id: 3,
     testimonial:
       'The location of their existing projects in Jaipur is prime. Perfect connectivity for daily commute and great neighborhood.',
     by: 'Vikram, Real Estate Investor',
@@ -51,6 +56,7 @@ const testimonials = [
   },
   {
     tempId: 4,
+    id: 4,
     testimonial:
       'Unki property management team bohot cooperative hai. Maintenance in the completed towers is excellent and hassle-free.',
     by: 'Ananya, Business Owner',
@@ -58,6 +64,7 @@ const testimonials = [
   },
   {
     tempId: 5,
+    id: 5,
     testimonial:
       'Visited their site in Noida. The society is fully secure and the amenities for kids are really good. Finalized our booking the same day.',
     by: 'Karan, Property Buyer',
@@ -65,6 +72,7 @@ const testimonials = [
   },
   {
     tempId: 6,
+    id: 6,
     testimonial:
       'Retail space in their completed project has given my shop a huge boost. Parking and security is totally tension-free.',
     by: 'Amit, Retail Entrepreneur',
@@ -72,6 +80,7 @@ const testimonials = [
   },
   {
     tempId: 7,
+    id: 7,
     testimonial:
       'I only trust SVI Infra for investment. Unke existing projects ki resale value aur demand hamesha market mein high rehti hai.',
     by: 'Siddharth, Financial Analyst',
@@ -79,6 +88,7 @@ const testimonials = [
   },
   {
     tempId: 8,
+    id: 8,
     testimonial:
       'My parents are really happy with the new apartment. Society temple nearby and a great park for their evening walks.',
     by: 'Neha, Homeowner',
@@ -86,6 +96,7 @@ const testimonials = [
   },
   {
     tempId: 9,
+    id: 9,
     testimonial:
       'The value growth in the Noida completed project has been outstanding. Definitely a great choice for NRI investors.',
     by: 'Kritika, Asset Manager',
@@ -93,6 +104,7 @@ const testimonials = [
   },
   {
     tempId: 10,
+    id: 10,
     testimonial:
       'SVI Infra literally delivers what they promise in the brochure. No hidden charges and super transparent booking process.',
     by: 'Varun, Homeowner',
@@ -100,6 +112,7 @@ const testimonials = [
   },
   {
     tempId: 11,
+    id: 11,
     testimonial:
       'Existing projects ki maintenance itni achi hai ki society abhi bhi brand new lagti hai. Very proactive facility team.',
     by: 'Rahul, Community Resident',
@@ -107,6 +120,7 @@ const testimonials = [
   },
   {
     tempId: 12,
+    id: 12,
     testimonial:
       'Leased an office space in their IT park. Electricity backup and internet connectivity is flawless. Great corporate vibe.',
     by: 'Sneha, Startup Founder',
@@ -114,6 +128,7 @@ const testimonials = [
   },
   {
     tempId: 13,
+    id: 13,
     testimonial:
       'Clubhouse and green area in their residential project is amazing. Weekend pe bahaar jaane ki zarurat hi nahi padti ab.',
     by: 'Manish, Property Buyer',
@@ -121,6 +136,7 @@ const testimonials = [
   },
   {
     tempId: 14,
+    id: 14,
     testimonial:
       "SVI Infra's completed commercial hubs have the best corporate crowd. Very premium feel and the layout is very spacious.",
     by: 'Deepika, Corporate Client',
@@ -128,6 +144,7 @@ const testimonials = [
   },
   {
     tempId: 15,
+    id: 15,
     testimonial:
       "Property papers and registry process was handled so smoothly. Really appreciate their legal team's support.",
     by: 'Rajesh, Portfolio Investor',
@@ -135,6 +152,7 @@ const testimonials = [
   },
   {
     tempId: 16,
+    id: 16,
     testimonial:
       'The floor plan is very spacious. Natural light aur ventilation ka poora dhyan rakha gaya hai apartments mein.',
     by: 'Kunal, Interior Designer',
@@ -142,6 +160,7 @@ const testimonials = [
   },
   {
     tempId: 17,
+    id: 17,
     testimonial:
       "We checked multiple options in NCR, but SVI's existing projects offer the best value for money and lifestyle.",
     by: 'Ankit, Prospective Buyer',
@@ -149,6 +168,7 @@ const testimonials = [
   },
   {
     tempId: 18,
+    id: 18,
     testimonial:
       'Key handover ceremony was beautifully organized. Really felt like a VIP customer when taking possession.',
     by: 'Simran, First-time Buyer',
@@ -156,6 +176,7 @@ const testimonials = [
   },
   {
     tempId: 19,
+    id: 19,
     testimonial:
       "Trust is everything in real estate, and SVI's track record with completed projects speaks for itself. Ekdum genuine builder.",
     by: 'Meera, Real Estate Consultant',
@@ -177,6 +198,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
   cardSize,
 }) => {
   const isCenter = position === 0;
+  const t = useTranslations('testimonials');
 
   return (
     <div
@@ -217,7 +239,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
       >
         <img
           src={testimonial.imgSrc}
-          alt={`${testimonial.by.split(',')[0]}`}
+          alt={`${t(`list.t${testimonial.id}.by`).split(',')[0]}`}
           className="h-full w-full object-cover object-top grayscale transition-all duration-300 hover:grayscale-0"
         />
       </div>
@@ -227,7 +249,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
           isCenter ? 'text-brand-navy' : 'text-brand-navy dark:text-gray-100'
         )}
       >
-        "{testimonial.testimonial}"
+        "{t(`list.t${testimonial.id}.text`)}"
       </h3>
       <p
         className={cn(
@@ -235,13 +257,14 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
           isCenter ? 'text-brand-navy/80' : 'text-gray-500 dark:text-gray-400'
         )}
       >
-        - {testimonial.by.split(',')[0]}
+        - {t(`list.t${testimonial.id}.by`).split(',')[0]}
       </p>
     </div>
   );
 };
 
 export const StaggerTestimonials: React.FC = () => {
+  const t = useTranslations('testimonials');
   const [cardSize, setCardSize] = useState(365);
   const [testimonialsList, setTestimonialsList] = useState(testimonials);
 
@@ -286,12 +309,9 @@ export const StaggerTestimonials: React.FC = () => {
     <section className="bg-brand-bg dark:bg-brand-dark-bg relative overflow-hidden py-24">
       <div className="container mx-auto mb-16 px-4 text-center">
         <h2 className="text-brand-navy mb-4 font-serif text-4xl md:text-5xl dark:text-white">
-          What Our Clients Say
+          {t('title')}
         </h2>
-        <p className="mx-auto max-w-2xl text-gray-600 dark:text-gray-400">
-          Discover why hundreds of families and businesses trust SVI Infra Solutions for their real
-          estate needs.
-        </p>
+        <p className="mx-auto max-w-2xl text-gray-600 dark:text-gray-400">{t('subtitle')}</p>
       </div>
       <div className="relative w-full overflow-hidden" style={{ height: 600 }}>
         {testimonialsList.map((testimonial, index) => {
@@ -317,7 +337,7 @@ export const StaggerTestimonials: React.FC = () => {
               'dark:bg-brand-dark-surface dark:border-brand-dark-border text-brand-navy hover:bg-brand-gold hover:text-brand-navy hover:border-brand-gold dark:hover:bg-brand-gold dark:hover:text-brand-navy border-2 border-gray-200 bg-white dark:text-gray-100',
               'focus-visible:ring-brand-gold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
             )}
-            aria-label="Previous testimonial"
+            aria-label={t('ariaPrevious')}
           >
             <ChevronLeft />
           </button>
@@ -328,7 +348,7 @@ export const StaggerTestimonials: React.FC = () => {
               'dark:bg-brand-dark-surface dark:border-brand-dark-border text-brand-navy hover:bg-brand-gold hover:text-brand-navy hover:border-brand-gold dark:hover:bg-brand-gold dark:hover:text-brand-navy border-2 border-gray-200 bg-white dark:text-gray-100',
               'focus-visible:ring-brand-gold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none'
             )}
-            aria-label="Next testimonial"
+            aria-label={t('ariaNext')}
           >
             <ChevronRight />
           </button>
