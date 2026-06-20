@@ -77,21 +77,29 @@ export function HistoryTable({
                   </td>
                   <td className="px-8 py-5">
                     {l.winners && l.winners.length > 0 ? (
-                      <div className="space-y-2">
+                      <div className="custom-scrollbar max-h-28 min-w-[200px] space-y-2.5 overflow-y-auto pr-1">
                         {l.winners.map((w: any, idx: number) => (
                           <div
                             key={idx}
                             className="border-b border-slate-100 pb-1.5 last:border-0 last:pb-0 dark:border-white/5"
                           >
-                            <div className="text-brand-gold flex items-center gap-2 font-bold">
-                              <Award className="h-4 w-4 shrink-0" /> {w.name}
+                            <div className="text-brand-gold flex items-center gap-1.5 text-xs font-bold">
+                              <Award className="h-3.5 w-3.5 shrink-0" />{' '}
+                              <span className="truncate">{w.name}</span>
                             </div>
-                            <div className="mt-0.5 pl-6 font-mono text-[10px] text-slate-500 dark:text-gray-500">
+                            <div className="mt-0.5 pl-5 font-mono text-[9px] text-slate-500 dark:text-gray-400">
                               Ticket: {w.ticket_number}
                             </div>
                             {w.id && (
-                              <div className="mt-0.5 pl-6 font-mono text-[9px] text-slate-500 dark:text-slate-400">
-                                ID: {w.id}
+                              <div className="mt-0.5 flex items-center gap-1.5 pl-5 font-mono text-[8px] text-slate-400 dark:text-slate-500">
+                                <span>ID: {w.id.substring(0, 8)}...</span>
+                                <button
+                                  onClick={() => navigator.clipboard.writeText(w.id)}
+                                  className="py-0.2 cursor-pointer rounded bg-slate-100 px-1 text-[8px] transition-colors hover:bg-slate-200 active:scale-95 dark:bg-white/5 dark:hover:bg-white/10"
+                                  title="Copy Full ID"
+                                >
+                                  Copy
+                                </button>
                               </div>
                             )}
                           </div>
@@ -99,15 +107,22 @@ export function HistoryTable({
                       </div>
                     ) : l.winner ? (
                       <div>
-                        <div className="text-brand-gold flex items-center gap-2 font-bold">
-                          <Award className="h-4 w-4 shrink-0" /> {l.winner.name}
+                        <div className="text-brand-gold flex items-center gap-1.5 text-xs font-bold">
+                          <Award className="h-3.5 w-3.5 shrink-0" /> {l.winner.name}
                         </div>
-                        <div className="mt-1 font-mono text-[10px] text-slate-500 dark:text-gray-500">
+                        <div className="mt-1 font-mono text-[9px] text-slate-500 dark:text-gray-500">
                           Ticket: {l.winner.ticket_number}
                         </div>
                         {l.winner.id && (
-                          <div className="mt-0.5 font-mono text-[9px] text-slate-500 dark:text-slate-400">
-                            ID: {l.winner.id}
+                          <div className="mt-0.5 flex items-center gap-1.5 font-mono text-[8px] text-slate-400 dark:text-slate-500">
+                            <span>ID: {l.winner.id.substring(0, 8)}...</span>
+                            <button
+                              onClick={() => navigator.clipboard.writeText(l.winner.id)}
+                              className="py-0.2 cursor-pointer rounded bg-slate-100 px-1 text-[8px] transition-colors hover:bg-slate-200 active:scale-95 dark:bg-white/5 dark:hover:bg-white/10"
+                              title="Copy Full ID"
+                            >
+                              Copy
+                            </button>
                           </div>
                         )}
                       </div>
@@ -168,6 +183,23 @@ export function HistoryTable({
           </table>
         </div>
       </div>
+
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.02);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(212, 175, 55, 0.25);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(212, 175, 55, 0.45);
+        }
+      `}</style>
     </div>
   );
 }

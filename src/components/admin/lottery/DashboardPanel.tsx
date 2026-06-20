@@ -245,39 +245,76 @@ export function DashboardPanel({
 
         <div className="flex shrink-0 flex-col gap-4 self-center lg:mt-16 lg:self-start">
           {activeWinners.length > 0 ? (
-            <div className="border-brand-gold/30 flex flex-col items-center justify-center gap-4 rounded-3xl border bg-gradient-to-b from-slate-50 to-white p-8 shadow-2xl dark:from-[#1a1a24] dark:to-[#0a0a0f]">
-              <div className="border-brand-gold/40 bg-brand-gold/10 text-brand-gold shadow-[0_0_20px_rgba(212, 175, 55,0.3)] flex h-16 w-16 items-center justify-center rounded-full border">
-                <Trophy className="h-8 w-8" />
+            <div className="border-brand-gold/30 flex w-full max-w-sm flex-col items-center justify-center gap-4 rounded-3xl border bg-gradient-to-b from-slate-50 to-white p-6 shadow-2xl dark:from-[#1a1a24] dark:to-[#0a0a0f]">
+              <div className="border-brand-gold/40 bg-brand-gold/10 text-brand-gold shadow-[0_0_20px_rgba(212, 175, 55,0.3)] flex h-14 w-14 items-center justify-center rounded-full border">
+                <Trophy className="h-7 w-7" />
               </div>
-              <div className="text-center">
-                <div className="text-brand-gold mb-1 text-[10px] font-bold tracking-widest uppercase">
+              <div className="w-full text-center">
+                <div className="text-brand-gold mb-3 text-[10px] font-bold tracking-widest uppercase">
                   {activeWinners.length === 1
                     ? 'Winner Declared'
                     : `${activeWinners.length} Winners Declared`}
                 </div>
-                {activeWinners.map((w: any, idx: number) => (
-                  <div key={w.id}>
-                    {activeWinners.length > 1 && (
-                      <div className="mb-0.5 text-[9px] font-medium tracking-widest text-slate-400 uppercase dark:text-slate-500">
-                        Winner #{idx + 1}
+
+                <div className="custom-scrollbar max-h-[260px] w-full space-y-2.5 overflow-y-auto px-1">
+                  {activeWinners.map((w: any, idx: number) => (
+                    <div
+                      key={w.id}
+                      className="border-brand-gold/10 from-brand-gold/5 dark:from-brand-gold/8 dark:border-brand-gold/15 flex items-center justify-between gap-3 rounded-2xl border bg-gradient-to-r via-transparent to-transparent p-3"
+                    >
+                      <div className="flex min-w-0 items-center gap-2.5">
+                        <div className="bg-brand-gold/10 border-brand-gold/20 text-brand-gold flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[9px] font-bold">
+                          #{idx + 1}
+                        </div>
+                        <div className="min-w-0 text-left">
+                          <div className="truncate font-serif text-sm font-bold text-slate-900 dark:text-white">
+                            {w.name}
+                          </div>
+                          {w.id && (
+                            <div className="mt-0.5 flex items-center gap-1 font-mono text-[8px] text-slate-400 dark:text-slate-500">
+                              <span className="truncate">ID: {w.id.substring(0, 8)}...</span>
+                              <button
+                                onClick={() => navigator.clipboard.writeText(w.id)}
+                                className="py-0.2 cursor-pointer rounded bg-slate-100 px-1 text-[8px] hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10"
+                                title="Copy Full ID"
+                              >
+                                Copy
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    )}
-                    <div className="font-serif text-2xl font-bold text-slate-900 dark:text-white">
-                      {w.name}
+                      <div className="bg-brand-gold/10 text-brand-gold border-brand-gold/20 shrink-0 rounded border px-2.5 py-1 font-mono text-xs font-bold">
+                        {w.ticket_number}
+                      </div>
                     </div>
-                    <div className="mt-1 inline-block rounded bg-slate-100 px-3 py-1 font-mono text-xs font-bold text-slate-600 dark:bg-white/10 dark:text-gray-300">
-                      {w.ticket_number}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
               <button
                 onClick={onResetDraw}
                 disabled={isPending}
-                className="mt-2 flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-6 py-2.5 text-xs font-bold tracking-wider text-slate-600 uppercase transition-all hover:bg-slate-200 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white"
+                className="mt-1 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-6 py-2.5 text-xs font-bold tracking-wider text-slate-600 uppercase transition-all hover:bg-slate-200 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 <RefreshCw className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} /> Reset Draw
               </button>
+
+              <style jsx>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                  width: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                  background: rgba(0, 0, 0, 0.02);
+                  border-radius: 10px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                  background: rgba(212, 175, 55, 0.25);
+                  border-radius: 10px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                  background: rgba(212, 175, 55, 0.45);
+                }
+              `}</style>
             </div>
           ) : (
             <button

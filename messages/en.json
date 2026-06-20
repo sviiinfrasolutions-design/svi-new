@@ -910,7 +910,9 @@
       "shufflingProgress": "Cryptographic shuffle in progress...",
       "initiateShuffle": "Verify {count} entries and initiate secure shuffle",
       "initiateSequence": "Initiate Sequence",
-      "shufflingText": "Encrypting & Shuffling..."
+      "shufflingText": "Encrypting & Shuffling...",
+      "muteAudio": "Mute audio",
+      "unmuteAudio": "Unmute audio"
     }
   }
 }
