@@ -54,7 +54,7 @@ export function DrawArenaModal({
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.92, y: 30, opacity: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-3xl overflow-hidden rounded-[2rem] border border-[#D4AF37]/15 bg-gradient-to-b from-[#0B1120] to-[#060a14] p-10 text-center shadow-[0_0_100px_rgba(212,175,55,0.08)] md:p-16"
+            className="relative w-full max-w-3xl overflow-hidden rounded-[2rem] border border-[#D4AF37]/15 bg-gradient-to-b from-[#0B1120] to-[#060a14] p-6 text-center shadow-[0_0_100px_rgba(212,175,55,0.08)] sm:p-10 md:p-16"
           >
             <div className="pointer-events-none absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-[#D4AF37]/5 blur-[100px]" />
 
@@ -67,16 +67,18 @@ export function DrawArenaModal({
               </button>
             )}
 
-            <div className="relative mx-auto max-w-xl space-y-10">
+            <div className="relative mx-auto max-w-xl space-y-6 sm:space-y-10">
               <div>
                 <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5 px-4 py-1.5 text-[10px] font-medium tracking-[0.2em] text-[#B38728] uppercase dark:text-[#D4AF37]">
                   <Zap className="h-3 w-3 fill-[#D4AF37]" /> {t('secureArena')}
                 </div>
-                <h3 className="font-serif text-3xl font-light text-white md:text-5xl">{title}</h3>
+                <h3 className="font-serif text-2xl font-light text-white sm:text-3xl md:text-5xl">
+                  {title}
+                </h3>
               </div>
 
               {/* Shuffle Cylinder */}
-              <div className="relative mx-auto my-12 h-40 w-full max-w-sm overflow-hidden rounded-2xl border border-[#D4AF37]/15 bg-[#020617] shadow-[inset_0_0_40px_rgba(212,175,55,0.04)]">
+              <div className="relative mx-auto my-6 h-40 w-full max-w-sm overflow-hidden rounded-2xl border border-[#D4AF37]/15 bg-[#020617] shadow-[inset_0_0_40px_rgba(212,175,55,0.04)] sm:my-10 md:my-12">
                 <div
                   className="pointer-events-none absolute inset-0 z-20 rounded-2xl border border-[#D4AF37]/10"
                   style={{
@@ -101,8 +103,8 @@ export function DrawArenaModal({
                         <span
                           className={`block truncate ${
                             drawWinnerCount > 0 && idx >= shuffledNames.length - drawWinnerCount
-                              ? 'scale-110 font-serif text-3xl font-medium text-[#D4AF37] transition-all duration-500'
-                              : 'text-2xl font-light text-white/20'
+                              ? 'scale-110 font-serif text-2xl font-medium text-[#D4AF37] transition-all duration-500 sm:text-3xl'
+                              : 'text-lg font-light text-white/20 sm:text-xl md:text-2xl'
                           }`}
                         >
                           {name}
@@ -158,7 +160,7 @@ export function DrawArenaModal({
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.25, type: 'spring', stiffness: 200 }}
-                          className="relative font-serif text-4xl text-white md:text-5xl"
+                          className="relative font-serif text-2xl text-white sm:text-4xl md:text-5xl"
                         >
                           {w.name}
                         </motion.h4>

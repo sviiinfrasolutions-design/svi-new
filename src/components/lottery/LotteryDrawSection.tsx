@@ -176,28 +176,28 @@ export default function LotteryDrawSection() {
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
+                <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-slate-600 sm:gap-8 dark:text-slate-300">
                   <div className="flex flex-col">
-                    <span className="text-3xl font-light text-slate-900 dark:text-white">
+                    <span className="text-2xl font-light text-slate-900 sm:text-3xl dark:text-white">
                       {participants.length}
                     </span>
                     <span className="mt-1 text-[10px] tracking-widest text-slate-400 uppercase dark:text-slate-500">
                       {t('clients')}
                     </span>
                   </div>
-                  <div className="h-12 w-px bg-slate-200 dark:bg-[#D4AF37]/10" />
+                  <div className="xs:block hidden h-12 w-px bg-slate-200 dark:bg-[#D4AF37]/10" />
                   <div className="flex flex-col">
-                    <span className="flex items-center gap-2 text-lg font-light text-slate-900 dark:text-white">
-                      <ShieldCheck className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />{' '}
+                    <span className="flex items-center gap-2 text-base font-light text-slate-900 sm:text-lg dark:text-white">
+                      <ShieldCheck className="h-4 text-emerald-500 sm:h-5 sm:w-5 dark:text-emerald-400" />{' '}
                       {t('secure')}
                     </span>
                   </div>
                   {winners.length > 0 && (
                     <>
-                      <div className="h-12 w-px bg-slate-200 dark:bg-[#D4AF37]/10" />
+                      <div className="xs:block hidden h-12 w-px bg-slate-200 dark:bg-[#D4AF37]/10" />
                       <div className="flex flex-col">
-                        <span className="flex items-center gap-2 text-lg font-light text-[#B38728] dark:text-[#D4AF37]">
-                          <Crown className="h-5 w-5" /> {winners.length}
+                        <span className="flex items-center gap-2 text-base font-light text-[#B38728] sm:text-lg dark:text-[#D4AF37]">
+                          <Crown className="h-4 sm:h-5 sm:w-5" /> {winners.length}
                         </span>
                         <span className="mt-1 text-[10px] tracking-widest text-slate-400 uppercase dark:text-slate-500">
                           {t('winners')}
