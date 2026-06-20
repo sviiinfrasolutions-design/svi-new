@@ -6,7 +6,16 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin/', '/api/', '/login', '/payment', '/thank-you'],
+        disallow: [
+          '/admin/',
+          '/api/',
+          '/login',
+          '/payment',
+          '/thank-you',
+          '/*?type=',
+          '/*?status=',
+          '/*?search=',
+        ],
       },
       {
         userAgent: 'Googlebot',
@@ -15,7 +24,16 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended'],
         allow: '/',
-        disallow: ['/admin/', '/api/', '/login', '/payment', '/thank-you'],
+        disallow: [
+          '/admin/',
+          '/api/',
+          '/login',
+          '/payment',
+          '/thank-you',
+          '/*?type=',
+          '/*?status=',
+          '/*?search=',
+        ],
       },
     ],
     sitemap: 'https://sviiinfrasolutions.com/sitemap.xml',

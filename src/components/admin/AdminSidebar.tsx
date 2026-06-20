@@ -118,9 +118,11 @@ function SidebarContent({
           animate={{ opacity: collapsed && !isMobile ? 0 : 1 }}
           className="flex flex-col overflow-hidden"
         >
-          <h1 className="text-brand-navy font-serif text-lg leading-tight font-bold whitespace-nowrap dark:text-white">
+          <div className="text-brand-navy font-serif text-lg leading-tight font-bold whitespace-nowrap dark:text-white">
             SVI Infra
-          </h1>
+            <br />
+            Solutions
+          </div>
           <p className="text-brand-gold text-[10px] font-bold tracking-widest whitespace-nowrap uppercase">
             Admin Portal
           </p>

@@ -44,35 +44,22 @@ export default function PortalAllotmentsAdmin() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch allotments with relations
-      const { data: allotmentsData, error: allotmentsError } = await supabase
-        .from('allotments')
-        .select(
-          `
-          *,
-          profiles(id, full_name, email),
-          properties(id, name),
-          payment_schedules(*)
-        `
-        )
-        .order('created_at', { ascending: false });
+      const [
+        { data: allotmentsData, error: allotmentsError },
+        { data: profilesData },
+        { data: propertiesData },
+      ] = await Promise.all([
+        supabase
+          .from('allotments')
+          .select('*, profiles(id, full_name, email), properties(id, name), payment_schedules(*)')
+          .order('created_at', { ascending: false }),
+        supabase.from('profiles').select('id, full_name, email').order('full_name'),
+        supabase.from('properties').select('id, name').eq('active', true).order('name'),
+      ]);
 
       if (allotmentsError) throw allotmentsError;
       setAllotments(allotmentsData || []);
-
-      // Fetch profiles
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('id, full_name, email')
-        .order('full_name');
       setProfiles(profilesData || []);
-
-      // Fetch properties
-      const { data: propertiesData } = await supabase
-        .from('properties')
-        .select('id, name')
-        .eq('active', true)
-        .order('name');
       setProperties(propertiesData || []);
     } catch (error: any) {
       toast.error('Failed to load data');
