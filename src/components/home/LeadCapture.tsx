@@ -2,6 +2,7 @@
 
 import React, { useState, memo } from 'react';
 import { Send, X, User, Phone, Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface LeadCaptureProps {
   onClose: () => void;
@@ -9,6 +10,7 @@ interface LeadCaptureProps {
 }
 
 function LeadCapture({ onClose, onSubmitted }: LeadCaptureProps) {
+  const t = useTranslations('leadCapture');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -18,11 +20,11 @@ function LeadCapture({ onClose, onSubmitted }: LeadCaptureProps) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!name.trim() || !phone.trim()) {
-      setError('Please fill in all fields');
+      setError(t('fillFields'));
       return;
     }
     if (!/^[6-9]\d{9}$/.test(phone.replace(/\s/g, ''))) {
-      setError('Please enter a valid 10-digit mobile number');
+      setError(t('invalidMobile'));
       return;
     }
 
@@ -42,7 +44,7 @@ function LeadCapture({ onClose, onSubmitted }: LeadCaptureProps) {
       onSubmitted();
       setTimeout(onClose, 2000);
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError(t('error'));
     } finally {
       setSubmitting(false);
     }
@@ -52,7 +54,7 @@ function LeadCapture({ onClose, onSubmitted }: LeadCaptureProps) {
     return (
       <div className="mx-4 mb-3 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-800 dark:bg-green-950/30 dark:text-green-400">
         <Check className="h-4 w-4 shrink-0" />
-        Thanks! We&apos;ll get back to you shortly.
+        {t('thanks')}
       </div>
     );
   }
@@ -60,9 +62,7 @@ function LeadCapture({ onClose, onSubmitted }: LeadCaptureProps) {
   return (
     <div className="border-brand-gold/20 bg-brand-gold/5 dark:border-brand-gold/10 mx-4 mb-3 rounded-xl border p-4">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-brand-navy text-sm font-medium dark:text-gray-200">
-          Want us to follow up? 👋
-        </p>
+        <p className="text-brand-navy text-sm font-medium dark:text-gray-200">{t('followUp')}</p>
         <button
           onClick={onClose}
           className="rounded-lg p-1 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300"
@@ -78,7 +78,7 @@ function LeadCapture({ onClose, onSubmitted }: LeadCaptureProps) {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
+            placeholder={t('yourName')}
             className="flex-1 text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:bg-transparent dark:text-gray-200"
           />
         </div>
@@ -88,7 +88,7 @@ function LeadCapture({ onClose, onSubmitted }: LeadCaptureProps) {
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="Mobile number"
+            placeholder={t('mobileNumber')}
             className="flex-1 text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:bg-transparent dark:text-gray-200"
           />
         </div>
@@ -103,7 +103,7 @@ function LeadCapture({ onClose, onSubmitted }: LeadCaptureProps) {
           ) : (
             <>
               <Send className="h-3 w-3" />
-              Send
+              {t('send')}
             </>
           )}
         </button>

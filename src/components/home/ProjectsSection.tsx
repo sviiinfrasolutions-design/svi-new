@@ -33,6 +33,7 @@ const PROJECTS = [
 
 export default function ProjectsSection() {
   const t = useTranslations('portfolio');
+  const tp = useTranslations('pages.projects');
   return (
     <section
       className="bg-white py-16 md:py-24 dark:bg-gray-900"
@@ -65,48 +66,59 @@ export default function ProjectsSection() {
         </div>
 
         <StaggerContainer className="grid grid-cols-1 gap-12 md:grid-cols-3">
-          {PROJECTS.map((project, idx) => (
-            <StaggerItem key={idx}>
-              <motion.div
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                className="group block overflow-hidden border border-gray-200 bg-white transition-shadow duration-300 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
-              >
-                <div className="bg-brand-navy img-zoom-container relative h-72 overflow-hidden">
-                  <div className="from-brand-navy/60 absolute inset-0 z-10 bg-gradient-to-t via-transparent to-transparent transition-opacity group-hover:opacity-70" />
-                  <Image
-                    src={project.img}
-                    alt={`${project.title} - ${project.type} in ${project.loc} by SVI Infra Solutions`}
-                    fill
-                    quality={85}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover opacity-90 transition-opacity group-hover:opacity-100"
-                  />
-                  <div className="text-brand-navy absolute top-4 right-4 z-20 bg-white px-3 py-1 text-[10px] font-semibold tracking-wider uppercase shadow-sm">
-                    {t('completed')}
-                  </div>
-                </div>
-                <div className="bg-gray-50 p-8 transition-colors dark:bg-gray-800">
-                  <p className="mb-2 text-[10px] font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
-                    {project.loc} · <span className="text-brand-gold">{project.type}</span>
-                  </p>
-                  <h3 className="text-brand-navy group-hover:text-brand-gold mb-4 font-serif text-2xl transition-colors duration-200 dark:text-gray-100">
-                    {project.title}
-                  </h3>
-                  <Link
-                    href="/projects/completed"
-                    className="text-brand-navy group-hover:text-brand-gold inline-flex items-center gap-2 text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
-                  >
-                    {t('exploreDetails')}
-                    <ArrowRight
-                      size={14}
-                      className="transition-transform group-hover:translate-x-1"
+          {(
+            [
+              { key: 'shyamAangan', img: '/images/project1.png' },
+              { key: 'shivaniVatika', img: '/images/project2.png' },
+              { key: 'shreeShyamResidency', img: '/images/hero1.png' },
+            ] as const
+          ).map((project, idx) => {
+            const title = tp(`data.${project.key}.title`);
+            const loc = tp(`data.${project.key}.location`);
+            const type = tp(`data.${project.key}.type`);
+            return (
+              <StaggerItem key={idx}>
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className="group block overflow-hidden border border-gray-200 bg-white transition-shadow duration-300 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <div className="bg-brand-navy img-zoom-container relative h-72 overflow-hidden">
+                    <div className="from-brand-navy/60 absolute inset-0 z-10 bg-gradient-to-t via-transparent to-transparent transition-opacity group-hover:opacity-70" />
+                    <Image
+                      src={project.img}
+                      alt={`${title} - ${type} in ${loc} by SVI Infra Solutions`}
+                      fill
+                      quality={85}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover opacity-90 transition-opacity group-hover:opacity-100"
                     />
-                  </Link>
-                </div>
-              </motion.div>
-            </StaggerItem>
-          ))}
+                    <div className="text-brand-navy absolute top-4 right-4 z-20 bg-white px-3 py-1 text-[10px] font-semibold tracking-wider uppercase shadow-sm">
+                      {t('completed')}
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-8 transition-colors dark:bg-gray-800">
+                    <p className="mb-2 text-[10px] font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
+                      {loc} · <span className="text-brand-gold">{type}</span>
+                    </p>
+                    <h3 className="text-brand-navy group-hover:text-brand-gold mb-4 font-serif text-2xl transition-colors duration-200 dark:text-gray-100">
+                      {title}
+                    </h3>
+                    <Link
+                      href="/projects/completed"
+                      className="text-brand-navy group-hover:text-brand-gold inline-flex items-center gap-2 text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
+                    >
+                      {t('exploreDetails')}
+                      <ArrowRight
+                        size={14}
+                        className="transition-transform group-hover:translate-x-1"
+                      />
+                    </Link>
+                  </div>
+                </motion.div>
+              </StaggerItem>
+            );
+          })}
         </StaggerContainer>
 
         <div className="mt-12 border-t border-gray-200 pt-6 text-center md:hidden dark:border-gray-700">

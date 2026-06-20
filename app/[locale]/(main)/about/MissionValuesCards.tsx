@@ -2,31 +2,18 @@
 
 import { motion } from 'motion/react';
 import { Target, Heart, Lightbulb, Award } from 'lucide-react';
-
-const VALUES = [
-  {
-    icon: <Target />,
-    title: 'Integrity',
-    desc: 'Honesty and transparency in every transaction.',
-  },
-  {
-    icon: <Heart />,
-    title: 'Customer-Centricity',
-    desc: "Putting our clients' needs and aspirations first.",
-  },
-  {
-    icon: <Lightbulb />,
-    title: 'Innovation',
-    desc: 'Pioneering new standards in real estate.',
-  },
-  {
-    icon: <Award />,
-    title: 'Excellence',
-    desc: 'Delivering world-class quality without compromise.',
-  },
-];
+import { useTranslations } from 'next-intl';
 
 export default function MissionValuesCards() {
+  const t = useTranslations('pages.about');
+
+  const VALUES = [
+    { icon: <Target />, title: t('integrity'), desc: t('integrityDesc') },
+    { icon: <Heart />, title: t('customerCentricity'), desc: t('customerCentricityDesc') },
+    { icon: <Lightbulb />, title: t('innovation'), desc: t('innovationDesc') },
+    { icon: <Award />, title: t('excellence'), desc: t('excellenceDesc') },
+  ];
+
   return (
     <section className="bg-brand-navy relative py-16 text-white md:py-24 dark:bg-gray-900">
       <div
@@ -40,9 +27,9 @@ export default function MissionValuesCards() {
       <div className="relative z-10 container mx-auto px-4">
         <div className="mb-16 text-center">
           <h4 className="text-brand-gold mb-4 text-[10px] font-bold tracking-[0.3em] uppercase">
-            Core Principles
+            {t('corePrinciples')}
           </h4>
-          <h2 className="mb-8 font-serif text-4xl text-white">Mission & Values</h2>
+          <h2 className="mb-8 font-serif text-4xl text-white">{t('missionValues')}</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">

@@ -206,10 +206,7 @@ export default function HeroSection({ images }: { images: HeroImage[] }) {
           <h3 className="text-brand-gold mb-3 font-serif text-5xl leading-none">
             15<span className="text-3xl">+</span>
           </h3>
-          <p className="text-sm leading-relaxed font-light text-white/70">
-            Years of delivering uncompromising luxury, architectural excellence, and prime real
-            estate investments.
-          </p>
+          <p className="text-sm leading-relaxed font-light text-white/70">{t('statDescription')}</p>
         </div>
       </motion.div>
 

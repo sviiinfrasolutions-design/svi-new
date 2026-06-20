@@ -2,16 +2,18 @@
 
 import { motion } from 'motion/react';
 import { CheckCircle } from 'lucide-react';
-
-const SERVICES = [
-  'Residential Properties',
-  'Commercial Properties',
-  'Property Management',
-  'Real Estate Builders and Developers',
-  'Project Development',
-];
+import { useTranslations } from 'next-intl';
 
 export default function ServicesList() {
+  const t = useTranslations('pages.about');
+
+  const SERVICES = [
+    t('serviceResidential'),
+    t('serviceCommercial'),
+    t('serviceManagement'),
+    t('serviceBuilders'),
+    t('serviceDevelopment'),
+  ];
   return (
     <div className="space-y-4">
       {SERVICES.map((service, idx) => (

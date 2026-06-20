@@ -4,6 +4,7 @@ import { memo } from 'react';
 import { ChevronDown, Building2, CheckSquare, Phone, Mail, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import LanguageToggle from '@/src/components/ui/LanguageToggle';
 import { ThemeToggle } from '@/src/components/ui/ThemeToggle';
 import { NAV_LINKS } from './navLinks';
@@ -65,6 +66,8 @@ const MobileNav = memo(function MobileNav({
   onToggleProjects,
   onToggleTheme,
 }: MobileNavProps) {
+  const t = useTranslations('nav');
+  const tc = useTranslations('common');
   return (
     <>
       {/* Hamburger Button */}
@@ -72,7 +75,7 @@ const MobileNav = memo(function MobileNav({
         <button
           className="bg-brand-navy flex items-center justify-center rounded-full p-2 text-white shadow-sm transition-colors dark:bg-zinc-900 dark:text-gray-200"
           onClick={onToggle}
-          aria-label={isOpen ? 'Close menu' : 'Open menu'}
+          aria-label={isOpen ? t('closeMenu') : t('openMenu')}
           aria-expanded={isOpen}
           aria-controls="mobile-menu"
         >
@@ -123,7 +126,7 @@ const MobileNav = memo(function MobileNav({
             <button
               onClick={onClose}
               className="border-gray-150 text-brand-navy dark:hover:bg-zinc-850 rounded-full border bg-gray-50/70 p-2 transition-all duration-300 hover:bg-gray-100 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-gray-200"
-              aria-label="Close menu"
+              aria-label={t('closeMenu')}
             >
               <X size={16} />
             </button>
@@ -136,12 +139,12 @@ const MobileNav = memo(function MobileNav({
           <div className="flex flex-col gap-3.5 min-[380px]:gap-4.5">
             {NAV_LINKS.map((link, index) => (
               <div
-                key={link.name}
+                key={link.nameKey}
                 className="transition-all duration-300 ease-out"
                 style={getStaggerStyle(isOpen, index)}
               >
                 <MobileLink href={link.path} isActive={currentPath === link.path}>
-                  {link.name}
+                  {t(link.nameKey)}
                 </MobileLink>
               </div>
             ))}
@@ -155,7 +158,7 @@ const MobileNav = memo(function MobileNav({
                 onClick={onToggleProjects}
                 className="text-brand-navy group flex w-full items-center justify-between py-2.5 text-left text-[16px] font-semibold tracking-wide min-[380px]:text-[17px] dark:text-gray-100"
               >
-                <span>Projects</span>
+                <span>{t('projects')}</span>
                 <ChevronDown
                   size={18}
                   className={`text-brand-gold transition-transform duration-300 ${
@@ -177,7 +180,7 @@ const MobileNav = memo(function MobileNav({
                     className="hover:text-brand-gold flex items-center gap-2 py-2 text-[13.5px] font-medium text-gray-600 transition-colors min-[380px]:text-[14.5px] dark:text-gray-400"
                   >
                     <Building2 size={15} className="text-brand-gold/70" />
-                    Current Projects
+                    {t('currentProjects')}
                   </Link>
                   <Link
                     href="/projects/completed"
@@ -185,7 +188,7 @@ const MobileNav = memo(function MobileNav({
                     className="hover:text-brand-gold flex items-center gap-2 py-2 text-[13.5px] font-medium text-gray-600 transition-colors min-[380px]:text-[14.5px] dark:text-gray-400"
                   >
                     <CheckSquare size={15} className="text-brand-gold/70" />
-                    Completed Projects
+                    {t('completedProjects')}
                   </Link>
                 </div>
               </div>
@@ -197,7 +200,7 @@ const MobileNav = memo(function MobileNav({
               style={getStaggerStyle(isOpen, NAV_LINKS.length + 1)}
             >
               <MobileLink href="/payment" isActive={currentPath === '/payment'}>
-                Payment
+                {t('payment')}
               </MobileLink>
             </div>
 
@@ -207,7 +210,7 @@ const MobileNav = memo(function MobileNav({
               style={getStaggerStyle(isOpen, NAV_LINKS.length + 2)}
             >
               <MobileLink href="/contact" isActive={currentPath === '/contact'}>
-                Contact Us
+                {t('contactUs')}
               </MobileLink>
             </div>
 
@@ -226,7 +229,7 @@ const MobileNav = memo(function MobileNav({
                       : 'text-brand-gold/80 hover:text-brand-gold'
                   }`}
                 >
-                  Lucky Draw
+                  {t('luckyDraw')}
                 </Link>
               </div>
             )}
@@ -242,14 +245,14 @@ const MobileNav = memo(function MobileNav({
               onClick={onClose}
               className="border-brand-navy dark:border-brand-gold/45 text-brand-navy dark:text-brand-gold block w-full rounded-full border py-2 text-center text-xs font-semibold tracking-widest uppercase transition-colors hover:bg-gray-50 min-[380px]:py-2.5 min-[380px]:text-sm dark:hover:bg-zinc-900"
             >
-              Client Login
+              {t('clientLogin')}
             </Link>
             <Link
               href="/registration"
               onClick={onClose}
               className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy block w-full rounded-full py-2 text-center text-xs font-semibold tracking-widest text-white uppercase min-[380px]:py-2.5 min-[380px]:text-sm"
             >
-              Register Now
+              {t('registerNow')}
             </Link>
           </div>
 
@@ -263,10 +266,10 @@ const MobileNav = memo(function MobileNav({
             }}
           >
             <p className="text-brand-gold text-[10px] font-bold tracking-widest uppercase">
-              SVI Infra Solutions
+              {tc('siteName')}
             </p>
             <p className="mt-1 text-[11px] text-gray-400 dark:text-gray-500">
-              Premium Property Developers
+              {tc('tagline')?.includes('Premium') ? tc('tagline') : (tc('subBrand') ?? '')}
             </p>
             <div className="mt-3.5 flex flex-col gap-2">
               <a

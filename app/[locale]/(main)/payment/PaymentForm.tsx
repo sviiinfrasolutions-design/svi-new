@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ShieldCheck, CreditCard, Landmark, Copy, Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 const AMOUNTS = [100000, 200000, 500000, 1000000];
 
 export default function PaymentForm() {
+  const t = useTranslations('pages.payment');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [projects, setProjects] = useState<{ value: string; label: string }[]>([]);
@@ -53,15 +55,13 @@ export default function PaymentForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-500/30 dark:bg-amber-500/10">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
-          <p className="text-sm text-amber-700 dark:text-amber-400">
-            Your payment is secure and encrypted. Proceed with confidence.
-          </p>
+          <p className="text-sm text-amber-700 dark:text-amber-400">{t('secureMessage')}</p>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Full Name *
+              {t('fullName')} *
             </label>
             <input
               type="text"
@@ -73,7 +73,7 @@ export default function PaymentForm() {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Email *
+              {t('email')} *
             </label>
             <input
               type="email"
@@ -88,7 +88,7 @@ export default function PaymentForm() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Phone *
+              {t('phone')} *
             </label>
             <input
               type="tel"
@@ -100,7 +100,7 @@ export default function PaymentForm() {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Project *
+              {t('project')} *
             </label>
             <select
               required
@@ -108,7 +108,7 @@ export default function PaymentForm() {
               onChange={(e) => setForm((f) => ({ ...f, project: e.target.value }))}
               className="focus:border-brand-gold w-full border px-4 py-3 text-sm outline-none dark:border-gray-600 dark:bg-gray-800"
             >
-              <option value="">Select project</option>
+              <option value="">{t('selectProject')}</option>
               {projects.map((p) => (
                 <option key={p.value} value={p.value}>
                   {p.label}
@@ -120,7 +120,7 @@ export default function PaymentForm() {
 
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Amount (₹)
+            {t('amount')}
           </label>
           <div className="mb-4 flex flex-wrap gap-3">
             {AMOUNTS.map((amt) => (
@@ -140,7 +140,7 @@ export default function PaymentForm() {
           </div>
           <input
             type="number"
-            placeholder="Or enter custom amount"
+            placeholder={t('customAmount')}
             value={form.amount}
             onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
             className="focus:border-brand-gold w-full border px-4 py-3 text-sm outline-none dark:border-gray-600 dark:bg-gray-800"
@@ -152,7 +152,7 @@ export default function PaymentForm() {
           disabled={isSubmitting}
           className="bg-brand-navy hover:bg-brand-gold flex w-full cursor-pointer items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors disabled:opacity-50"
         >
-          {isSubmitting ? 'Redirecting...' : 'Pay Securely'}
+          {isSubmitting ? t('redirecting') : t('paySecurely')}
           <CreditCard size={16} />
         </button>
       </form>
@@ -166,7 +166,9 @@ export default function PaymentForm() {
       >
         <div className="mb-6 flex items-center gap-3">
           <Landmark className="text-brand-gold h-6 w-6" />
-          <h3 className="text-brand-navy font-serif text-xl dark:text-gray-100">Payment Details</h3>
+          <h3 className="text-brand-navy font-serif text-xl dark:text-gray-100">
+            {t('paymentDetails')}
+          </h3>
         </div>
         <div className="flex flex-col items-start gap-8 md:flex-row">
           {/* Left Column: Beautiful Recreated 3D IDBI Bank Scanner Stand */}
@@ -354,7 +356,7 @@ export default function PaymentForm() {
           <div className="flex w-full flex-1 flex-col space-y-4">
             <div className="flex flex-col space-y-1.5">
               <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Account Name
+                {t('accountName')}
               </span>
               <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#f8fafc] p-3.5 dark:border-gray-700 dark:bg-gray-800">
                 <span className="mr-2 font-mono text-[13px] leading-tight tracking-wider break-words text-[#1e293b] uppercase dark:text-white">
@@ -377,7 +379,7 @@ export default function PaymentForm() {
 
             <div className="flex flex-col space-y-1.5">
               <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Account Number
+                {t('accountNumber')}
               </span>
               <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#f8fafc] p-3.5 dark:border-gray-700 dark:bg-gray-800">
                 <span className="font-mono text-[13px] tracking-wider text-[#1e293b] dark:text-white">
@@ -400,7 +402,7 @@ export default function PaymentForm() {
 
             <div className="flex flex-col space-y-1.5">
               <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                IFSC Code
+                {t('ifscCode')}
               </span>
               <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#f8fafc] p-3.5 dark:border-gray-700 dark:bg-gray-800">
                 <span className="font-mono text-[13px] tracking-wider text-[#1e293b] dark:text-white">
@@ -423,7 +425,7 @@ export default function PaymentForm() {
 
             <div className="flex flex-col space-y-1.5">
               <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Bank / Branch
+                {t('bankBranch')}
               </span>
               <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#f8fafc] p-3.5 dark:border-gray-700 dark:bg-gray-800">
                 <span className="font-mono text-[13px] tracking-wider text-[#1e293b] dark:text-white">

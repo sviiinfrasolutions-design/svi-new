@@ -22,46 +22,47 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import FormattedText from '@/src/components/home/FormattedText';
 import QuickActions from '@/src/components/home/QuickActions';
 import LeadCapture from '@/src/components/home/LeadCapture';
+import { useTranslations } from 'next-intl';
 
 const STORAGE_KEY = 'svi-chat-history';
-const SUGGESTION_POOLS: Record<string, string[]> = {
-  default: [
-    'What projects do you have in Jaipur?',
-    'Tell me about Phulera Smart City',
-    'What commercial properties are available?',
-  ],
-  jaipur: ['What is the price range in Jaipur?', 'Are there ready-to-move flats in Jaipur?'],
-  noida: ['Which commercial projects are in Noida?', 'What is the rental yield in Noida?'],
-  phulera: ['What is Phulera Smart City?', 'What are the payment plans in Phulera?'],
-  price: ['What is the starting price?', 'What payment plans do you offer?'],
-  commercial: ['Tell me about commercial properties', 'What is the ROI on commercial?'],
-  residential: ['Tell me about residential flats', 'What sizes are available?'],
-  contact: ['What is your office address?', 'I want to schedule a site visit'],
-};
 
-function getSuggestions(lastMessage: string): string[] {
+function getSuggestionPool(t: ReturnType<typeof useTranslations>): Record<string, string[]> {
+  return {
+    default: [t('suggestions.default1'), t('suggestions.default2'), t('suggestions.default3')],
+    jaipur: [t('suggestions.jaipur1'), t('suggestions.jaipur2')],
+    noida: [t('suggestions.noida1'), t('suggestions.noida2')],
+    phulera: [t('suggestions.phulera1'), t('suggestions.phulera2')],
+    price: [t('suggestions.price1'), t('suggestions.price2')],
+    commercial: [t('suggestions.commercial1'), t('suggestions.commercial2')],
+    residential: [t('suggestions.residential1'), t('suggestions.residential2')],
+    contact: [t('suggestions.contact1'), t('suggestions.contact2')],
+  };
+}
+
+function getSuggestions(lastMessage: string, pools: Record<string, string[]>): string[] {
   const lower = lastMessage.toLowerCase();
-  const pools: string[] = [];
+  const matchedPools: string[] = [];
 
-  if (lower.includes('jaipur') || lower.includes('jodhpur')) pools.push('jaipur');
-  if (lower.includes('noida')) pools.push('noida');
-  if (lower.includes('phulera')) pools.push('phulera');
-  if (lower.includes('price') || lower.includes('cost') || lower.includes('₹')) pools.push('price');
+  if (lower.includes('jaipur') || lower.includes('jodhpur')) matchedPools.push('jaipur');
+  if (lower.includes('noida')) matchedPools.push('noida');
+  if (lower.includes('phulera')) matchedPools.push('phulera');
+  if (lower.includes('price') || lower.includes('cost') || lower.includes('₹'))
+    matchedPools.push('price');
   if (lower.includes('commercial') || lower.includes('office') || lower.includes('shop'))
-    pools.push('commercial');
+    matchedPools.push('commercial');
   if (lower.includes('flat') || lower.includes('apartment') || lower.includes('resi'))
-    pools.push('residential');
+    matchedPools.push('residential');
   if (
     lower.includes('contact') ||
     lower.includes('address') ||
     lower.includes('visit') ||
     lower.includes('call')
   )
-    pools.push('contact');
+    matchedPools.push('contact');
 
-  if (pools.length === 0) pools.push('default');
+  if (matchedPools.length === 0) matchedPools.push('default');
 
-  const suggestions = pools.flatMap((key) => SUGGESTION_POOLS[key] || []);
+  const suggestions = matchedPools.flatMap((key) => pools[key] || []);
   // Shuffle & take 2-3 unique
   const shuffled = [...new Set(suggestions)].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, 3);
@@ -72,6 +73,7 @@ function generateSessionId(): string {
 }
 
 export default function ChatBot() {
+  const t = useTranslations('chatbot');
   const [isOpen, setIsOpen] = useState(false);
   const [showLeadCapture, setShowLeadCapture] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
@@ -215,10 +217,12 @@ export default function ChatBot() {
     return text;
   }, [messages]);
 
+  const suggestionPools = useMemo(() => getSuggestionPool(t), [t]);
+
   const contextualSuggestions = useMemo(() => {
     if (!lastAiMessage) return [];
-    return getSuggestions(lastAiMessage);
-  }, [lastAiMessage]);
+    return getSuggestions(lastAiMessage, suggestionPools);
+  }, [lastAiMessage, suggestionPools]);
 
   // ─── Voice Input ───────────────────────────────────────────────────────
   const toggleVoice = useCallback(() => {
@@ -300,9 +304,9 @@ export default function ChatBot() {
                   <Sparkles className="text-brand-gold h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-white">SVI Assistant</h3>
+                  <h3 className="text-sm font-semibold text-white">{t('assistant')}</h3>
                   <p className="text-xs text-gray-300">
-                    {isStreaming ? 'Typing...' : 'Powered by AI'}
+                    {isStreaming ? t('typing') : t('poweredByAI')}
                   </p>
                 </div>
               </div>
@@ -333,14 +337,13 @@ export default function ChatBot() {
                     <Sparkles className="text-brand-gold h-8 w-8" />
                   </div>
                   <h4 className="text-brand-navy mb-2 font-serif text-lg font-semibold dark:text-white">
-                    Welcome to SVI Infra!
+                    {t('welcomeTitle')}
                   </h4>
                   <p className="mb-6 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-                    I&apos;m your AI real estate assistant. Ask me anything about our projects in
-                    Jaipur, Noida, or Phulera Smart City.
+                    {t('welcomeDesc')}
                   </p>
                   <div className="flex w-full flex-col gap-2">
-                    {(SUGGESTION_POOLS.default || []).map((suggestion) => (
+                    {(suggestionPools.default || []).map((suggestion) => (
                       <button
                         key={suggestion}
                         onClick={() => handleSuggestionClick(suggestion)}
@@ -437,7 +440,9 @@ export default function ChatBot() {
                 contextualSuggestions.length > 0 &&
                 status === 'ready' && (
                   <div className="mb-4">
-                    <p className="mb-2 text-xs font-medium text-gray-400">Suggested follow-ups:</p>
+                    <p className="mb-2 text-xs font-medium text-gray-400">
+                      {t('suggestedFollowups')}
+                    </p>
                     <div className="flex flex-wrap gap-1.5">
                       {contextualSuggestions.map((suggestion) => (
                         <button
@@ -462,7 +467,8 @@ export default function ChatBot() {
                     <div className="flex items-center gap-2 rounded-2xl rounded-tl-md bg-gray-100 px-4 py-3 dark:bg-gray-800">
                       <Loader2 className="text-brand-gold h-4 w-4 animate-spin" />
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        Thinking{typingDots}
+                        {t('thinking')}
+                        {typingDots}
                       </span>
                     </div>
                   </div>
@@ -472,7 +478,7 @@ export default function ChatBot() {
               {/* Error state */}
               {error && (
                 <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-600 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
-                  Something went wrong. Please try again.
+                  {t('error')}
                 </div>
               )}
 
@@ -516,7 +522,7 @@ export default function ChatBot() {
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about our properties..."
+                  placeholder={t('placeholder')}
                   disabled={status !== 'ready' && status !== 'error'}
                   className="focus:border-brand-gold focus:ring-brand-gold/20 dark:focus:border-brand-gold flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-800 transition-all placeholder:text-gray-400 focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:placeholder:text-gray-500"
                   aria-label="Type your message"
@@ -544,7 +550,7 @@ export default function ChatBot() {
               </div>
 
               <p className="mt-2 text-center text-[10px] text-gray-400 dark:text-gray-500">
-                Powered by SVI Infra Solutions &middot; AI responses may vary
+                {t('footer')}
               </p>
             </form>
           </motion.div>

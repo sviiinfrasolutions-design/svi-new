@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { PHONE_HREF, WHATSAPP_URL } from '@/src/lib/constants';
 
 export function FloatingContact() {
+  const t = useTranslations('floatingContact');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -34,7 +35,7 @@ export function FloatingContact() {
           className="hover:text-brand-gold flex flex-1 flex-col items-center justify-center gap-1 text-gray-600 transition-colors dark:text-gray-400"
         >
           <Phone size={20} />
-          <span className="text-[10px] font-medium tracking-wider uppercase">Call</span>
+          <span className="text-[10px] font-medium tracking-wider uppercase">{t('call')}</span>
         </a>
         <div className="h-8 w-px bg-gray-300 dark:bg-gray-700" />
         <a
@@ -45,7 +46,7 @@ export function FloatingContact() {
           className="flex flex-1 flex-col items-center justify-center gap-1 text-[#25D366] transition-colors hover:text-green-500"
         >
           <MessageCircle size={20} />
-          <span className="text-[10px] font-medium tracking-wider uppercase">WhatsApp</span>
+          <span className="text-[10px] font-medium tracking-wider uppercase">{t('whatsapp')}</span>
         </a>
         <div className="h-8 w-px bg-gray-300 dark:bg-gray-700" />
         <button
@@ -53,7 +54,7 @@ export function FloatingContact() {
           className="text-brand-navy hover:text-brand-gold flex flex-1 flex-col items-center justify-center gap-1 transition-colors dark:text-gray-100"
         >
           <Calendar size={20} />
-          <span className="text-[10px] font-medium tracking-wider uppercase">Book Visit</span>
+          <span className="text-[10px] font-medium tracking-wider uppercase">{t('bookVisit')}</span>
         </button>
       </div>
 
@@ -82,7 +83,7 @@ export function FloatingContact() {
           className="bg-brand-gold text-brand-navy flex items-center gap-2 rounded-full px-5 py-3 font-semibold tracking-wider shadow-xl transition-transform hover:scale-105"
         >
           <Calendar size={18} />
-          <span className="text-xs uppercase">Book Visit</span>
+          <span className="text-xs uppercase">{t('bookVisit')}</span>
         </button>
       </div>
 
@@ -108,10 +109,8 @@ export function FloatingContact() {
                 >
                   <X size={24} />
                 </button>
-                <h3 className="text-brand-gold mb-2 font-serif text-2xl">Book a Site Visit</h3>
-                <p className="text-sm text-white/80">
-                  Experience luxury living firsthand. Schedule your visit today.
-                </p>
+                <h3 className="text-brand-gold mb-2 font-serif text-2xl">{t('bookSiteVisit')}</h3>
+                <p className="text-sm text-white/80">{t('bookSiteVisitDesc')}</p>
               </div>
 
               <form
@@ -127,47 +126,47 @@ export function FloatingContact() {
               >
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
-                    Name
+                    {t('name')}
                   </label>
                   <input
                     required
                     type="text"
                     className="focus:border-brand-gold focus:ring-brand-gold w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-all outline-none focus:ring-1 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                    placeholder="John Doe"
+                    placeholder={t('namePlaceholder')}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
-                      Phone
+                      {t('phone')}
                     </label>
                     <input
                       required
                       type="tel"
                       className="focus:border-brand-gold focus:ring-brand-gold w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-all outline-none focus:ring-1 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                      placeholder="+91 00000 00000"
+                      placeholder={t('phonePlaceholder')}
                     />
                   </div>
                   <div>
                     <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
-                      Email
+                      {t('email')}
                     </label>
                     <input
                       required
                       type="email"
                       className="focus:border-brand-gold focus:ring-brand-gold w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-all outline-none focus:ring-1 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                      placeholder="john@example.com"
+                      placeholder={t('emailPlaceholder')}
                     />
                   </div>
                 </div>
 
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
-                    Project Interest
+                    {t('projectInterest')}
                   </label>
                   <select className="focus:border-brand-gold focus:ring-brand-gold w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-all outline-none focus:ring-1 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
-                    <option value="">Select a project</option>
+                    <option value="">{t('selectProject')}</option>
                     <option value="Shyam Aangan">Shyam Aangan</option>
                     <option value="Shivani Vatika">Shivani Vatika</option>
                     <option value="Shree Shyam Residency">Shree Shyam Residency</option>
@@ -176,7 +175,7 @@ export function FloatingContact() {
 
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
-                    Preferred Visit Date
+                    {t('preferredDate')}
                   </label>
                   <input
                     required
@@ -189,7 +188,7 @@ export function FloatingContact() {
                   type="submit"
                   className="bg-brand-gold text-brand-navy hover:bg-brand-gold-light mt-2 w-full rounded-md py-4 font-bold tracking-wider uppercase transition-colors"
                 >
-                  Confirm Booking
+                  {t('confirmBooking')}
                 </button>
               </form>
             </motion.div>

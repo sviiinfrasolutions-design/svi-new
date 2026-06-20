@@ -3,16 +3,10 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Send, AlertCircle } from 'lucide-react';
-
-const CATEGORIES = [
-  { value: 'service', label: 'Service Issue' },
-  { value: 'billing', label: 'Billing / Payment' },
-  { value: 'maintenance', label: 'Maintenance' },
-  { value: 'staff', label: 'Staff Behavior' },
-  { value: 'other', label: 'Other' },
-];
+import { useTranslations } from 'next-intl';
 
 export default function GrievanceForm() {
+  const t = useTranslations('pages.grievance');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [ticketId, setTicketId] = useState('');
@@ -25,6 +19,14 @@ export default function GrievanceForm() {
     category: '',
     description: '',
   });
+
+  const CATEGORIES = [
+    { value: 'service', label: t('catService') },
+    { value: 'billing', label: t('catBilling') },
+    { value: 'maintenance', label: t('catMaintenance') },
+    { value: 'staff', label: t('catStaff') },
+    { value: 'other', label: t('catOther') },
+  ];
 
   const updateField = (field: string, value: string) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -44,7 +46,7 @@ export default function GrievanceForm() {
       setTicketId(data.ticket_id);
       setSubmitted(true);
     } catch {
-      setSubmitError('Failed to submit. Please try again.');
+      setSubmitError(t('submitFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -61,15 +63,13 @@ export default function GrievanceForm() {
           <Send size={28} />
         </div>
         <h3 className="text-brand-navy mb-2 font-serif text-2xl dark:text-gray-100">
-          Grievance Submitted
+          {t('submitted')}
         </h3>
-        <p className="mb-4 text-gray-600 dark:text-gray-400">
-          Your grievance has been received. Your ticket ID is:
-        </p>
+        <p className="mb-4 text-gray-600 dark:text-gray-400">{t('received')}</p>
         <div className="bg-brand-navy/5 mx-auto inline-block rounded-lg px-6 py-3 font-mono text-lg font-bold dark:bg-white/5">
           {ticketId}
         </div>
-        <p className="mt-4 text-sm text-gray-500">We will respond within 48 hours.</p>
+        <p className="mt-4 text-sm text-gray-500">{t('respond48h')}</p>
       </motion.div>
     );
   }
@@ -85,7 +85,7 @@ export default function GrievanceForm() {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Full Name *
+            {t('fullName')} *
           </label>
           <input
             type="text"
@@ -97,7 +97,7 @@ export default function GrievanceForm() {
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Email *
+            {t('email')} *
           </label>
           <input
             type="email"
@@ -111,7 +111,7 @@ export default function GrievanceForm() {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Phone *
+            {t('phone')} *
           </label>
           <input
             type="tel"
@@ -123,7 +123,7 @@ export default function GrievanceForm() {
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Category *
+            {t('category')} *
           </label>
           <select
             required
@@ -131,7 +131,7 @@ export default function GrievanceForm() {
             onChange={(e) => updateField('category', e.target.value)}
             className="focus:border-brand-gold dark:focus:border-brand-gold w-full border border-gray-300 bg-white px-4 py-3 text-sm transition-colors outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
           >
-            <option value="">Select category</option>
+            <option value="">{t('selectCategory')}</option>
             {CATEGORIES.map((cat) => (
               <option key={cat.value} value={cat.value}>
                 {cat.label}
@@ -142,7 +142,7 @@ export default function GrievanceForm() {
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Subject *
+          {t('subject')} *
         </label>
         <input
           type="text"
@@ -154,7 +154,7 @@ export default function GrievanceForm() {
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Description *
+          {t('description')} *
         </label>
         <textarea
           required
@@ -169,7 +169,7 @@ export default function GrievanceForm() {
         disabled={isSubmitting}
         className="bg-brand-navy hover:bg-brand-gold flex w-full items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors disabled:opacity-50"
       >
-        {isSubmitting ? 'Submitting...' : 'Submit Grievance'}
+        {isSubmitting ? t('submitting') : t('submit')}
         <Send size={16} />
       </button>
     </form>

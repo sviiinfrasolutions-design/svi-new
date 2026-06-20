@@ -4,32 +4,23 @@ import { motion } from 'motion/react';
 import { DollarSign, Laptop, Star } from 'lucide-react';
 import Link from 'next/link';
 import { Send } from 'lucide-react';
-
-const PERKS = [
-  {
-    icon: <Laptop size={28} />,
-    title: '100% Remote',
-    desc: 'Work from anywhere, anytime. Be your own boss and manage your own schedule.',
-  },
-  {
-    icon: <DollarSign size={28} />,
-    title: 'Up to 12% Commission',
-    desc: 'Earn highly attractive commissions on every successful closing. Unlimited earning potential.',
-  },
-  {
-    icon: <Star size={28} />,
-    title: 'Full Support',
-    desc: 'Get marketing materials, project details, and dedicated support from our expert team.',
-  },
-];
-
-const GRADIENT_STYLE = {
-  backgroundImage:
-    'repeating-linear-gradient(45deg, #d4af37 0, #d4af37 1px, transparent 0, transparent 50%)',
-  backgroundSize: '40px 40px',
-};
+import { useTranslations } from 'next-intl';
 
 export default function FreelancePerks() {
+  const t = useTranslations('pages.careers');
+
+  const PERKS = [
+    { icon: <Laptop size={28} />, title: t('perkRemote'), desc: t('perkRemoteDesc') },
+    { icon: <DollarSign size={28} />, title: t('perkCommission'), desc: t('perkCommissionDesc') },
+    { icon: <Star size={28} />, title: t('perkSupport'), desc: t('perkSupportDesc') },
+  ];
+
+  const GRADIENT_STYLE = {
+    backgroundImage:
+      'repeating-linear-gradient(45deg, #d4af37 0, #d4af37 1px, transparent 0, transparent 50%)',
+    backgroundSize: '40px 40px',
+  };
+
   return (
     <section className="bg-brand-navy relative py-14 text-white md:py-24 dark:bg-gray-900">
       <div
@@ -39,15 +30,11 @@ export default function FreelancePerks() {
       <div className="relative z-10 container mx-auto px-4">
         <div className="mx-auto mb-16 max-w-4xl text-center">
           <h4 className="text-brand-gold mb-6 text-[10px] font-bold tracking-[0.3em] uppercase">
-            Join Our Team
+            {t('heading')}
           </h4>
-          <h2 className="mb-8 font-serif text-4xl text-white">Freelance Real Estate Consultant</h2>
+          <h2 className="mb-8 font-serif text-4xl text-white">{t('freelanceHeading')}</h2>
           <div className="space-y-6 text-lg leading-relaxed text-gray-300">
-            <p>
-              Are you passionate about real estate? Do you want the flexibility to work from
-              anywhere while earning industry-leading commissions? Join SVI Infra Solutions as a
-              Freelance Partner and build your own success story.
-            </p>
+            <p>{t('freelanceDescription')}</p>
           </div>
         </div>
 
@@ -75,7 +62,7 @@ export default function FreelancePerks() {
             href="/contact"
             className="bg-brand-gold text-brand-navy inline-flex items-center gap-2 px-8 py-4 text-sm font-bold tracking-widest uppercase transition-colors hover:bg-white"
           >
-            Apply Now <Send size={16} />
+            {t('applyNow')} <Send size={16} />
           </Link>
         </div>
       </div>

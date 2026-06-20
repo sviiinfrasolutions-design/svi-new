@@ -10,7 +10,8 @@
     "email": "info@sviinfrasolutions.com",
     "address": "A-61 सेक्टर 65, नोएडा, उत्तर प्रदेश 201309",
     "description": "15+ साल के एक्सपीरियंस वाला प्रीमियम रियल एस्टेट डेवलपर। जयपुर, नोएडा और DMIC कॉरिडोर में रेजिडेंशियल फ्लैट और कमर्शियल प्रॉपर्टी में स्पेशलाइज़ेशन।",
-    "copyright": "© 2026 SVI Infra Solutions. सर्वाधिकार सुरक्षित।"
+    "copyright": "© 2026 SVI Infra Solutions. सर्वाधिकार सुरक्षित।",
+    "subBrand": "प्रीमियम प्रॉपर्टी डेवलपर"
   },
   "timeline": {
     "subtitle": "विकास प्रक्रिया",
@@ -54,6 +55,8 @@
     "clientLogin": "क्लाइंट लॉगिन",
     "registerNow": "अभी रजिस्टर करें",
     "luckyDraw": "लकी ड्रा",
+    "openMenu": "मेन्यू खोलें",
+    "closeMenu": "मेन्यू बंद करें",
     "contact": "संपर्क करें",
     "register": "रजिस्टर",
     "followUs": "हमें {social} पर फ़ॉलो करें",

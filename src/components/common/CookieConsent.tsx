@@ -4,10 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Link from 'next/link';
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 const CONSENT_KEY = 'svi-cookie-consent-v1';
 
 export default function CookieConsent() {
+  const t = useTranslations('cookieConsent');
   const [isVisible, setIsVisible] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -49,15 +51,12 @@ export default function CookieConsent() {
             <X size={16} />
           </button>
           <div>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              We use cookies to enhance your browsing experience and analyze website traffic. By
-              clicking "Accept", you consent to our use of cookies.
-            </p>
+            <p className="text-sm text-gray-700 dark:text-gray-300">{t('message')}</p>
             <Link
               href="/privacy-policy"
               className="text-brand-gold mt-1 inline-block text-xs hover:underline"
             >
-              Learn more in our Privacy Policy
+              {t('learnMore')}
             </Link>
           </div>
         </div>
@@ -66,13 +65,13 @@ export default function CookieConsent() {
             onClick={handleDecline}
             className="hover:text-brand-navy px-4 py-2 text-xs font-bold tracking-widest text-gray-500 uppercase transition-colors dark:text-gray-400 dark:hover:text-gray-200"
           >
-            Decline
+            {t('decline')}
           </button>
           <button
             onClick={handleAccept}
             className="bg-brand-gold text-brand-navy hover:bg-brand-navy hover:text-brand-gold border-brand-gold border px-6 py-2 text-xs font-bold tracking-widest uppercase transition-colors"
           >
-            Accept
+            {t('accept')}
           </button>
         </div>
       </div>

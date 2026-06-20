@@ -83,7 +83,7 @@ const Footer = memo(function Footer() {
                   href="/"
                   className="text-brand-navy hover:text-brand-gold dark:hover:text-brand-gold text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
                 >
-                  Home
+                  {t('nav.home')}
                 </Link>
               </li>
               <li>
@@ -91,7 +91,7 @@ const Footer = memo(function Footer() {
                   href="/about"
                   className="text-brand-navy hover:text-brand-gold dark:hover:text-brand-gold text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
                 >
-                  About Us
+                  {t('nav.aboutUs')}
                 </Link>
               </li>
               <li>
@@ -99,7 +99,7 @@ const Footer = memo(function Footer() {
                   href="/leadership"
                   className="text-brand-navy hover:text-brand-gold dark:hover:text-brand-gold text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
                 >
-                  Leadership
+                  {t('nav.leadership')}
                 </Link>
               </li>
               <li>
@@ -107,7 +107,7 @@ const Footer = memo(function Footer() {
                   href="/faq"
                   className="text-brand-navy hover:text-brand-gold dark:hover:text-brand-gold text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
                 >
-                  FAQ
+                  {t('nav.faq')}
                 </Link>
               </li>
               <li>
@@ -115,7 +115,7 @@ const Footer = memo(function Footer() {
                   href="/projects/completed"
                   className="text-brand-navy hover:text-brand-gold dark:hover:text-brand-gold text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
                 >
-                  Completed Projects
+                  {t('nav.completedProjects')}
                 </Link>
               </li>
               <li>
@@ -123,7 +123,7 @@ const Footer = memo(function Footer() {
                   href="/registration"
                   className="text-brand-navy hover:text-brand-gold dark:hover:text-brand-gold text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
                 >
-                  Register
+                  {t('footer.register')}
                 </Link>
               </li>
               <li>
@@ -131,7 +131,7 @@ const Footer = memo(function Footer() {
                   href="/contact"
                   className="text-brand-navy hover:text-brand-gold dark:hover:text-brand-gold text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
                 >
-                  Contact Us
+                  {t('nav.contactUs')}
                 </Link>
               </li>
             </ul>
@@ -147,7 +147,7 @@ const Footer = memo(function Footer() {
                   href="/payment"
                   className="text-brand-navy hover:text-brand-gold dark:hover:text-brand-gold text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
                 >
-                  Pay Online
+                  {t('footer.payOnline')}
                 </Link>
               </li>
               <li>
@@ -155,17 +155,17 @@ const Footer = memo(function Footer() {
                   href="/grievance"
                   className="text-brand-navy hover:text-brand-gold dark:hover:text-brand-gold text-[11px] font-semibold tracking-wider uppercase transition-colors dark:text-gray-200"
                 >
-                  Raise a Grievance
+                  {t('footer.raiseGrievance')}
                 </Link>
               </li>
               <li className="text-brand-gold dark:text-brand-gold text-[11px] font-semibold tracking-wider uppercase">
-                Residential Properties
+                {t('footer.residentialProperties')}
               </li>
               <li className="text-brand-gold dark:text-brand-gold text-[11px] font-semibold tracking-wider uppercase">
-                Commercial Properties
+                {t('footer.commercialProperties')}
               </li>
               <li className="text-brand-gold dark:text-brand-gold text-[11px] font-semibold tracking-wider uppercase">
-                Property Management
+                {t('footer.propertyManagement')}
               </li>
             </ul>
           </div>
@@ -217,7 +217,7 @@ const Footer = memo(function Footer() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={t('footer.enterEmail')}
                 className="text-brand-navy focus:border-brand-gold w-full border border-gray-200 bg-gray-50 px-4 py-3 text-sm transition-colors focus:outline-none sm:flex-1 md:w-64 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                 required
               />
@@ -235,7 +235,7 @@ const Footer = memo(function Footer() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                     >
-                      ✓ Done!
+                      {t('footer.done')}
                     </motion.span>
                   ) : (
                     <motion.span

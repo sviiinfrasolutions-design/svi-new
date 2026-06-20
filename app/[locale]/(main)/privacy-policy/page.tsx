@@ -23,6 +23,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PrivacyPolicy({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations('pages.privacy');
+
+  const sections = [
+    { title: t('s1Title'), content: t('s1Content') },
+    {
+      title: t('s2Title'),
+      subsections: [
+        { title: t('s2_1Title'), intro: t('s2_1Intro'), list: t('s2_1List') },
+        { title: t('s2_2Title'), intro: t('s2_2Intro'), list: t('s2_2List') },
+      ],
+    },
+    { title: t('s3Title'), intro: t('s3Intro'), list: t('s3List') },
+    { title: t('s4Title'), content: t('s4Content'), list: t('s4List') },
+    { title: t('s5Title'), content: t('s5Content') },
+    { title: t('s6Title'), content: t('s6Content') },
+    { title: t('s7Title'), intro: t('s7Intro'), list: t('s7List') },
+    { title: t('s8Title'), content: t('s8Content') },
+    { title: t('s9Title'), content: t('s9Content') },
+    { title: t('s10Title'), content: t('s10Content') },
+    { title: t('s11Title'), content: t('s11Content') },
+  ];
+
   return (
     <div className="bg-brand-bg min-h-screen pt-24 pb-20 dark:bg-gray-900">
       <div className="container mx-auto max-w-4xl px-4">
@@ -31,167 +53,54 @@ export default async function PrivacyPolicy({ params }: Props) {
           className="text-brand-navy hover:text-brand-gold mb-12 inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase transition-colors dark:text-gray-200"
         >
           <ArrowLeft size={16} />
-          Back to Home
+          {t('backToHome')}
         </Link>
 
         <h1 className="text-brand-navy mb-4 font-serif text-4xl md:text-5xl dark:text-gray-100">
-          Privacy Policy
+          {t('heading')}
         </h1>
-        <p className="mb-12 text-sm text-gray-500 dark:text-gray-400">Last updated: May 2026</p>
+        <p className="mb-12 text-sm text-gray-500 dark:text-gray-400">{t('lastUpdated')}</p>
 
         <div className="space-y-8 rounded-lg border border-gray-200 bg-white p-8 leading-relaxed text-gray-600 shadow-sm md:p-12 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              1. Introduction
-            </h2>
-            <p>
-              SVI Infra Solutions Pvt. Ltd. ("we", "our", or "us") is committed to protecting your
-              personal information. This Privacy Policy explains how we collect, use, disclose, and
-              safeguard your information when you visit our website or use our services.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              2. Information We Collect
-            </h2>
-            <h3 className="text-brand-navy mb-2 text-lg font-semibold dark:text-gray-200">
-              2.1 Personal Information
-            </h3>
-            <p className="mb-4">
-              We may collect personal information that you voluntarily provide, including:
-            </p>
-            <ul className="ml-4 list-inside list-disc space-y-1">
-              <li>Full name</li>
-              <li>Email address</li>
-              <li>Phone number</li>
-              <li>Property interests and preferences</li>
-              <li>Messages and inquiries submitted through our forms</li>
-            </ul>
-
-            <h3 className="text-brand-navy mt-6 mb-2 text-lg font-semibold dark:text-gray-200">
-              2.2 Automatically Collected Information
-            </h3>
-            <p className="mb-4">When you visit our website, we may automatically collect:</p>
-            <ul className="ml-4 list-inside list-disc space-y-1">
-              <li>IP address and browser type</li>
-              <li>Device information and operating system</li>
-              <li>Pages visited and time spent on the website</li>
-              <li>Referring website URLs</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              3. How We Use Your Information
-            </h2>
-            <p className="mb-4">We use the information we collect to:</p>
-            <ul className="ml-4 list-inside list-disc space-y-1">
-              <li>Respond to your inquiries and provide customer support</li>
-              <li>Send property updates, newsletters, and promotional materials</li>
-              <li>Improve our website and services</li>
-              <li>Comply with legal obligations</li>
-              <li>Analyze website usage and trends</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              4. Information Sharing
-            </h2>
-            <p>
-              We do not sell, trade, or rent your personal information to third parties. We may
-              share your information with:
-            </p>
-            <ul className="mt-2 ml-4 list-inside list-disc space-y-1">
-              <li>Service providers who assist in operating our website</li>
-              <li>Legal authorities when required by law</li>
-              <li>Business partners with your explicit consent</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              5. Cookies
-            </h2>
-            <p>
-              Our website uses cookies to enhance your browsing experience. Cookies are small files
-              stored on your device that help us remember your preferences and understand how you
-              use our website. You can control cookie settings through your browser preferences.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              6. Data Security
-            </h2>
-            <p>
-              We implement appropriate technical and organizational measures to protect your
-              personal information against unauthorized access, alteration, disclosure, or
-              destruction. However, no method of transmission over the Internet is 100% secure.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              7. Your Rights
-            </h2>
-            <p className="mb-4">Depending on your location, you may have the right to:</p>
-            <ul className="ml-4 list-inside list-disc space-y-1">
-              <li>Access your personal data</li>
-              <li>Correct inaccurate or incomplete data</li>
-              <li>Request deletion of your personal data</li>
-              <li>Object to or restrict processing of your data</li>
-              <li>Withdraw consent at any time</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              8. Third-Party Links
-            </h2>
-            <p>
-              Our website may contain links to third-party websites, including Google Maps and
-              social media platforms. We are not responsible for the privacy practices of these
-              external sites. We encourage you to review their privacy policies.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              9. Children's Privacy
-            </h2>
-            <p>
-              Our website is not intended for children under 13 years of age. We do not knowingly
-              collect personal information from children under 13.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              10. Changes to This Policy
-            </h2>
-            <p>
-              We may update this Privacy Policy from time to time. Changes will be posted on this
-              page with an updated revision date. We encourage you to review this policy
-              periodically.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
-              11. Contact Us
-            </h2>
-            <p>If you have questions about this Privacy Policy, please contact us at:</p>
-            <div className="bg-brand-bg mt-4 rounded-lg p-4 dark:bg-gray-900">
-              <p className="text-brand-navy font-semibold dark:text-gray-200">
-                SVI Infra Solutions Pvt. Ltd.
-              </p>
-              <p>A-61 Sector 65, Noida, Uttar Pradesh 201309</p>
-              <p>Email: info@sviinfrasolutions.com</p>
-              <p>Phone: +91 73000 07643</p>
-            </div>
-          </section>
+          {sections.map((section, idx) => (
+            <section key={idx}>
+              <h2 className="text-brand-navy mb-4 font-serif text-2xl dark:text-gray-100">
+                {section.title}
+              </h2>
+              {section.content && <p>{section.content}</p>}
+              {section.intro && <p className="mb-4">{section.intro}</p>}
+              {section.list && (
+                <ul className="ml-4 list-inside list-disc space-y-1">
+                  {section.list.split(', ').map((item: string, i: number) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              )}
+              {section.subsections?.map((sub, subIdx) => (
+                <div key={subIdx} className={subIdx > 0 ? 'mt-6' : ''}>
+                  <h3 className="text-brand-navy mb-2 text-lg font-semibold dark:text-gray-200">
+                    {sub.title}
+                  </h3>
+                  <p className="mb-4">{sub.intro}</p>
+                  <ul className="ml-4 list-inside list-disc space-y-1">
+                    {sub.list.split(', ').map((item: string, i: number) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+              {idx === sections.length - 1 && (
+                <div className="bg-brand-bg mt-4 rounded-lg p-4 dark:bg-gray-900">
+                  <p className="text-brand-navy font-semibold dark:text-gray-200">
+                    SVI Infra Solutions Pvt. Ltd.
+                  </p>
+                  <p>A-61 Sector 65, Noida, Uttar Pradesh 201309</p>
+                  <p>Email: info@sviinfrasolutions.com</p>
+                  <p>Phone: +91 73000 07643</p>
+                </div>
+              )}
+            </section>
+          ))}
         </div>
       </div>
       <PrivacyFAQ />

@@ -46,17 +46,13 @@ export default async function Careers({ params }: Props) {
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-4xl text-center">
             <h4 className="mb-6 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase dark:text-gray-400">
-              Sales & Promotion
+              {t('salesPromotion')}
             </h4>
             <h2 className="text-brand-navy mb-8 font-serif text-4xl dark:text-gray-100">
-              Onsite Opportunities
+              {t('onsiteOpportunities')}
             </h2>
             <div className="space-y-6 text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-              <p>
-                We are expanding our Sales & Promotion team. Join us onsite and take your career to
-                the next level with competitive salaries, great growth opportunities, and an
-                inspiring work environment.
-              </p>
+              <p>{t('onsiteDescription')}</p>
             </div>
           </div>
 
@@ -68,7 +64,7 @@ export default async function Careers({ params }: Props) {
               href="/contact"
               className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy hover:bg-brand-gold inline-flex items-center gap-2 px-8 py-4 text-sm font-bold tracking-widest text-white uppercase transition-colors hover:text-white dark:hover:bg-white"
             >
-              Apply For Onsite Role <Send size={16} />
+              {t('applyOnsite')} <Send size={16} />
             </Link>
           </div>
         </div>
