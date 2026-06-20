@@ -64,7 +64,7 @@ export function FloatingContact() {
           href={PHONE_HREF}
           onClick={handleCallClick}
           className="hover:text-brand-gold flex h-12 w-12 items-center justify-center rounded-full bg-white text-gray-700 shadow-xl transition-transform hover:scale-110 dark:bg-gray-800 dark:text-gray-200"
-          title="Call Us"
+          title={t('callTitle')}
         >
           <Phone size={20} />
         </a>
@@ -74,7 +74,7 @@ export function FloatingContact() {
           rel="noreferrer"
           onClick={handleWhatsAppClick}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl transition-transform hover:scale-110"
-          title="WhatsApp Us"
+          title={t('whatsappTitle')}
         >
           <MessageCircle size={22} />
         </a>

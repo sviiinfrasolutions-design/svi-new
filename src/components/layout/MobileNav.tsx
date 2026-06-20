@@ -100,7 +100,7 @@ const MobileNav = memo(function MobileNav({
         }`}
         role="dialog"
         aria-modal="true"
-        aria-label="Mobile navigation menu"
+        aria-label={t('mobileNavLabel')}
       >
         {/* Drawer Header */}
         <div className="absolute top-5 right-5 left-5 flex items-center justify-between">

@@ -255,7 +255,7 @@ export default function CompletedProjectsContent({ projects }: { projects: Proje
               <button
                 onClick={closeModal}
                 className="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center border border-gray-200 bg-white/50 backdrop-blur transition-colors hover:bg-white"
-                aria-label={t('closeModal', { defaultValue: 'Close modal' })}
+                aria-label={t('closeModal')}
               >
                 <X size={20} className="text-brand-navy" />
               </button>
@@ -292,14 +292,14 @@ export default function CompletedProjectsContent({ projects }: { projects: Proje
                         <button
                           onClick={prevImage}
                           className="hover:text-brand-gold absolute top-1/2 left-4 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-gray-200 bg-white/95 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:bg-white"
-                          aria-label={t('prevImage', { defaultValue: 'Previous image' })}
+                          aria-label={t('prevImage')}
                         >
                           <ChevronLeft size={20} />
                         </button>
                         <button
                           onClick={nextImage}
                           className="hover:text-brand-gold absolute top-1/2 right-4 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-gray-200 bg-white/95 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:bg-white"
-                          aria-label={t('nextImage', { defaultValue: 'Next image' })}
+                          aria-label={t('nextImage')}
                         >
                           <ChevronRight size={20} />
                         </button>
@@ -360,7 +360,7 @@ export default function CompletedProjectsContent({ projects }: { projects: Proje
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors hover:bg-[#1877F2] hover:text-white"
-                        aria-label="Share on Facebook"
+                        aria-label={t('shareOnFacebook')}
                       >
                         <FacebookIcon size={14} />
                       </a>
@@ -369,7 +369,7 @@ export default function CompletedProjectsContent({ projects }: { projects: Proje
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors hover:bg-[#1DA1F2] hover:text-white"
-                        aria-label="Share on Twitter"
+                        aria-label={t('shareOnTwitter')}
                       >
                         <TwitterIcon size={14} />
                       </a>
@@ -378,7 +378,7 @@ export default function CompletedProjectsContent({ projects }: { projects: Proje
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors hover:bg-[#0A66C2] hover:text-white"
-                        aria-label="Share on LinkedIn"
+                        aria-label={t('shareOnLinkedIn')}
                       >
                         <LinkedinIcon size={14} />
                       </a>

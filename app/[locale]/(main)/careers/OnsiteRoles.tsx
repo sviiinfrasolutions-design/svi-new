@@ -10,17 +10,22 @@ export default function OnsiteRoles() {
   const ROLES = [
     {
       icon: <Briefcase size={28} />,
-      role: 'Business Development Manager (BDM)',
-      type: 'Onsite',
-      salary: 'Up to 40k INR',
+      role: t('jobs.bdm'),
+      type: t('onsite'),
+      salary: t('upTo', { amount: '40k' }),
     },
     {
       icon: <Users size={28} />,
-      role: 'Business Development Executive (BDE)',
-      type: 'Onsite',
-      salary: 'Up to 30k INR',
+      role: t('jobs.bde'),
+      type: t('onsite'),
+      salary: t('upTo', { amount: '30k' }),
     },
-    { icon: <Target size={28} />, role: 'Team Lead (TL)', type: 'Onsite', salary: 'Up to 60k INR' },
+    {
+      icon: <Target size={28} />,
+      role: t('jobs.tl'),
+      type: t('onsite'),
+      salary: t('upTo', { amount: '60k' }),
+    },
   ];
   return (
     <div className="mb-16 grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3">

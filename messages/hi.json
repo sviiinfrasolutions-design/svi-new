@@ -60,6 +60,7 @@
     "luckyDraw": "लकी ड्रा",
     "openMenu": "मेन्यू खोलें",
     "closeMenu": "मेन्यू बंद करें",
+    "mobileNavLabel": "मोबाइल नेविगेशन मेन्यू",
     "contact": "संपर्क करें",
     "register": "रजिस्टर",
     "followUs": "हमें {social} पर फ़ॉलो करें",
@@ -92,7 +93,12 @@
     "cta": "हमारे प्रोजेक्ट देखें",
     "invest": "निवेश करें",
     "scroll": "स्क्रॉल करें",
-    "statDescription": "बेजोड़ लक्ज़री, आर्किटेक्चरल उत्कृष्टता और प्राइम रियल एस्टेट निवेश के साल।"
+    "statDescription": "बेजोड़ लक्ज़री, आर्किटेक्चरल उत्कृष्टता और प्राइम रियल एस्टेट निवेश के साल।",
+    "ariaHeroSection": "हीरो अनुभाग",
+    "ariaPrevSlide": "पिछली स्लाइड",
+    "ariaNextSlide": "अगली स्लाइड",
+    "ariaSlideNav": "हीरो स्लाइड नेविगेशन",
+    "ariaGoToSlide": "स्लाइड {number} पर जाएं"
   },
   "about": {
     "welcomeTitle": "SVI Infra में आपका स्वागत है",
@@ -126,7 +132,9 @@
     "confirmBooking": "बुकिंग कन्फ़र्म करें",
     "namePlaceholder": "राहुल शर्मा",
     "phonePlaceholder": "+91 00000 00000",
-    "emailPlaceholder": "rahul@example.com"
+    "emailPlaceholder": "rahul@example.com",
+    "callTitle": "हमें कॉल करें",
+    "whatsappTitle": "व्हाट्सऐप करें"
   },
   "chatbot": {
     "assistant": "SVI असिस्टेंट",
@@ -408,6 +416,16 @@
       "title": "SVI Infra में करियर",
       "heading": "हमारी टीम से जुड़ें",
       "subtitle": "एक भरोसेमंद रियल एस्टेट डेवलपर के साथ अपना करियर बनाएँ",
+      "onsite": "ऑनसाइट",
+      "upTo": "{amount} INR तक",
+      "jobs": {
+        "bdm": "बिज़नेस डेवलपमेंट मैनेजर (BDM)",
+        "bde": "बिज़नेस डेवलपमेंट एक्जीक्यूटिव (BDE)",
+        "tl": "टीम लीड (TL)"
+      },
+      "shareOnFacebook": "फेसबुक पर शेयर करें",
+      "shareOnTwitter": "ट्विटर पर शेयर करें",
+      "shareOnLinkedIn": "लिंक्डइन पर शेयर करें",
       "salesPromotion": "सेल्स और प्रमोशन",
       "onsiteOpportunities": "ऑनसाइट अवसर",
       "onsiteDescription": "हम अपनी सेल्स और प्रमोशन टीम का विस्तार कर रहे हैं। प्रतिस्पर्धी वेतन, बेहतरीन ग्रोथ के अवसर और प्रेरणादायक कार्य वातावरण के साथ अपने करियर को अगले स्तर पर ले जाएं।",
@@ -754,6 +772,12 @@
       "comingSoonDesc": "हम वर्तमान में प्रमुख स्थानों में रोमांचक नई आवासीय और वाणिज्यिक परियोजनाओं पर काम कर रहे हैं। विस्तृत लेआउट, मूल्य निर्धारण और उपलब्धता के लिए जल्द ही वापस देखें।",
       "getNotifiedFirst": "पहले सूचित किया जाए",
       "shareProject": "प्रोजेक्ट साझा करें",
+      "shareOnFacebook": "फेसबुक पर शेयर करें",
+      "shareOnTwitter": "ट्विटर पर शेयर करें",
+      "shareOnLinkedIn": "लिंक्डइन पर शेयर करें",
+      "closeModal": "डायलॉग बंद करें",
+      "prevImage": "पिछली तस्वीर",
+      "nextImage": "अगली तस्वीर",
       "downloadBrochure": "ब्रोशर डाउनलोड करें (PDF)",
       "downloadPdf": "PDF डाउनलोड करें",
       "upcomingInterestTitle": "क्या आप हमारे आने वाले प्रोजेक्ट्स में रुचि रखते हैं?",

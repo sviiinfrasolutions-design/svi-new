@@ -64,7 +64,7 @@ export default function HeroSection({ images }: { images: HeroImage[] }) {
       ref={heroRef}
       className="relative flex min-h-[85vh] items-center justify-center overflow-hidden py-20 md:min-h-[900px] lg:py-32"
       role="region"
-      aria-label="Hero section"
+      aria-label={t('ariaHeroSection')}
     >
       {/* Parallax background with all hero images */}
       <motion.div
@@ -99,14 +99,14 @@ export default function HeroSection({ images }: { images: HeroImage[] }) {
       <button
         onClick={prevHeroSlide}
         className="hover:border-brand-gold hover:bg-brand-gold/10 hover:text-brand-gold absolute right-24 bottom-8 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/80 backdrop-blur-md transition-all md:right-32 md:bottom-12"
-        aria-label="Previous slide"
+        aria-label={t('ariaPrevSlide')}
       >
         <ChevronLeft size={20} strokeWidth={1.5} />
       </button>
       <button
         onClick={nextHeroSlide}
         className="hover:border-brand-gold hover:bg-brand-gold/10 hover:text-brand-gold absolute right-8 bottom-8 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/80 backdrop-blur-md transition-all md:right-16 md:bottom-12"
-        aria-label="Next slide"
+        aria-label={t('ariaNextSlide')}
       >
         <ChevronRight size={20} strokeWidth={1.5} />
       </button>
@@ -115,7 +115,7 @@ export default function HeroSection({ images }: { images: HeroImage[] }) {
       <div
         className="absolute bottom-12 left-8 z-30 hidden gap-3 md:flex lg:left-16"
         role="tablist"
-        aria-label="Hero slide navigation"
+        aria-label={t('ariaSlideNav')}
       >
         {images.map((_, idx) => (
           <motion.button
@@ -124,7 +124,7 @@ export default function HeroSection({ images }: { images: HeroImage[] }) {
               setIsAutoPlaying(false);
               setCurrentHeroIndex(idx);
             }}
-            aria-label={`Go to slide ${idx + 1}`}
+            aria-label={t('ariaGoToSlide', { number: idx + 1 })}
             aria-selected={idx === currentHeroIndex}
             role="tab"
             animate={{
