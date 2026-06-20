@@ -6,7 +6,6 @@ import { ProjectDropdown } from './ProjectDropdown';
 import LanguageToggle from '@/src/components/ui/LanguageToggle';
 import { ThemeToggle } from '@/src/components/ui/ThemeToggle';
 import { NAV_LINKS } from './navLinks';
-import { useTranslations } from 'next-intl';
 
 interface DesktopNavProps {
   currentPath: string;
@@ -66,33 +65,18 @@ const DesktopNav = memo(function DesktopNav({
   onProjectsClick,
   onToggleTheme,
 }: DesktopNavProps) {
-  const t = useTranslations('nav');
-
   return (
     <nav className="hidden items-center lg:flex lg:gap-3 xl:gap-5 2xl:gap-8">
-      {NAV_LINKS.map((link) => {
-        // Map path to nav translation key
-        const getNavKey = (path: string) => {
-          if (path === '/') return 'home';
-          if (path === '/about') return 'aboutUs';
-          if (path === '/calculators') return 'calculators';
-          if (path === '/careers') return 'careers';
-          if (path === '/blog') return 'blog';
-          return link.name;
-        };
-        const key = getNavKey(link.path);
-
-        return (
-          <NavLink
-            key={link.name}
-            href={link.path}
-            isActive={currentPath === link.path}
-            isHomeTransparent={isHomeTransparent}
-          >
-            {t(key as any) || link.name}
-          </NavLink>
-        );
-      })}
+      {NAV_LINKS.map((link) => (
+        <NavLink
+          key={link.name}
+          href={link.path}
+          isActive={currentPath === link.path}
+          isHomeTransparent={isHomeTransparent}
+        >
+          {link.name}
+        </NavLink>
+      ))}
 
       {/* Projects Dropdown */}
       <ProjectDropdown
@@ -109,7 +93,7 @@ const DesktopNav = memo(function DesktopNav({
         isActive={currentPath === '/payment'}
         isHomeTransparent={isHomeTransparent}
       >
-        {t('payment')}
+        Payment
       </NavLink>
 
       <NavLink
@@ -117,7 +101,7 @@ const DesktopNav = memo(function DesktopNav({
         isActive={currentPath === '/contact'}
         isHomeTransparent={isHomeTransparent}
       >
-        {t('contactUs')}
+        Contact
       </NavLink>
 
       {/* Lucky Draw Button */}
@@ -145,14 +129,14 @@ const DesktopNav = memo(function DesktopNav({
               : 'text-brand-navy hover:text-brand-gold dark:text-gray-200'
           }`}
         >
-          {t('clientLogin')}
+          Client Login
           <span className="bg-brand-gold absolute bottom-0 left-0 h-[1.5px] w-0 transition-all duration-300 group-hover/login:w-full" />
         </Link>
         <Link
           href="/registration"
           className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy relative overflow-hidden rounded-full px-3 py-1.5 text-[10px] font-semibold tracking-widest text-white uppercase transition-all duration-300 hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 xl:px-4 xl:text-[11px]"
         >
-          {t('registerNow')}
+          Register
         </Link>
       </div>
 

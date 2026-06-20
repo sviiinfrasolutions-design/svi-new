@@ -2,7 +2,6 @@
 
 import { ChevronDown, Building2, CheckSquare } from 'lucide-react';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
 
 interface ProjectDropdownProps {
   isOpen: boolean;
@@ -21,8 +20,6 @@ export function ProjectDropdown({
   onMouseLeave,
   onClick,
 }: ProjectDropdownProps) {
-  const t = useTranslations('nav');
-
   return (
     <div
       className="group relative cursor-pointer py-1"
@@ -39,7 +36,7 @@ export function ProjectDropdown({
               : 'text-brand-navy hover:text-brand-gold dark:text-gray-200'
         }`}
       >
-        {t('projects')}{' '}
+        Projects{' '}
         <ChevronDown
           size={14}
           className="transition-transform duration-300 group-hover:rotate-180"
@@ -63,7 +60,7 @@ export function ProjectDropdown({
             </div>
             <div>
               <div className="text-brand-navy group-hover/item:text-brand-gold text-[11px] font-semibold tracking-widest uppercase transition-colors dark:text-gray-100">
-                {t('currentProjects')}
+                Current Projects
               </div>
               <div className="mt-0.5 text-[9.5px] leading-relaxed text-gray-500 dark:text-gray-300">
                 Ongoing developments & infrastructure mappings.
@@ -79,7 +76,7 @@ export function ProjectDropdown({
             </div>
             <div>
               <div className="text-brand-navy group-hover/item:text-brand-gold text-[11px] font-semibold tracking-widest uppercase transition-colors dark:text-gray-100">
-                {t('completedProjects')}
+                Completed Projects
               </div>
               <div className="mt-0.5 text-[9.5px] leading-relaxed text-gray-500 dark:text-gray-300">
                 Landmark properties successfully delivered.

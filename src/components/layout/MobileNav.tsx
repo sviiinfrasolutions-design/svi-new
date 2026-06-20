@@ -8,7 +8,6 @@ import LanguageToggle from '@/src/components/ui/LanguageToggle';
 import { ThemeToggle } from '@/src/components/ui/ThemeToggle';
 import { NAV_LINKS } from './navLinks';
 import { PHONE_HREF } from '@/src/lib/constants';
-import { useTranslations } from 'next-intl';
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -66,8 +65,6 @@ const MobileNav = memo(function MobileNav({
   onToggleProjects,
   onToggleTheme,
 }: MobileNavProps) {
-  const t = useTranslations('nav');
-
   return (
     <>
       {/* Hamburger Button */}
@@ -137,29 +134,17 @@ const MobileNav = memo(function MobileNav({
         <div className="flex flex-grow flex-col gap-5.5 overflow-y-auto py-4 pr-1">
           {/* Main Links */}
           <div className="flex flex-col gap-3.5 min-[380px]:gap-4.5">
-            {NAV_LINKS.map((link, index) => {
-              const getNavKey = (path: string) => {
-                if (path === '/') return 'home';
-                if (path === '/about') return 'aboutUs';
-                if (path === '/calculators') return 'calculators';
-                if (path === '/careers') return 'careers';
-                if (path === '/blog') return 'blog';
-                return link.name;
-              };
-              const key = getNavKey(link.path);
-
-              return (
-                <div
-                  key={link.name}
-                  className="transition-all duration-300 ease-out"
-                  style={getStaggerStyle(isOpen, index)}
-                >
-                  <MobileLink href={link.path} isActive={currentPath === link.path}>
-                    {t(key as any) || link.name}
-                  </MobileLink>
-                </div>
-              );
-            })}
+            {NAV_LINKS.map((link, index) => (
+              <div
+                key={link.name}
+                className="transition-all duration-300 ease-out"
+                style={getStaggerStyle(isOpen, index)}
+              >
+                <MobileLink href={link.path} isActive={currentPath === link.path}>
+                  {link.name}
+                </MobileLink>
+              </div>
+            ))}
 
             {/* Projects Accordion */}
             <div
@@ -170,7 +155,7 @@ const MobileNav = memo(function MobileNav({
                 onClick={onToggleProjects}
                 className="text-brand-navy group flex w-full items-center justify-between py-2.5 text-left text-[16px] font-semibold tracking-wide min-[380px]:text-[17px] dark:text-gray-100"
               >
-                <span>{t('projects')}</span>
+                <span>Projects</span>
                 <ChevronDown
                   size={18}
                   className={`text-brand-gold transition-transform duration-300 ${
@@ -192,7 +177,7 @@ const MobileNav = memo(function MobileNav({
                     className="hover:text-brand-gold flex items-center gap-2 py-2 text-[13.5px] font-medium text-gray-600 transition-colors min-[380px]:text-[14.5px] dark:text-gray-400"
                   >
                     <Building2 size={15} className="text-brand-gold/70" />
-                    {t('currentProjects')}
+                    Current Projects
                   </Link>
                   <Link
                     href="/projects/completed"
@@ -200,7 +185,7 @@ const MobileNav = memo(function MobileNav({
                     className="hover:text-brand-gold flex items-center gap-2 py-2 text-[13.5px] font-medium text-gray-600 transition-colors min-[380px]:text-[14.5px] dark:text-gray-400"
                   >
                     <CheckSquare size={15} className="text-brand-gold/70" />
-                    {t('completedProjects')}
+                    Completed Projects
                   </Link>
                 </div>
               </div>
@@ -212,7 +197,7 @@ const MobileNav = memo(function MobileNav({
               style={getStaggerStyle(isOpen, NAV_LINKS.length + 1)}
             >
               <MobileLink href="/payment" isActive={currentPath === '/payment'}>
-                {t('payment')}
+                Payment
               </MobileLink>
             </div>
 
@@ -222,7 +207,7 @@ const MobileNav = memo(function MobileNav({
               style={getStaggerStyle(isOpen, NAV_LINKS.length + 2)}
             >
               <MobileLink href="/contact" isActive={currentPath === '/contact'}>
-                {t('contactUs')}
+                Contact Us
               </MobileLink>
             </div>
 
@@ -257,14 +242,14 @@ const MobileNav = memo(function MobileNav({
               onClick={onClose}
               className="border-brand-navy dark:border-brand-gold/45 text-brand-navy dark:text-brand-gold block w-full rounded-full border py-2 text-center text-xs font-semibold tracking-widest uppercase transition-colors hover:bg-gray-50 min-[380px]:py-2.5 min-[380px]:text-sm dark:hover:bg-zinc-900"
             >
-              {t('clientLogin')}
+              Client Login
             </Link>
             <Link
               href="/registration"
               onClick={onClose}
               className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy block w-full rounded-full py-2 text-center text-xs font-semibold tracking-widest text-white uppercase min-[380px]:py-2.5 min-[380px]:text-sm"
             >
-              {t('registerNow')}
+              Register Now
             </Link>
           </div>
 
