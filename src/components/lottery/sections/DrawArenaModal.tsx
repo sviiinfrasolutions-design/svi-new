@@ -182,7 +182,9 @@ export function DrawArenaModal({
                 <p className="mx-auto max-w-sm text-xs leading-relaxed font-medium tracking-widest text-slate-500 uppercase">
                   {isShuffling
                     ? t('shufflingProgress')
-                    : t('initiateShuffle', { count: participants.length })}
+                    : t('initiateShuffle', {
+                        count: participants.filter((p) => p.is_winner).length,
+                      })}
                 </p>
               )}
 
@@ -203,7 +205,7 @@ export function DrawArenaModal({
                   </motion.button>
                 ) : (
                   <button
-                    disabled={isShuffling || participants.length === 0}
+                    disabled={isShuffling || participants.filter((p) => p.is_winner).length === 0}
                     onClick={onStartShuffle}
                     className="group relative mx-auto block w-full max-w-sm cursor-pointer overflow-hidden rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B38728] px-8 py-4 text-xs font-semibold tracking-[0.15em] text-[#020617] uppercase transition-all duration-300 hover:from-[#E5C158] hover:to-[#D4AF37] hover:shadow-lg hover:shadow-[#D4AF37]/20 disabled:from-slate-700 disabled:to-slate-800 disabled:text-slate-500"
                   >

@@ -346,10 +346,11 @@ export function useLotteryDraw(): UseLotteryDrawReturn {
     setCurrentRevealIndex(-1);
 
     const namePool: string[] = [];
-    const scrollRounds = 4;
+    const minNames = 20;
+    const scrollRounds = Math.max(4, Math.ceil(minNames / drawWinners.length));
 
     for (let r = 0; r < scrollRounds; r++) {
-      const shuffledChunk = [...participants].map((p) => p.name).sort(() => Math.random() - 0.5);
+      const shuffledChunk = [...drawWinners].map((p) => p.name).sort(() => Math.random() - 0.5);
       namePool.push(...shuffledChunk);
     }
 
