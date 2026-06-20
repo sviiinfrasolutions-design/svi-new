@@ -1,8 +1,8 @@
 /** Shared navigation links used by DesktopNav and MobileNav. */
 export const NAV_LINKS = [
-  { name: 'Home', path: '/' },
-  { name: 'About Us', path: '/about' },
-  { name: 'Calculators', path: '/calculators' },
-  { name: 'Careers', path: '/careers' },
-  { name: 'Blog', path: '/blog' },
+  { nameKey: 'home' as const, path: '/' },
+  { nameKey: 'aboutUs' as const, path: '/about' },
+  { nameKey: 'calculators' as const, path: '/calculators' },
+  { nameKey: 'careers' as const, path: '/careers' },
+  { nameKey: 'blog' as const, path: '/blog' },
 ] as const;
