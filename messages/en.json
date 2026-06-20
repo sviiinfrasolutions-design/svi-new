@@ -11,6 +11,9 @@
     "address": "A-61 Sector 65, Noida, Uttar Pradesh 201309",
     "description": "Premium real estate developer with 15+ years of experience. Specializing in residential flats and commercial properties in Jaipur, Noida, and DMIC corridors.",
     "copyright": "© 2026 SVI Infra Solutions. All rights reserved.",
+    "faqTitleDefault": "Frequently Asked Questions",
+    "faqStillQuestions": "Still have questions?",
+    "faqContactTeam": "Contact Our Team",
     "subBrand": "Premium Property Developers"
   },
   "timeline": {
@@ -123,7 +126,9 @@
     "confirmBooking": "Confirm Booking",
     "namePlaceholder": "John Doe",
     "phonePlaceholder": "+91 00000 00000",
-    "emailPlaceholder": "john@example.com"
+    "emailPlaceholder": "john@example.com",
+    "callTitle": "Call Us",
+    "whatsappTitle": "WhatsApp Us"
   },
   "chatbot": {
     "assistant": "SVI Assistant",
@@ -308,6 +313,29 @@
       }
     }
   },
+  "breadcrumbs": {
+    "home": "Home",
+    "ariaLabel": "Breadcrumb",
+    "ariaGoHome": "Go to homepage",
+    "routes": {
+      "about": "About Us",
+      "careers": "Careers",
+      "blog": "Blog",
+      "projects": "Projects",
+      "current": "Current Projects",
+      "completed": "Completed Projects",
+      "contact": "Contact Us",
+      "registration": "Register",
+      "login": "Client Login",
+      "payment": "Payment",
+      "grievance": "Grievance",
+      "faq": "FAQ",
+      "leadership": "Leadership",
+      "privacy-policy": "Privacy Policy",
+      "terms-conditions": "Terms & Conditions",
+      "thank-you": "Thank You"
+    }
+  },
   "pages": {
     "about": {
       "title": "About SVI Infra Solutions",
@@ -382,6 +410,16 @@
       "title": "Careers at SVI Infra",
       "heading": "Join Our Team",
       "subtitle": "Build your career with a trusted real estate developer",
+      "onsite": "Onsite",
+      "upTo": "Up to {amount} INR",
+      "jobs": {
+        "bdm": "Business Development Manager (BDM)",
+        "bde": "Business Development Executive (BDE)",
+        "tl": "Team Lead (TL)"
+      },
+      "shareOnFacebook": "Share on Facebook",
+      "shareOnTwitter": "Share on Twitter",
+      "shareOnLinkedIn": "Share on LinkedIn",
       "salesPromotion": "Sales & Promotion",
       "onsiteOpportunities": "Onsite Opportunities",
       "onsiteDescription": "We are expanding our Sales & Promotion team. Join us onsite and take your career to the next level with competitive salaries, great growth opportunities, and an inspiring work environment.",
@@ -576,6 +614,8 @@
     "registration": {
       "title": "Online Registration",
       "heading": "Register Your Interest",
+      "faqTitle": "Registration FAQ",
+      "faqSubtitle": "Have questions about the registration process? Find answers here.",
       "sizes": {
         "50-100": "50 to 100 (Sq.Yrd)",
         "100-200": "100 to 200 (Sq.Yrd)",
@@ -714,6 +754,8 @@
       "completedTitle": "Completed Projects",
       "currentSubtitle": "Discover our ongoing developments. We are currently working on exciting new residential and commercial projects in prime locations, offering unparalleled amenities and lifestyle options.",
       "completedSubtitle": "Explore our portfolio of successfully delivered projects. Each property is a testament to our commitment to excellence, timely delivery, and unmatched quality.",
+      "faqTitle": "About Our Projects",
+      "faqSubtitle": "Get answers to common questions about our real estate projects and developments.",
       "projectLocations": "Project Locations",
       "mapInitializing": "Initializing project locations map...",
       "viewDetails": "View Details",

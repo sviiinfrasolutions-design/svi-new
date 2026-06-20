@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export interface FAQItem {
   category?: string;
@@ -38,7 +39,7 @@ interface FAQSectionProps {
 
 export default function FAQSection({
   items,
-  title = 'Frequently Asked Questions',
+  title,
   subtitle,
   showStructuredData = true,
   maxWidth = 'max-w-3xl',
@@ -46,9 +47,13 @@ export default function FAQSection({
   className = '',
   hideCTA = false,
   ctaHref = '/contact',
-  ctaText = 'Contact Our Team',
+  ctaText,
   defaultActiveIndex = 0,
 }: FAQSectionProps) {
+  const t = useTranslations('common');
+  const displayTitle = title ?? t('faqTitleDefault');
+  const displayCtaText = ctaText ?? t('faqContactTeam');
+
   const [activeIndex, setActiveIndex] = useState<number | null>(
     defaultActiveIndex >= 0 ? defaultActiveIndex : null
   );
@@ -104,9 +109,9 @@ export default function FAQSection({
       <div className={`container mx-auto px-4 ${maxWidth}`}>
         {/* Header */}
         <div className="mb-12 text-center">
-          {title && (
+          {displayTitle && (
             <h2 className="text-brand-navy mb-4 font-serif text-3xl md:text-4xl dark:text-gray-100">
-              {title}
+              {displayTitle}
             </h2>
           )}
           {subtitle ? (
@@ -185,12 +190,12 @@ export default function FAQSection({
             viewport={{ once: true }}
             className="mt-16 text-center"
           >
-            <p className="mb-6 text-gray-600 dark:text-gray-400">Still have questions?</p>
+            <p className="mb-6 text-gray-600 dark:text-gray-400">{t('faqStillQuestions')}</p>
             <Link
               href={ctaHref}
               className="bg-brand-navy dark:bg-brand-gold dark:text-brand-navy hover:bg-brand-gold hover:text-brand-navy border-brand-navy dark:border-brand-gold inline-flex border px-8 py-4 text-xs font-bold tracking-widest text-white uppercase shadow-md transition-colors hover:shadow-xl"
             >
-              {ctaText}
+              {displayCtaText}
             </Link>
           </motion.div>
         )}

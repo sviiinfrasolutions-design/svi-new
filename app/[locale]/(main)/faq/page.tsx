@@ -3,6 +3,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { ALL_FAQS } from '@/src/data/faq/general';
+import { ALL_FAQS_HI } from '@/src/data/faq/hi';
 
 const FAQSection = dynamic(() => import('@/src/components/faq/FAQSection'));
 
@@ -24,10 +25,12 @@ export default async function FAQPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations('pages.faq');
 
+  const faqs = locale === 'hi' ? ALL_FAQS_HI : ALL_FAQS;
+
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: ALL_FAQS.map((faq) => ({
+    mainEntity: faqs.map((faq) => ({
       '@type': 'Question',
       name: faq.question,
       acceptedAnswer: {
@@ -58,7 +61,7 @@ export default async function FAQPage({ params }: Props) {
       {/* FAQ Content */}
       <section className="bg-white py-16 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <FAQSection items={ALL_FAQS} variant="none" hideCTA={false} defaultActiveIndex={-1} />
+          <FAQSection items={faqs} variant="none" hideCTA={false} defaultActiveIndex={-1} />
         </div>
       </section>
     </div>
