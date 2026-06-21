@@ -30,6 +30,7 @@ import { AttachmentList } from './compose/AttachmentList';
 import { TemplatePicker } from './compose/TemplatePicker';
 import { AIImprovePanel } from './compose/AIImprovePanel';
 import type { ForwardData, ReplyData, EmailAttachment, TemplatePrefill, DraftData } from './types';
+import { useAIEmail } from './hooks/useAIEmail';
 
 interface ComposeTabProps {
   adminEmail: string;
@@ -70,6 +71,8 @@ export function ComposeTab({
   const [inReplyToMessageId, setInReplyToMessageId] = useState<string | null>(null);
   const [scheduledAt, setScheduledAt] = useState<string | null>(null);
   const [showImprove, setShowImprove] = useState(false);
+  const [autoComposeName, setAutoComposeName] = useState<string | null>(null);
+  const { autoCompose, loading: aiLoading } = useAIEmail();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load saved draft on mount
@@ -705,6 +708,54 @@ export function ComposeTab({
     }
   };
 
+  // Auto Compose: subject → template or AI-generated
+  const handleAutoCompose = async () => {
+    if (!subject.trim() || aiLoading) return;
+    setAutoComposeName(null);
+
+    const result = await autoCompose({
+      subject: subject.trim(),
+      to,
+      cc,
+      onChunk: (html) => setHtml(html),
+    });
+
+    if (!result) return;
+
+    if (result.action === 'template_match') {
+      // Load existing template
+      const tpl = EMAIL_TEMPLATES.find((t) => t.id === result.templateId);
+      if (tpl) {
+        setSubjectTemplate(tpl.subject);
+        setTemplateHtml(tpl.html);
+        setSelectedTemplate(result.templateId);
+        // Fill variables from suggestion
+        const vars: Record<string, string> = {};
+        Object.keys(result.variables).forEach((k) => {
+          vars[k] = result.variables[k] || '';
+        });
+        setTemplateVars(vars);
+        setPreviewMode(true);
+        setEditorKey((prev) => prev + 1);
+      }
+    } else {
+      // AI-generated template
+      setTemplateHtml(result.html);
+      setSelectedTemplate('_ai_generated');
+      setAutoComposeName(result.templateName);
+      // Extract variables from the AI-generated HTML
+      const vars = extractTemplateVars(result.html);
+      const initialVars: Record<string, string> = {};
+      vars.forEach((v) => {
+        initialVars[v] = result.variables[v] || '';
+      });
+      setTemplateVars(initialVars);
+      setPreviewMode(true);
+      setEditorKey((prev) => prev + 1);
+      setHtml(result.html);
+    }
+  };
+
   const discardAll = async () => {
     setTo('');
     setCc('');
@@ -819,6 +870,8 @@ export function ComposeTab({
           forwardData={forwardData}
           replyData={replyData}
           scheduledAt={scheduledAt}
+          autoComposing={aiLoading}
+          onAutoCompose={handleAutoCompose}
           onToChange={setTo}
           onCcChange={setCc}
           onBccChange={setBcc}
@@ -838,6 +891,9 @@ export function ComposeTab({
         <TemplateBanner
           selectedTemplate={selectedTemplate}
           templateVars={templateVars}
+          templateName={
+            selectedTemplate === '_ai_generated' ? autoComposeName || 'AI Generated' : undefined
+          }
           recipientEmail={to}
           onEditTemplate={() => {
             if (!html && templateHtml) {

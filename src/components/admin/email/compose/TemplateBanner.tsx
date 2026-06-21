@@ -8,6 +8,7 @@ import { SmartTemplateSuggestion } from './SmartTemplateSuggestion';
 interface TemplateBannerProps {
   selectedTemplate: string | null;
   templateVars: Record<string, string>;
+  templateName?: string; // override for AI-generated templates
   recipientEmail?: string;
   onEditTemplate: () => void;
   onClearTemplate: () => void;
@@ -19,6 +20,7 @@ interface TemplateBannerProps {
 export function TemplateBanner({
   selectedTemplate,
   templateVars,
+  templateName: explicitName,
   recipientEmail,
   onEditTemplate,
   onClearTemplate,
@@ -29,7 +31,7 @@ export function TemplateBanner({
   const [showSmartFill, setShowSmartFill] = useState(false);
   if (!selectedTemplate) return null;
 
-  const templateName = EMAIL_TEMPLATES.find((t) => t.id === selectedTemplate)?.name;
+  const templateName = explicitName || EMAIL_TEMPLATES.find((t) => t.id === selectedTemplate)?.name;
   if (!templateName) return null;
 
   return (

@@ -5,6 +5,7 @@ import { rateLimit } from '@/src/lib/api/rateLimit';
 import { AppError, handleApiError } from '@/src/lib/api/errors';
 import { streamText, generateText } from 'ai';
 import { groq } from '@ai-sdk/groq';
+import emailTemplates from '@/src/data/email-templates.json';
 
 export const maxDuration = 30;
 
@@ -89,6 +90,54 @@ export async function POST(request: NextRequest) {
 
     if (!action) {
       return NextResponse.json({ error: 'Missing action field' }, { status: 400 });
+    }
+
+    // ─── Auto Compose: subject → template match or AI-generated (streaming) ───
+    if (action === 'auto_compose') {
+      const { subject, to, cc } = body;
+      if (!subject) {
+        return NextResponse.json({ error: 'Missing subject' }, { status: 400 });
+      }
+
+      // Fetch recipient context if email provided
+      let recipientData: Record<string, any> = {};
+      if (to) {
+        recipientData = await fetchRecipientData(to);
+      }
+
+      // Build existing templates list for AI to match against
+      const templatesList = getTemplatesSummary();
+
+      const prompt = `You are an email template assistant for SVI Infra Solutions.
+
+EXISTING TEMPLATES:
+${templatesList}
+
+TASK:
+Analyze the email subject below and do ONE of the following:
+
+1) If the subject MATCHES an existing template above, respond with:
+   {"action":"template_match","templateId":"the_template_id","templateName":"Template Name","variables":{"var1":"value1",...}}
+   Then on the NEXT line, output the template HTML with all variables filled in using the recipient data.
+
+2) If the subject does NOT match any existing template, CREATE a new email template on the fly:
+   {"action":"ai_template","templateId":"_ai_generated","templateName":"A Short Descriptive Name","variables":{"var1":"suggested_value",...}}
+   Then on the NEXT line, output the complete email HTML. Use {{variable}} placeholders for dynamic values. Wrap the email in proper HTML structure matching SVI Infra's style (gold/navy header, professional body, footer).
+
+RECIPIENT DATA:
+${JSON.stringify(recipientData, null, 2)}
+
+EMAIL SUBJECT: ${subject}
+
+IMPORTANT: First line MUST be valid JSON only. Second line onwards is HTML. No other text.`;
+
+      const result = streamText({
+        model: groq('llama-3.3-70b-versatile'),
+        system: EMAIL_SYSTEM_PROMPT,
+        prompt,
+      });
+
+      return result.toTextStreamResponse();
     }
 
     // ─── Feature 1: Generate email content (streaming) ─────
@@ -234,6 +283,13 @@ export async function POST(request: NextRequest) {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────
+
+/** Build a summary of email templates for AI to match against */
+function getTemplatesSummary(): string {
+  return (emailTemplates as Array<{ id: string; name: string; subject: string; category?: string }>)
+    .map((t) => `- id: ${t.id} | name: ${t.name} | subject: ${t.subject}`)
+    .join('\n');
+}
 
 function stripHtml(html: string): string {
   return html

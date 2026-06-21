@@ -147,6 +147,99 @@ export function useAIEmail() {
     [apiCall]
   );
 
+  interface AutoComposeOptions {
+    subject: string;
+    to?: string;
+    cc?: string;
+    onChunk?: (html: string) => void;
+  }
+
+  interface AutoComposeResult {
+    action: 'template_match' | 'ai_template';
+    templateId: string;
+    templateName: string;
+    variables: Record<string, string>;
+    html: string;
+  }
+
+  // Auto Compose: subject → template match or AI-generated template
+  const autoCompose = useCallback(
+    async ({ subject, to, cc, onChunk }: AutoComposeOptions): Promise<AutoComposeResult | null> => {
+      const controller = new AbortController();
+      abortRef.current = controller;
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await apiCall({ action: 'auto_compose', subject, to, cc }, controller.signal);
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error('No response stream');
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let metaRead = false;
+        let metadata: AutoComposeResult | null = null;
+        let fullHtml = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+
+          if (!metaRead) {
+            // First line is JSON metadata
+            const newlineIdx = buffer.indexOf('\n');
+            if (newlineIdx !== -1) {
+              const metaLine = buffer.slice(0, newlineIdx);
+              buffer = buffer.slice(newlineIdx + 1);
+              try {
+                metadata = JSON.parse(metaLine);
+              } catch {
+                // If metadata parse fails, treat entire response as HTML
+                metadata = {
+                  action: 'ai_template',
+                  templateId: '_ai_generated',
+                  templateName: 'AI Generated',
+                  variables: {},
+                  html: '',
+                };
+              }
+              metaRead = true;
+            }
+          }
+
+          if (metaRead) {
+            fullHtml += buffer;
+            buffer = '';
+            onChunk?.(fullHtml);
+          }
+        }
+
+        if (!metadata) {
+          metadata = {
+            action: 'ai_template',
+            templateId: '_ai_generated',
+            templateName: 'AI Generated',
+            variables: {},
+            html: fullHtml,
+          };
+        }
+
+        return { ...metadata, html: fullHtml };
+      } catch (err: any) {
+        if (err.name === 'AbortError') return null;
+        const msg = err.message || 'Failed to auto-compose';
+        setError(msg);
+        toast.error(msg);
+        return null;
+      } finally {
+        setLoading(false);
+        abortRef.current = null;
+      }
+    },
+    [apiCall]
+  );
+
   // Feature 3: Summarize thread (non-streaming)
   const summarizeThread = useCallback(
     async ({ emails }: SummarizeOptions) => {
@@ -245,6 +338,7 @@ export function useAIEmail() {
     cancel,
     generateContent,
     improveContent,
+    autoCompose,
     summarizeThread,
     populateTemplate,
     analyzeSentiment,
