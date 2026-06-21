@@ -946,7 +946,7 @@ export function ComposeTab({
           {previewMode ? (
             <div className="min-h-[400px] p-6">
               <div
-                className="mx-auto overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700"
+                className="mx-auto overflow-hidden rounded-xl border border-gray-200 bg-white text-gray-900 shadow-sm dark:border-gray-700 dark:text-gray-900"
                 style={{ maxWidth: '700px' }}
               >
                 <div

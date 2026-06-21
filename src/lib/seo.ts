@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-export const SITE_URL = 'https://sviiinfrasolutions.com';
+export const SITE_URL = 'https://www.sviinfrasolutions.com';
 export const SITE_NAME = 'SVI Infra Solutions';
 export const COMPANY_NAME = 'SVI Infra Solutions Pvt. Ltd.';
 export const DEFAULT_OG_IMAGE = '/opengraph-image';

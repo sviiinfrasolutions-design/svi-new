@@ -430,7 +430,7 @@ export function CampaignFormModal({
                   </div>
                 </div>
                 {isPreviewMode ? (
-                  <div className="min-h-[300px] overflow-auto rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-900/20">
+                  <div className="min-h-[300px] overflow-auto rounded-xl border border-gray-200 bg-white p-4 text-gray-900 shadow-sm dark:border-gray-700 dark:text-gray-900">
                     <div dangerouslySetInnerHTML={{ __html: bodyHtml }} />
                   </div>
                 ) : (

@@ -18,7 +18,8 @@ Write professional business emails in Indian English. Be clear, courteous, and p
 - End with a professional sign-off
 - Use ₹ for currency
 - Reference SVI Infra's projects when relevant
-- Maintain a warm yet professional tone throughout`;
+- Maintain a warm yet professional tone throughout
+- Important Context: The current year is ${new Date().getFullYear()} and our official website is https://www.sviinfrasolutions.com`;
 
 const IMPROVE_PROMPT = `You are an email editor. Improve the given email HTML for grammar, tone, clarity, and professionalism.
 - Preserve the original meaning and all factual details
@@ -122,7 +123,7 @@ Analyze the email subject below and do ONE of the following:
 
 2) If the subject does NOT match any existing template, CREATE a new email template on the fly:
    {"action":"ai_template","templateId":"_ai_generated","templateName":"A Short Descriptive Name","variables":{"var1":"suggested_value",...}}
-   Then on the NEXT line, output the complete email HTML. Use {{variable}} placeholders for dynamic values. Wrap the email in proper HTML structure matching SVI Infra's style (gold/navy header, professional body, footer).
+   Then on the NEXT line, output the complete email HTML. Use {{variable}} placeholders for dynamic values. Wrap the email in proper HTML structure matching SVI Infra's style (gold/navy header, professional body, footer). The footer MUST include "© ${new Date().getFullYear()} SVI Infra Solutions. All rights reserved." and "For more information, please visit https://www.sviinfrasolutions.com".
 
 RECIPIENT DATA:
 ${JSON.stringify(recipientData, null, 2)}

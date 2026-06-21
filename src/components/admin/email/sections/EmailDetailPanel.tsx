@@ -305,7 +305,7 @@ export function EmailDetailPanel({
               {/* Body - with better styling */}
               {selected.html && (
                 <div className="mt-4">
-                  <div className="rounded-xl border border-gray-100 bg-gray-50/50 p-5 dark:border-gray-800 dark:bg-gray-900/20">
+                  <div className="rounded-xl border border-gray-200 bg-white p-5 text-gray-900 shadow-sm dark:border-gray-700 dark:text-gray-900">
                     <div
                       className="email-preview-wrapper overflow-auto"
                       dangerouslySetInnerHTML={{
