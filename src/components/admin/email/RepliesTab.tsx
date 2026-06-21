@@ -305,9 +305,18 @@ export function RepliesTab({ adminEmail: propAdminEmail, onForward, onReply }: R
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
-                        {reply.subject}
-                      </p>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className={`inline-block h-1.5 w-1.5 shrink-0 rounded-full ${
+                          isUrgent(reply.subject) ? 'bg-red-500' :
+                          isImportant(reply.subject) ? 'bg-amber-500' : 'bg-gray-300'
+                        }`} title={
+                          isUrgent(reply.subject) ? 'High priority' :
+                          isImportant(reply.subject) ? 'Medium priority' : 'Normal'
+                        } />
+                        <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
+                          {reply.subject}
+                        </p>
+                      </div>
                       <div className="flex shrink-0 items-center gap-1.5">
                         {starred.has(reply.id) && (
                           <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
@@ -450,4 +459,18 @@ export function RepliesTab({ adminEmail: propAdminEmail, onForward, onReply }: R
       )}
     </div>
   );
+}
+
+// ─── Priority helpers (client-side, no API call) ─────────────
+const URGENT_WORDS = ['urgent', 'overdue', 'complaint', 'cancellation', 'immediate', 'asap', 'notice', 'demand', 'warning', 'termination', 'final'];
+const IMPORTANT_WORDS = ['payment', 'allotment', 'site visit', 'receipt', 'document', 'purchase', 'booking', 'agreement', 'installment', 'due', 'schedule', 'milestone'];
+
+function isUrgent(subject: string): boolean {
+  const s = subject.toLowerCase();
+  return URGENT_WORDS.some((w) => s.includes(w));
+}
+
+function isImportant(subject: string): boolean {
+  const s = subject.toLowerCase();
+  return IMPORTANT_WORDS.some((w) => s.includes(w));
 }

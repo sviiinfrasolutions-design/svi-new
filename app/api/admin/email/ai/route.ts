@@ -350,6 +350,111 @@ IMPORTANT: First line = JSON only. Second line onwards = HTML only. No explanati
       }
     }
 
+    // ─── Feature 6: Suggest Subject Lines ─────
+    if (action === 'suggest_subject') {
+      const { html } = body;
+      if (!html) return NextResponse.json({ error: 'Missing html' }, { status: 400 });
+
+      const { text } = await generateText({
+        model: groq('llama-3.3-70b-versatile'),
+        system: 'You are an email subject line expert for SVI Infra Solutions, a real estate company.',
+        prompt: `Analyze this email body and suggest exactly 3 professional subject lines.
+Return ONLY a JSON array of strings, no other text.
+Make them specific to real estate (property, payment, allotment, site visit, etc.).
+Keep each under 60 characters.
+
+Email body:
+${stripHtml(html)}`,
+      });
+
+      try {
+        const suggestions = JSON.parse(text);
+        return NextResponse.json({ success: true, suggestions: Array.isArray(suggestions) ? suggestions.slice(0, 3) : [] });
+      } catch {
+        const arrMatch = text.match(/\[[\s\S]*?\]/);
+        if (arrMatch) {
+          const suggestions = JSON.parse(arrMatch[0]);
+          return NextResponse.json({ success: true, suggestions: Array.isArray(suggestions) ? suggestions.slice(0, 3) : [] });
+        }
+        return NextResponse.json({ error: 'Failed to parse suggestions' }, { status: 500 });
+      }
+    }
+
+    // ─── Feature 7: Classify Email (priority + category) ─────
+    if (action === 'classify_email') {
+      const { emailHtml, emailText } = body;
+      if (!emailHtml && !emailText) return NextResponse.json({ error: 'Missing content' }, { status: 400 });
+
+      const content = stripHtml(emailHtml || '') || emailText || '';
+
+      const { text } = await generateText({
+        model: groq('llama-3.3-70b-versatile'),
+        system: 'You classify real estate emails for SVI Infra Solutions admin team.',
+        prompt: `Classify this email and return JSON:
+{
+  "priority": "high" | "medium" | "low",
+  "category": "Payment" | "Allotment" | "Site Visit" | "Complaint" | "Inquiry" | "Other",
+  "summary": "one line summary"
+}
+
+Rules:
+- high priority: payment overdue, complaints, cancellations, urgent requests
+- medium priority: payment inquiries, allotment questions, site visit requests
+- low priority: general inquiries, marketing, informational
+
+Email:
+${content.slice(0, 3000)}`,
+      });
+
+      try {
+        const result = JSON.parse(text);
+        return NextResponse.json({ success: true, ...result });
+      } catch {
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) return NextResponse.json({ success: true, ...JSON.parse(jsonMatch[0]) });
+        return NextResponse.json({ error: 'Failed to classify' }, { status: 500 });
+      }
+    }
+
+    // ─── Feature 8: Suggest Follow-up Date ─────
+    if (action === 'suggest_followup') {
+      const { html, recipientName } = body;
+      if (!html) return NextResponse.json({ error: 'Missing html' }, { status: 400 });
+
+      const { text } = await generateText({
+        model: groq('llama-3.3-70b-versatile'),
+        system: 'You suggest follow-up timing for SVI Infra Solutions real estate emails.',
+        prompt: `Analyze this sent email and suggest when to follow up.
+Return JSON:
+{
+  "suggestedDays": number,
+  "reason": "brief reason",
+  "message": "one sentence follow-up suggestion for the admin"
+}
+
+Rules:
+- Payment reminders: follow up in 3-5 days
+- Site visit follow-ups: 2-3 days
+- Allotment/legal: 5-7 days
+- General inquiries: 3-4 days
+- Urgent/complaints: 1-2 days
+
+Recipient: ${recipientName || 'Unknown'}
+
+Email content:
+${stripHtml(html)}`,
+      });
+
+      try {
+        const result = JSON.parse(text);
+        return NextResponse.json({ success: true, ...result });
+      } catch {
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) return NextResponse.json({ success: true, ...JSON.parse(jsonMatch[0]) });
+        return NextResponse.json({ error: 'Failed to suggest follow-up' }, { status: 500 });
+      }
+    }
+
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   } catch (err) {
     return handleApiError(err);

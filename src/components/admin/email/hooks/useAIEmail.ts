@@ -332,6 +332,72 @@ export function useAIEmail() {
     [apiCall]
   );
 
+  // Feature 6: Suggest subject lines
+  const suggestSubject = useCallback(
+    async (html: string): Promise<string[] | null> => {
+      const controller = new AbortController();
+      abortRef.current = controller;
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await apiCall({ action: 'suggest_subject', html }, controller.signal);
+        const data = await res.json();
+        return data.success ? data.suggestions : null;
+      } catch (err: any) {
+        if (err.name === 'AbortError') return null;
+        return null;
+      } finally {
+        setLoading(false);
+        abortRef.current = null;
+      }
+    },
+    [apiCall]
+  );
+
+  // Feature 7: Classify email (priority + category)
+  const classifyEmail = useCallback(
+    async (content: { emailHtml?: string; emailText?: string }): Promise<{ priority: string; category: string; summary: string } | null> => {
+      const controller = new AbortController();
+      abortRef.current = controller;
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await apiCall({ action: 'classify_email', ...content }, controller.signal);
+        const data = await res.json();
+        return data.success ? { priority: data.priority, category: data.category, summary: data.summary } : null;
+      } catch (err: any) {
+        if (err.name === 'AbortError') return null;
+        return null;
+      } finally {
+        setLoading(false);
+        abortRef.current = null;
+      }
+    },
+    [apiCall]
+  );
+
+  // Feature 8: Suggest follow-up
+  const suggestFollowup = useCallback(
+    async (html: string, recipientName?: string): Promise<{ suggestedDays: number; reason: string; message: string } | null> => {
+      const controller = new AbortController();
+      abortRef.current = controller;
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await apiCall({ action: 'suggest_followup', html, recipientName }, controller.signal);
+        const data = await res.json();
+        return data.success ? { suggestedDays: data.suggestedDays, reason: data.reason, message: data.message } : null;
+      } catch (err: any) {
+        if (err.name === 'AbortError') return null;
+        return null;
+      } finally {
+        setLoading(false);
+        abortRef.current = null;
+      }
+    },
+    [apiCall]
+  );
+
   return {
     loading,
     error,
@@ -342,5 +408,8 @@ export function useAIEmail() {
     summarizeThread,
     populateTemplate,
     analyzeSentiment,
+    suggestSubject,
+    classifyEmail,
+    suggestFollowup,
   };
 }

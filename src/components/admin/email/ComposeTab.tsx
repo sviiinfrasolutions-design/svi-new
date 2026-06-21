@@ -15,6 +15,8 @@ import {
   Sparkles,
   Trash2,
   X,
+  Lightbulb,
+  Calendar,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { EMAIL_TEMPLATES } from './constants';
@@ -72,7 +74,11 @@ export function ComposeTab({
   const [scheduledAt, setScheduledAt] = useState<string | null>(null);
   const [showImprove, setShowImprove] = useState(false);
   const [autoComposeName, setAutoComposeName] = useState<string | null>(null);
-  const { autoCompose, loading: aiLoading } = useAIEmail();
+  const { autoCompose, loading: aiLoading, suggestSubject, suggestFollowup } = useAIEmail();
+  const [subjectSuggestions, setSubjectSuggestions] = useState<string[] | null>(null);
+  const [showSubjectSuggestions, setShowSubjectSuggestions] = useState(false);
+  const [subjectSuggesting, setSubjectSuggesting] = useState(false);
+  const [followUpSuggestion, setFollowUpSuggestion] = useState<{ suggestedDays: number; reason: string; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load saved draft on mount
@@ -684,6 +690,14 @@ export function ComposeTab({
         setSent(true);
         await clearDraft();
         toast.success('Email sent successfully');
+
+        // Suggest follow-up in background
+        const finalBody = getPreviewHtml() || html;
+        const recipient = to.split(',')[0]?.trim();
+        suggestFollowup(finalBody, recipient).then((followUp) => {
+          if (followUp) setFollowUpSuggestion(followUp);
+        });
+
         setTimeout(() => {
           setSent(false);
           setTo('');
@@ -754,6 +768,25 @@ export function ComposeTab({
       setEditorKey((prev) => prev + 1);
       setHtml(result.html);
     }
+  };
+
+  // Suggest subject lines based on email body
+  const handleSuggestSubject = async () => {
+    const bodyHtml = getPreviewHtml() || html;
+    if (!bodyHtml.trim()) return;
+    setSubjectSuggesting(true);
+    setSubjectSuggestions(null);
+    const suggestions = await suggestSubject(bodyHtml);
+    if (suggestions && suggestions.length > 0) {
+      setSubjectSuggestions(suggestions);
+      setShowSubjectSuggestions(true);
+    }
+    setSubjectSuggesting(false);
+  };
+
+  const handleApplySubject = (suggestion: string) => {
+    handleSubjectChange(suggestion);
+    setShowSubjectSuggestions(false);
   };
 
   const discardAll = async () => {
@@ -995,6 +1028,39 @@ export function ComposeTab({
           )}
         </AnimatePresence>
 
+        {/* Follow-up Suggestion */}
+        <AnimatePresence>
+          {followUpSuggestion && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mx-6 mb-4 flex items-start gap-3 rounded-xl border border-blue-200/60 bg-blue-50/80 px-4 py-3 dark:border-blue-800/40 dark:bg-blue-900/15">
+                <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-blue-700 dark:text-blue-400">
+                    Follow up in {followUpSuggestion.suggestedDays} day{followUpSuggestion.suggestedDays !== 1 ? 's' : ''}
+                  </p>
+                  <p className="mt-0.5 text-xs text-blue-600/80 dark:text-blue-300/80">
+                    {followUpSuggestion.message}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-blue-500/60 dark:text-blue-400/60">
+                    Reason: {followUpSuggestion.reason}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setFollowUpSuggestion(null)}
+                  className="shrink-0 text-blue-400 hover:text-blue-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Footer toolbar */}
         <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4 dark:border-gray-800">
           <div className="flex items-center gap-1">
@@ -1031,6 +1097,43 @@ export function ComposeTab({
               <Sparkles className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Improve</span>
             </button>
+
+            <div className="relative">
+              <button
+                onClick={handleSuggestSubject}
+                disabled={!html && !templateHtml}
+                className="text-amber-600 hover:bg-amber-50 flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all disabled:opacity-50 dark:hover:bg-amber-500/10"
+              >
+                {subjectSuggesting ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Lightbulb className="h-3.5 w-3.5" />
+                )}
+                <span className="hidden sm:inline">Subject</span>
+              </button>
+
+              {showSubjectSuggestions && subjectSuggestions && (
+                <div className="dark:bg-brand-dark-surface absolute bottom-full right-0 z-50 mb-2 w-72 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700">
+                  <div className="border-b border-gray-100 px-3 py-2 dark:border-gray-800">
+                    <span className="text-[10px] font-semibold tracking-wide text-gray-500 uppercase">
+                      Suggested Subjects
+                    </span>
+                  </div>
+                  <div className="p-2">
+                    {subjectSuggestions.map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleApplySubject(s)}
+                        className="flex w-full items-start gap-2 rounded-lg px-3 py-2.5 text-left text-xs text-gray-700 transition-colors hover:bg-amber-50 dark:text-gray-300 dark:hover:bg-amber-500/10"
+                      >
+                        <Lightbulb className="mt-0.5 h-3 w-3 shrink-0 text-amber-500" />
+                        <span>{s}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <button
               onClick={() => fileInputRef.current?.click()}
