@@ -2,8 +2,9 @@
 
 import { motion, AnimatePresence } from 'motion/react';
 import { AlertTriangle, ChevronDown, Inbox, Loader2 } from 'lucide-react';
-import type { ForwardData, ReplyData } from './types';
-import { buildForwardHtml, buildReplyHtml } from './helpers';
+import type { ForwardData, ReplyData, SentEmail } from './types';
+import { buildForwardHtml, buildReplyHtml, getToken } from './helpers';
+import { toast } from 'sonner';
 import { EmailListSkeleton, EmailDetailSkeleton } from './Skeletons';
 import { useSentEmails } from './hooks/useSentEmails';
 import { EmailToolbar, ActiveFilterChips } from './sections/EmailToolbar';
@@ -21,6 +22,35 @@ interface SentTabProps {
 export function SentTab({ onForward, onReply }: SentTabProps) {
   const h = useSentEmails();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [emailToDelete, setEmailToDelete] = useState<SentEmail | null>(null);
+
+  const handleForwardEmail = (email: SentEmail) => {
+    if (!onForward) return;
+    onForward({
+      subject: `Fwd: ${email.subject}`,
+      html: buildForwardHtml(email),
+      originalFrom: email.from,
+      originalTo: email.to || [],
+      originalDate: email.created_at,
+      originalSubject: email.subject,
+      attachments: email.attachments || [],
+    });
+  };
+
+  const handleReplyEmail = (email: SentEmail) => {
+    if (!onReply) return;
+    onReply({
+      to: email.from,
+      subject: `Re: ${email.subject}`,
+      html: buildReplyHtml(email),
+      originalFrom: email.from,
+      originalDate: email.created_at,
+      originalSubject: email.subject,
+      cc: email.cc,
+      originalMessageId: email.id,
+      attachments: email.attachments || [],
+    });
+  };
 
   /* ─── Forward / Reply ─── */
   const handleForward = () => {
@@ -56,14 +86,53 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
     setShowDeleteConfirm(true);
   };
 
+  const handleDeleteEmailClick = (email: SentEmail) => {
+    setEmailToDelete(email);
+  };
+
   const handleDeleteConfirm = async () => {
-    const count = h.selectedIds.size;
-    await h.deleteSelectedEmails();
-    setShowDeleteConfirm(false);
+    if (emailToDelete) {
+      try {
+        const token = await getToken();
+        const res = await fetch('/api/admin/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            action: 'delete_emails',
+            emailIds: [emailToDelete.id],
+            emails: [
+              {
+                id: emailToDelete.id,
+                subject: emailToDelete.subject,
+                from: emailToDelete.from,
+                to: emailToDelete.to,
+                created_at: emailToDelete.created_at,
+                last_event: emailToDelete.last_event,
+              },
+            ],
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete email');
+        h.addToDeleted([emailToDelete.id]);
+        toast.success('Email deleted');
+      } catch (e) {
+        toast.error((e as Error).message);
+      } finally {
+        setEmailToDelete(null);
+      }
+    } else {
+      await h.deleteSelectedEmails();
+      setShowDeleteConfirm(false);
+    }
   };
 
   const handleDeleteCancel = () => {
     setShowDeleteConfirm(false);
+    setEmailToDelete(null);
   };
 
   return (
@@ -219,6 +288,9 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
                   onSelect={h.fetchDetail}
                   onToggleStar={h.toggleStar}
                   onToggleCheck={h.toggleSelectEmail}
+                  onForward={handleForwardEmail}
+                  onReply={handleReplyEmail}
+                  onDelete={handleDeleteEmailClick}
                 />
               ))}
             </motion.div>
@@ -275,10 +347,18 @@ export function SentTab({ onForward, onReply }: SentTabProps) {
 
       {/* ─── Delete Confirmation Dialog ─── */}
       <ConfirmDialog
-        open={showDeleteConfirm}
-        title="Delete emails?"
-        message={`Are you sure you want to delete ${h.selectedIds.size} email${h.selectedIds.size > 1 ? 's' : ''}? This action will hide ${h.selectedIds.size > 1 ? 'them' : 'it'} from your Sent tab. You can restore deleted emails by contacting support.`}
-        confirmLabel={`Delete ${h.selectedIds.size} email${h.selectedIds.size > 1 ? 's' : ''}`}
+        open={showDeleteConfirm || !!emailToDelete}
+        title="Delete email?"
+        message={
+          emailToDelete
+            ? `Are you sure you want to delete the email "${emailToDelete.subject}"? This action will hide it from your Sent tab.`
+            : `Are you sure you want to delete ${h.selectedIds.size} email${h.selectedIds.size > 1 ? 's' : ''}? This action will hide ${h.selectedIds.size > 1 ? 'them' : 'it'} from your Sent tab.`
+        }
+        confirmLabel={
+          emailToDelete
+            ? 'Delete email'
+            : `Delete ${h.selectedIds.size} email${h.selectedIds.size > 1 ? 's' : ''}`
+        }
         cancelLabel="Cancel"
         variant="danger"
         onConfirm={handleDeleteConfirm}
