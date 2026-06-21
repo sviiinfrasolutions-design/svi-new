@@ -12,6 +12,7 @@ import {
   PenLine,
   Save,
   Send,
+  Sparkles,
   Trash2,
   X,
 } from 'lucide-react';
@@ -27,6 +28,7 @@ import { ComposeFields } from './compose/ComposeFields';
 import { TemplateBanner } from './compose/TemplateBanner';
 import { AttachmentList } from './compose/AttachmentList';
 import { TemplatePicker } from './compose/TemplatePicker';
+import { AIImprovePanel } from './compose/AIImprovePanel';
 import type { ForwardData, ReplyData, EmailAttachment, TemplatePrefill, DraftData } from './types';
 
 interface ComposeTabProps {
@@ -67,6 +69,7 @@ export function ComposeTab({
   const [hasDraft, setHasDraft] = useState(false);
   const [inReplyToMessageId, setInReplyToMessageId] = useState<string | null>(null);
   const [scheduledAt, setScheduledAt] = useState<string | null>(null);
+  const [showImprove, setShowImprove] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load saved draft on mount
@@ -831,6 +834,7 @@ export function ComposeTab({
         <TemplateBanner
           selectedTemplate={selectedTemplate}
           templateVars={templateVars}
+          recipientEmail={to}
           onEditTemplate={() => {
             if (!html && templateHtml) {
               setHtml(getPreviewHtml());
@@ -855,6 +859,25 @@ export function ComposeTab({
             if (templateHtml) {
               setTemplateHtml(templateHtml.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), ''));
             }
+          }}
+          onApplySuggestions={(suggestions) => {
+            // suggestions already applied via onVariableChange in TemplateBanner
+          }}
+        />
+
+        {/* AI Improve Panel */}
+        <AIImprovePanel
+          open={showImprove}
+          html={getPreviewHtml() || html}
+          onClose={() => setShowImprove(false)}
+          onApply={(improvedHtml) => {
+            if (templateHtml) {
+              // Template mode: apply to template HTML
+              setTemplateHtml(improvedHtml);
+            } else {
+              setHtml(improvedHtml);
+            }
+            setEditorKey((prev) => prev + 1);
           }}
         />
 
@@ -937,6 +960,15 @@ export function ComposeTab({
 
           <div className="flex items-center gap-2">
             <TemplatePicker selectedTemplate={selectedTemplate} onSelect={loadTemplate} />
+
+            <button
+              onClick={() => setShowImprove(true)}
+              disabled={!html && !templateHtml}
+              className="text-brand-gold hover:bg-brand-gold/10 flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all disabled:opacity-50"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Improve</span>
+            </button>
 
             <button
               onClick={() => fileInputRef.current?.click()}

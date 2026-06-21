@@ -17,10 +17,13 @@ import {
   Users,
   ExternalLink,
   Calendar,
+  Sparkles,
 } from 'lucide-react';
 import type { EmailDetail } from '../types';
 import { buildCopyText } from '../helpers';
 import { useState } from 'react';
+import { AISummaryPanel } from './AISummaryPanel';
+import { SentimentBadge } from './SentimentBadge';
 
 interface EmailDetailPanelProps {
   selected: EmailDetail | null;
@@ -31,7 +34,7 @@ interface EmailDetailPanelProps {
   copyMenuRef: React.RefObject<HTMLDivElement | null>;
   starred: Set<string>;
   onClose: () => void;
-  onReply: () => void;
+  onReply: (html?: string) => void;
   onForward: () => void;
   onCopyMenuToggle: () => void;
   onCopyText: (text: string, type: string) => void;
@@ -56,7 +59,19 @@ export function EmailDetailPanel({
   onToggleStar,
 }: EmailDetailPanelProps) {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [showSummary, setShowSummary] = useState(false);
   if (!selected) return null;
+
+  // Build thread emails array for summarization
+  const threadEmails = [
+    {
+      from: selected.from,
+      subject: selected.subject,
+      html: selected.html,
+      text: selected.text,
+      created_at: selected.created_at,
+    },
+  ];
 
   return (
     <AnimatePresence>
@@ -142,12 +157,31 @@ export function EmailDetailPanel({
                 <span>{new Date(selected.created_at).toLocaleString('en-IN')}</span>
               </div>
 
-              {/* Actions - icon-only for compact view */}
+              {/* Sentiment + AI Actions */}
               <div className="mb-6 flex items-center gap-1.5">
+                {selected.html && (
+                  <SentimentBadge
+                    emailHtml={selected.html}
+                    emailText={selected.text}
+                    onSuggestionSelect={(html) => onReply(html)}
+                  />
+                )}
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={onReply}
+                  onClick={() => setShowSummary(!showSummary)}
+                  className="border-brand-gold/20 bg-brand-gold/10 text-brand-gold hover:border-brand-gold/30 hover:bg-brand-gold/20 flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-all"
+                  title="Summarize Thread"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Summarize</span>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => onReply()}
                   className="flex items-center gap-1.5 rounded-lg border border-blue-200/60 bg-blue-50/80 px-3 py-2 text-xs font-medium text-blue-600 transition-all hover:border-blue-300 hover:bg-blue-100 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400"
                   title="Reply"
                 >
@@ -256,6 +290,17 @@ export function EmailDetailPanel({
                   />
                 </motion.button>
               </div>
+
+              {/* Summary Panel */}
+              {showSummary && (
+                <div className="mb-6">
+                  <AISummaryPanel
+                    open={showSummary}
+                    emails={threadEmails}
+                    onClose={() => setShowSummary(false)}
+                  />
+                </div>
+              )}
 
               {/* Body - with better styling */}
               {selected.html && (

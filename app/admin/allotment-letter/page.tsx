@@ -1222,7 +1222,7 @@ export default function AllotmentLetterPage() {
                 <div className="mb-6 overflow-hidden border border-gray-400">
                   <table className="w-full border-collapse text-left">
                     <thead>
-                      <tr className="bg-[#00b0f0] text-xs text-black">
+                      <tr className="break-inside-avoid bg-[#00b0f0] text-xs text-black">
                         <th className="border border-gray-400 p-2 font-bold whitespace-nowrap">
                           Client Name
                         </th>
@@ -1250,7 +1250,7 @@ export default function AllotmentLetterPage() {
                       </tr>
                     </thead>
                     <tbody className="text-xs">
-                      <tr>
+                      <tr className="break-inside-avoid">
                         <td className="border border-gray-400 p-2 font-bold">
                           {formData.clientName}
                         </td>
@@ -1281,7 +1281,7 @@ export default function AllotmentLetterPage() {
                 <div className="mb-6 overflow-hidden border border-gray-400">
                   <table className="w-full border-collapse text-left">
                     <thead>
-                      <tr className="bg-[#00b0f0] text-xs text-black">
+                      <tr className="break-inside-avoid bg-[#00b0f0] text-xs text-black">
                         <th className="border border-gray-400 p-2 font-bold">SNO</th>
                         <th className="border border-gray-400 p-2 font-bold">Date</th>
                         <th className="border border-gray-400 p-2 font-bold">Particulars</th>
@@ -1291,7 +1291,7 @@ export default function AllotmentLetterPage() {
                     </thead>
                     <tbody className="text-xs">
                       {/* First Instalment (Custom %) */}
-                      <tr>
+                      <tr className="break-inside-avoid">
                         <td className="border border-gray-400 p-2 font-bold">1</td>
                         <td className="border border-gray-400 p-2 font-bold">
                           {(() => {
@@ -1310,7 +1310,7 @@ export default function AllotmentLetterPage() {
                       </tr>
                       {/* Second Instalment (20%) — only shown if enabled */}
                       {showSecondInstalment && (
-                        <tr>
+                        <tr className="break-inside-avoid">
                           <td className="border border-gray-400 p-2 font-bold">2</td>
                           <td className="border border-gray-400 p-2 font-bold">
                             {(() => {
@@ -1364,7 +1364,7 @@ export default function AllotmentLetterPage() {
                           }
 
                           return (
-                            <tr key={i}>
+                            <tr key={i} className="break-inside-avoid">
                               <td className="border border-gray-400 p-2 font-bold">
                                 {i + emiStartIndex}
                               </td>

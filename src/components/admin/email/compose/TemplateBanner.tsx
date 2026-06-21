@@ -1,25 +1,32 @@
 'use client';
 
-import { PenLine, LayoutTemplate, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { PenLine, LayoutTemplate, Trash2, Sparkles } from 'lucide-react';
 import { EMAIL_TEMPLATES } from '../constants';
+import { SmartTemplateSuggestion } from './SmartTemplateSuggestion';
 
 interface TemplateBannerProps {
   selectedTemplate: string | null;
   templateVars: Record<string, string>;
+  recipientEmail?: string;
   onEditTemplate: () => void;
   onClearTemplate: () => void;
   onVariableChange: (key: string, value: string) => void;
   onRemoveVariable?: (key: string) => void;
+  onApplySuggestions?: (suggestions: Record<string, string>) => void;
 }
 
 export function TemplateBanner({
   selectedTemplate,
   templateVars,
+  recipientEmail,
   onEditTemplate,
   onClearTemplate,
   onVariableChange,
   onRemoveVariable,
+  onApplySuggestions,
 }: TemplateBannerProps) {
+  const [showSmartFill, setShowSmartFill] = useState(false);
   if (!selectedTemplate) return null;
 
   const templateName = EMAIL_TEMPLATES.find((t) => t.id === selectedTemplate)?.name;
@@ -36,6 +43,12 @@ export function TemplateBanner({
         </div>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setShowSmartFill(!showSmartFill)}
+            className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Smart Fill
+          </button>
+          <button
             onClick={onEditTemplate}
             className="flex items-center gap-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
           >
@@ -50,32 +63,47 @@ export function TemplateBanner({
         </div>
       </div>
       {Object.keys(templateVars).length > 0 && (
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          {Object.entries(templateVars).map(([key, value]) => (
-            <div key={key} className="flex flex-col">
-              <label className="mb-1 text-[10px] font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                {key.replace(/_/g, ' ')}
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={value}
-                  onChange={(e) => onVariableChange(key, e.target.value)}
-                  placeholder={`Enter ${key.replace(/_/g, ' ')}...`}
-                  className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-900 placeholder-gray-400 transition-colors outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                />
-                {onRemoveVariable && (
-                  <button
-                    onClick={() => onRemoveVariable(key)}
-                    title={`Delete ${key}`}
-                    className="rounded-md p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                )}
+        <div className="mt-3">
+          <SmartTemplateSuggestion
+            open={showSmartFill}
+            templateId={selectedTemplate}
+            variables={Object.keys(templateVars)}
+            recipientEmail={recipientEmail}
+            onClose={() => setShowSmartFill(false)}
+            onApply={(suggestions) => {
+              Object.entries(suggestions).forEach(([key, value]) => {
+                onVariableChange(key, value);
+              });
+              onApplySuggestions?.(suggestions);
+            }}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            {Object.entries(templateVars).map(([key, value]) => (
+              <div key={key} className="flex flex-col">
+                <label className="mb-1 text-[10px] font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+                  {key.replace(/_/g, ' ')}
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => onVariableChange(key, e.target.value)}
+                    placeholder={`Enter ${key.replace(/_/g, ' ')}...`}
+                    className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-900 placeholder-gray-400 transition-colors outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                  />
+                  {onRemoveVariable && (
+                    <button
+                      onClick={() => onRemoveVariable(key)}
+                      title={`Delete ${key}`}
+                      className="rounded-md p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

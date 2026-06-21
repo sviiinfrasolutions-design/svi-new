@@ -31,7 +31,9 @@ import {
   Code,
   RemoveFormatting,
   Palette,
+  Sparkles,
 } from 'lucide-react';
+import { AIComposePopover } from './compose/AIComposePopover';
 
 interface RichTextEditorProps {
   value: string;
@@ -39,6 +41,10 @@ interface RichTextEditorProps {
   placeholder?: string;
   /** Unique key to force re-mount when content changes externally (e.g., template load) */
   contentKey?: string | number;
+  /** Recipient name for AI context */
+  recipientName?: string;
+  /** Email subject for AI context */
+  subject?: string;
 }
 
 const TOOLBAR_BUTTON_CLASS =
@@ -48,10 +54,18 @@ const ACTIVE_BUTTON_CLASS =
 
 const DIVIDER = <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-gray-700" />;
 
-export function RichTextEditor({ value, onChange, placeholder, contentKey }: RichTextEditorProps) {
+export function RichTextEditor({
+  value,
+  onChange,
+  placeholder,
+  contentKey,
+  recipientName,
+  subject,
+}: RichTextEditorProps) {
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showAIPopover, setShowAIPopover] = useState(false);
   const isInternalUpdate = useRef(false);
   const lastSyncedValue = useRef<string | null>(null);
 
@@ -378,6 +392,27 @@ export function RichTextEditor({ value, onChange, placeholder, contentKey }: Ric
         >
           <RemoveFormatting className="h-4 w-4" />
         </button>
+
+        {DIVIDER}
+
+        {/* AI Compose */}
+        <div className="relative">
+          <button
+            onClick={() => setShowAIPopover(!showAIPopover)}
+            className={`${TOOLBAR_BUTTON_CLASS} text-brand-gold hover:bg-brand-gold/10`}
+            title="AI Write"
+          >
+            <Sparkles className="h-4 w-4" />
+          </button>
+          <AIComposePopover
+            open={showAIPopover}
+            onClose={() => setShowAIPopover(false)}
+            onInsert={(html) => editor.chain().focus().insertContent(html).run()}
+            onReplace={(html) => editor.chain().focus().clearContent().insertContent(html).run()}
+            recipientName={recipientName}
+            subject={subject}
+          />
+        </div>
       </div>
 
       {/* Editor */}

@@ -49,6 +49,47 @@ export async function exportToPDF({
 
   document.body.appendChild(clone);
 
+  // --- BEGIN PAGE BREAK LOGIC ---
+  const A4_ASPECT_RATIO = 297 / 210;
+  const cloneWidthPx = parseFloat(width) || 1024;
+  const domPageHeight = cloneWidthPx * A4_ASPECT_RATIO;
+
+  const avoidElements = clone.querySelectorAll('.break-inside-avoid');
+
+  avoidElements.forEach((el) => {
+    const cloneRect = clone.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    const elTop = rect.top - cloneRect.top;
+    const elBottom = rect.bottom - cloneRect.top;
+
+    const startPage = Math.floor(elTop / domPageHeight);
+    const endPage = Math.floor(elBottom / domPageHeight);
+
+    if (startPage !== endPage) {
+      // Add +20 to shift amount to account for any floating point rounding errors
+      const shiftAmount = (startPage + 1) * domPageHeight - elTop + 20;
+
+      if (el.tagName.toLowerCase() === 'tr') {
+        const spacer = document.createElement('tr');
+        spacer.className = 'page-break-spacer';
+        const td = document.createElement('td');
+        td.colSpan = 99;
+        td.style.border = 'none';
+        td.style.padding = '0';
+        td.style.margin = '0';
+        const div = document.createElement('div');
+        div.style.height = `${shiftAmount}px`;
+        td.appendChild(div);
+        spacer.appendChild(td);
+        el.parentNode?.insertBefore(spacer, el);
+      } else {
+        const currentMargin = parseFloat(window.getComputedStyle(el).marginTop) || 0;
+        (el as HTMLElement).style.marginTop = `${currentMargin + shiftAmount}px`;
+      }
+    }
+  });
+  // --- END PAGE BREAK LOGIC ---
+
   try {
     await Promise.all(imagePromises);
 
@@ -90,7 +131,7 @@ export async function exportToPDF({
     pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightMM);
     heightLeft -= pdfHeight;
 
-    while (heightLeft > 0) {
+    while (heightLeft > 1) {
       position = heightLeft - imgHeightMM; // This shifts the image up for the next page
       pdf.addPage();
       pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightMM);

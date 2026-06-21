@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { FileEdit, Search, X, Loader2, Clock, Trash2, Edit3 } from 'lucide-react';
+import { FileEdit, Search, X, Loader2, Clock, Trash2, Edit3, Sparkles } from 'lucide-react';
 import type { DraftData } from './types';
 import { formatTime } from './helpers';
 import { useDrafts } from './hooks/useDrafts';
@@ -11,9 +11,10 @@ import { containerVariants, itemVariants } from './sections/constants';
 
 interface DraftsTabProps {
   onOpenDraft: (draft: DraftData) => void;
+  onImproveDraft?: (draft: DraftData) => void;
 }
 
-export function DraftsTab({ onOpenDraft }: DraftsTabProps) {
+export function DraftsTab({ onOpenDraft, onImproveDraft }: DraftsTabProps) {
   const { drafts, loading, refreshDrafts, deleteDraft } = useDrafts();
   const [search, setSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
@@ -161,6 +162,18 @@ export function DraftsTab({ onOpenDraft }: DraftsTabProps) {
                     >
                       Open
                     </button>
+                    {onImproveDraft && draft.html && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onImproveDraft(draft);
+                        }}
+                        className="border-brand-gold/20 bg-brand-gold/10 text-brand-gold hover:border-brand-gold/30 hover:bg-brand-gold/20 rounded-lg border px-2 py-1.5 text-[11px] font-medium transition-all"
+                        title="Improve with AI"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                      </button>
+                    )}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
