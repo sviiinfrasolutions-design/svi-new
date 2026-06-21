@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.scheduled_emails (
 
 ALTER TABLE public.scheduled_emails ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can manage scheduled emails" ON public.scheduled_emails;
 CREATE POLICY "Admins can manage scheduled emails" 
   ON public.scheduled_emails 
   FOR ALL 
@@ -39,6 +40,7 @@ CREATE TABLE IF NOT EXISTS public.email_attachments (
 
 ALTER TABLE public.email_attachments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can manage email attachments" ON public.email_attachments;
 CREATE POLICY "Admins can manage email attachments" 
   ON public.email_attachments 
   FOR ALL 

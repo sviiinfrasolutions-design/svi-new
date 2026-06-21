@@ -82,49 +82,106 @@ export function getDomainStatusColor(status: string) {
   }
 }
 
-// ─── Draft Save/Load ───────────────────────────────────────
-const DRAFT_KEY = 'svi-email-draft';
-const DRAFTS_KEY = 'svi-email-drafts';
+// ─── Draft Save/Load (Supabase) ────────────────────────────
 
-// Migration helper: move old single draft to new drafts array
-function migrateDraftIfNeeded(): void {
+function rowToDraftData(row: Record<string, unknown>): DraftData {
+  return {
+    id: row.id,
+    to: row.to_emails || '',
+    cc: row.cc_emails || '',
+    bcc: row.bcc_emails || '',
+    subject: row.subject || '',
+    html: row.html_body || '',
+    replyTo: row.reply_to || '',
+    fromName: row.from_name || 'SVI Infra',
+    savedAt: new Date(row.updated_at || row.created_at).getTime(),
+  };
+}
+
+function draftDataToRow(draft: {
+  to: string;
+  cc: string;
+  bcc: string;
+  subject: string;
+  html: string;
+  replyTo: string;
+  fromName: string;
+  isCurrent?: boolean;
+  userId?: string;
+}) {
+  const row: Record<string, unknown> = {
+    to_emails: draft.to,
+    cc_emails: draft.cc,
+    bcc_emails: draft.bcc,
+    subject: draft.subject,
+    html_body: draft.html,
+    reply_to: draft.replyTo,
+    from_name: draft.fromName,
+    is_current: draft.isCurrent ?? false,
+    updated_at: new Date().toISOString(),
+  };
+  if (draft.userId) row.user_id = draft.userId;
+  return row;
+}
+
+async function getUserId(): Promise<string | null> {
+  const { data } = await supabase.auth.getUser();
+  return data.user?.id || null;
+}
+
+// Migrate localStorage drafts to Supabase once
+async function migrateLocalDrafts(): Promise<void> {
   try {
-    const oldRaw = localStorage.getItem(DRAFT_KEY);
-    const newRaw = localStorage.getItem(DRAFTS_KEY);
-    if (oldRaw && !newRaw) {
-      const oldDraft = JSON.parse(oldRaw);
-      const draft: DraftData = {
-        id: 'migrated-' + Date.now(),
-        to: oldDraft.to || '',
-        cc: oldDraft.cc || '',
-        bcc: oldDraft.bcc || '',
-        subject: oldDraft.subject || '',
-        html: oldDraft.html || '',
-        replyTo: oldDraft.replyTo || '',
-        fromName: oldDraft.fromName || 'SVI Infra',
-        savedAt: oldDraft.savedAt || Date.now(),
-      };
-      localStorage.setItem(DRAFTS_KEY, JSON.stringify([draft]));
-      localStorage.removeItem(DRAFT_KEY);
+    const raw = localStorage.getItem('svi-email-drafts');
+    if (!raw) return;
+    const userId = await getUserId();
+    if (!userId) return;
+
+    const localDrafts: DraftData[] = JSON.parse(raw);
+    if (!Array.isArray(localDrafts) || localDrafts.length === 0) return;
+
+    for (const d of localDrafts) {
+      const row = draftDataToRow({ ...d, isCurrent: d.id === 'current', userId });
+      await supabase.from('email_drafts').upsert(row, {
+        onConflict: undefined,
+        ignoreDuplicates: false,
+      });
     }
+    localStorage.removeItem('svi-email-drafts');
+    localStorage.removeItem('svi-email-draft');
   } catch {
-    // ignore migration errors
+    // migration best-effort
   }
 }
 
-export function getAllDrafts(): DraftData[] {
-  migrateDraftIfNeeded();
-  try {
-    const raw = localStorage.getItem(DRAFTS_KEY);
-    if (!raw) return [];
-    const drafts = JSON.parse(raw);
-    return Array.isArray(drafts) ? drafts : [];
-  } catch {
+let migrationDone = false;
+
+async function ensureMigrated(): Promise<void> {
+  if (migrationDone) return;
+  migrationDone = true;
+  await migrateLocalDrafts();
+}
+
+export async function getAllDrafts(): Promise<DraftData[]> {
+  await ensureMigrated();
+  const userId = await getUserId();
+  if (!userId) return [];
+
+  const { data, error } = await supabase
+    .from('email_drafts')
+    .select('*')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false });
+
+  if (error || !data) {
+    console.error('Failed to load drafts:', error);
     return [];
   }
+
+  return data.map(rowToDraftData);
 }
 
-export function saveDraft(draft: {
+export async function saveDraft(draft: {
   to: string;
   cc: string;
   bcc: string;
@@ -132,58 +189,92 @@ export function saveDraft(draft: {
   html: string;
   replyTo: string;
   fromName: string;
-}): boolean {
-  try {
-    const drafts = getAllDrafts();
-    const idx = drafts.findIndex((d) => d.id === 'current');
-    const newDraft: DraftData = {
-      id: 'current',
-      ...draft,
-      savedAt: Date.now(),
-    };
-    if (idx >= 0) {
-      drafts[idx] = newDraft;
-    } else {
-      drafts.unshift(newDraft);
+}): Promise<boolean> {
+  const userId = await getUserId();
+  if (!userId) return false;
+
+  const row = draftDataToRow({ ...draft, isCurrent: true });
+
+  // Try update first (current draft exists)
+  const { data: existing, error: fetchError } = await supabase
+    .from('email_drafts')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('is_current', true)
+    .maybeSingle();
+
+  if (fetchError) {
+    console.error('Failed to check draft:', fetchError);
+    return false;
+  }
+
+  if (existing) {
+    // Update existing current draft
+    const { error: updateError } = await supabase
+      .from('email_drafts')
+      .update(row)
+      .eq('id', existing.id);
+
+    if (updateError) {
+      console.error('Failed to update draft:', updateError);
+      return false;
     }
-    localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
-    return true;
-  } catch {
-    return false;
+  } else {
+    // Insert new current draft
+    const { error: insertError } = await supabase
+      .from('email_drafts')
+      .insert({ ...row, user_id: userId });
+
+    if (insertError) {
+      console.error('Failed to insert draft:', insertError);
+      return false;
+    }
   }
+
+  return true;
 }
 
-export function loadDraft(): DraftData | null {
-  try {
-    const drafts = getAllDrafts();
-    return drafts.find((d) => d.id === 'current') || null;
-  } catch {
+export async function loadDraft(): Promise<DraftData | null> {
+  await ensureMigrated();
+  const userId = await getUserId();
+  if (!userId) return null;
+
+  const { data, error } = await supabase
+    .from('email_drafts')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_current', true)
+    .maybeSingle();
+
+  if (error || !data) {
     return null;
   }
+
+  return rowToDraftData(data);
 }
 
-export function clearDraft(): void {
-  try {
-    const drafts = getAllDrafts();
-    const filtered = drafts.filter((d) => d.id !== 'current');
-    localStorage.setItem(DRAFTS_KEY, JSON.stringify(filtered));
-  } catch {
-    // ignore
-  }
+export async function clearDraft(): Promise<void> {
+  const userId = await getUserId();
+  if (!userId) return;
+
+  await supabase.from('email_drafts').delete().eq('user_id', userId).eq('is_current', true);
 }
 
-export function deleteDraft(id: string): boolean {
-  try {
-    const drafts = getAllDrafts();
-    const filtered = drafts.filter((d) => d.id !== id);
-    localStorage.setItem(DRAFTS_KEY, JSON.stringify(filtered));
-    return true;
-  } catch {
+export async function deleteDraft(id: string): Promise<boolean> {
+  const userId = await getUserId();
+  if (!userId) return false;
+
+  // Allow deleting 'current' via this too
+  const { error } = await supabase.from('email_drafts').delete().eq('id', id).eq('user_id', userId);
+
+  if (error) {
+    console.error('Failed to delete draft:', error);
     return false;
   }
+  return true;
 }
 
-export function saveNewDraft(draft: {
+export async function saveNewDraft(draft: {
   to: string;
   cc: string;
   bcc: string;
@@ -191,20 +282,24 @@ export function saveNewDraft(draft: {
   html: string;
   replyTo: string;
   fromName: string;
-}): DraftData | null {
-  try {
-    const drafts = getAllDrafts();
-    const newDraft: DraftData = {
-      id: crypto.randomUUID(),
-      ...draft,
-      savedAt: Date.now(),
-    };
-    drafts.push(newDraft);
-    localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
-    return newDraft;
-  } catch {
+}): Promise<DraftData | null> {
+  const userId = await getUserId();
+  if (!userId) return null;
+
+  const row = draftDataToRow({ ...draft, isCurrent: false });
+
+  const { data, error } = await supabase
+    .from('email_drafts')
+    .insert({ ...row, user_id: userId })
+    .select()
+    .single();
+
+  if (error || !data) {
+    console.error('Failed to save new draft:', error);
     return null;
   }
+
+  return rowToDraftData(data);
 }
 
 // ─── Forward / Reply HTML Builders ──────────────────────────

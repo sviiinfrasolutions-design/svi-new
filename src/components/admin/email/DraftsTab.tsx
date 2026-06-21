@@ -32,7 +32,7 @@ export function DraftsTab({ onOpenDraft }: DraftsTabProps) {
   const handleDelete = async (id: string) => {
     setDeleting(true);
     try {
-      deleteDraft(id);
+      await deleteDraft(id);
       setConfirmDelete(null);
     } finally {
       setDeleting(false);

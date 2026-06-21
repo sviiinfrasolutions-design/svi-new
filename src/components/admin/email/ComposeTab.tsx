@@ -70,8 +70,9 @@ export function ComposeTab({
 
   // Load saved draft on mount
   useEffect(() => {
-    const saved = loadDraft();
-    if (saved && saved.to) setHasDraft(true);
+    loadDraft().then((saved) => {
+      if (saved && saved.to) setHasDraft(true);
+    });
   }, []);
 
   // Apply forward/reply prefills
@@ -543,15 +544,15 @@ export function ComposeTab({
   useEffect(() => {
     if (!to && !subject && !html) return;
     const timer = setInterval(() => {
-      saveDraft({ to, cc, bcc, subject, html, replyTo, fromName });
+      saveDraft({ to, cc, bcc, subject, html, replyTo, fromName }).then();
       setDraftSaved(true);
       setTimeout(() => setDraftSaved(false), 2000);
     }, 5000);
     return () => clearInterval(timer);
   }, [to, cc, bcc, subject, html, replyTo, fromName]);
 
-  const restoreDraft = () => {
-    const saved = loadDraft();
+  const restoreDraft = async () => {
+    const saved = await loadDraft();
     if (saved) {
       setTo(saved.to || '');
       setCc(saved.cc || '');
@@ -651,7 +652,7 @@ export function ComposeTab({
         toast.error(data.error || 'Failed to send email');
       } else {
         setSent(true);
-        clearDraft();
+        await clearDraft();
         toast.success('Email sent successfully');
         setTimeout(() => {
           setSent(false);
@@ -675,7 +676,7 @@ export function ComposeTab({
     }
   };
 
-  const discardAll = () => {
+  const discardAll = async () => {
     setTo('');
     setCc('');
     setBcc('');
@@ -688,7 +689,7 @@ export function ComposeTab({
     setAttachments([]);
     setInReplyToMessageId(null);
     setScheduledAt(null);
-    clearDraft();
+    await clearDraft();
   };
 
   return (
@@ -716,8 +717,8 @@ export function ComposeTab({
                 Restore
               </button>
               <button
-                onClick={() => {
-                  clearDraft();
+                onClick={async () => {
+                  await clearDraft();
                   setHasDraft(false);
                 }}
                 className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/5"

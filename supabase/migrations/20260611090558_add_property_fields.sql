@@ -36,7 +36,7 @@ CREATE POLICY "Admins can modify project images"
     USING (public.is_admin());
 
 -- Notify PostgREST to reload schema
-NOTIFY pgrst, reload_schema;
+NOTIFY pgrst, 'reload schema';
 
 CREATE TABLE IF NOT EXISTS public.faqs (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -61,4 +61,4 @@ CREATE POLICY "Admins can modify faqs"
     ON public.faqs FOR ALL
     USING (public.is_admin());
 
-NOTIFY pgrst, reload_schema;
+NOTIFY pgrst, 'reload schema';

@@ -9,7 +9,7 @@ interface UseDraftsReturn {
   drafts: DraftData[];
   loading: boolean;
   refreshDrafts: () => void;
-  deleteDraft: (id: string) => boolean;
+  deleteDraft: (id: string) => Promise<boolean>;
   openDraft: (id: string) => DraftData | null;
 }
 
@@ -19,26 +19,26 @@ export function useDrafts(): UseDraftsReturn {
 
   const refreshDrafts = useCallback(() => {
     setLoading(true);
-    try {
-      const allDrafts = getAllDrafts();
-      // Filter out the 'current' draft (auto-saved) if you want to show only saved drafts?
-      // For now, show all drafts including current.
-      setDrafts(allDrafts);
-    } catch (error) {
-      console.error('Failed to load drafts:', error);
-      toast.error('Failed to load drafts');
-    } finally {
-      setLoading(false);
-    }
+    getAllDrafts()
+      .then((allDrafts) => {
+        setDrafts(allDrafts);
+      })
+      .catch((error) => {
+        console.error('Failed to load drafts:', error);
+        toast.error('Failed to load drafts');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
     refreshDrafts();
   }, [refreshDrafts]);
 
-  const deleteDraft = useCallback((id: string): boolean => {
+  const deleteDraft = useCallback(async (id: string): Promise<boolean> => {
     try {
-      const success = deleteDraftHelper(id);
+      const success = await deleteDraftHelper(id);
       if (success) {
         setDrafts((prev) => prev.filter((d) => d.id !== id));
         toast.success('Draft deleted');

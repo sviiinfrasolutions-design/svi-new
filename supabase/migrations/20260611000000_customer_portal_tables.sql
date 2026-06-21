@@ -4,7 +4,7 @@
 
 -- 1. Allotments Table (Customer Properties)
 CREATE TABLE IF NOT EXISTS public.allotments (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   property_id uuid not null references public.properties(id) on delete restrict,
   unit_no text not null,
@@ -49,7 +49,7 @@ CREATE TRIGGER allotments_updated_at
 
 -- 2. Payment Schedules Table
 CREATE TABLE IF NOT EXISTS public.payment_schedules (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   allotment_id uuid not null references public.allotments(id) on delete cascade,
   user_id uuid not null references public.profiles(id) on delete cascade,
   title text not null, -- E.g., 'Booking Amount', '1st Installment'
