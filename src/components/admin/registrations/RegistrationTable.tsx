@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo } from 'react';
 import {
   Users,
   Star,
@@ -10,34 +11,39 @@ import {
   Mail,
   FileText,
   Receipt,
+  MoreVertical,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  AlertCircle,
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import * as Tooltip from '@radix-ui/react-tooltip';
+
 import { STATUS_OPTIONS } from './types';
 import type { Registration } from './types';
+
+// ==========================================
+// Sub-components
+// ==========================================
 
 function TableSkeleton() {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full animate-pulse text-sm">
+      <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50/50 dark:bg-white/2">
+          <tr className="border-b border-gray-200 bg-gray-50/50 dark:bg-white/5">
             <th className="w-10 px-4 py-4"></th>
-            {[
-              'Submission ID',
-              'Name',
-              'Email',
-              'Phone',
-              'Project',
-              'Advisor',
-              'Status',
-              'Date',
-              'Actions',
-            ].map((h) => (
-              <th
-                key={h}
-                className="px-6 py-4 text-left text-[9px] font-bold tracking-widest text-gray-400 uppercase"
-              >
-                <div className="h-3 w-16 rounded bg-gray-200 dark:bg-white/5" />
+            {[...Array(8)].map((_, i) => (
+              <th key={i} className="px-6 py-4 text-left">
+                <div className="h-3 w-16 animate-pulse rounded bg-gray-200 dark:bg-white/10" />
               </th>
             ))}
           </tr>
@@ -46,9 +52,9 @@ function TableSkeleton() {
           {[...Array(6)].map((_, i) => (
             <tr key={i}>
               <td className="px-4 py-4.5"></td>
-              {[...Array(9)].map((__, j) => (
+              {[...Array(8)].map((__, j) => (
                 <td key={j} className="px-6 py-4.5">
-                  <div className="h-4 w-20 rounded bg-gray-200 dark:bg-white/5" />
+                  <div className="h-4 w-20 animate-pulse rounded bg-gray-200 dark:bg-white/5" />
                 </td>
               ))}
             </tr>
@@ -69,14 +75,24 @@ function EmptyState({
   onClear: () => void;
 }) {
   return (
-    <div className="py-24 text-center">
-      <Users className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-700" />
-      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-        {hasSearch || hasFilters ? 'No matches found.' : 'No registrations yet.'}
+    <div className="flex flex-col items-center justify-center py-24 text-center">
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5">
+        <Users className="h-8 w-8 text-gray-400 dark:text-gray-600" />
+      </div>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        {hasSearch || hasFilters ? 'No matches found' : 'No registrations yet'}
+      </h3>
+      <p className="mt-1 max-w-sm text-sm text-gray-500 dark:text-gray-400">
+        {hasSearch || hasFilters
+          ? 'Try adjusting your search query or removing some filters to find what you are looking for.'
+          : 'When new property registrations are submitted, they will appear here.'}
       </p>
       {(hasSearch || hasFilters) && (
-        <button onClick={onClear} className="text-brand-gold mt-2 text-xs underline">
-          Clear filters
+        <button
+          onClick={onClear}
+          className="bg-brand-gold hover:bg-brand-gold/90 mt-6 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors"
+        >
+          Clear all filters
         </button>
       )}
     </div>
@@ -91,21 +107,83 @@ function StarButton({
   onToggle: (e: React.MouseEvent) => void;
 }) {
   return (
-    <button
-      onClick={onToggle}
-      className="flex items-center justify-center text-gray-300 transition-colors hover:text-amber-500"
-      title={isImportant ? 'Important (starred)' : 'Mark as important'}
-    >
-      <Star
-        className={`h-4.5 w-4.5 transition-all ${
-          isImportant
-            ? 'scale-110 fill-amber-500 text-amber-500'
-            : 'hover:scale-110 hover:text-amber-400'
-        }`}
-      />
-    </button>
+    <Tooltip.Provider delayDuration={200}>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
+          <button
+            onClick={onToggle}
+            className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-gray-100 dark:hover:bg-white/10"
+          >
+            <Star
+              className={`h-4.5 w-4.5 transition-all duration-300 ${
+                isImportant
+                  ? 'scale-110 fill-amber-500 text-amber-500 drop-shadow-md'
+                  : 'text-gray-300 hover:scale-110 hover:text-amber-400 dark:text-gray-600'
+              }`}
+            />
+          </button>
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content
+            className="animate-in fade-in zoom-in-95 z-50 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 shadow-md dark:border-white/10 dark:bg-gray-900 dark:text-white"
+            sideOffset={5}
+          >
+            {isImportant ? 'Unmark important' : 'Mark as important'}
+            <Tooltip.Arrow className="fill-white dark:fill-gray-900" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   );
 }
+
+const StatusBadge = ({ status }: { status: string }) => {
+  const getStatusStyles = () => {
+    switch (status.toLowerCase()) {
+      case 'approved':
+      case 'completed':
+        return 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20';
+      case 'pending':
+        return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20';
+      case 'rejected':
+      case 'cancelled':
+        return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
+    }
+  };
+
+  const getIcon = () => {
+    switch (status.toLowerCase()) {
+      case 'approved':
+      case 'completed':
+        return <CheckCircle2 className="mr-1 h-3 w-3" />;
+      case 'pending':
+        return <Clock className="mr-1 h-3 w-3" />;
+      case 'rejected':
+      case 'cancelled':
+        return <XCircle className="mr-1 h-3 w-3" />;
+      default:
+        return <AlertCircle className="mr-1 h-3 w-3" />;
+    }
+  };
+
+  const option = STATUS_OPTIONS.find((s) => s.value === status);
+  const label = option ? option.label : status;
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide uppercase shadow-sm ${getStatusStyles()}`}
+    >
+      {getIcon()}
+      {label}
+    </span>
+  );
+};
+
+// ==========================================
+// Main Component
+// ==========================================
 
 interface RegistrationTableProps {
   registrations: Registration[];
@@ -125,6 +203,8 @@ interface RegistrationTableProps {
   onPageChange: (page: number) => void;
 }
 
+const columnHelper = createColumnHelper<Registration>();
+
 export function RegistrationTable({
   registrations,
   loading,
@@ -142,160 +222,257 @@ export function RegistrationTable({
   onClearFilters,
   onPageChange,
 }: RegistrationTableProps) {
+  // Define columns using useMemo to prevent recreation
+  const columns = useMemo(
+    () => [
+      columnHelper.display({
+        id: 'star',
+        header: '',
+        cell: (info) => {
+          const reg = info.row.original;
+          return (
+            <div className="flex justify-center">
+              <StarButton isImportant={reg.is_important} onToggle={() => onStarToggle(reg)} />
+            </div>
+          );
+        },
+        size: 50,
+      }),
+      columnHelper.accessor('submission_id', {
+        header: 'ID',
+        cell: (info) =>
+          info.getValue() ? (
+            <span className="bg-brand-gold/10 text-brand-gold inline-flex items-center rounded-md px-2 py-0.5 font-mono text-xs font-bold tracking-wider">
+              {info.getValue()}
+            </span>
+          ) : (
+            <span className="text-xs text-gray-400">—</span>
+          ),
+      }),
+      columnHelper.accessor('name', {
+        header: 'Applicant',
+        cell: (info) => {
+          const reg = info.row.original;
+          return (
+            <div>
+              <div className="font-semibold tracking-wide text-gray-900 dark:text-white">
+                {reg.name} {reg.last_name || ''}
+              </div>
+              <div className="mt-0.5 flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-gray-500">{reg.email}</span>
+                <span className="text-[10px] text-gray-400">{reg.phone}</span>
+              </div>
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor('project', {
+        header: 'Project / Advisor',
+        cell: (info) => {
+          const reg = info.row.original;
+          return (
+            <div>
+              <div className="text-brand-gold dark:text-brand-gold/90 font-semibold">
+                {reg.project || reg.property_interest || '—'}
+              </div>
+              <div className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500">
+                <Users className="h-3 w-3" />
+                {reg.advisor_name || 'Direct'}
+              </div>
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor('status', {
+        header: 'Status',
+        cell: (info) => {
+          const reg = info.row.original;
+          return (
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className="focus:ring-brand-gold/50 rounded-full ring-offset-2 ring-offset-white outline-none focus:ring-2 dark:ring-offset-[#111118]">
+                  <StatusBadge status={reg.status} />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  className="animate-in fade-in zoom-in-95 z-50 min-w-[140px] rounded-xl border border-gray-200 bg-white p-1.5 shadow-xl dark:border-white/10 dark:bg-[#1a1a24]"
+                  sideOffset={8}
+                >
+                  <DropdownMenu.Label className="px-2 py-1.5 text-[10px] font-semibold tracking-wider text-gray-500 uppercase">
+                    Update Status
+                  </DropdownMenu.Label>
+                  {STATUS_OPTIONS.map((status) => (
+                    <DropdownMenu.Item
+                      key={status.value}
+                      onClick={() => onStatusChange(reg.id, status.value)}
+                      className="group relative flex cursor-pointer items-center rounded-md px-2 py-2 text-xs font-medium text-gray-700 outline-none select-none hover:bg-gray-100 hover:text-gray-900 data-[highlighted]:bg-gray-100 data-[highlighted]:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white dark:data-[highlighted]:bg-white/5 dark:data-[highlighted]:text-white"
+                    >
+                      <div
+                        className={`mr-2 h-2 w-2 rounded-full ${
+                          status.value === 'Approved'
+                            ? 'bg-emerald-500'
+                            : status.value === 'Pending'
+                              ? 'bg-amber-500'
+                              : status.value === 'Rejected'
+                                ? 'bg-red-500'
+                                : 'bg-gray-400'
+                        }`}
+                      />
+                      {status.label}
+                    </DropdownMenu.Item>
+                  ))}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+          );
+        },
+      }),
+      columnHelper.accessor('created_at', {
+        header: 'Date',
+        cell: (info) => (
+          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+            {new Date(info.getValue()).toLocaleDateString('en-IN', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            })}
+          </span>
+        ),
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: '',
+        cell: (info) => {
+          const reg = info.row.original;
+          return (
+            <div className="flex justify-end">
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <button className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none dark:hover:bg-white/10 dark:hover:text-white">
+                    <MoreVertical className="h-4.5 w-4.5" />
+                  </button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    className="animate-in fade-in zoom-in-95 z-50 min-w-[180px] rounded-xl border border-gray-200 bg-white p-1.5 shadow-xl dark:border-white/10 dark:bg-[#1a1a24]"
+                    sideOffset={8}
+                    align="end"
+                  >
+                    <DropdownMenu.Item
+                      onClick={() => onView(reg)}
+                      className="group flex cursor-pointer items-center rounded-md px-2 py-2 text-xs font-medium text-gray-700 outline-none select-none hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5"
+                    >
+                      <Eye className="group-hover:text-brand-gold mr-2 h-4 w-4 text-gray-400" />
+                      View Details
+                    </DropdownMenu.Item>
+
+                    <DropdownMenu.Separator className="my-1 h-px bg-gray-100 dark:bg-white/5" />
+                    <DropdownMenu.Label className="px-2 py-1 text-[9px] font-semibold tracking-wider text-gray-400 uppercase">
+                      Generate Documents
+                    </DropdownMenu.Label>
+
+                    <DropdownMenu.Item
+                      onClick={() => {
+                        sessionStorage.setItem('allotmentPrefillRegistration', JSON.stringify(reg));
+                        window.location.href = '/admin/allotment-letter?prefillRegistration=true';
+                      }}
+                      className="group flex cursor-pointer items-center rounded-md px-2 py-2 text-xs font-medium text-gray-700 outline-none select-none hover:bg-blue-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
+                    >
+                      <FileText className="mr-2 h-4 w-4" />
+                      Allotment Letter
+                    </DropdownMenu.Item>
+
+                    <DropdownMenu.Item
+                      onClick={() => {
+                        sessionStorage.setItem('receiptPrefillRegistration', JSON.stringify(reg));
+                        window.location.href = '/admin/payment-receipt?prefillRegistration=true';
+                      }}
+                      className="group flex cursor-pointer items-center rounded-md px-2 py-2 text-xs font-medium text-gray-700 outline-none select-none hover:bg-green-50 hover:text-green-600 dark:text-gray-300 dark:hover:bg-green-500/10 dark:hover:text-green-400"
+                    >
+                      <Receipt className="mr-2 h-4 w-4" />
+                      Payment Receipt
+                    </DropdownMenu.Item>
+
+                    <DropdownMenu.Item
+                      onClick={() => {
+                        sessionStorage.setItem('emailPrefillRegistration', JSON.stringify(reg));
+                        window.location.href = '/admin/email?tab=compose&prefillRegistration=true';
+                      }}
+                      className="group flex cursor-pointer items-center rounded-md px-2 py-2 text-xs font-medium text-gray-700 outline-none select-none hover:bg-purple-50 hover:text-purple-600 dark:text-gray-300 dark:hover:bg-purple-500/10 dark:hover:text-purple-400"
+                    >
+                      <Mail className="mr-2 h-4 w-4" />
+                      Send Email
+                    </DropdownMenu.Item>
+
+                    <DropdownMenu.Separator className="my-1 h-px bg-gray-100 dark:bg-white/5" />
+                    <DropdownMenu.Item
+                      onClick={() => onDelete(reg)}
+                      className="group flex cursor-pointer items-center rounded-md px-2 py-2 text-xs font-medium text-red-600 outline-none select-none hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete Record
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            </div>
+          );
+        },
+      }),
+    ],
+    [onStarToggle, onStatusChange, onView, onDelete]
+  );
+
+  const table = useReactTable({
+    data: registrations,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
-    <div className="dark:bg-brand-dark-surface/65 relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 shadow-2xl backdrop-blur-xl dark:border-white/8">
-      <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[1.5px] bg-gradient-to-r from-transparent to-transparent" />
+    <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/90 shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-[#111118]/80">
+      {/* Decorative top border */}
+      <div className="via-brand-gold/50 absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent to-transparent" />
 
       {loading ? (
         <TableSkeleton />
       ) : registrations.length === 0 ? (
         <EmptyState hasFilters={hasFilters} hasSearch={hasSearch} onClear={onClearFilters} />
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="dark:border-brand-gold/15 border-b border-gray-200 bg-gray-50/50 dark:bg-white/2">
-                <th className="w-10 px-4 py-4"></th>
-                {[
-                  'Submission ID',
-                  'Name',
-                  'Email',
-                  'Phone',
-                  'Project',
-                  'Advisor',
-                  'Status',
-                  'Date',
-                  'Actions',
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="px-6 py-4 text-left text-[9px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {registrations.map((reg, i) => (
-                <motion.tr
-                  key={reg.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.02, duration: 0.4 }}
-                  className="group border-b border-gray-100 transition-colors hover:bg-gray-50 dark:border-white/5 dark:hover:bg-[#111118]/60"
-                >
-                  <td className="px-4 py-4.5 text-center">
-                    <StarButton
-                      isImportant={reg.is_important}
-                      onToggle={(e) => {
-                        e.stopPropagation();
-                        onStarToggle(reg);
-                      }}
-                    />
-                  </td>
-                  <td className="px-6 py-4.5">
-                    {reg.submission_id ? (
-                      <span className="bg-brand-gold/10 text-brand-gold inline-flex items-center rounded-md px-2 py-0.5 font-mono text-xs font-bold tracking-wider">
-                        {reg.submission_id}
-                      </span>
-                    ) : (
-                      <span className="text-xs text-gray-400">—</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4.5">
-                    <div className="font-semibold tracking-wide text-gray-900 dark:text-white">
-                      {reg.name} {reg.last_name || ''}
-                    </div>
-                    {reg.so_wo_do && (
-                      <div className="mt-0.5 text-xs text-gray-400">{reg.so_wo_do}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4.5 font-medium text-gray-700 dark:text-gray-300">
-                    {reg.email}
-                  </td>
-                  <td className="px-6 py-4.5 text-gray-700 dark:text-gray-300">{reg.phone}</td>
-                  <td className="px-6 py-4.5">
-                    <span className="text-brand-gold/90 font-semibold">
-                      {reg.project || reg.property_interest || '—'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4.5 text-gray-700 dark:text-gray-300">
-                    {reg.advisor_name || '—'}
-                  </td>
-                  <td className="px-6 py-4.5">
-                    <select
-                      value={reg.status}
-                      onChange={(e) => onStatusChange(reg.id, e.target.value)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="focus:border-brand-gold appearance-none rounded border border-transparent bg-transparent px-1 py-0.5 text-[10px] font-bold uppercase outline-none hover:border-gray-200 dark:hover:border-white/10"
+        <div className="no-scrollbar relative max-h-[700px] w-full overflow-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="sticky top-0 z-10 border-b border-gray-200 bg-gray-50/95 backdrop-blur supports-[backdrop-filter]:bg-gray-50/75 dark:border-white/10 dark:bg-[#15151c]/95">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      className="px-6 py-4 text-[10px] font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400"
+                      style={{ width: header.getSize() !== 150 ? header.getSize() : 'auto' }}
                     >
-                      {STATUS_OPTIONS.map((s) => (
-                        <option key={s.value} value={s.value}>
-                          {s.label}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="px-6 py-4.5 text-xs whitespace-nowrap text-gray-500">
-                    {new Date(reg.created_at).toLocaleDateString('en-IN', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </td>
-                  <td className="px-6 py-4.5">
-                    <div className="flex items-center justify-end gap-1.5 opacity-0 transition-all group-hover:opacity-100">
-                      <button
-                        onClick={() => onView(reg)}
-                        className="hover:text-brand-gold hover:bg-brand-gold/10 dark:hover:bg-brand-gold/10 dark:hover:text-brand-gold flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors"
-                        title="View Details"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          sessionStorage.setItem(
-                            'allotmentPrefillRegistration',
-                            JSON.stringify(reg)
-                          );
-                          window.location.href = '/admin/allotment-letter?prefillRegistration=true';
-                        }}
-                        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
-                        title="Generate Document"
-                      >
-                        <FileText className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          sessionStorage.setItem('emailPrefillRegistration', JSON.stringify(reg));
-                          window.location.href =
-                            '/admin/email?tab=compose&prefillRegistration=true';
-                        }}
-                        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-500/10 dark:hover:text-purple-400"
-                        title="Email Client"
-                      >
-                        <Mail className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          sessionStorage.setItem('receiptPrefillRegistration', JSON.stringify(reg));
-                          window.location.href = '/admin/payment-receipt?prefillRegistration=true';
-                        }}
-                        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-500/10 dark:hover:text-green-400"
-                        title="Payment Receipt"
-                      >
-                        <Receipt className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => onDelete(reg)}
-                        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
-                        title="Delete"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+              {table.getRowModel().rows.map((row, i) => (
+                <motion.tr
+                  key={row.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.015, duration: 0.3 }}
+                  className="group transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="px-6 py-4 align-middle">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
                 </motion.tr>
               ))}
             </tbody>
@@ -303,32 +480,29 @@ export function RegistrationTable({
         </div>
       )}
 
-      {/* Pagination */}
+      {/* Pagination Footer */}
       {!loading && total > 0 && (
-        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4 dark:border-white/8">
-          <p className="text-xs text-gray-500">
-            Showing{' '}
-            <span className="font-semibold text-gray-700 dark:text-gray-300">{startItem}</span>
-            {' - '}
-            <span className="font-semibold text-gray-700 dark:text-gray-300">{endItem}</span>
-            {' of '}
-            <span className="font-semibold text-gray-700 dark:text-gray-300">{total}</span>
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-gray-200 bg-gray-50/50 px-6 py-4 sm:flex-row dark:border-white/10 dark:bg-transparent">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+            Showing <span className="font-bold text-gray-900 dark:text-white">{startItem}</span> to{' '}
+            <span className="font-bold text-gray-900 dark:text-white">{endItem}</span> of{' '}
+            <span className="font-bold text-gray-900 dark:text-white">{total}</span> results
           </p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1}
-              className="hover:border-brand-gold hover:text-brand-gold flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10"
+              className="hover:border-brand-gold hover:text-brand-gold dark:hover:border-brand-gold dark:hover:text-brand-gold flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-400"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="min-w-[2rem] text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+            <div className="flex h-9 min-w-[2.5rem] items-center justify-center rounded-lg bg-gray-100 px-3 text-xs font-bold text-gray-900 dark:bg-white/10 dark:text-white">
               {page}
-            </span>
+            </div>
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={!hasMore}
-              className="hover:border-brand-gold hover:text-brand-gold flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10"
+              className="hover:border-brand-gold hover:text-brand-gold dark:hover:border-brand-gold dark:hover:text-brand-gold flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-400"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
