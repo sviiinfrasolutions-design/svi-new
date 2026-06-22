@@ -74,4 +74,4 @@ test-results/
 !.crew/artifacts/
 !.crew/graphs/
 !.crew/artifacts/.gitkeep
-!.crew/graphs/.gitkeep
+!.crew/graphs/.gitkeep.agents/skills/
