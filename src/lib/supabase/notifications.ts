@@ -64,7 +64,10 @@ export async function createNotificationForAllAdmins(
       action_url: params.action_url || null,
       metadata: params.metadata || {},
     }));
-    const { data, error } = await supabaseAdmin.from('notifications').insert(notifications).select();
+    const { data, error } = await supabaseAdmin
+      .from('notifications')
+      .insert(notifications)
+      .select();
     if (error) {
       console.error('Error creating notifications for admins:', error);
       throw error;
@@ -102,7 +105,7 @@ export const NotificationHelper = {
   },
 
   emailDispatchFailed: async (recipient: string, error: string, referenceId: string) => {
-    let eventName = 'email';
+    let eventName: string;
     if (referenceId.startsWith('SVI-')) eventName = 'grievance alert email';
     else if (referenceId.startsWith('SVI2')) eventName = 'registration copy email';
     else eventName = 'contact copy email';
@@ -159,7 +162,12 @@ export const NotificationHelper = {
     });
   },
 
-  attendanceMarked: async (teamName: string, date: string, memberCount: number, adminName: string) => {
+  attendanceMarked: async (
+    teamName: string,
+    date: string,
+    memberCount: number,
+    adminName: string
+  ) => {
     return createNotificationForAllAdmins({
       title: 'Attendance Marked',
       message: `${adminName} marked attendance for ${memberCount} member(s) in ${teamName} on ${date}.`,
@@ -243,7 +251,11 @@ export const NotificationHelper = {
     });
   },
 
-  registrationStatusUpdated: async (registrationId: string, newStatus: string, adminName: string) => {
+  registrationStatusUpdated: async (
+    registrationId: string,
+    newStatus: string,
+    adminName: string
+  ) => {
     return createNotificationForAllAdmins({
       title: 'Registration Status Updated',
       message: `${adminName} changed registration ${registrationId.slice(0, 8)}... status to "${newStatus}".`,
