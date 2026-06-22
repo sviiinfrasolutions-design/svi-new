@@ -75,3 +75,4 @@ test-results/
 !.crew/graphs/
 !.crew/artifacts/.gitkeep
 !.crew/graphs/.gitkeep.agents/skills/
+.agents/
