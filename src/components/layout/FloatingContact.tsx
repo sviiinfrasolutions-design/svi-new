@@ -1,9 +1,9 @@
 'use client';
 
 import { track } from '@vercel/analytics';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Phone, MessageCircle, Calendar, X } from 'lucide-react';
+import { Phone, MessageCircle, Calendar, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { PHONE_HREF, WHATSAPP_URL } from '@/src/lib/constants';
 
@@ -12,9 +12,15 @@ export function FloatingContact() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  const showToast = useCallback((type: 'success' | 'error', msg: string) => {
+    setToast({ type, msg });
+    setTimeout(() => setToast(null), 4000);
   }, []);
 
   if (!isMounted) return null;
@@ -143,9 +149,9 @@ export function FloatingContact() {
 
                     form.reset();
                     setIsModalOpen(false);
-                    alert(t('bookingSuccess'));
+                    showToast('success', t('bookingSuccess'));
                   } catch {
-                    alert(t('bookingError'));
+                    showToast('error', t('bookingError'));
                   } finally {
                     setIsSubmitting(false);
                   }
@@ -227,6 +233,29 @@ export function FloatingContact() {
                 </button>
               </form>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Toast notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className={`fixed right-4 bottom-4 z-[200] flex items-center gap-3 rounded-xl border px-5 py-3.5 text-sm font-semibold shadow-2xl md:right-8 md:bottom-8 ${
+              toast.type === 'success'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-950/95 dark:text-emerald-300'
+                : 'border-red-200 bg-red-50 text-red-600 dark:border-red-500/30 dark:bg-red-950/95 dark:text-red-300'
+            }`}
+          >
+            {toast.type === 'success' ? (
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" />
+            ) : (
+              <AlertCircle className="h-5 w-5 shrink-0 text-red-400" />
+            )}
+            <span>{toast.msg}</span>
           </motion.div>
         )}
       </AnimatePresence>
