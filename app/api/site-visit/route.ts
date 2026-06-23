@@ -1,9 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/src/lib/supabase/admin';
+import { verifyAdmin } from '@/src/lib/supabase/verifyAdmin';
 import { rateLimit } from '@/src/lib/api/rateLimit';
 import { NotificationHelper } from '@/src/lib/supabase/notifications';
 import { AppError, handleApiError } from '@/src/lib/api/errors';
 
+// GET /api/site-visit — list site visit leads
+export async function GET(request: NextRequest) {
+  try {
+    const admin = await verifyAdmin(request);
+    if (!admin) throw AppError.unauthorized();
+
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1);
+    const limit = Math.min(100, parseInt(searchParams.get('limit') || '50') || 50);
+    const offset = (page - 1) * limit;
+
+    const { data, error, count } = await supabaseAdmin
+      .from('chat_leads')
+      .select('*', { count: 'exact' })
+      .eq('source', 'site_visit')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) throw AppError.internal(error.message);
+
+    return NextResponse.json({
+      leads: data,
+      total: count || 0,
+      page,
+      limit,
+      hasMore: (count || 0) > offset + limit,
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// POST /api/site-visit — create site visit lead
 export async function POST(req: NextRequest) {
   try {
     const limited = rateLimit(req, { limit: 3, windowSeconds: 60 });
@@ -50,6 +84,26 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({ success: true, id: data.id }, { status: 201 });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// DELETE /api/site-visit?id=xxx — delete a site visit lead
+export async function DELETE(request: NextRequest) {
+  try {
+    const admin = await verifyAdmin(request);
+    if (!admin) throw AppError.unauthorized();
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) throw AppError.badRequest('id is required');
+
+    const { error } = await supabaseAdmin.from('chat_leads').delete().eq('id', id);
+
+    if (error) throw AppError.internal(error.message);
+
+    return NextResponse.json({ success: true });
   } catch (error) {
     return handleApiError(error);
   }

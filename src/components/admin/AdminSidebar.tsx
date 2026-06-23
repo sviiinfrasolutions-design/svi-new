@@ -4,6 +4,7 @@ import {
   Bell,
   Building2,
   Calculator,
+  Calendar,
   CheckSquare,
   ChevronLeft,
   ChevronRight,
@@ -46,6 +47,7 @@ const documentItems = [
 const managementItems = [
   { name: 'Portal Allotments', path: '/admin/portal-allotments', icon: Building2 },
   { name: 'Registrations', path: '/admin/registrations', icon: ClipboardList },
+  { name: 'Site Visits', path: '/admin/site-visits', icon: Calendar },
   { name: 'Employees', path: '/admin/employees', icon: Users },
   { name: 'Attendance', path: '/admin/attendance', icon: CheckSquare },
   { name: 'Properties', path: '/admin/properties', icon: Building2 },
