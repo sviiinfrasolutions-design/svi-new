@@ -902,6 +902,7 @@
       "showLess": "Show Less",
       "showMore": "Show More ({count} of {total} remaining)",
       "liveCountdown": "Live Draw Countdown",
+      "liveRevealInProgress": "Live reveal in progress",
       "scheduledFor": "Draw scheduled for <time>{date}</time> IST",
       "hrs": "hrs",
       "min": "min",

@@ -902,6 +902,7 @@
       "showLess": "कम दिखाएं",
       "showMore": "और दिखाएं ({count} का {total} शेष)",
       "liveCountdown": "लाइव ड्रा काउंटडाउन",
+      "liveRevealInProgress": "लाइव रिवील प्रगति पर है",
       "scheduledFor": "ड्रॉ <time>{date}</time> IST के लिए निर्धारित है",
       "hrs": "घंटे",
       "min": "मिनट",
