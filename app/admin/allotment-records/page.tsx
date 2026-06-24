@@ -8,7 +8,6 @@ import {
   Trash2,
   Eye,
   Download,
-  Calendar,
   IndianRupee,
   RefreshCw,
   X,
@@ -16,12 +15,15 @@ import {
   TrendingUp,
   Image as ImageIcon,
   Mail,
+  AlertCircle,
+  WifiOff,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { exportToPDF, exportToImage } from '@/src/lib/utils/documentExporter';
 import { supabase } from '@/src/lib/supabase/client';
 import Link from 'next/link';
 import { AllotmentLetterPreview } from '@/src/components/admin/DocumentGenerator/AllotmentLetterPreview';
+import { SkeletonBlock } from '@/src/components/ui/DynamicSkeleton';
 
 interface SavedAllotment {
   id: string;
@@ -48,10 +50,65 @@ interface SavedAllotment {
   };
 }
 
+function StatCardSkeleton() {
+  return (
+    <div className="dark:bg-brand-dark-surface/50 animate-pulse rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-white/5">
+      <div className="flex items-center gap-4">
+        <div className="h-10 w-10 rounded-xl bg-gray-200 dark:bg-white/10" />
+        <div className="space-y-2">
+          <div className="h-3 w-24 rounded bg-gray-200 dark:bg-white/10" />
+          <div className="h-6 w-16 rounded bg-gray-200 dark:bg-white/10" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TableSkeleton() {
+  return (
+    <div className="animate-pulse">
+      {[...Array(6)].map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-4 border-b border-gray-100 px-6 py-4 dark:border-white/5"
+        >
+          <SkeletonBlock className="h-4 w-16" />
+          <SkeletonBlock className="h-4 w-32" />
+          <SkeletonBlock className="h-4 w-28" />
+          <SkeletonBlock className="h-4 w-20" />
+          <SkeletonBlock className="h-4 w-20" />
+          <SkeletonBlock className="h-4 w-24" />
+          <SkeletonBlock className="h-4 w-20" />
+          <SkeletonBlock className="h-4 w-28" />
+          <div className="ml-auto flex gap-1.5">
+            <SkeletonBlock className="h-8 w-8 rounded-md" />
+            <SkeletonBlock className="h-8 w-8 rounded-md" />
+            <SkeletonBlock className="h-8 w-8 rounded-md" />
+            <SkeletonBlock className="h-8 w-8 rounded-md" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const defaultCompanyInfo = {
+  company_name: 'SVI Infra Solutions Pvt. Ltd.',
+  company_address: 'A-61 Sector 65 Noida Uttar Pradesh 201309',
+  company_email: 'info@sviinfrasolutions.com',
+  company_phone: '+91 9216014579',
+  company_website: 'www.sviinfrasolutions.in | www.sviinfrasolutions.com',
+  bank_account_name: 'Svi Infra Solutions Pvt. Ltd',
+  bank_account_no: '0894102000013837',
+  bank_name: 'IDBI BANK',
+  bank_ifsc: 'IBKL0000894',
+};
+
 export default function AllotmentRecordsPage() {
   const { token } = useAuthStore();
   const [allotments, setAllotments] = useState<SavedAllotment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [projectFilter, setProjectFilter] = useState('');
   const [selectedAllotment, setSelectedAllotment] = useState<SavedAllotment | null>(null);
@@ -60,6 +117,7 @@ export default function AllotmentRecordsPage() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
   const [projects, setProjects] = useState<string[]>(['Shyam Aangan', 'Shyam Aangan Farm House']);
+  const [companyInfo, setCompanyInfo] = useState(defaultCompanyInfo);
 
   useEffect(() => {
     async function loadProjects() {
@@ -81,21 +139,10 @@ export default function AllotmentRecordsPage() {
     loadProjects();
   }, []);
 
-  const [companyInfo, setCompanyInfo] = useState({
-    company_name: 'SVI Infra Solutions Pvt. Ltd.',
-    company_address: 'A-61 Sector 65 Noida Uttar Pradesh 201309',
-    company_email: 'info@sviinfrasolutions.com',
-    company_phone: '+91 9216014579',
-    company_website: 'www.sviinfrasolutions.in | www.sviinfrasolutions.com',
-    bank_account_name: 'Svi Infra Solutions Pvt. Ltd',
-    bank_account_no: '0894102000013837',
-    bank_name: 'IDBI BANK',
-    bank_ifsc: 'IBKL0000894',
-  });
-
-  const fetchAllotments = () => {
+  const fetchAllotments = useCallback(() => {
     if (!token) return;
     setLoading(true);
+    setError(null);
     fetch('/api/admin/documents?type=allotment_letter&limit=1000', {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -108,13 +155,16 @@ export default function AllotmentRecordsPage() {
           setAllotments(json.documents);
         }
       })
-      .catch((err) => console.error('Error fetching allotments:', err))
+      .catch((err) => {
+        console.error('Error fetching allotments:', err);
+        setError(err.message || 'Failed to load allotment records');
+      })
       .finally(() => setLoading(false));
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchAllotments();
-  }, [token]);
+  }, [fetchAllotments]);
 
   useEffect(() => {
     if (!token) return;
@@ -138,14 +188,9 @@ export default function AllotmentRecordsPage() {
     const bsp = parseFloat(formData?.bsp) || 0;
     const plc = parseFloat(formData?.plc) || 0;
     const edc = parseFloat(formData?.edc || '0') || 0;
-
     const base = area * bsp;
     const plcAmount = base * (plc / 100);
     return base + plcAmount + edc;
-  };
-
-  const calculateInitialPayment = (formData: SavedAllotment['form_data']) => {
-    return calculateTotalCost(formData) * 0.05;
   };
 
   const formatDateTime = (dateStr: string) => {
@@ -165,7 +210,6 @@ export default function AllotmentRecordsPage() {
     }
   };
 
-  // Statistics calculation
   const totalCount = allotments.length;
   const totalValue = allotments.reduce(
     (sum, r) => sum + (r.form_data ? calculateTotalCost(r.form_data) : 0),
@@ -188,7 +232,7 @@ export default function AllotmentRecordsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
-        fetchAllotments();
+        setAllotments((prev) => prev.filter((a) => a.id !== deleteTarget.id));
         setDeleteTarget(null);
       } else {
         alert('Failed to delete allotment record');
@@ -210,8 +254,6 @@ export default function AllotmentRecordsPage() {
         elementId: 'modalAllotmentPreview',
         filename,
       });
-
-      // Update status to completed in db
       if (selectedAllotment && token) {
         try {
           await fetch(`/api/admin/documents/${selectedAllotment.id}`, {
@@ -272,6 +314,7 @@ export default function AllotmentRecordsPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl font-sans">
+      {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-brand-navy mb-2 font-serif text-3xl tracking-tight dark:text-white">
@@ -283,76 +326,107 @@ export default function AllotmentRecordsPage() {
         </div>
         <button
           onClick={fetchAllotments}
-          className="dark:bg-brand-dark-surface/50 flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:bg-gray-50 dark:border-white/10 dark:hover:bg-white/5"
+          disabled={loading}
+          className="dark:bg-brand-dark-surface/50 flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:bg-gray-50 disabled:opacity-50 dark:border-white/10 dark:hover:bg-white/5"
           title="Refresh List"
         >
-          <RefreshCw className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          <RefreshCw
+            className={`h-4 w-4 text-gray-600 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`}
+          />
         </button>
       </div>
 
       {/* Quick Statistics Cards */}
       <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="dark:bg-brand-dark-surface/50 relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-white/5">
-          <div className="flex items-center gap-4">
-            <div className="bg-brand-gold/10 flex h-10 w-10 items-center justify-center rounded-xl">
-              <FileText className="text-brand-gold h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                Total Letters
-              </p>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{totalCount}</h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="dark:bg-brand-dark-surface/50 relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-white/5">
-          <div className="flex items-center gap-4">
-            <div className="bg-brand-gold/10 flex h-10 w-10 items-center justify-center rounded-xl">
-              <IndianRupee className="text-brand-gold h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                Total Unit Value
-              </p>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                ₹{totalValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-              </h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="dark:bg-brand-dark-surface/50 relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-white/5">
-          <div className="flex items-center gap-4">
-            <div className="bg-brand-gold/10 flex h-10 w-10 items-center justify-center rounded-xl">
-              <TrendingUp className="text-brand-gold h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                Avg Area (Sq.Yds)
-              </p>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {avgArea.toFixed(1)}
-              </h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="dark:bg-brand-dark-surface/50 relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-white/5">
-          <div className="flex items-center gap-4">
-            <div className="bg-brand-gold/10 flex h-10 w-10 items-center justify-center rounded-xl">
-              <Building2 className="text-brand-gold h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                Shyam Aangan
-              </p>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {shyamAanganCount}
-              </h3>
-            </div>
-          </div>
-        </div>
+        {loading ? (
+          <>
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </>
+        ) : (
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0, duration: 0.3 }}
+              className="dark:bg-brand-dark-surface/50 relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-white/5"
+            >
+              <div className="flex items-center gap-4">
+                <div className="bg-brand-gold/10 flex h-10 w-10 items-center justify-center rounded-xl">
+                  <FileText className="text-brand-gold h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                    Total Letters
+                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{totalCount}</h3>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05, duration: 0.3 }}
+              className="dark:bg-brand-dark-surface/50 relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-white/5"
+            >
+              <div className="flex items-center gap-4">
+                <div className="bg-brand-gold/10 flex h-10 w-10 items-center justify-center rounded-xl">
+                  <IndianRupee className="text-brand-gold h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                    Total Unit Value
+                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    ₹{totalValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                  </h3>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.3 }}
+              className="dark:bg-brand-dark-surface/50 relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-white/5"
+            >
+              <div className="flex items-center gap-4">
+                <div className="bg-brand-gold/10 flex h-10 w-10 items-center justify-center rounded-xl">
+                  <TrendingUp className="text-brand-gold h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                    Avg Area (Sq.Yds)
+                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {avgArea.toFixed(1)}
+                  </h3>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.3 }}
+              className="dark:bg-brand-dark-surface/50 relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-md dark:border-white/5"
+            >
+              <div className="flex items-center gap-4">
+                <div className="bg-brand-gold/10 flex h-10 w-10 items-center justify-center rounded-xl">
+                  <Building2 className="text-brand-gold h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                    Shyam Aangan
+                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {shyamAanganCount}
+                  </h3>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
       </div>
 
       {/* Toolbar */}
@@ -391,78 +465,50 @@ export default function AllotmentRecordsPage() {
         </div>
       </div>
 
-      {/* Records Table glassmorphic container */}
+      {/* Records Table */}
       <div className="dark:bg-brand-dark-surface/65 relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 shadow-2xl backdrop-blur-xl transition-colors duration-300 dark:border-white/8">
-        {/* Subtle gold line on top */}
         <div className="via-brand-gold/40 absolute top-0 right-0 left-0 h-[1.5px] bg-gradient-to-r from-transparent to-transparent" />
 
         <div className="overflow-x-auto">
           {loading ? (
-            <table className="w-full font-sans text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-50/80 backdrop-blur-md transition-colors duration-300 dark:border-white/5 dark:bg-white/5">
-                  {[
-                    'Ticket ID',
-                    'Client Name',
-                    'Project',
-                    'Unit / Plot',
-                    'Area',
-                    'Total Cost',
-                    'Plan',
-                    'Date & Time',
-                    'Actions',
-                  ].map((h, idx) => (
-                    <th
-                      key={h}
-                      className={`px-6 py-5 text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase transition-colors duration-300 dark:text-gray-400 ${idx === 8 ? 'text-right' : 'text-left'}`}
-                    >
-                      <div
-                        className={`h-3 rounded bg-gray-200 dark:bg-white/5 ${idx === 8 ? 'ml-auto w-16' : 'w-24'}`}
-                      />
-                    </th>
+            <>
+              {/* Table header skeleton */}
+              <div className="animate-pulse border-b border-gray-200 bg-gray-50/80 px-6 py-5 dark:border-white/5 dark:bg-white/5">
+                <div className="flex items-center gap-4">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                    <SkeletonBlock key={i} className="h-3 w-24" />
                   ))}
-                </tr>
-              </thead>
-              <tbody className="divide-gray-150 divide-y dark:divide-white/5">
-                {[...Array(6)].map((_, i) => (
-                  <tr key={i}>
-                    <td className="px-6 py-4.5">
-                      <div className="h-4 w-12 rounded bg-gray-200 dark:bg-white/5" />
-                    </td>
-                    <td className="px-6 py-4.5">
-                      <div className="h-4 w-28 rounded bg-gray-200 dark:bg-white/5" />
-                    </td>
-                    <td className="px-6 py-4.5">
-                      <div className="h-4 w-20 rounded bg-gray-200 dark:bg-white/5" />
-                    </td>
-                    <td className="px-6 py-4.5">
-                      <div className="h-4 w-12 rounded bg-gray-200 dark:bg-white/5" />
-                    </td>
-                    <td className="px-6 py-4.5">
-                      <div className="h-4 w-16 rounded bg-gray-200 dark:bg-white/5" />
-                    </td>
-                    <td className="px-6 py-4.5">
-                      <div className="h-4 w-20 rounded bg-gray-200 dark:bg-white/5" />
-                    </td>
-                    <td className="px-6 py-4.5">
-                      <div className="h-4 w-16 rounded bg-gray-200 dark:bg-white/5" />
-                    </td>
-                    <td className="px-6 py-4.5">
-                      <div className="h-4 w-24 rounded bg-gray-200 dark:bg-white/5" />
-                    </td>
-                    <td className="px-6 py-4.5 text-right">
-                      <div className="ml-auto h-8 w-28 rounded bg-gray-200 dark:bg-white/5" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                </div>
+              </div>
+              <TableSkeleton />
+            </>
+          ) : error ? (
+            <div className="py-24 text-center font-sans">
+              <WifiOff className="mx-auto mb-4 h-12 w-12 text-red-400 dark:text-red-600" />
+              <p className="mb-2 text-sm font-medium text-red-500 dark:text-red-400">{error}</p>
+              <button
+                onClick={fetchAllotments}
+                className="text-brand-gold hover:text-brand-gold-light mx-auto mt-2 flex items-center gap-2 text-xs font-bold tracking-wider uppercase"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Retry
+              </button>
+            </div>
           ) : filteredAllotments.length === 0 ? (
             <div className="py-24 text-center font-sans">
-              <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400 transition-colors duration-300 dark:text-gray-700" />
-              <p className="text-sm font-medium text-gray-500 transition-colors duration-300 dark:text-gray-400">
-                {searchQuery ? 'No matches found.' : 'No allotment records generated yet.'}
+              <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-700" />
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                {searchQuery
+                  ? 'No matches found for your search.'
+                  : 'No allotment records generated yet.'}
               </p>
+              <Link
+                href="/admin/allotment-letter"
+                className="bg-brand-gold mt-4 inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-xs font-bold text-white uppercase shadow-md transition-all hover:bg-yellow-500"
+              >
+                <FileText className="h-3.5 w-3.5" />
+                Create New Allotment
+              </Link>
             </div>
           ) : (
             <table className="w-full font-sans text-sm">
@@ -592,7 +638,11 @@ export default function AllotmentRecordsPage() {
       {/* Delete Confirmation Modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-md dark:bg-black/85">
-          <div className="dark:bg-brand-dark-surface relative w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-white/10">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="dark:bg-brand-dark-surface relative w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-white/10"
+          >
             <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
               Delete Allotment Record
             </h3>
@@ -622,14 +672,18 @@ export default function AllotmentRecordsPage() {
                 Delete
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
 
       {/* View & Re-download overlay Modal */}
       {selectedAllotment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-md dark:bg-black/90">
-          <div className="dark:bg-brand-dark-surface relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-white/10">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="dark:bg-brand-dark-surface relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-white/10"
+          >
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-white/8">
               <div>
@@ -674,7 +728,7 @@ export default function AllotmentRecordsPage() {
               </div>
             </div>
 
-            {/* Modal Body with Scrollable Live Preview */}
+            {/* Modal Body */}
             <div className="flex-1 overflow-y-auto bg-gray-100 p-6 dark:bg-zinc-900/30">
               <AllotmentLetterPreview
                 id="modalAllotmentPreview"
@@ -683,7 +737,7 @@ export default function AllotmentRecordsPage() {
                 companyInfo={companyInfo}
               />
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </div>
