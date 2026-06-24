@@ -51,7 +51,7 @@ const Footer = memo(function Footer() {
                 {
                   icon: <FacebookIcon size={18} />,
                   label: 'Facebook',
-                  href: 'https://www.facebook.com/profile.php?id=61574028993364',
+                  href: 'https://www.facebook.com/profile.php?id=61590993533426',
                 },
                 {
                   icon: <InstagramIcon size={18} />,
