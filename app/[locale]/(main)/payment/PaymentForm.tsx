@@ -186,23 +186,15 @@ export default function PaymentForm() {
 
                 {/* IDBI Brand Header */}
                 <div className="mb-1.5 text-center font-sans text-[8px] font-bold tracking-widest uppercase opacity-95">
-                  Powered by
+                  Secure Gateway
                 </div>
 
                 {/* Double Border IDBI Box */}
                 <div className="mb-3 border border-white/95 bg-[#005c30] p-[2px]">
                   <div className="flex items-center justify-center border border-white/95 bg-[#005c30] px-3 py-1.5">
-                    <svg viewBox="0 0 100 100" className="mr-2 h-5 w-5 shrink-0">
-                      <circle cx="50" cy="50" r="46" fill="#e35205" />
-                      <circle cx="50" cy="30" r="7" fill="#ffffff" />
-                      <path d="M46 42h8v35h-8z" fill="#ffffff" />
-                      <path
-                        d="M50 42c-10 0-16 6-16 16v17h6V58c0-6 4-10 10-10s10 4 10 10v17h6V58c0-10-6-16-16-16z"
-                        fill="#ffffff"
-                      />
-                    </svg>
+                    <ShieldCheck className="mr-2 h-5 w-5 shrink-0 text-white" />
                     <span className="font-serif text-[14px] leading-none font-bold tracking-wider text-white">
-                      IDBI BANK
+                      VERIFIED SCANNER
                     </span>
                   </div>
                 </div>
@@ -286,7 +278,7 @@ export default function PaymentForm() {
                   {/* QR Code Container */}
                   <div className="border-gray-150 mb-2 flex aspect-square w-full items-center justify-center rounded-lg border bg-white p-1.5 shadow-sm">
                     <img
-                      src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=1000221207001410.7300007643@idbi&pn=SVI%20INFRA%20SOLUTIONS%20PVT.%20LTD."
+                      src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi%3A%2F%2Fpay%3Fpa%3D1000221207001410.7300007643%40idbi%26pn%3DSVI%20INFRA%20SOLUTIONS%20PVT.%20LTD."
                       alt="UPI QR Code"
                       className="aspect-square h-auto w-full object-contain"
                     />
@@ -420,17 +412,6 @@ export default function PaymentForm() {
                     <Copy size={18} className="text-gray-600" />
                   )}
                 </button>
-              </div>
-            </div>
-
-            <div className="flex flex-col space-y-1.5">
-              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                {t('bankBranch')}
-              </span>
-              <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-[#f8fafc] p-3.5 dark:border-gray-700 dark:bg-gray-800">
-                <span className="font-mono text-[13px] tracking-wider text-[#1e293b] dark:text-white">
-                  IDBI BANK
-                </span>
               </div>
             </div>
           </div>
