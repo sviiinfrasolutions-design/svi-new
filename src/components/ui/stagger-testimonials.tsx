@@ -9,16 +9,16 @@ import { useTranslations } from 'next-intl';
 const SQRT_5000 = Math.sqrt(5000);
 
 const testimonialImages = [
-  'https://ui-avatars.com/api/?name=Arjun&background=D4AF37&color=fff',
-  'https://ui-avatars.com/api/?name=Rohan&background=1e293b&color=fff',
-  'https://ui-avatars.com/api/?name=Priya&background=D4AF37&color=fff',
-  'https://ui-avatars.com/api/?name=Vikram&background=1e293b&color=fff',
-  'https://ui-avatars.com/api/?name=Ananya&background=D4AF37&color=fff',
-  'https://ui-avatars.com/api/?name=Karan&background=1e293b&color=fff',
-  'https://ui-avatars.com/api/?name=Amit&background=D4AF37&color=fff',
-  'https://ui-avatars.com/api/?name=Siddharth&background=1e293b&color=fff',
-  'https://ui-avatars.com/api/?name=Neha&background=D4AF37&color=fff',
-  'https://ui-avatars.com/api/?name=Kritika&background=1e293b&color=fff',
+  '/images/testimonials/client_male_1.png',
+  '/images/testimonials/client_male_2.png',
+  '/images/testimonials/client_female_1.png',
+  '/images/testimonials/client_male_3.png',
+  '/images/testimonials/client_female_2.png',
+  '/images/testimonials/client_male_1.png',
+  '/images/testimonials/client_male_2.png',
+  '/images/testimonials/client_male_3.png',
+  '/images/testimonials/client_female_3.png',
+  '/images/testimonials/client_female_1.png',
 ];
 
 const testimonials = [
