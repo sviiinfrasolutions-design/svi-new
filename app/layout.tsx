@@ -8,6 +8,7 @@ import { getLocale } from 'next-intl/server';
 
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import PwaRegister from '@/src/components/PwaRegister';
 import QueryProvider from '@/src/components/QueryProvider';
 import { ThemeScript } from '@/src/components/ThemeProvider';
 
@@ -107,6 +108,9 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: '#111827',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -211,12 +215,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
         <link rel="manifest" href="/manifest.json" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className={`${outfit.variable} ${playfair.variable}`} suppressHydrationWarning>
         <ThemeScript />
         <QueryProvider>{children}</QueryProvider>
         <Analytics />
         <SpeedInsights />
+        <PwaRegister />
       </body>
     </html>
   );

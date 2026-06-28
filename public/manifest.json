@@ -1,22 +1,41 @@
 {
-  "name": "SVI - Shiv Vardhan Infrastructure",
-  "short_name": "SVI",
-  "description": "Shiv Vardhan Infrastructure - Your trusted partner in real estate and infrastructure development",
+  "name": "SVI Infra Solutions — Premium Real Estate Developer",
+  "short_name": "SVI Infra",
+  "description": "Trusted real estate developer with 15+ years of experience. Premium residential and commercial properties in Jaipur, Noida, and DMIC corridors.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#1e40af",
+  "theme_color": "#111827",
   "orientation": "portrait-primary",
   "scope": "/",
-  "lang": "en-US",
-  "categories": ["business", "real estate", "infrastructure"],
-  "icons": [],
-  "screenshots": [
+  "lang": "en-IN",
+  "categories": ["business", "real estate", "construction", "property"],
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     {
-      "src": "/screenshots/home.png",
-      "sizes": "1280x720",
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
       "type": "image/png",
-      "form_factor": "wide"
+      "purpose": "maskable"
+    },
+    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicons/favicon_256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
     }
-  ]
+  ],
+  "screenshots": [],
+  "edge_side_panel": {
+    "preferred_width": 480
+  }
 }
