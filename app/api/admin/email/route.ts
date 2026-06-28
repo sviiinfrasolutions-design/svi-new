@@ -683,26 +683,58 @@ export async function POST(request: NextRequest) {
 
       const normalizedReplyTo = parseReplyTo(replyTo) || parseReplyTo(defaultReplyTo);
 
-      const result = await resend.emails.send({
+      // Resend limits `to`/`cc`/`bcc` to 50 items each — batch if needed
+      const MAX_RESEND_RECIPIENTS = 50;
+      const toList = Array.isArray(to) ? to : [to];
+      const ccList = cc ? (Array.isArray(cc) ? cc : [cc]) : [];
+      const bccList = bcc ? (Array.isArray(bcc) ? bcc : [bcc]) : [];
+
+      // Build the base send params (shared across batches)
+      const baseSendParams = {
         from: fromAddress,
-        to: Array.isArray(to) ? to : [to],
         subject,
         html: html || undefined,
         text: text || undefined,
         replyTo: normalizedReplyTo,
-        cc: cc ? (Array.isArray(cc) ? cc : [cc]) : undefined,
-        bcc: bcc ? (Array.isArray(bcc) ? bcc : [bcc]) : undefined,
         attachments: resendAttachments,
-        headers: inReplyTo
-          ? {
-              'In-Reply-To': inReplyTo,
-              References: inReplyTo,
-            }
-          : undefined,
-      });
+        headers: inReplyTo ? { 'In-Reply-To': inReplyTo, References: inReplyTo } : undefined,
+      };
 
-      if (result.error) {
-        return NextResponse.json({ error: result.error.message }, { status: 422 });
+      const batchCount = Math.max(
+        Math.ceil(toList.length / MAX_RESEND_RECIPIENTS),
+        Math.ceil(ccList.length / MAX_RESEND_RECIPIENTS),
+        Math.ceil(bccList.length / MAX_RESEND_RECIPIENTS),
+        1
+      );
+
+      const results = [];
+      for (let i = 0; i < batchCount; i++) {
+        const toChunk = toList.slice(i * MAX_RESEND_RECIPIENTS, (i + 1) * MAX_RESEND_RECIPIENTS);
+        const ccChunk = ccList.slice(i * MAX_RESEND_RECIPIENTS, (i + 1) * MAX_RESEND_RECIPIENTS);
+        const bccChunk = bccList.slice(i * MAX_RESEND_RECIPIENTS, (i + 1) * MAX_RESEND_RECIPIENTS);
+
+        if (toChunk.length === 0 && ccChunk.length === 0 && bccChunk.length === 0) break;
+
+        const { data: batchResult, error: batchError } = await resend.emails.send({
+          ...baseSendParams,
+          to: toChunk,
+          cc: ccChunk.length > 0 ? ccChunk : undefined,
+          bcc: bccChunk.length > 0 ? bccChunk : undefined,
+        });
+
+        if (batchError) {
+          results.push({ error: batchError.message, batch: i });
+        } else {
+          results.push({ id: batchResult?.id, batch: i });
+        }
+      }
+
+      const errors = results.filter((r) => r.error);
+      if (errors.length > 0 && errors.length === results.length) {
+        return NextResponse.json(
+          { error: `All batches failed. First error: ${errors[0].error}` },
+          { status: 422 }
+        );
       }
 
       try {
@@ -717,9 +749,11 @@ export async function POST(request: NextRequest) {
         console.error('Failed to create email sent notification:', notifErr);
       }
 
-      if (result.data?.id && Array.isArray(attachments) && attachments.length > 0) {
+      // Attach files to first successful batch's Resend ID
+      const firstSuccessId = results.find((r) => r.id)?.id;
+      if (firstSuccessId && Array.isArray(attachments) && attachments.length > 0) {
         await ensureAttachmentBucket();
-        const emailId = result.data.id;
+        const emailId = firstSuccessId;
         for (const att of attachments) {
           const buffer = Buffer.from(att.content, 'base64');
           const filePath = `${emailId}/${att.filename}`;
@@ -761,7 +795,12 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      return NextResponse.json({ success: true, id: result.data?.id });
+      return NextResponse.json({
+        success: true,
+        id: firstSuccessId,
+        batches: results.length,
+        errors: errors.length > 0 ? errors : undefined,
+      });
     }
 
     if (action === 'cancel') {

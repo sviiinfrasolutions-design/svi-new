@@ -48,6 +48,7 @@ export function HistoryTable({
             <thead className="border-b border-slate-200 bg-slate-50 text-[10px] font-bold tracking-widest text-slate-500 uppercase dark:border-white/10 dark:bg-black/40 dark:text-gray-400">
               <tr>
                 <th className="px-8 py-5">Campaign Name</th>
+                <th className="px-8 py-5">Campaign ID</th>
                 <th className="px-8 py-5">Date</th>
                 <th className="px-8 py-5">Status</th>
                 <th className="px-8 py-5">Winner Details</th>
@@ -61,6 +62,32 @@ export function HistoryTable({
                   className="transition-colors hover:bg-slate-50 dark:hover:bg-white/5"
                 >
                   <td className="px-8 py-5 font-bold text-slate-900 dark:text-white">{l.title}</td>
+                  <td className="px-8 py-5">
+                    <div className="flex items-center gap-1.5">
+                      <code className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[10px] text-slate-600 dark:bg-white/5 dark:text-gray-400">
+                        {l.id.substring(0, 12)}…
+                      </code>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(l.id)}
+                        className="inline-flex cursor-pointer items-center rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 active:scale-95 dark:hover:bg-white/10 dark:hover:text-gray-300"
+                        title="Copy Full ID"
+                      >
+                        <svg
+                          className="h-3.5 w-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
                   <td className="px-8 py-5 text-slate-500 dark:text-gray-400">
                     {new Date(l.created_at).toLocaleDateString()}
                   </td>
