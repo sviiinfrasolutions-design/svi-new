@@ -17,7 +17,6 @@ self.addEventListener('install', (event) => {
         '/about',
         '/contact',
         '/blog',
-        '/projects',
         '/projects/current',
         '/projects/completed',
         '/faq',
@@ -27,10 +26,26 @@ self.addEventListener('install', (event) => {
         '/manifest.json',
         '/logo.png',
       ];
-      // Cache individually so one 404 doesn't break the whole SW install
+      // Cache individually so one failure/redirect doesn't break the whole SW install
       await Promise.all(
         urls.map((url) =>
-          cache.add(url).catch((err) => console.warn(`SW cache failed for ${url}:`, err))
+          fetch(url)
+            .then(async (response) => {
+              if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+              }
+              let responseToCache = response;
+              if (response.redirected) {
+                const blob = await response.blob();
+                responseToCache = new Response(blob, {
+                  status: response.status,
+                  statusText: response.statusText,
+                  headers: response.headers,
+                });
+              }
+              return cache.put(url, responseToCache);
+            })
+            .catch((err) => console.warn(`SW cache failed for ${url}:`, err))
         )
       );
     }).then(() => self.skipWaiting())
@@ -147,6 +162,16 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET') return;
 
+  // Bypass service worker for videos, audio, and range requests (which return 206 status codes)
+  if (
+    request.destination === 'video' ||
+    request.destination === 'audio' ||
+    request.headers.has('range') ||
+    /\.(mp4|webm|ogg|mp3|wav|flac|aac)$/i.test(url.pathname)
+  ) {
+    return;
+  }
+
   // Cross-origin images: stale-while-revalidate
   if (url.origin !== location.origin && request.destination === 'image') {
     event.respondWith(staleWhileRevalidate(request));
@@ -193,7 +218,7 @@ async function cacheFirst(request, cacheName) {
   if (cached) return cached;
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    if (response.ok && response.status !== 206) {
       const cache = await caches.open(cacheName);
       cache.put(request, response.clone());
     }
@@ -207,7 +232,7 @@ async function cacheFirst(request, cacheName) {
 async function networkFirstNav(request) {
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    if (response.ok && response.status !== 206) {
       const cache = await caches.open(NAV_CACHE);
       cache.put(request, response.clone());
     }
@@ -225,7 +250,7 @@ async function staleWhileRevalidate(request) {
   const cached = await cache.match(request);
   const fetchPromise = fetch(request)
     .then((response) => {
-      if (response.ok) cache.put(request, response.clone());
+      if (response.ok && response.status !== 206) cache.put(request, response.clone());
       return response;
     })
     .catch(() => cached);
