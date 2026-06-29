@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
   Percent,
@@ -15,6 +16,8 @@ import {
   Building2,
   Star,
   Users,
+  Calculator,
+  Coins,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -51,6 +54,29 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function ExclusiveOffersClient() {
   const t = useTranslations('pages.exclusiveOffers');
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => { setIsMounted(true); }, []);
+
+  const [selectedSize, setSelectedSize] = useState('200 SQ. YRD.');
+  const [plotValue, setPlotValue] = useState(4000000); // ₹40 Lakhs default
+
+  const rates: { [key: string]: number } = {
+    '100 SQ. YRD.': 0.07,
+    '200 SQ. YRD.': 0.10,
+    '300 SQ. YRD.': 0.12,
+    '500 SQ. YRD.': 0.15,
+  };
+
+  const commissionRate = rates[selectedSize] || 0.07;
+  const estimatedCommission = plotValue * commissionRate;
+
+  const formatINR = (value: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   const benefits = [
     {
@@ -102,7 +128,7 @@ export default function ExclusiveOffersClient() {
   ];
 
   return (
-    <div className="bg-brand-navy min-h-screen text-white">
+    <div className="bg-brand-navy min-h-screen text-white" suppressHydrationWarning>
       {/* Hero Section */}
       <section className="relative flex min-h-[90dvh] items-center justify-start overflow-hidden pt-28 pb-16">
         {/* Background Image with Overlay */}
@@ -119,62 +145,176 @@ export default function ExclusiveOffersClient() {
           <div className="from-brand-navy to-brand-navy/50 absolute inset-0 bg-gradient-to-t via-transparent" />
         </div>
 
-        <div className="relative z-10 container mx-auto px-6 lg:px-8">
-          <div className="max-w-3xl">
-            {/* Trusted Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="border-brand-gold/30 bg-brand-gold/10 text-brand-gold inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-bold tracking-wider uppercase"
-            >
-              <Users className="h-4 w-4" />
-              <span>Trusted by 1000+ Families</span>
-            </motion.div>
-
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="mt-8 font-serif text-4xl leading-none font-extrabold tracking-tight text-white uppercase sm:text-5xl md:text-7xl"
-            >
-              Earn More <br />
-              <span className="text-brand-gold">Grow Together</span>
-            </motion.h1>
-
-            {/* Subtitles */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="border-brand-gold mt-6 border-l-2 pl-4 text-sm font-semibold tracking-[0.25em] text-gray-300 uppercase sm:text-base"
-            >
-              {t('description')}
-            </motion.p>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="text-brand-gold mt-4 font-sans text-base font-bold sm:text-lg"
-            >
-              BETTER PLOTS. HIGHER RETURNS. BIGGER BENEFITS FOR BROKERS.
-            </motion.p>
-
-            {/* CTA Arrow Down */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-              className="mt-12"
-            >
-              <a
-                href="#benefits"
-                className="hover:bg-brand-gold/20 border-brand-gold text-brand-gold inline-flex items-center justify-center rounded-full border px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:scale-105"
+        <div className="relative z-10 container mx-auto px-6 lg:px-8 w-full">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center">
+            {/* Left Column: Headline & Subtitles */}
+            <div className="lg:col-span-7 flex flex-col justify-center max-w-3xl">
+              {/* Trusted Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="border-brand-gold/30 bg-brand-gold/10 text-brand-gold inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-bold tracking-wider uppercase w-fit"
               >
-                Explore Exclusive Offers
-              </a>
+                <Users className="h-4 w-4" />
+                <span>Trusted by 1000+ Families</span>
+              </motion.div>
+
+              {/* Headline */}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="mt-8 font-serif text-4xl leading-none font-extrabold tracking-tight text-white uppercase sm:text-5xl md:text-6xl xl:text-7xl"
+              >
+                Earn More <br />
+                <span className="text-brand-gold">Grow Together</span>
+              </motion.h1>
+
+              {/* Subtitles */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="border-brand-gold mt-6 border-l-2 pl-4 text-sm font-semibold tracking-[0.25em] text-gray-300 uppercase sm:text-base"
+              >
+                {t('description')}
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="text-brand-gold mt-4 font-sans text-base font-bold sm:text-lg"
+              >
+                BETTER PLOTS. HIGHER RETURNS. BIGGER BENEFITS FOR BROKERS.
+              </motion.p>
+
+              {/* CTA Arrow Down */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+                className="mt-12"
+              >
+                <a
+                  href="#benefits"
+                  className="hover:bg-brand-gold/20 border-brand-gold text-brand-gold inline-flex items-center justify-center rounded-full border px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:scale-105"
+                >
+                  Explore Exclusive Offers
+                </a>
+              </motion.div>
+            </div>
+
+            {/* Right Column: Interactive Calculator Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="lg:col-span-5 w-full"
+            >
+              <div className="border-brand-gold/30 relative overflow-hidden rounded-2xl border bg-slate-900/80 p-6 shadow-2xl backdrop-blur-md sm:p-8">
+                {/* Gold Highlight Border Top */}
+                <div className="via-brand-gold absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent to-transparent" />
+                
+                <div className="flex items-center gap-2.5 mb-6">
+                  <div className="bg-brand-gold/10 border-brand-gold/20 flex h-10 w-10 items-center justify-center rounded-lg border">
+                    <Calculator className="text-brand-gold h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-brand-gold block text-[10px] font-bold tracking-[0.2em] uppercase">
+                      Broker Utility
+                    </span>
+                    <h3 className="font-serif text-lg font-bold text-white leading-tight">
+                      Commission Estimator
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Size selector tabs */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
+                      Select Plot Size
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.keys(rates).map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSize(size)}
+                          className={`px-3 py-2 text-xs font-bold rounded-lg border transition-all duration-300 ${
+                            selectedSize === size
+                              ? 'bg-brand-gold border-brand-gold text-brand-navy shadow-lg shadow-brand-gold/20'
+                              : 'border-white/10 bg-white/5 text-gray-300 hover:border-brand-gold/40 hover:bg-white/10'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Value Range Slider */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs font-bold text-gray-400">
+                      <span className="uppercase tracking-wider">Est. Sale Value</span>
+                      <span className="text-brand-gold font-sans font-bold text-sm">
+                        {formatINR(plotValue)}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={1000000}
+                      max={15000000}
+                      step={500000}
+                      value={plotValue}
+                      onChange={(e) => setPlotValue(Number(e.target.value))}
+                      className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand-gold outline-none"
+                    />
+                    <div className="flex justify-between text-[10px] text-gray-500 font-bold tracking-wider">
+                      <span>₹10 LAKH</span>
+                      <span>₹1.5 CRORE</span>
+                    </div>
+                  </div>
+
+                  {/* Progress towards max tier */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      <span>Commission Tier Progress</span>
+                      <span className="text-white">
+                        {(commissionRate * 100).toFixed(0)}% Rate
+                      </span>
+                    </div>
+                    <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                      <div
+                        className="h-full bg-gradient-to-r from-brand-gold/50 to-brand-gold transition-all duration-500 rounded-full"
+                        style={{ width: `${(commissionRate / 0.15) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Results box */}
+                  <div className="bg-brand-gold/5 border-brand-gold/20 rounded-xl border p-4 text-center">
+                    <span className="text-gray-400 text-xs font-bold tracking-wider uppercase block mb-1">
+                      Estimated Broker Payout
+                    </span>
+                    <span className="text-brand-gold font-serif text-3xl font-extrabold tracking-wide block transition-all duration-300">
+                      {formatINR(estimatedCommission)}
+                    </span>
+                  </div>
+
+                  {/* Claim Button */}
+                  <a
+                    href={`https://wa.me/917300007643?text=Hi%20SVI%20Infra,%20I'm%20a%20broker%20interested%20in%20a%20${selectedSize}%20plot%20with%20an%20estimated%20sale%20value%20of%20${formatINR(plotValue)}.%20I'd%20like%20to%20learn%20more%20about%20earning%20the%20${(commissionRate * 100).toFixed(0)}%25%20commission%20(${(formatINR(estimatedCommission))}).`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3.5 bg-brand-gold text-brand-navy font-bold rounded-xl hover:bg-brand-gold/90 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] shadow-lg shadow-brand-gold/10 text-sm uppercase tracking-wider"
+                  >
+                    <Coins className="h-4.5 w-4.5" />
+                    <span>Claim Your Commission</span>
+                  </a>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -204,13 +344,28 @@ export default function ExclusiveOffersClient() {
             <div className="via-brand-gold absolute inset-x-0 top-0 z-10 h-1 bg-gradient-to-r from-transparent to-transparent" />
 
             <div className="relative aspect-video w-full">
-              <video
-                src="/a svi 1.mp4"
-                controls
-                preload="metadata"
-                className="h-full w-full object-cover"
-                poster="/images/exclusive_offers_hero.png"
-              />
+              {isMounted ? (
+                <video
+                  src="/a svi 1.mp4"
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  className="h-full w-full object-cover"
+                  poster="/images/exclusive_offers_hero.png"
+                />
+              ) : (
+                <div
+                  className="h-full w-full bg-slate-900"
+                  style={{
+                    backgroundImage: 'url(/images/exclusive_offers_hero.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                />
+              )}
             </div>
           </motion.div>
         </div>
@@ -417,8 +572,8 @@ export default function ExclusiveOffersClient() {
                       className="flex items-center gap-5 rounded-2xl border border-white/10 bg-[#075e54]/10 p-5 transition-all hover:scale-[1.02] hover:border-[#25d366]/50"
                     >
                       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#25d366] text-white">
-                        <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24">
-                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.062 5.248 5.311 0 11.776 0c3.132.001 6.077 1.22 8.29 3.433 2.212 2.214 3.43 5.159 3.43 8.29 0 6.546-5.249 11.796-11.713 11.796-2.007-.001-3.97-.513-5.712-1.488L0 24zm6.49-4.22c1.642.975 3.254 1.486 4.903 1.488 5.4 0 9.794-4.393 9.797-9.793.002-2.616-1.015-5.074-2.862-6.92C16.536 2.709 14.08 1.69 11.47 1.69c-5.41 0-9.81 4.403-9.814 9.813 0 1.77.473 3.497 1.367 5.048L1.923 22.3l6.104-1.602c1.558.85 3.228 1.29 4.903 1.29zM17.56 18.06c-.326-.09-1.534-.757-1.77-.842-.236-.085-.407-.127-.578.127-.17.255-.66.842-.808 1.012-.148.17-.296.19-.622.02-.326-.17-1.378-.508-2.625-1.62-1.012-.903-1.694-2.02-1.892-2.36-.198-.34-.02-.523.15-.693.153-.153.326-.382.49-.573.163-.19.217-.327.326-.546.109-.218.055-.41-.027-.58-.083-.17-.707-1.702-.97-2.336-.256-.617-.516-.533-.707-.543-.183-.009-.393-.01-.602-.01-.209 0-.55.078-.838.393-.287.315-1.096 1.072-1.096 2.616 0 1.544 1.123 3.036 1.277 3.248.154.212 2.21 3.376 5.353 4.733.747.323 1.33.516 1.784.66.75.238 1.433.204 1.973.123.6-.09 1.534-.627 1.77-1.233.236-.607.236-1.127.165-1.23-.07-.105-.255-.17-.58-.327z" />
+                        <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                         </svg>
                       </div>
                       <div>
@@ -435,7 +590,7 @@ export default function ExclusiveOffersClient() {
                   {/* Right Column: QR Code scanning card */}
                   <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-6 text-center md:col-span-4">
                     <div className="border-brand-gold/20 relative mb-3 flex h-24 w-24 items-center justify-center rounded-lg border bg-[#0f172a] p-1.5">
-                      {}
+                      { }
                       <img
                         src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.sviinfrasolutions.com&color=d4af37&bgcolor=0f172a"
                         alt="SVI Infra Website QR Code"

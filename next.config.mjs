@@ -70,7 +70,7 @@ const nextConfig = {
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel-scripts.com https://www.googletagmanager.com https://js.hcaptcha.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://hcaptcha.com https://*.hcaptcha.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://maps.googleapis.com https://maps.gstatic.com https://images.unsplash.com https://www.google-analytics.com https://*.openstreetmap.org https://api.qrserver.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.groq.com https://api.resend.com https://www.google-analytics.com https://hcaptcha.com https://*.hcaptcha.com https://*.openstreetmap.org; frame-src 'self' https://newassets.hcaptcha.com https://js.hcaptcha.com; frame-ancestors 'none';",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel-scripts.com https://www.googletagmanager.com https://js.hcaptcha.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://hcaptcha.com https://*.hcaptcha.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://maps.googleapis.com https://maps.gstatic.com https://images.unsplash.com https://www.google-analytics.com https://*.openstreetmap.org https://api.qrserver.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.groq.com https://api.resend.com https://www.google-analytics.com https://hcaptcha.com https://*.hcaptcha.com https://*.openstreetmap.org https://api.qrserver.com; frame-src 'self' https://newassets.hcaptcha.com https://js.hcaptcha.com; frame-ancestors 'none';",
           },
         ],
       },
@@ -93,7 +93,7 @@ const nextConfig = {
     ],
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [320, 420, 768, 1024, 1200, 1920],
-    qualities: [75, 85, 90, 100],
+    qualities: [75, 85, 90, 95, 100],
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },
 };
