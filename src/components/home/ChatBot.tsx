@@ -23,6 +23,7 @@ import FormattedText from '@/src/components/home/FormattedText';
 import QuickActions from '@/src/components/home/QuickActions';
 import LeadCapture from '@/src/components/home/LeadCapture';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 const STORAGE_KEY = 'svi-chat-history';
 
@@ -83,6 +84,17 @@ export default function ChatBot() {
   const [sessionId] = useState(generateSessionId);
   const [isListening, setIsListening] = useState(false);
   const [typingDots, setTypingDots] = useState('');
+  const [hasSpeechSupport, setHasSpeechSupport] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        setHasSpeechSupport(true);
+      }
+    }
+  }, []);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -227,7 +239,11 @@ export default function ChatBot() {
 
   // ─── Voice Input ───────────────────────────────────────────────────────
   const toggleVoice = useCallback(() => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    if (typeof window === 'undefined') return;
+    const SpeechRecognitionAPI =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) {
+      toast.error(t('voiceNotSupported') || 'Speech recognition is not supported in this browser.');
       return;
     }
 
@@ -237,26 +253,53 @@ export default function ChatBot() {
       return;
     }
 
-    const SpeechRecognitionAPI =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognitionAPI();
-    recognition.lang = 'en-IN';
+    const isHindi = window.location.pathname.includes('/hi');
+    recognition.lang = isHindi ? 'hi-IN' : 'en-IN';
     recognition.continuous = false;
     recognition.interimResults = false;
 
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
-      setInput((prev) => prev + transcript);
+      setInput((prev) => prev + (prev.endsWith(' ') || prev === '' ? '' : ' ') + transcript);
       setIsListening(false);
     };
 
-    recognition.onerror = () => setIsListening(false);
-    recognition.onend = () => setIsListening(false);
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+
+      if (event.error === 'not-allowed') {
+        toast.error(
+          t('voiceNotAllowed') ||
+            'Microphone permission denied. Please allow access in browser settings.'
+        );
+      } else if (event.error === 'no-speech') {
+        toast.error(
+          t('voiceNoSpeech') || 'No speech detected. Please speak clearly into your microphone.'
+        );
+      } else if (event.error === 'audio-capture') {
+        toast.error(
+          t('voiceAudioCapture') || 'No microphone detected. Please connect a microphone.'
+        );
+      } else {
+        toast.error(t('voiceError') || `Speech recognition error: ${event.error}`);
+      }
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
 
     recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
-  }, [isListening]);
+    try {
+      recognition.start();
+      setIsListening(true);
+    } catch (err) {
+      console.error('Failed to start speech recognition:', err);
+      setIsListening(false);
+    }
+  }, [isListening, t]);
 
   // ─── Feedback ──────────────────────────────────────────────────────────
   const handleFeedback = useCallback((messageId: string, type: 'up' | 'down') => {
@@ -504,13 +547,13 @@ export default function ChatBot() {
             >
               <div className="flex items-center gap-2">
                 {/* Voice Input */}
-                {'webkitSpeechRecognition' in window || 'SpeechRecognition' in window ? (
+                {hasSpeechSupport ? (
                   <button
                     type="button"
                     onClick={toggleVoice}
                     className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all ${
                       isListening
-                        ? 'bg-red-500 text-white hover:bg-red-600'
+                        ? 'animate-pulse bg-red-500 text-white hover:bg-red-600'
                         : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300'
                     }`}
                     aria-label={isListening ? 'Stop recording' : 'Voice input'}

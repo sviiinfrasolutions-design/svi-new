@@ -160,6 +160,11 @@
     "error": "Something went wrong. Please try again.",
     "placeholder": "Ask about our properties...",
     "footer": "Powered by SVI Infra Solutions · AI responses may vary",
+    "voiceNotSupported": "Speech recognition is not supported in this browser.",
+    "voiceNotAllowed": "Microphone permission denied. Please allow access in browser settings.",
+    "voiceNoSpeech": "No speech detected. Please speak clearly into your microphone.",
+    "voiceAudioCapture": "No microphone detected. Please connect a microphone.",
+    "voiceError": "Voice input error. Please try again.",
     "suggestions": {
       "default1": "What projects do you have in Jaipur?",
       "default2": "Tell me about Phulera Smart City",
