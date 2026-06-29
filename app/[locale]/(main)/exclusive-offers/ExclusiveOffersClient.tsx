@@ -55,8 +55,27 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function ExclusiveOffersClient() {
   const t = useTranslations('pages.exclusiveOffers');
   const [isMounted, setIsMounted] = useState(false);
+  const [videoSrc, setVideoSrc] = useState('/a svi 1.mp4');
+
   useEffect(() => {
     setIsMounted(true);
+
+    // Detect slow network connections and fall back to low quality if available
+    if (typeof window !== 'undefined') {
+      const conn =
+        (navigator as any).connection ||
+        (navigator as any).mozConnection ||
+        (navigator as any).webkitConnection;
+      if (conn) {
+        const isSlow =
+          conn.saveData ||
+          ['slow-2g', '2g', '3g'].includes(conn.effectiveType) ||
+          (conn.downlink && conn.downlink < 2.0); // Connection speed under 2 Mbps
+        if (isSlow) {
+          setVideoSrc('/a svi 1_low.mp4');
+        }
+      }
+    }
   }, []);
 
   const [selectedSize, setSelectedSize] = useState('200 SQ. YRD.');
@@ -346,15 +365,21 @@ export default function ExclusiveOffersClient() {
             <div className="relative aspect-video w-full">
               {isMounted ? (
                 <video
-                  src="/a svi 1.mp4"
+                  src={videoSrc}
                   controls
                   autoPlay
                   muted
                   loop
                   playsInline
                   preload="metadata"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full bg-slate-950 object-contain"
                   poster="/images/exclusive_offers_hero.png"
+                  onError={() => {
+                    // Fall back to high quality if the low quality video fails to load
+                    if (videoSrc !== '/a svi 1.mp4') {
+                      setVideoSrc('/a svi 1.mp4');
+                    }
+                  }}
                 />
               ) : (
                 <div
