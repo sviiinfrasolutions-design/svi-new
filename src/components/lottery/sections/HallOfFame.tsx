@@ -17,6 +17,11 @@ export function HallOfFame({
 }: HallOfFameProps) {
   const t = useTranslations('pages.lottery');
 
+  // Sort participants alphabetically by name
+  const sortedWinners = [...historicalWinners].sort((a, b) =>
+    (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' })
+  );
+
   return (
     <div className="relative flex flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl backdrop-blur-xl transition-colors duration-500 dark:border-[#D4AF37]/10 dark:bg-gradient-to-b dark:from-[#0B1120] dark:to-[#0d1526] dark:shadow-[0_0_40px_rgba(212,175,55,0.04)]">
       <div className="mb-6 flex items-center justify-between">
@@ -52,7 +57,7 @@ export function HallOfFame({
       )}
 
       <div className="custom-scrollbar max-h-[480px] space-y-3 overflow-y-auto pr-2">
-        {historicalWinners.slice(0, visibleCount).map((hw: any, idx: number) => {
+        {sortedWinners.slice(0, visibleCount).map((hw: any, idx: number) => {
           const isWinner = hw.is_winner;
           return (
             <motion.div
@@ -86,7 +91,7 @@ export function HallOfFame({
                       : 'text-slate-400 dark:text-slate-500'
                   }`}
                 >
-                  {isWinner ? t('winners') : t('betterLuck')}
+                  {isWinner ? t('winners') : t('participant')}
                 </div>
               </div>
               <div className="text-right">

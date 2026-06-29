@@ -929,6 +929,7 @@
       "clients": "क्लाइंट",
       "secure": "सुरक्षित",
       "winners": "विजेता",
+      "participant": "प्रतिभागी",
       "officialWinner": "आधिकारिक विजेता",
       "officialWinners": "{count} आधिकारिक विजेता",
       "winnerNumber": "विजेता #{index} का {total}",

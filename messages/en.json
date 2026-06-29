@@ -929,6 +929,7 @@
       "clients": "Clients",
       "secure": "Secure",
       "winners": "Winners",
+      "participant": "Participant",
       "officialWinner": "Official Winner",
       "officialWinners": "{count} Official Winners",
       "winnerNumber": "Winner #{index} of {total}",

@@ -84,7 +84,6 @@ export function useLotteryData(): UseLotteryDataReturn {
         .from('lottery_participants')
         .select('name, ticket_number, is_winner, created_at')
         .eq('lottery_id', lotteryData[0].id)
-        .eq('is_winner', true)
         .order('created_at', { ascending: true });
 
       if (!error && data) {
